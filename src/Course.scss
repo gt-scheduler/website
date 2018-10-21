@@ -1,0 +1,170 @@
+.Course {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  color: white;
+
+  .course-header {
+    display: flex;
+    flex-direction: column;
+    margin: -8px;
+    padding: 8px;
+    cursor: pointer;
+
+    .row {
+      display: flex;
+      align-items: center;
+
+      .course_id {
+        flex: 1;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      .section_ids {
+        font-weight: bold;
+        margin-right: 8px;
+      }
+    }
+
+    .row {
+      .course_title {
+        flex: 1;
+        font-size: .8em;
+        margin-right: 8px;
+      }
+
+      .toggle {
+        width: 1em;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+
+    .section {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      color: rgba(white, .5);
+      cursor: pointer;
+
+      &.excluded {
+        .exclude {
+          color: white;
+        }
+
+        &:before {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 1em;
+          height: 1px;
+          background-color: white;
+        }
+      }
+
+      &.pinned {
+        color: white;
+
+        .pin {
+          color: white;
+        }
+      }
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: white;
+        opacity: .2;
+      }
+
+      .section-header {
+        display: flex;
+
+        .section_id {
+          flex: 1;
+          font-weight: bold;
+          margin-right: 8px;
+        }
+
+        .instructors {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .meetings {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin-left: 24px;
+        margin-top: 8px;
+
+        .meeting {
+          display: flex;
+          justify-content: flex-end;
+
+          .days {
+            font-size: .8em;
+            margin-right: 8px;
+          }
+
+          .period {
+            font-size: .8em;
+            min-width: 8em;
+          }
+        }
+      }
+
+      &:hover > .actions {
+        display: flex;
+      }
+    }
+  }
+
+  .actions {
+    position: relative;
+    display: none;
+    margin: 8px -8px -8px;
+
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: white;
+      opacity: .2;
+    }
+
+    div {
+      text-align: center;
+      font-weight: bold;
+      flex: 1;
+      padding: 8px;
+      cursor: pointer;
+      color: rgba(white, .5);
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+
+  .section-actions {
+    display: flex;
+  }
+}

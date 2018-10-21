@@ -1,0 +1,67 @@
+@import "variables";
+
+.App {
+  display: flex;
+  height: 100vh;
+
+  .container {
+    flex: 1;
+    overflow-y: scroll;
+    display: flex;
+    justify-content: center;
+  }
+
+  .sidebar {
+    width: 240px;
+    overflow-y: scroll;
+
+    .title {
+      padding: 8px;
+      font-weight: bold;
+      font-size: 1.2em;
+      background-color: $color-light;
+    }
+
+    .course-add {
+      display: flex;
+      flex-direction: column;
+
+      .keyword {
+        padding: 8px;
+        border: 1px solid $color-dark;
+        font-size: inherit;
+      }
+
+      .courses {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .combinations {
+      display: flex;
+      flex-direction: column;
+
+      .combination {
+        display: flex;
+
+        .number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: $color-dark;
+          width: 2em;
+          color: white;
+          font-size: .8em;
+          font-weight: bold;
+        }
+
+        .preview {
+          flex: 1;
+          cursor: pointer;
+          border-bottom: 1px solid $color-dark;
+        }
+      }
+    }
+  }
+}

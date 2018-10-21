@@ -1,0 +1,61 @@
+.Section {
+  &.overlay {
+    .meeting {
+      opacity: .5;
+    }
+  }
+
+  .meeting {
+    position: absolute;
+    width: 20%;
+    height: 100px;
+    background-color: green;
+    opacity: .8;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .meeting-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      padding: 0 8px;
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: .72em;
+        color: white;
+        flex-shrink: 0;
+      }
+
+      .course_id {
+        font-weight: bold;
+        font-size: .8em;
+      }
+    }
+
+    &.M {
+      left: 0;
+    }
+
+    &.T {
+      left: 20%;
+    }
+
+    &.W {
+      left: 40%;
+    }
+
+    &.R {
+      left: 60%;
+    }
+
+    &.F {
+      left: 80%;
+    }
+  }
+}

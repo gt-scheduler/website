@@ -1,0 +1,90 @@
+@import "variables";
+
+.Calendar {
+  flex: 1;
+  max-width: 1024px;
+  position: relative;
+  height: $calendar-height;
+  margin: $day-height 24px 24px $time-width;
+  background-color: $color-lighter;
+  border-bottom: 1px solid $color-light;
+  border-right: 1px solid $color-light;
+
+  &.preview {
+    margin: 0;
+    height: 80px;
+  }
+
+  .times {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -$time-width;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+
+    .time {
+      position: relative;
+      flex: 1;
+      margin-top: -.5em;
+
+      .label {
+        display: block;
+        width: $time-width;
+        padding-right: 8px;
+        font-size: .8em;
+        font-weight: bold;
+        text-align: right;
+      }
+
+      &:after {
+        content: '';
+        position: absolute;
+        left: $time-width;
+        right: 0;
+        top: .5em;
+        height: 1px;
+        background-color: $color-light;
+      }
+    }
+  }
+
+  .days {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -$day-height;
+    bottom: 0;
+    display: flex;
+
+    .day {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        height: $day-height;
+        font-size: 1em;
+        font-weight: bold;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 8px;
+      }
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: $day-height;
+        bottom: 0;
+        width: 1px;
+        background-color: $color-light;
+      }
+    }
+  }
+
+  .meetings {
+  }
+}
