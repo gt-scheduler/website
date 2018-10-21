@@ -1,0 +1,13 @@
+{
+  "main.css": "/gatech-scheduler/static/css/main.7e5f575d.chunk.css",
+  "main.js": "/gatech-scheduler/static/js/main.54c8fbaf.chunk.js",
+  "main.js.map": "/gatech-scheduler/static/js/main.54c8fbaf.chunk.js.map",
+  "static/js/1.493bcf30.chunk.js": "/gatech-scheduler/static/js/1.493bcf30.chunk.js",
+  "static/js/1.493bcf30.chunk.js.map": "/gatech-scheduler/static/js/1.493bcf30.chunk.js.map",
+  "runtime~main.js": "/gatech-scheduler/static/js/runtime~main.1dee46cd.js",
+  "runtime~main.js.map": "/gatech-scheduler/static/js/runtime~main.1dee46cd.js.map",
+  "static/css/main.7e5f575d.chunk.css.map": "/gatech-scheduler/static/css/main.7e5f575d.chunk.css.map",
+  "index.html": "/gatech-scheduler/index.html",
+  "precache-manifest.559478e996da181b9a024a00e1e18245.js": "/gatech-scheduler/precache-manifest.559478e996da181b9a024a00e1e18245.js",
+  "service-worker.js": "/gatech-scheduler/service-worker.js"
+}
