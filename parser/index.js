@@ -2,15 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const HTMLParser = require('fast-html-parser');
 
-const html = fs.readFileSync(path.resolve(__dirname, 'crawled.html'), 'utf8').replace(/CLASS=/g, 'class=');
+const html = fs.readFileSync(path.resolve(__dirname, 'crawled.html'), 'utf8');
 const dom = HTMLParser.parse(html);
 
-const rows = dom.querySelector('.datadisplaytable').childNodes.filter(node => node.tagName === 'tr');
+const rows = dom.querySelector('.datadisplaytable tbody').childNodes.filter(node => node.tagName === 'tr');
 
 const courses = {};
 while (rows.length) {
   const headerRow = rows.shift();
+  console.log(headerRow);
   const bodyRow = rows.shift();
+  console.log(bodyRow);
 
   const titleTokens = headerRow.querySelector('a').rawText.split(' - ');
   const sectionId = titleTokens.pop();
