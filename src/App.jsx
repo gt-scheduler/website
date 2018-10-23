@@ -98,7 +98,11 @@ class App extends Component {
             course.lectures = sections.filter(section => section.scheduleType === TYPE_LECTURE);
             course.labs = sections.filter(section => section.scheduleType === TYPE_LAB);
             course.lectures.forEach(lecture => lecture.labs = course.labs.filter(lab => lab.id.startsWith(lecture.id)));
-            course.labs.forEach(lab => lab.lecture = course.lectures.find(lecture => lab.id.startsWith(lecture.id)));
+            course.labs.forEach(lab => lab.lectures = course.lectures.filter(lecture => lab.id.startsWith(lecture.id)));
+            if (course.lectures.every(lecture => !lecture.labs.length)) {
+              course.lectures.forEach(lecture => lecture.labs = course.labs);
+              course.labs.forEach(lab => lab.lectures = course.lectures);
+            }
           } else {
             course.sectionGroups = distinct(sections);
           }
@@ -146,14 +150,14 @@ class App extends Component {
           const pinnedLabs = course.labs.filter(isPinned);
           if (pinnedLabs.length) {
             pinnedLabs.forEach(lab => {
-              const { lecture } = lab;
-              if (!lecture) return;
-              if (isPinned(lecture)) {
-                dfs(courseIndex + 1, combination);
-              } else {
-                if (!isIncluded(lecture) || hasConflict(lecture)) return;
-                dfs(courseIndex + 1, [...combination, lecture.crn]);
-              }
+              lab.lectures.filter(isIncluded).forEach(lecture => {
+                if (isPinned(lecture)) {
+                  dfs(courseIndex + 1, combination);
+                } else {
+                  if (hasConflict(lecture)) return;
+                  dfs(courseIndex + 1, [...combination, lecture.crn]);
+                }
+              });
             });
           } else if (pinnedLectures.length) {
             pinnedLectures.forEach(lecture => {
