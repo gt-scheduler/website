@@ -18,6 +18,7 @@
   .capture-container {
     position: absolute;
     left: 100vw;
+    background-color: white;
 
     .fake-calendar {
       width: $calendar-width;
@@ -32,14 +33,18 @@
     width: 240px;
     border-left: 1px solid $color-dark;
 
+    > * {
+      border-bottom: 1px solid $color-dark;
+    }
+
     .title {
+      flex-shrink: 0;
       padding: 8px;
       font-weight: bold;
       font-size: 1.2em;
       background-color: $color-light;
       display: flex;
       align-items: center;
-      border-bottom: 1px solid $color-dark;
 
       .primary {
         flex: 1;
@@ -59,15 +64,10 @@
       font-weight: bold;
       background-color: $color-light;
       color: $color-darker;
-      border-bottom: 1px solid $color-dark;
       cursor: pointer;
 
       &:hover {
         color: black;
-      }
-
-      &:last-child {
-        border-bottom: none;
       }
     }
 
@@ -77,31 +77,100 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      border-bottom: 1px solid $color-dark;
 
-      > * {
+      .courses-container {
         flex-shrink: 0;
-        border-bottom: 1px solid $color-dark;
-      }
-
-      .courses {
         display: flex;
         flex-direction: column;
-      }
+        align-items: stretch;
 
-      .course-add {
-        display: flex;
-        flex-direction: column;
-
-        .keyword {
-          padding: 8px;
-          border: none;
-          font-size: inherit;
+        > * {
+          border-bottom: 1px solid $color-dark;
         }
 
-        .autocomplete {
+        .course-list {
           display: flex;
           flex-direction: column;
+        }
+
+        .course-add {
+          display: flex;
+          flex-direction: column;
+
+          .keyword {
+            padding: 8px;
+            border: none;
+            font-size: inherit;
+          }
+
+          .autocomplete {
+            display: flex;
+            flex-direction: column;
+          }
+        }
+      }
+
+      .combinations-container {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        > * {
+          border-bottom: 1px solid $color-dark;
+        }
+      }
+    }
+  }
+
+  &.mobile {
+    flex-direction: column;
+
+    .sidebar {
+      flex: 1;
+      width: auto;
+      border-left: none;
+
+      .tab-container {
+        flex-shrink: 0;
+        display: flex;
+        border-bottom: none;
+
+        .tab {
+          flex: 1;
+          padding: 16px;
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          border-right: 1px solid $color-dark;
+          font-weight: bold;
+          background-color: $color-lighter;
+          color: $color-darker;
+          cursor: pointer;
+          border-bottom: 1px solid $color-dark;
+
+          &.active {
+            background-color: $color-light;
+            color: black;
+            border-top: 1px solid $color-dark;
+            border-bottom: none;
+          }
+
+          &:last-child {
+            border-right: none;
+          }
+        }
+      }
+
+      .scroller {
+        .calendar-container,
+        .courses-container,
+        .combinations-container {
+          display: none;
+
+          &.active {
+            display: flex;
+          }
         }
       }
     }

@@ -11,6 +11,10 @@ class Calendar extends Component {
     return (
       <div className={classes('Calendar', preview && 'preview', className)}>
         {
+          preview &&
+          <img className="ratio" src="5x2.png"/>
+        }
+        {
           !preview &&
           <div className="times">
             {

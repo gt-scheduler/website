@@ -12,8 +12,15 @@
 
   &.preview {
     margin: 0;
-    height: 80px;
+    height: auto;
     border: none;
+  }
+
+  .ratio {
+    display: block;
+    visibility: hidden;
+    width: 100%;
+    height: auto;
   }
 
   .times {

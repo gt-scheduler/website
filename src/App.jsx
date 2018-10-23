@@ -4,11 +4,11 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
 import './App.scss';
-import { getRandomColor, hasConflictBetween, stringToTime } from './utils';
+import { classes, getRandomColor, hasConflictBetween, stringToTime } from './utils';
 import Course from './Course';
 import Calendar from './Calendar';
 import Cookies from 'js-cookie';
-import { IMAGE_WIDTH, PNG_SCALE_FACTOR, TYPE_LAB, TYPE_LECTURE } from './constants';
+import { PNG_SCALE_FACTOR, TYPE_LAB, TYPE_LECTURE } from './constants';
 import Combinations from './Combinations';
 
 class App extends Component {
@@ -24,11 +24,14 @@ class App extends Component {
       overlayCrns: [],
       keyword: '',
       loaded: false,
+      tabIndex: 0,
+      mobile: this.isMobile(),
     };
 
     this.captureRef = React.createRef();
     this.inputRef = React.createRef();
 
+    this.handleResize = this.handleResize.bind(this);
     this.handleSetPinnedCrns = this.handleSetPinnedCrns.bind(this);
     this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
     this.handleAddCourse = this.handleAddCourse.bind(this);
@@ -60,7 +63,7 @@ class App extends Component {
       return groups;
     };
 
-    axios.get(`./courses.json`)
+    axios.get('./courses.json')
       .then(res => {
         const crns = {};
         const courses = res.data;
@@ -117,6 +120,12 @@ class App extends Component {
         this.crns = crns;
         this.updateCombinations({ loaded: true });
       });
+
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   saveData({ desiredCourses = [], pinnedCrns = [], excludedCrns = [] }) {
@@ -200,6 +209,20 @@ class App extends Component {
 
   searchCourses(keyword) {
     return Object.values(this.courses).filter(course => course.id.startsWith(keyword.toUpperCase()));
+  }
+
+  getTotalCredits() {
+    const { pinnedCrns } = this.state;
+    return pinnedCrns.reduce((credits, crn) => credits + this.crns[crn].credits, 0);
+  }
+
+  isMobile() {
+    return window.innerWidth < 768;
+  }
+
+  handleResize(e) {
+    const mobile = this.isMobile();
+    this.setState({ mobile });
   }
 
   handleRemoveCourse(course) {
@@ -291,70 +314,101 @@ class App extends Component {
     }).then(blob => saveAs(blob, 'schedule.png'));
   }
 
+  handleChangeTab(tabIndex) {
+    this.setState({ tabIndex });
+  }
+
   render() {
-    const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, keyword, loaded } = this.state;
+    const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, keyword, loaded, tabIndex, mobile } = this.state;
 
     return loaded && (
-      <div className="App">
-        <div className="calendar-container">
-          <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
-        </div>
+      <div className={classes('App', mobile && 'mobile')}>
+        {
+          !mobile &&
+          <div className="calendar-container">
+            <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
+          </div>
+        }
         <div className="capture-container" ref={this.captureRef}>
           <Calendar className="fake-calendar" pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
         </div>
         <div className="sidebar">
+          {
+            mobile &&
+            <div className="tab-container">
+              {
+                ['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
+                  <div className={classes('tab', tabIndex === i && 'active')} onClick={() => this.handleChangeTab(i)}
+                       key={i}>
+                    {tabTitle}
+                  </div>
+                ))
+              }
+            </div>
+          }
           <div className="title">
             <span className="primary">Spring 2019</span>
             <span className="secondary">
-              {pinnedCrns.reduce((credits, crn) => credits + this.crns[crn].credits, 0)} Credits
+              {this.getTotalCredits()} Credits
             </span>
           </div>
           <div className="scroller">
-            {
-              pinnedCrns.length > 0 &&
-              <CopyToClipboard className="button" text={pinnedCrns.join(', ')}>
-                <span>{pinnedCrns.join(', ')}</span>
-              </CopyToClipboard>
-            }
-            <div className="courses">
+            <div className={classes('courses-container', tabIndex === 0 && 'active')}>
               {
-                desiredCourses.map(courseId => {
-                  const course = this.courses[courseId];
-                  return (
-                    <Course course={course} expandable key={course.id}
-                            onRemove={this.handleRemoveCourse}
-                            onTogglePinned={this.handleTogglePinned}
-                            onToggleExcluded={this.handleToggleExcluded}
-                            onSetOverlayCrns={this.handleSetOverlayCrns}
-                            pinnedCrns={pinnedCrns}
-                            excludedCrns={excludedCrns}/>
-                  );
-                })
+                pinnedCrns.length > 0 &&
+                <CopyToClipboard className="button" text={pinnedCrns.join(', ')}>
+                  <span>{pinnedCrns.join(', ')}</span>
+                </CopyToClipboard>
               }
-            </div>
-            <div className="course-add">
-              <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
-                     className="keyword"
-                     placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
-              <div className="autocomplete">
+              <div className="course-list">
                 {
-                  keyword &&
-                  this.searchCourses(keyword).slice(0, 10).map(course => (
-                    <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
-                            pinnedCrns={pinnedCrns}/>
-                  ))
+                  desiredCourses.map(courseId => {
+                    const course = this.courses[courseId];
+                    return (
+                      <Course course={course} expandable key={course.id}
+                              onRemove={this.handleRemoveCourse}
+                              onTogglePinned={this.handleTogglePinned}
+                              onToggleExcluded={this.handleToggleExcluded}
+                              onSetOverlayCrns={this.handleSetOverlayCrns}
+                              pinnedCrns={pinnedCrns}
+                              excludedCrns={excludedCrns}/>
+                    );
+                  })
                 }
               </div>
+              <div className="course-add">
+                <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
+                       className="keyword"
+                       placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
+                <div className="autocomplete">
+                  {
+                    keyword &&
+                    this.searchCourses(keyword).slice(0, 10).map(course => (
+                      <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
+                              pinnedCrns={pinnedCrns}/>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+            <div className={classes('combinations-container', tabIndex === 1 && 'active')}>
+              {
+                pinnedCrns.length > 0 &&
+                <div className="button" onClick={() => this.handleSetPinnedCrns([])}>
+                  Reset Sections
+                </div>
+              }
+              <Combinations className="combinations" combinations={combinations}
+                            crns={this.crns} pinnedCrns={pinnedCrns}
+                            onSetOverlayCrns={this.handleSetOverlayCrns}
+                            onSetPinnedCrns={this.handleSetPinnedCrns}/>
             </div>
             {
-              pinnedCrns.length > 0 &&
-              <div className="button" onClick={() => this.handleSetPinnedCrns([])}>
-                Reset Sections
+              mobile &&
+              <div className={classes('mobile', 'calendar-container', tabIndex === 2 && 'active')}>
+                <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
               </div>
             }
-            <Combinations className="combinations" combinations={combinations} crns={this.crns} pinnedCrns={pinnedCrns}
-                          onSetOverlayCrns={this.handleSetOverlayCrns}
-                          onSetPinnedCrns={this.handleSetPinnedCrns}/>
           </div>
           <div className="button" onClick={this.handleDownload}>
             Download as PNG

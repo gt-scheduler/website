@@ -2,11 +2,14 @@
 
 .Combinations {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  margin-bottom: -1px;
 
   .combination {
+    flex: 1 0 160px;
     display: flex;
-    border-bottom: 2px solid $color-dark;
+    border-top: 1px solid $color-dark;
+    border-bottom: 1px solid $color-dark;
 
     .number {
       display: flex;
@@ -22,10 +25,6 @@
     .preview {
       flex: 1;
       cursor: pointer;
-    }
-
-    &:last-child {
-      border-bottom: none;
     }
   }
 }
