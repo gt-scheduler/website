@@ -1,15 +1,27 @@
 @import "variables";
 
 .App {
+  position: relative;
   display: flex;
   align-items: stretch;
+  width: 100vw;
   height: 100vh;
+  overflow: hidden;
 
   .calendar-container {
     flex: 1;
     overflow-y: scroll;
     display: flex;
     justify-content: center;
+  }
+
+  .capture-container {
+    position: absolute;
+    left: 100vw;
+
+    .fake-calendar {
+      width: $calendar-width;
+    }
   }
 
   .sidebar {

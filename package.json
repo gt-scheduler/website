@@ -5,7 +5,9 @@
   "homepage": "https://jasonpark.me/gt-scheduler",
   "dependencies": {
     "axios": "^0.18.0",
+    "dom-to-image": "^2.6.0",
     "fast-html-parser": "^1.0.1",
+    "file-saver": "^2.0.0-rc.4",
     "js-cookie": "^2.2.0",
     "node-sass": "^4.9.4",
     "react": "^16.5.2",

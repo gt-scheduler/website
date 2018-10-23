@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './Section.scss';
-import { classes, periodToString } from './util';
-import { close, open } from './config';
+import { classes, periodToString } from './utils';
+import { CLOSE, OPEN } from './constants';
 
 class Section extends Component {
   render() {
@@ -14,8 +14,8 @@ class Section extends Component {
             meeting.days.map(day => (
               <div className={`meeting ${day}`} key={[i, day].join('-')}
                    style={{
-                     top: (meeting.period.start - open) / (close - open) * 100 + '%',
-                     height: (meeting.period.end - meeting.period.start) / (close - open) * 100 + '%',
+                     top: (meeting.period.start - OPEN) / (CLOSE - OPEN) * 100 + '%',
+                     height: (meeting.period.end - meeting.period.start) / (CLOSE - OPEN) * 100 + '%',
                      backgroundColor: meeting.course.color,
                    }}>
                 {

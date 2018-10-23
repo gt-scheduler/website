@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import './Combinations.scss';
 import Calendar from './Calendar';
-import { classes } from './util';
+import { classes } from './utils';
 
 class Combinations extends PureComponent {
   render() {

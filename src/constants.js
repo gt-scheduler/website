@@ -1,14 +1,15 @@
-const open = 8 * 60;
-
-const close = 21 * 60;
+const OPEN = 8 * 60;
+const CLOSE = 21 * 60;
 
 const TYPE_LECTURE = 'Lecture';
-
 const TYPE_LAB = 'Supervised Laboratory';
 
+const PNG_SCALE_FACTOR = 2;
+
 export {
-  open,
-  close,
+  OPEN,
+  CLOSE,
   TYPE_LECTURE,
   TYPE_LAB,
+  PNG_SCALE_FACTOR,
 };

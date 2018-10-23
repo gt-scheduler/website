@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
 import './Calendar.scss';
-import { close, open } from './config';
-import { classes, timeToString } from './util';
+import { CLOSE, OPEN } from './constants';
+import { classes, timeToString } from './utils';
 import Section from './Section';
 
 class Calendar extends Component {
   render() {
-    const { className, pinnedCrns, overlayCrns, crns, preview, download } = this.props;
+    const { className, pinnedCrns, overlayCrns, crns, preview } = this.props;
 
     return (
-      <div className={classes('Calendar', preview && 'preview', download && 'download', className)}>
+      <div className={classes('Calendar', preview && 'preview', className)}>
         {
           !preview &&
           <div className="times">
             {
-              new Array((close - open) / 60).fill(0).map((_, i) => {
-                const time = open + i * 60;
+              new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
+                const time = OPEN + i * 60;
                 return (
                   <div className="time" key={time}>
                     <span className="label">

@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import domtoimage from 'dom-to-image';
+import saveAs from 'file-saver';
 import './App.scss';
-import { getRandomColor, hasConflictBetween, stringToTime } from './util';
+import { getRandomColor, hasConflictBetween, stringToTime } from './utils';
 import Course from './Course';
 import Calendar from './Calendar';
 import Cookies from 'js-cookie';
-import { TYPE_LAB, TYPE_LECTURE } from './config';
+import { IMAGE_WIDTH, PNG_SCALE_FACTOR, TYPE_LAB, TYPE_LECTURE } from './constants';
 import Combinations from './Combinations';
 
 class App extends Component {
@@ -24,6 +26,7 @@ class App extends Component {
       loaded: false,
     };
 
+    this.captureRef = React.createRef();
     this.inputRef = React.createRef();
 
     this.handleSetPinnedCrns = this.handleSetPinnedCrns.bind(this);
@@ -276,7 +279,16 @@ class App extends Component {
   }
 
   handleDownload() {
-
+    const { current } = this.captureRef;
+    domtoimage.toPng(current, {
+      width: current.offsetWidth * PNG_SCALE_FACTOR,
+      height: current.offsetHeight * PNG_SCALE_FACTOR,
+      style: {
+        'left': 0,
+        'transform': `scale(${PNG_SCALE_FACTOR})`,
+        'transform-origin': 'top left',
+      },
+    }).then(blob => saveAs(blob, 'schedule.png'));
   }
 
   render() {
@@ -286,6 +298,9 @@ class App extends Component {
       <div className="App">
         <div className="calendar-container">
           <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
+        </div>
+        <div className="capture-container" ref={this.captureRef}>
+          <Calendar className="fake-calendar" pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
         </div>
         <div className="sidebar">
           <div className="title">
