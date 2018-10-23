@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.2/workbox-sw.js");
 
 importScripts(
-  "/gatech-scheduler/precache-manifest.02cd31c4ee9e7cad3dfe77434809239f.js"
+  "/gt-scheduler/precache-manifest.019b10182dea084d0ef96d9053ff1a47.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/gatech-scheduler/index.html", {
+workbox.routing.registerNavigationRoute("/gt-scheduler/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });
