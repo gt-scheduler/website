@@ -2,10 +2,10 @@
 
 .App {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   height: 100vh;
 
-  .container {
+  .calendar-container {
     flex: 1;
     overflow-y: scroll;
     display: flex;
@@ -14,9 +14,10 @@
 
   .sidebar {
     background-color: $color-lighter;
-    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     width: 240px;
-    overflow-y: scroll;
     border-left: 1px solid $color-dark;
 
     .title {
@@ -38,7 +39,7 @@
       }
     }
 
-    .crns {
+    .button {
       display: block;
       text-align: center;
       padding: 8px;
@@ -52,22 +53,44 @@
       &:hover {
         color: black;
       }
+
+      &:last-child {
+        border-bottom: none;
+      }
     }
 
-    .course-add {
+    .scroller {
+      flex: 1;
+      overflow-y: scroll;
       display: flex;
       flex-direction: column;
+      align-items: stretch;
       border-bottom: 1px solid $color-dark;
 
-      .keyword {
-        padding: 8px;
-        border: none;
-        font-size: inherit;
+      > * {
+        flex-shrink: 0;
+        border-bottom: 1px solid $color-dark;
       }
 
       .courses {
         display: flex;
         flex-direction: column;
+      }
+
+      .course-add {
+        display: flex;
+        flex-direction: column;
+
+        .keyword {
+          padding: 8px;
+          border: none;
+          font-size: inherit;
+        }
+
+        .autocomplete {
+          display: flex;
+          flex-direction: column;
+        }
       }
     }
   }

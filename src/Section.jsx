@@ -5,10 +5,10 @@ import { close, open } from './config';
 
 class Section extends Component {
   render() {
-    const { section, overlay, preview } = this.props;
+    const { className, section, overlay, preview } = this.props;
 
     return (
-      <div className={classes('Section', overlay && 'overlay')}>
+      <div className={classes('Section', overlay && 'overlay', className)}>
         {
           section.meetings.map((meeting, i) => meeting.period && (
             meeting.days.map(day => (

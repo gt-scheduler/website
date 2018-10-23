@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
 import './Combinations.scss';
 import Calendar from './Calendar';
+import { classes } from './util';
 
 class Combinations extends PureComponent {
   render() {
-    const { combinations, crns, pinnedCrns, onSetOverlayCrns, onSetPinnedCrns } = this.props;
+    const { className, combinations, crns, pinnedCrns, onSetOverlayCrns, onSetPinnedCrns } = this.props;
 
     return (
-      <div className="Combinations">
+      <div className={classes('Combinations', className)}>
         {
           combinations.map((combination, i) => (
             <div className="combination" key={i}

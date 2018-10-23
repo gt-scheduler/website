@@ -34,6 +34,7 @@ class App extends Component {
     this.handleRemoveCourse = this.handleRemoveCourse.bind(this);
     this.handleToggleExcluded = this.handleToggleExcluded.bind(this);
     this.handleTogglePinned = this.handleTogglePinned.bind(this);
+    this.handleDownload = this.handleDownload.bind(this);
   }
 
   componentDidMount() {
@@ -274,12 +275,16 @@ class App extends Component {
     this.setState({ overlayCrns });
   }
 
+  handleDownload() {
+
+  }
+
   render() {
     const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, keyword, loaded } = this.state;
 
     return loaded && (
       <div className="App">
-        <div className="container">
+        <div className="calendar-container">
           <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
         </div>
         <div className="sidebar">
@@ -289,49 +294,59 @@ class App extends Component {
               {pinnedCrns.reduce((credits, crn) => credits + this.crns[crn].credits, 0)} Credits
             </span>
           </div>
-          {
-            pinnedCrns.length > 0 &&
-            <CopyToClipboard className="crns" text={pinnedCrns.join(', ')}>
-              <span>{pinnedCrns.join(', ')}</span>
-            </CopyToClipboard>
-          }
-          {
-            desiredCourses.map(courseId => {
-              const course = this.courses[courseId];
-              return (
-                <Course course={course} expandable key={course.id}
-                        onRemove={this.handleRemoveCourse}
-                        onTogglePinned={this.handleTogglePinned}
-                        onToggleExcluded={this.handleToggleExcluded}
-                        onSetOverlayCrns={this.handleSetOverlayCrns}
-                        pinnedCrns={pinnedCrns}
-                        excludedCrns={excludedCrns}/>
-              );
-            })
-          }
-          <div className="course-add">
-            <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
-                   className="keyword"
-                   placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
+          <div className="scroller">
+            {
+              pinnedCrns.length > 0 &&
+              <CopyToClipboard className="button" text={pinnedCrns.join(', ')}>
+                <span>{pinnedCrns.join(', ')}</span>
+              </CopyToClipboard>
+            }
             <div className="courses">
               {
-                keyword &&
-                this.searchCourses(keyword).slice(0, 10).map(course => (
-                  <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
-                          pinnedCrns={pinnedCrns}/>
-                ))
+                desiredCourses.map(courseId => {
+                  const course = this.courses[courseId];
+                  return (
+                    <Course course={course} expandable key={course.id}
+                            onRemove={this.handleRemoveCourse}
+                            onTogglePinned={this.handleTogglePinned}
+                            onToggleExcluded={this.handleToggleExcluded}
+                            onSetOverlayCrns={this.handleSetOverlayCrns}
+                            pinnedCrns={pinnedCrns}
+                            excludedCrns={excludedCrns}/>
+                  );
+                })
               }
             </div>
-          </div>
-          {
-            pinnedCrns.length > 0 &&
-            <div className="crns" onClick={() => this.handleSetPinnedCrns([])}>
-              Reset Sections
+            <div className="course-add">
+              <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
+                     className="keyword"
+                     placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
+              <div className="autocomplete">
+                {
+                  keyword &&
+                  this.searchCourses(keyword).slice(0, 10).map(course => (
+                    <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
+                            pinnedCrns={pinnedCrns}/>
+                  ))
+                }
+              </div>
             </div>
-          }
-          <Combinations combinations={combinations} crns={this.crns} pinnedCrns={pinnedCrns}
-                        onSetOverlayCrns={this.handleSetOverlayCrns}
-                        onSetPinnedCrns={this.handleSetPinnedCrns}/>
+            {
+              pinnedCrns.length > 0 &&
+              <div className="button" onClick={() => this.handleSetPinnedCrns([])}>
+                Reset Sections
+              </div>
+            }
+            <Combinations className="combinations" combinations={combinations} crns={this.crns} pinnedCrns={pinnedCrns}
+                          onSetOverlayCrns={this.handleSetOverlayCrns}
+                          onSetPinnedCrns={this.handleSetPinnedCrns}/>
+          </div>
+          <div className="button" onClick={this.handleDownload}>
+            Download as PNG
+          </div>
+          <a className="button" href="https://github.com/parkjs814/gt-scheduler" rel="noopener" target="_blank">
+            Fork me on GitHub
+          </a>
         </div>
       </div>
     );

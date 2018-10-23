@@ -13,6 +13,11 @@
   &.preview {
     margin: 0;
     height: 80px;
+    border: none;
+  }
+
+  &.download {
+    width: $calendar-width;
   }
 
   .times {

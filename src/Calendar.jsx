@@ -6,10 +6,10 @@ import Section from './Section';
 
 class Calendar extends Component {
   render() {
-    const { className, pinnedCrns, overlayCrns, crns, preview } = this.props;
+    const { className, pinnedCrns, overlayCrns, crns, preview, download } = this.props;
 
     return (
-      <div className={classes('Calendar', preview && 'preview', className)}>
+      <div className={classes('Calendar', preview && 'preview', download && 'download', className)}>
         {
           !preview &&
           <div className="times">

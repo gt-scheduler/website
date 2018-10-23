@@ -16,11 +16,12 @@ class Course extends Component {
   }
 
   render() {
-    const { course, expandable, onClick, onRemove, onTogglePinned, onToggleExcluded, onSetOverlayCrns, pinnedCrns, excludedCrns } = this.props;
+    const { className, course, expandable, onClick, onRemove, onTogglePinned, onToggleExcluded, onSetOverlayCrns, pinnedCrns, excludedCrns } = this.props;
     const { expanded } = this.state;
 
     return (
-      <div className="Course" style={{ backgroundColor: course.color }} key={course.id} onClick={onClick}>
+      <div className={classes('Course', className)} style={{ backgroundColor: course.color }} key={course.id}
+           onClick={onClick}>
         <div className="course-header" onClick={expandable ? () => this.handleToggleExpanded() : undefined}>
           <div className="row">
             <span className="course_id">{course.id}</span>
