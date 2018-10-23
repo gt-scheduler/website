@@ -10,15 +10,15 @@ const rows = dom.querySelector('.datadisplaytable tbody').childNodes.filter(node
 const courses = {};
 while (rows.length) {
   const headerRow = rows.shift();
-  console.log(headerRow);
   const bodyRow = rows.shift();
-  console.log(bodyRow);
 
   const titleTokens = headerRow.querySelector('a').rawText.split(' - ');
   const sectionId = titleTokens.pop();
   const courseId = titleTokens.pop();
   const crn = titleTokens.pop();
   const courseTitle = titleTokens.join(' - ');
+  const descriptionNodes = bodyRow.childNodes[1].childNodes;
+  const [scheduleType] = descriptionNodes.find(node => node.rawText.includes('Schedule Type')).rawText.replace(/\n/g, '').split('* ');
 
   const subrows = bodyRow.querySelectorAll('.datadisplaytable tr');
   subrows.shift();
@@ -42,6 +42,7 @@ while (rows.length) {
   courses[courseId].sections[sectionId] = {
     crn,
     meetings,
+    scheduleType,
   };
 }
 

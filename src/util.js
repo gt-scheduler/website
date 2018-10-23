@@ -20,7 +20,7 @@ const getRandomColor = (from = 0, to = 256) => {
   return hex;
 };
 
-const hasTimeConflict = (section1, section2) =>
+const hasConflictBetween = (section1, section2) =>
   section1.meetings.some(meeting1 =>
     section2.meetings.some(meeting2 =>
       meeting1.period && meeting2.period &&
@@ -34,6 +34,6 @@ export {
   timeToString,
   periodToString,
   getRandomColor,
-  hasTimeConflict,
+  hasConflictBetween,
   classes,
 };

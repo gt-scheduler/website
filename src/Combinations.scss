@@ -1,0 +1,27 @@
+@import "variables";
+
+.Combinations {
+  display: flex;
+  flex-direction: column;
+
+  .combination {
+    display: flex;
+
+    .number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: $color-dark;
+      width: 2em;
+      color: white;
+      font-size: .8em;
+      font-weight: bold;
+    }
+
+    .preview {
+      flex: 1;
+      cursor: pointer;
+      border-bottom: 1px solid $color-dark;
+    }
+  }
+}

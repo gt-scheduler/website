@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.scss';
-import { getRandomColor, hasTimeConflict, stringToTime } from './util';
+import { getRandomColor, hasConflictBetween, stringToTime } from './util';
 import Course from './Course';
 import Calendar from './Calendar';
 import Cookies from 'js-cookie';
+import { TYPE_LAB, TYPE_LECTURE } from './config';
+import Combinations from './Combinations';
 
 class App extends Component {
   constructor(props) {
@@ -20,9 +22,36 @@ class App extends Component {
       keyword: '',
       loaded: false,
     };
+
+    this.handleSetPinnedCrns = this.handleSetPinnedCrns.bind(this);
+    this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
+    this.handleAddCourse = this.handleAddCourse.bind(this);
+    this.handleChangeKeyword = this.handleChangeKeyword.bind(this);
+    this.handleRemoveCourse = this.handleRemoveCourse.bind(this);
+    this.handleToggleExcluded = this.handleToggleExcluded.bind(this);
+    this.handleTogglePinned = this.handleTogglePinned.bind(this);
   }
 
   componentDidMount() {
+    const distinct = sections => {
+      let groups = {};
+      sections.forEach(section => {
+        const sectionGroupMeetings = section.meetings.map(({ days, period }) => ({ days, period }));
+        const sectionGroupHash = JSON.stringify(sectionGroupMeetings);
+        const sectionGroup = groups[sectionGroupHash];
+        if (sectionGroup) {
+          sectionGroup.sections.push(section);
+        } else {
+          groups[sectionGroupHash] = {
+            hash: sectionGroupHash,
+            meetings: sectionGroupMeetings,
+            sections: [section],
+          };
+        }
+      });
+      return groups;
+    };
+
     axios.get(`./courses.json`)
       .then(res => {
         const crns = {};
@@ -31,7 +60,6 @@ class App extends Component {
           const course = courses[courseId];
           course.id = courseId;
           course.color = getRandomColor(32, 160);
-          course.sectionGroups = {};
           Object.keys(course.sections).forEach(sectionId => {
             const section = course.sections[sectionId];
             section.id = sectionId;
@@ -59,19 +87,18 @@ class App extends Component {
                 };
               }
             });
-            const sectionGroupMeetings = section.meetings.map(({ days, period }) => ({ days, period }));
-            const sectionGroupHash = JSON.stringify(sectionGroupMeetings);
-            const sectionGroup = course.sectionGroups[sectionGroupHash];
-            if (sectionGroup) {
-              sectionGroup.sections.push(section);
-            } else {
-              course.sectionGroups[sectionGroupHash] = {
-                hash: sectionGroupHash,
-                meetings: sectionGroupMeetings,
-                sections: [section],
-              };
-            }
           });
+          const sections = Object.values(course.sections);
+          const scheduleTypes = sections.map(section => section.scheduleType);
+          course.hasLab = scheduleTypes.includes(TYPE_LECTURE) && scheduleTypes.includes(TYPE_LAB);
+          if (course.hasLab) {
+            course.lectures = sections.filter(section => section.scheduleType === TYPE_LECTURE);
+            course.labs = sections.filter(section => section.scheduleType === TYPE_LAB);
+            course.lectures.forEach(lecture => lecture.labs = course.labs.filter(lab => lab.id.startsWith(lecture.id)));
+            course.labs.forEach(lab => lab.lecture = course.lectures.find(lecture => lab.id.startsWith(lecture.id)));
+          } else {
+            course.sectionGroups = distinct(sections);
+          }
         });
 
         this.courses = courses;
@@ -108,17 +135,50 @@ class App extends Component {
           return;
         }
         const course = this.courses[desiredCourses[courseIndex]];
-        if (Object.values(course.sections).some(section => pinnedCrns.includes(section.crn))) {
-          dfs(courseIndex + 1, combination);
-          return;
+        const isIncluded = section => !excludedCrns.includes(section.crn);
+        const isPinned = section => pinnedCrns.includes(section.crn);
+        const hasConflict = section => [...pinnedCrns, ...combination].some(crn => hasConflictBetween(this.crns[crn], section));
+        if (course.hasLab) {
+          const pinnedLectures = course.lectures.filter(isPinned);
+          const pinnedLabs = course.labs.filter(isPinned);
+          if (pinnedLectures.length) {
+            pinnedLectures.forEach(lecture => {
+              lecture.labs.filter(isIncluded).forEach(lab => {
+                if (isPinned(lab)) {
+                  dfs(courseIndex + 1, combination);
+                } else {
+                  if (hasConflict(lab)) return;
+                  dfs(courseIndex + 1, [...combination, lab.crn]);
+                }
+              });
+            });
+          } else if (pinnedLabs.length) {
+            pinnedLabs.forEach(lab => {
+              const { lecture } = lab;
+              if (!lecture || !isIncluded(lecture) || hasConflict(lecture)) return;
+              dfs(courseIndex + 1, [...combination, lecture.crn]);
+            });
+          } else {
+            course.lectures.filter(isIncluded).forEach(lecture => {
+              if (hasConflict(lecture)) return;
+              lecture.labs.filter(isIncluded).forEach(lab => {
+                if (hasConflict(lab)) return;
+                dfs(courseIndex + 1, [...combination, lecture.crn, lab.crn]);
+              });
+            });
+          }
+        } else {
+          const sections = Object.values(course.sections);
+          if (sections.some(isPinned)) {
+            dfs(courseIndex + 1, combination);
+          } else {
+            Object.values(course.sectionGroups).forEach(sectionGroup => {
+              const section = sectionGroup.sections.find(isIncluded);
+              if (!section || hasConflict(section)) return;
+              dfs(courseIndex + 1, [...combination, section.crn]);
+            });
+          }
         }
-        Object.values(course.sectionGroups).forEach(sectionGroup => {
-          const section = sectionGroup.sections.find(section => !excludedCrns.includes(section.crn));
-          if (!section) return;
-          const timeConflict = [...pinnedCrns, ...combination].map(crn => this.crns[crn]).some(pinnedSection => hasTimeConflict(pinnedSection, section));
-          if (timeConflict) return;
-          dfs(courseIndex + 1, [...combination, section.crn]);
-        });
       };
       dfs();
       return { ...update, combinations };
@@ -127,17 +187,25 @@ class App extends Component {
 
   handleRemoveCourse(course) {
     this.updateCombinations(state => {
-      const pinnedCrns = state.pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn));
       const desiredCourses = state.desiredCourses.filter(courseId => courseId !== course.id);
-      return { pinnedCrns, desiredCourses };
+      const pinnedCrns = state.pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn));
+      const excludedCrns = state.excludedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn));
+      return { desiredCourses, pinnedCrns, excludedCrns };
     });
   }
 
   handleAddCourse(course) {
     this.updateCombinations(state => {
-      const { desiredCourses } = state;
+      const { desiredCourses, excludedCrns } = state;
       if (!desiredCourses.includes(course.id)) {
-        return { keyword: '', desiredCourses: [...desiredCourses, course.id] };
+        const tbaCrns = Object.values(course.sections)
+          .filter(section => section.meetings.some(meeting => !meeting.days.length || !meeting.period))
+          .map(section => section.crn);
+        return {
+          keyword: '',
+          desiredCourses: [...desiredCourses, course.id],
+          excludedCrns: [...excludedCrns, ...tbaCrns],
+        };
       }
       return { keyword: '' };
     });
@@ -181,12 +249,10 @@ class App extends Component {
   }
 
   handleSetOverlayCrns(overlayCrns) {
-    //if (JSON.stringify(overlayCrns) === JSON.stringify(this.state.overlayCrns)) return;//
     this.setState({ overlayCrns });
   }
 
   render() {
-    console.log('render');
     const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, keyword, loaded } = this.state;
 
     return loaded && (
@@ -203,17 +269,17 @@ class App extends Component {
               const course = this.courses[courseId];
               return (
                 <Course course={course} expandable key={course.id}
-                        onRemove={course => this.handleRemoveCourse(course)}
-                        onTogglePinned={course => this.handleTogglePinned(course)}
-                        onToggleExcluded={course => this.handleToggleExcluded(course)}
-                        onSetOverlayCrns={overlayCrns => this.handleSetOverlayCrns(overlayCrns)}
+                        onRemove={this.handleRemoveCourse}
+                        onTogglePinned={this.handleTogglePinned}
+                        onToggleExcluded={this.handleToggleExcluded}
+                        onSetOverlayCrns={this.handleSetOverlayCrns}
                         pinnedCrns={pinnedCrns}
                         excludedCrns={excludedCrns}/>
               );
             })
           }
           <div className="course-add">
-            <input type="text" value={keyword} onChange={e => this.handleChangeKeyword(e)} className="keyword"
+            <input type="text" value={keyword} onChange={this.handleChangeKeyword} className="keyword"
                    placeholder="XX 0000"/>
             <div className="courses">
               {
@@ -228,20 +294,9 @@ class App extends Component {
           <div className="title">
             Auto Select
           </div>
-          <div className="combinations">
-            {
-              combinations.map((combination, i) => (
-                <div className="combination"
-                     onMouseEnter={() => this.handleSetOverlayCrns(combination)}
-                     onMouseLeave={() => this.handleSetOverlayCrns([])}
-                     onClick={() => this.handleSetPinnedCrns([...pinnedCrns, ...combination])}>
-                  <div className="number">{i + 1}</div>
-                  <Calendar className="preview" pinnedCrns={[...pinnedCrns, ...combination]} overlayCrns={[]}
-                            crns={this.crns} key={i} preview/>
-                </div>
-              ))
-            }
-          </div>
+          <Combinations combinations={combinations} crns={this.crns} pinnedCrns={pinnedCrns}
+                        onSetOverlayCrns={this.handleSetOverlayCrns}
+                        onSetPinnedCrns={this.handleSetPinnedCrns}/>
         </div>
       </div>
     );
