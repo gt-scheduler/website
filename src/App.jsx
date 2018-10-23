@@ -129,7 +129,7 @@ class App extends Component {
   }
 
   saveData({ desiredCourses = [], pinnedCrns = [], excludedCrns = [] }) {
-    Cookies.set('data', JSON.stringify({ desiredCourses, pinnedCrns, excludedCrns }));
+    Cookies.set('data', JSON.stringify({ desiredCourses, pinnedCrns, excludedCrns }), { expires: 365 });
   }
 
   loadData() {
@@ -239,7 +239,7 @@ class App extends Component {
       const { desiredCourses, excludedCrns } = state;
       if (!desiredCourses.includes(course.id)) {
         const tbaCrns = Object.values(course.sections)
-          .filter(section => section.meetings.some(meeting => !meeting.days.length || !meeting.period))
+          .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
           .map(section => section.crn);
         return {
           keyword: '',
