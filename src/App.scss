@@ -2,6 +2,7 @@
 
 .App {
   display: flex;
+  align-items: flex-start;
   height: 100vh;
 
   .container {
@@ -12,8 +13,11 @@
   }
 
   .sidebar {
+    background-color: $color-lighter;
+    align-self: stretch;
     width: 240px;
     overflow-y: scroll;
+    border-left: 1px solid $color-dark;
 
     .title {
       padding: 8px;
@@ -22,6 +26,7 @@
       background-color: $color-light;
       display: flex;
       align-items: center;
+      border-bottom: 1px solid $color-dark;
 
       .primary {
         flex: 1;
@@ -40,16 +45,22 @@
       font-weight: bold;
       background-color: $color-light;
       color: $color-darker;
-      border-top: 1px solid $color-dark;
+      border-bottom: 1px solid $color-dark;
+      cursor: pointer;
+
+      &:hover {
+        color: black;
+      }
     }
 
     .course-add {
       display: flex;
       flex-direction: column;
+      border-bottom: 1px solid $color-dark;
 
       .keyword {
         padding: 8px;
-        border: 1px solid $color-dark;
+        border: none;
         font-size: inherit;
       }
 
