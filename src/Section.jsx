@@ -5,10 +5,10 @@ import { CLOSE, OPEN } from './constants';
 
 class Section extends Component {
   render() {
-    const { className, section, overlay, preview } = this.props;
+    const { className, section, overlay, preview, mobile } = this.props;
 
     return (
-      <div className={classes('Section', overlay && 'overlay', className)}>
+      <div className={classes('Section', mobile && 'mobile', overlay && 'overlay', className)}>
         {
           section.meetings.map((meeting, i) => meeting.period && (
             meeting.days.map(day => (
@@ -21,10 +21,16 @@ class Section extends Component {
                 {
                   !preview &&
                   <div className="meeting-wrapper">
-                    <span className="course_id">{meeting.course.id} {meeting.section.id}</span>
+                    <span className="course_id">{meeting.course.id}{mobile ? '' : ` ${meeting.section.id}`}</span>
                     <span className="period">{periodToString(meeting.period)}</span>
-                    <span className="where">{meeting.where}</span>
-                    <span className="instructors">{meeting.instructors.join(', ')}</span>
+                    {
+                      !mobile &&
+                      <span className="where">{meeting.where}</span>
+                    }
+                    {
+                      !mobile &&
+                      <span className="instructors">{meeting.instructors.join(', ')}</span>
+                    }
                   </div>
                 }
               </div>

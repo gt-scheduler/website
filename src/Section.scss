@@ -57,4 +57,17 @@
       left: 80%;
     }
   }
+
+  &.mobile {
+    .meeting {
+      .meeting-wrapper {
+        padding: 2px;
+
+        span {
+          white-space: normal;
+          overflow: visible;
+        }
+      }
+    }
+  }
 }

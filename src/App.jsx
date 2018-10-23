@@ -406,7 +406,7 @@ class App extends Component {
             {
               mobile &&
               <div className={classes('mobile', 'calendar-container', tabIndex === 2 && 'active')}>
-                <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
+                <Calendar mobile pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
               </div>
             }
           </div>

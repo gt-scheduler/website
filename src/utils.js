@@ -9,6 +9,11 @@ const timeToString = (time, ampm = true) => {
   return `${hour > 12 ? hour - 12 : hour}:${minute < 10 ? '0' + minute : minute}${ampm ? ` ${hour < 12 ? 'a' : 'p'}m` : ''}`;
 };
 
+const timeToShortString = time => {
+  const hour = time / 60 | 0;
+  return `${hour > 12 ? hour - 12 : hour}${hour < 12 ? 'a' : 'p'}m`;
+};
+
 const periodToString = period => period ? `${timeToString(period.start, false)} - ${timeToString(period.end)}` : 'TBA';
 
 const getRandomColor = (from = 0, to = 256) => {
@@ -32,6 +37,7 @@ const classes = (...classList) => classList.filter(c => c).join(' ');
 export {
   stringToTime,
   timeToString,
+  timeToShortString,
   periodToString,
   getRandomColor,
   hasConflictBetween,

@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import './Calendar.scss';
 import { CLOSE, OPEN } from './constants';
-import { classes, timeToString } from './utils';
+import { classes, timeToShortString } from './utils';
 import Section from './Section';
 
 class Calendar extends Component {
   render() {
-    const { className, pinnedCrns, overlayCrns, crns, preview } = this.props;
+    const { className, pinnedCrns, overlayCrns, crns, preview, mobile } = this.props;
 
     return (
-      <div className={classes('Calendar', preview && 'preview', className)}>
+      <div className={classes('Calendar', mobile && 'mobile', preview && 'preview', className)}>
         {
           preview &&
           <img className="ratio" src="5x2.png"/>
@@ -23,7 +23,7 @@ class Calendar extends Component {
                 return (
                   <div className="time" key={time}>
                     <span className="label">
-                      {timeToString(time)}
+                      {timeToShortString(time)}
                     </span>
                   </div>
                 );
@@ -48,12 +48,12 @@ class Calendar extends Component {
         <div className="meetings">
           {
             pinnedCrns.map(crn => (
-              <Section key={crn} section={crns[crn]} preview={preview}/>
+              <Section key={crn} mobile={mobile} section={crns[crn]} preview={preview}/>
             ))
           }
           {
             overlayCrns.filter(crn => !pinnedCrns.includes(crn)).map(crn => (
-              <Section key={crn} section={crns[crn]} overlay preview={preview}/>
+              <Section key={crn} mobile={mobile} section={crns[crn]} overlay preview={preview}/>
             ))
           }
         </div>

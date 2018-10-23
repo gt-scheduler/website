@@ -7,6 +7,7 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  background-color: white;
 
   .calendar-container {
     flex: 1;
@@ -172,6 +173,11 @@
             display: flex;
           }
         }
+
+        .calendar-container {
+          background-color: white;
+        }
+      ;
       }
     }
   }
