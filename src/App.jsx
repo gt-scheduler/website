@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import './App.scss';
 import { getRandomColor, hasConflictBetween, stringToTime } from './util';
 import Course from './Course';
@@ -290,9 +291,9 @@ class App extends Component {
           </div>
           {
             pinnedCrns.length > 0 &&
-            <div className="crns">
-              {pinnedCrns.join(', ')}
-            </div>
+            <CopyToClipboard className="crns" text={pinnedCrns.join(', ')}>
+              <span>{pinnedCrns.join(', ')}</span>
+            </CopyToClipboard>
           }
           {
             desiredCourses.map(courseId => {

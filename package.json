@@ -9,6 +9,7 @@
     "js-cookie": "^2.2.0",
     "node-sass": "^4.9.4",
     "react": "^16.5.2",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.5.2",
     "react-scripts": "2.0.5"
   },
