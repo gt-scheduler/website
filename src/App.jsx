@@ -323,12 +323,12 @@ class App extends Component {
               }
             </div>
           </div>
-          <div className="title">
-            Auto Select
-          </div>
-          <div className="crns" onClick={() => this.handleSetPinnedCrns([])}>
-            Reset Sections
-          </div>
+          {
+            pinnedCrns.length > 0 &&
+            <div className="crns" onClick={() => this.handleSetPinnedCrns([])}>
+              Reset Sections
+            </div>
+          }
           <Combinations combinations={combinations} crns={this.crns} pinnedCrns={pinnedCrns}
                         onSetOverlayCrns={this.handleSetOverlayCrns}
                         onSetPinnedCrns={this.handleSetPinnedCrns}/>

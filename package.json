@@ -1,8 +1,8 @@
 {
-  "name": "scheduler",
+  "name": "gt-scheduler",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://parkjs814.github.io/gatech-scheduler",
+  "homepage": "https://jasonpark.me/gt-scheduler",
   "dependencies": {
     "axios": "^0.18.0",
     "fast-html-parser": "^1.0.1",
