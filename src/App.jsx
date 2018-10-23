@@ -23,10 +23,13 @@ class App extends Component {
       loaded: false,
     };
 
+    this.inputRef = React.createRef();
+
     this.handleSetPinnedCrns = this.handleSetPinnedCrns.bind(this);
     this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
     this.handleAddCourse = this.handleAddCourse.bind(this);
     this.handleChangeKeyword = this.handleChangeKeyword.bind(this);
+    this.handlePressEnter = this.handlePressEnter.bind(this);
     this.handleRemoveCourse = this.handleRemoveCourse.bind(this);
     this.handleToggleExcluded = this.handleToggleExcluded.bind(this);
     this.handleTogglePinned = this.handleTogglePinned.bind(this);
@@ -131,7 +134,7 @@ class App extends Component {
       const combinations = [];
       const dfs = (courseIndex = 0, combination = []) => {
         if (courseIndex === desiredCourses.length) {
-          if (combination.length) combinations.push(combination);
+          combinations.push(combination);
           return;
         }
         const course = this.courses[desiredCourses[courseIndex]];
@@ -186,6 +189,10 @@ class App extends Component {
     });
   }
 
+  searchCourses(keyword) {
+    return Object.values(this.courses).filter(course => course.id.startsWith(keyword.toUpperCase()));
+  }
+
   handleRemoveCourse(course) {
     this.updateCombinations(state => {
       const desiredCourses = state.desiredCourses.filter(courseId => courseId !== course.id);
@@ -210,6 +217,7 @@ class App extends Component {
       }
       return { keyword: '' };
     });
+    this.inputRef.current.focus();
   }
 
   handleTogglePinned(section) {
@@ -243,6 +251,14 @@ class App extends Component {
   handleChangeKeyword(e) {
     const keyword = e.target.value;
     this.setState({ keyword });
+  }
+
+  handlePressEnter(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const courses = this.searchCourses(this.state.keyword);
+      if (courses.length) this.handleAddCourse(courses[0]);
+    }
   }
 
   handleSetPinnedCrns(pinnedCrns) {
@@ -289,12 +305,13 @@ class App extends Component {
             })
           }
           <div className="course-add">
-            <input type="text" value={keyword} onChange={this.handleChangeKeyword} className="keyword"
-                   placeholder="XX 0000"/>
+            <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
+                   className="keyword"
+                   placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
             <div className="courses">
               {
                 keyword &&
-                Object.values(this.courses).filter(course => course.id.startsWith(keyword.toUpperCase())).slice(0, 10).map(course => (
+                this.searchCourses(keyword).slice(0, 10).map(course => (
                   <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
                           pinnedCrns={pinnedCrns}/>
                 ))

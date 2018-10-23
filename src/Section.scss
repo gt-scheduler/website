@@ -21,7 +21,7 @@
       flex-direction: column;
       align-items: stretch;
       justify-content: center;
-      padding: 0 8px;
+      padding: 2px 8px;
 
       span {
         white-space: nowrap;
@@ -29,7 +29,6 @@
         text-overflow: ellipsis;
         font-size: .72em;
         color: white;
-        flex-shrink: 0;
       }
 
       .course_id {
