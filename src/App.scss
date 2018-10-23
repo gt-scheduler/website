@@ -20,6 +20,27 @@
       font-weight: bold;
       font-size: 1.2em;
       background-color: $color-light;
+      display: flex;
+      align-items: center;
+
+      .primary {
+        flex: 1;
+      }
+
+      .secondary {
+        font-size: .8em;
+        color: $color-darker;
+      }
+    }
+
+    .crns {
+      text-align: center;
+      padding: 8px;
+      font-size: .8em;
+      font-weight: bold;
+      background-color: $color-light;
+      color: $color-darker;
+      border-top: 1px solid $color-dark;
     }
 
     .course-add {

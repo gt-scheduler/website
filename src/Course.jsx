@@ -29,7 +29,7 @@ class Course extends Component {
             </span>
           </div>
           <div className="row">
-            <span className="course_title">{course.title}</span>
+            <span className="course_title" dangerouslySetInnerHTML={{ __html: course.title }}/>
             {
               expandable &&
               <span className="toggle">{expanded ? '-' : '+'}</span>

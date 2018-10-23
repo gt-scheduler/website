@@ -19,6 +19,7 @@ while (rows.length) {
   const courseTitle = titleTokens.join(' - ');
   const descriptionNodes = bodyRow.childNodes[1].childNodes;
   const [scheduleType] = descriptionNodes.find(node => node.rawText.includes('Schedule Type')).rawText.replace(/\n/g, '').split('* ');
+  const credits = Number.parseInt(/(\d\.\d{3})/.exec(descriptionNodes.find(node => node.rawText.includes('Credits')).rawText)[1]);
 
   const subrows = bodyRow.querySelectorAll('.datadisplaytable tr');
   subrows.shift();
@@ -43,6 +44,7 @@ while (rows.length) {
     crn,
     meetings,
     scheduleType,
+    credits,
   };
 }
 

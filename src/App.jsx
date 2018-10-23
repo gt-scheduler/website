@@ -141,22 +141,23 @@ class App extends Component {
         if (course.hasLab) {
           const pinnedLectures = course.lectures.filter(isPinned);
           const pinnedLabs = course.labs.filter(isPinned);
-          if (pinnedLectures.length) {
-            pinnedLectures.forEach(lecture => {
-              lecture.labs.filter(isIncluded).forEach(lab => {
-                if (isPinned(lab)) {
-                  dfs(courseIndex + 1, combination);
-                } else {
-                  if (hasConflict(lab)) return;
-                  dfs(courseIndex + 1, [...combination, lab.crn]);
-                }
-              });
-            });
-          } else if (pinnedLabs.length) {
+          if (pinnedLabs.length) {
             pinnedLabs.forEach(lab => {
               const { lecture } = lab;
-              if (!lecture || !isIncluded(lecture) || hasConflict(lecture)) return;
-              dfs(courseIndex + 1, [...combination, lecture.crn]);
+              if (!lecture) return;
+              if (isPinned(lecture)) {
+                dfs(courseIndex + 1, combination);
+              } else {
+                if (!isIncluded(lecture) || hasConflict(lecture)) return;
+                dfs(courseIndex + 1, [...combination, lecture.crn]);
+              }
+            });
+          } else if (pinnedLectures.length) {
+            pinnedLectures.forEach(lecture => {
+              lecture.labs.filter(isIncluded).forEach(lab => {
+                if (hasConflict(lab)) return;
+                dfs(courseIndex + 1, [...combination, lab.crn]);
+              });
             });
           } else {
             course.lectures.filter(isIncluded).forEach(lecture => {
@@ -262,8 +263,17 @@ class App extends Component {
         </div>
         <div className="sidebar">
           <div className="title">
-            Spring 2019
+            <span className="primary">Spring 2019</span>
+            <span className="secondary">
+              {pinnedCrns.reduce((credits, crn) => credits + this.crns[crn].credits, 0)} Credits
+            </span>
           </div>
+          {
+            pinnedCrns.length > 0 &&
+            <div className="crns">
+              {pinnedCrns.join(', ')}
+            </div>
+          }
           {
             desiredCourses.map(courseId => {
               const course = this.courses[courseId];
