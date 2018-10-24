@@ -8,7 +8,7 @@ import { classes, getRandomColor, hasConflictBetween, stringToTime } from './uti
 import Course from './Course';
 import Calendar from './Calendar';
 import Cookies from 'js-cookie';
-import { PNG_SCALE_FACTOR, TYPE_LAB, TYPE_LECTURE } from './constants';
+import { PNG_SCALE_FACTOR } from './constants';
 import Combinations from './Combinations';
 
 class App extends Component {
@@ -100,11 +100,12 @@ class App extends Component {
             });
           });
           const sections = Object.values(course.sections);
-          const scheduleTypes = sections.map(section => section.scheduleType);
-          course.hasLab = scheduleTypes.includes(TYPE_LECTURE) && scheduleTypes.includes(TYPE_LAB);
+          const lectures = sections.filter(section => section.credits > 0);
+          const labs = sections.filter(section => section.credits === 0);
+          course.hasLab = !course.id.startsWith('VIP') && lectures.length && labs.length;
           if (course.hasLab) {
-            course.lectures = sections.filter(section => section.scheduleType === TYPE_LECTURE);
-            course.labs = sections.filter(section => section.scheduleType === TYPE_LAB);
+            course.lectures = lectures;
+            course.labs = labs;
             course.lectures.forEach(lecture => lecture.labs = course.labs.filter(lab => lab.id.startsWith(lecture.id)));
             course.labs.forEach(lab => lab.lectures = course.lectures.filter(lecture => lab.id.startsWith(lecture.id)));
             if (course.lectures.every(lecture => !lecture.labs.length)) {
