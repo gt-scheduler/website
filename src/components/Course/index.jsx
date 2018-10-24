@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import './Course.scss';
-import { classes, periodToString } from './utils';
+import { classes, periodToString } from '../../utils';
+import './stylesheet.scss';
 
 class Course extends Component {
   constructor(props) {

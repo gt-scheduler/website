@@ -3,13 +3,11 @@ import axios from 'axios';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
-import './App.scss';
-import { classes, getRandomColor, hasConflictBetween, stringToTime } from './utils';
-import Course from './Course';
-import Calendar from './Calendar';
 import Cookies from 'js-cookie';
-import { PNG_SCALE_FACTOR } from './constants';
-import Combinations from './Combinations';
+import { classes, getRandomColor, hasConflictBetween, stringToTime } from '../../utils';
+import { PNG_SCALE_FACTOR } from '../../constants';
+import { Calendar, Combinations, Course, CourseAdd } from '../';
+import './stylesheet.scss';
 
 class App extends Component {
   constructor(props) {
@@ -22,21 +20,17 @@ class App extends Component {
       ...this.loadData(),
       combinations: [],
       overlayCrns: [],
-      keyword: '',
       loaded: false,
       tabIndex: 0,
       mobile: this.isMobile(),
     };
 
     this.captureRef = React.createRef();
-    this.inputRef = React.createRef();
 
     this.handleResize = this.handleResize.bind(this);
     this.handleSetPinnedCrns = this.handleSetPinnedCrns.bind(this);
     this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
     this.handleAddCourse = this.handleAddCourse.bind(this);
-    this.handleChangeKeyword = this.handleChangeKeyword.bind(this);
-    this.handlePressEnter = this.handlePressEnter.bind(this);
     this.handleRemoveCourse = this.handleRemoveCourse.bind(this);
     this.handleToggleExcluded = this.handleToggleExcluded.bind(this);
     this.handleTogglePinned = this.handleTogglePinned.bind(this);
@@ -208,10 +202,6 @@ class App extends Component {
     });
   }
 
-  searchCourses(keyword) {
-    return Object.values(this.courses).filter(course => course.id.startsWith(keyword.toUpperCase()));
-  }
-
   getTotalCredits() {
     const { pinnedCrns } = this.state;
     return pinnedCrns.reduce((credits, crn) => credits + this.crns[crn].credits, 0);
@@ -243,14 +233,12 @@ class App extends Component {
           .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
           .map(section => section.crn);
         return {
-          keyword: '',
           desiredCourses: [...desiredCourses, course.id],
           excludedCrns: [...excludedCrns, ...tbaCrns],
         };
       }
-      return { keyword: '' };
+      return {};
     });
-    this.inputRef.current.focus();
   }
 
   handleTogglePinned(section) {
@@ -281,19 +269,6 @@ class App extends Component {
     });
   }
 
-  handleChangeKeyword(e) {
-    const keyword = e.target.value;
-    this.setState({ keyword });
-  }
-
-  handlePressEnter(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const courses = this.searchCourses(this.state.keyword);
-      if (courses.length) this.handleAddCourse(courses[0]);
-    }
-  }
-
   handleSetPinnedCrns(pinnedCrns) {
     this.updateCombinations({ pinnedCrns });
   }
@@ -320,7 +295,7 @@ class App extends Component {
   }
 
   render() {
-    const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, keyword, loaded, tabIndex, mobile } = this.state;
+    const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, loaded, tabIndex, mobile } = this.state;
 
     return loaded && (
       <div className={classes('App', mobile && 'mobile')}>
@@ -377,20 +352,7 @@ class App extends Component {
                   })
                 }
               </div>
-              <div className="course-add">
-                <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
-                       className="keyword"
-                       placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
-                <div className="autocomplete">
-                  {
-                    keyword &&
-                    this.searchCourses(keyword).slice(0, 10).map(course => (
-                      <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
-                              pinnedCrns={pinnedCrns}/>
-                    ))
-                  }
-                </div>
-              </div>
+              <CourseAdd courses={this.courses} pinnedCrns={pinnedCrns} onAddCourse={this.handleAddCourse}/>
             </div>
             <div className={classes('combinations-container', tabIndex === 1 && 'active')}>
               {
@@ -414,7 +376,8 @@ class App extends Component {
           <div className="button" onClick={this.handleDownload}>
             Download as PNG
           </div>
-          <a className="button" href="https://github.com/parkjs814/gt-scheduler" rel="noopener" target="_blank">
+          <a className="button" href="https://github.com/parkjs814/gt-scheduler" rel="noopener noreferrer"
+             target="_blank">
             Fork me on GitHub
           </a>
         </div>

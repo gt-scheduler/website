@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import './Calendar.scss';
-import { CLOSE, OPEN } from './constants';
-import { classes, timeToShortString } from './utils';
-import Section from './Section';
+import { CLOSE, OPEN } from '../../constants';
+import { classes, timeToShortString } from '../../utils';
+import { Section } from '../';
+import './stylesheet.scss';
 
 class Calendar extends Component {
   render() {
@@ -12,7 +12,7 @@ class Calendar extends Component {
       <div className={classes('Calendar', mobile && 'mobile', preview && 'preview', className)}>
         {
           preview &&
-          <img className="ratio" src="5x2.png"/>
+          <img className="ratio" src="5x2.png" alt=""/>
         }
         {
           !preview &&

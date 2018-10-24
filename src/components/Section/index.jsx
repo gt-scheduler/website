@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import './Section.scss';
-import { classes, periodToString } from './utils';
-import { CLOSE, OPEN } from './constants';
+import { classes, periodToString } from '../../utils';
+import { CLOSE, OPEN } from '../../constants';
+import './stylesheet.scss';
 
 class Section extends Component {
   render() {

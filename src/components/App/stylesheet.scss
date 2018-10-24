@@ -1,4 +1,4 @@
-@import "variables";
+@import "../../variables";
 
 .App {
   position: relative;
@@ -92,22 +92,6 @@
         .course-list {
           display: flex;
           flex-direction: column;
-        }
-
-        .course-add {
-          display: flex;
-          flex-direction: column;
-
-          .keyword {
-            padding: 8px;
-            border: none;
-            font-size: inherit;
-          }
-
-          .autocomplete {
-            display: flex;
-            flex-direction: column;
-          }
         }
       }
 

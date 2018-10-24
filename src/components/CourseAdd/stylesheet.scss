@@ -1,0 +1,15 @@
+.CourseAdd {
+  display: flex;
+  flex-direction: column;
+
+  .keyword {
+    padding: 8px;
+    border: none;
+    font-size: inherit;
+  }
+
+  .autocomplete {
+    display: flex;
+    flex-direction: column;
+  }
+}
