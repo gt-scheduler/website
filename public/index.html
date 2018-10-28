@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128271224-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      gtag('js', new Date());
+
+      gtag('config', 'UA-128271224-1');
+    </script>
     <meta charset="utf-8">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -20,26 +33,30 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>GT Scheduler</title>
-    <meta property="og:image" content="https://jasonpark.me/gt-scheduler/screenshot.png" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="GT Scheduler" />
-    <meta property="og:url" content="https://jasonpark.me/gt-scheduler" />
-    <meta property="og:description" content="Just input the courses you'd like to take. We will show you all the possible combinations of schedule." />
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you OPEN it directly in the browser, you will see an empty page.
+    <meta name="description"
+          content="Georgia Tech Scheduler lets you find the schedule that fits you best among all the possible combinations of courses.">
+    <meta name="author" content="Jinseo Jason Park">
+    <meta property="og:image" content="https://jasonpark.me/gt-scheduler/screenshot.png"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="GT Scheduler"/>
+    <meta property="og:url" content="https://jasonpark.me/gt-scheduler"/>
+    <meta property="og:description"
+          content="Georgia Tech Scheduler lets you find the schedule that fits you best among all the possible combinations of courses."/>
+</head>
+<body>
+<noscript>
+    You need to enable JavaScript to run this app.
+</noscript>
+<div id="root"></div>
+<!--
+  This HTML file is a template.
+  If you OPEN it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  You can add webfonts, meta tags, or analytics to this file.
+  The build step will place the bundled scripts into the <body> tag.
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+  To begin the development, run `npm start` or `yarn start`.
+  To create a production bundle, use `npm run build` or `yarn build`.
+-->
+</body>
 </html>
