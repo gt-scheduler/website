@@ -14,14 +14,44 @@ class Course extends SemiPureComponent {
     };
   }
 
+  handleRemoveCourse(course) {
+    const { desiredCourses, pinnedCrns, excludedCrns } = this.props.user;
+    this.props.setDesiredCourses(desiredCourses.filter(courseId => courseId !== course.id));
+    this.props.setPinnedCrns(pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
+    this.props.setExcludedCrns(excludedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
+  }
+
+  handleTogglePinned(section) {
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    if (pinnedCrns.includes(section.crn)) {
+      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+    } else {
+      this.props.setPinnedCrns([...pinnedCrns, section.crn]);
+      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
+    }
+  }
+
+  handleToggleExcluded(section) {
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    if (excludedCrns.includes(section.crn)) {
+      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
+    } else {
+      this.props.setExcludedCrns([...excludedCrns, section.crn]);
+      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+    }
+  }
+
   handleToggleExpanded(expanded = !this.state.expanded) {
     this.setState({ expanded });
   }
 
   render() {
+    const { className, courseId, expandable, onClick, onSetOverlayCrns } = this.props;
+    const { courses } = this.props.oscar;
     const { pinnedCrns, excludedCrns } = this.props.user;
-    const { className, course, expandable, onClick, onRemove, onTogglePinned, onToggleExcluded, onSetOverlayCrns } = this.props;
     const { expanded } = this.state;
+
+    const course = courses[courseId];
 
     return (
       <div className={classes('Course', className)} style={{ backgroundColor: course.color }} key={course.id}
@@ -50,7 +80,7 @@ class Course extends SemiPureComponent {
                 const pinned = pinnedCrns.includes(section.crn);
                 return (
                   <div className={classes('section', excluded && 'excluded', pinned && 'pinned')}
-                       key={section.id} onClick={() => onTogglePinned(section)}
+                       key={section.id} onClick={() => this.handleTogglePinned(section)}
                        onMouseEnter={() => onSetOverlayCrns([section.crn])}
                        onMouseLeave={() => onSetOverlayCrns([])}>
                     <div className="section-header">
@@ -76,7 +106,7 @@ class Course extends SemiPureComponent {
                       <div className="exclude"
                            onClick={e => {
                              e.stopPropagation();
-                             onToggleExcluded(section);
+                             this.handleToggleExcluded(section);
                            }}>{excluded ? 'Include' : 'Exclude'}</div>
                     </div>
                   </div>
@@ -88,7 +118,7 @@ class Course extends SemiPureComponent {
         {
           expanded &&
           <div className="actions section-actions">
-            <div className="dim" onClick={() => onRemove(course)}>Remove</div>
+            <div className="dim" onClick={() => this.handleRemoveCourse(course)}>Remove</div>
           </div>
         }
       </div>
@@ -97,4 +127,4 @@ class Course extends SemiPureComponent {
 }
 
 
-export default connect(({ user }) => ({ user }), actions)(Course);
+export default connect(({ oscar, user }) => ({ oscar, user }), actions)(Course);

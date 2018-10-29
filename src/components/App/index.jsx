@@ -23,12 +23,7 @@ class App extends SemiPureComponent {
     this.captureRef = React.createRef();
 
     this.handleResize = this.handleResize.bind(this);
-    this.handleSetPinnedCrns = this.handleSetPinnedCrns.bind(this);
     this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
-    this.handleAddCourse = this.handleAddCourse.bind(this);
-    this.handleRemoveCourse = this.handleRemoveCourse.bind(this);
-    this.handleToggleExcluded = this.handleToggleExcluded.bind(this);
-    this.handleTogglePinned = this.handleTogglePinned.bind(this);
     this.handleDownload = this.handleDownload.bind(this);
   }
 
@@ -132,43 +127,6 @@ class App extends SemiPureComponent {
     }
   }
 
-  handleRemoveCourse(course) {
-    const { desiredCourses, pinnedCrns, excludedCrns } = this.props.user;
-    this.props.setDesiredCourses(desiredCourses.filter(courseId => courseId !== course.id));
-    this.props.setPinnedCrns(pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
-    this.props.setExcludedCrns(excludedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
-  }
-
-  handleAddCourse(course) {
-    const { desiredCourses, excludedCrns } = this.props.user;
-    if (desiredCourses.includes(course.id)) return;
-    const tbaCrns = Object.values(course.sections)
-      .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
-      .map(section => section.crn);
-    this.props.setDesiredCourses([...desiredCourses, course.id]);
-    this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
-  }
-
-  handleTogglePinned(section) {
-    const { pinnedCrns, excludedCrns } = this.props.user;
-    if (pinnedCrns.includes(section.crn)) {
-      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
-    } else {
-      this.props.setPinnedCrns([...pinnedCrns, section.crn]);
-      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
-    }
-  }
-
-  handleToggleExcluded(section) {
-    const { pinnedCrns, excludedCrns } = this.props.user;
-    if (excludedCrns.includes(section.crn)) {
-      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
-    } else {
-      this.props.setExcludedCrns([...excludedCrns, section.crn]);
-      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
-    }
-  }
-
   handleSetPinnedCrns(pinnedCrns) {
     this.props.setPinnedCrns(pinnedCrns);
   }
@@ -244,16 +202,12 @@ class App extends SemiPureComponent {
                   desiredCourses.map(courseId => {
                     const course = courses[courseId];
                     return (
-                      <Course course={course} expandable key={course.id}
-                              onRemove={this.handleRemoveCourse}
-                              onTogglePinned={this.handleTogglePinned}
-                              onToggleExcluded={this.handleToggleExcluded}
-                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                      <Course courseId={courseId} expandable key={course.id} onSetOverlayCrns={this.handleSetOverlayCrns}/>
                     );
                   })
                 }
               </div>
-              <CourseAdd onAddCourse={this.handleAddCourse}/>
+              <CourseAdd/>
             </div>
             <div className={classes('combinations-container', tabIndex === 1 && 'active')}>
               {
@@ -262,9 +216,7 @@ class App extends SemiPureComponent {
                   Reset Sections
                 </div>
               }
-              <Combinations className="combinations"
-                            onSetOverlayCrns={this.handleSetOverlayCrns}
-                            onSetPinnedCrns={this.handleSetPinnedCrns}/>
+              <Combinations className="combinations" onSetOverlayCrns={this.handleSetOverlayCrns}/>
             </div>
             {
               mobile &&

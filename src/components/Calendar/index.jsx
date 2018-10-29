@@ -10,7 +10,6 @@ class Calendar extends SemiPureComponent {
   render() {
     const { className, overlayCrns, preview } = this.props;
     const { mobile } = this.props.env;
-    const { crns } = this.props.oscar;
     const { pinnedCrns } = this.props.user;
 
     return (
@@ -53,13 +52,13 @@ class Calendar extends SemiPureComponent {
         <div className="meetings">
           {
             pinnedCrns.map(crn => (
-              <Section key={crn} section={crns[crn]} preview={preview}/>
+              <Section key={crn} crn={crn} preview={preview}/>
             ))
           }
           {
             overlayCrns &&
             overlayCrns.filter(crn => !pinnedCrns.includes(crn)).map(crn => (
-              <Section key={crn} section={crns[crn]} overlay={!preview} preview={preview}/>
+              <Section key={crn} crn={crn} overlay={!preview} preview={preview}/>
             ))
           }
         </div>
@@ -69,4 +68,4 @@ class Calendar extends SemiPureComponent {
 }
 
 
-export default connect(({ env, oscar, user }) => ({ env, oscar, user }), actions)(Calendar);
+export default connect(({ env, user }) => ({ env, user }), actions)(Calendar);

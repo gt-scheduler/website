@@ -8,8 +8,11 @@ import './stylesheet.scss';
 
 class Section extends SemiPureComponent {
   render() {
-    const { className, section, overlay, preview } = this.props;
+    const { className, crn, overlay, preview } = this.props;
     const { mobile } = this.props.env;
+    const { crns } = this.props.oscar;
+
+    const section = crns[crn];
 
     return (
       <div className={classes('Section', mobile && 'mobile', overlay && 'overlay', className)}>
@@ -47,4 +50,4 @@ class Section extends SemiPureComponent {
 }
 
 
-export default connect(({ env }) => ({ env }), actions)(Section);
+export default connect(({ env, oscar }) => ({ env, oscar }), actions)(Section);

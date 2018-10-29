@@ -67,8 +67,12 @@ class Combinations extends SemiPureComponent {
     return combinations;
   }
 
+  handleSetPinnedCrns(pinnedCrns) {
+    this.props.setPinnedCrns(pinnedCrns);
+  }
+
   render() {
-    const { className, onSetOverlayCrns, onSetPinnedCrns } = this.props;
+    const { className, onSetOverlayCrns } = this.props;
     const { pinnedCrns } = this.props.user;
 
     const combinations = this.getCombinations();
@@ -80,7 +84,7 @@ class Combinations extends SemiPureComponent {
             <div className="combination" key={i}
                  onMouseEnter={() => onSetOverlayCrns(combination)}
                  onMouseLeave={() => onSetOverlayCrns([])}
-                 onClick={() => onSetPinnedCrns([...pinnedCrns, ...combination])}>
+                 onClick={() => this.handleSetPinnedCrns([...pinnedCrns, ...combination])}>
               <div className="number">{i + 1}</div>
               <Calendar className="preview" overlayCrns={combination} preview/>
             </div>

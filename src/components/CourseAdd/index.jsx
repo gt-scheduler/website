@@ -17,7 +17,6 @@ class CourseAdd extends SemiPureComponent {
 
     this.handleChangeKeyword = this.handleChangeKeyword.bind(this);
     this.handlePressEnter = this.handlePressEnter.bind(this);
-    this.handleAddCourse = this.handleAddCourse.bind(this);
   }
 
   searchCourses(keyword) {
@@ -53,8 +52,14 @@ class CourseAdd extends SemiPureComponent {
   }
 
   handleAddCourse(course) {
-    const { onAddCourse } = this.props;
-    onAddCourse(course);
+    const { desiredCourses, excludedCrns } = this.props.user;
+    if (desiredCourses.includes(course.id)) return;
+    const tbaCrns = Object.values(course.sections)
+      .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
+      .map(section => section.crn);
+    this.props.setDesiredCourses([...desiredCourses, course.id]);
+    this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
+
     this.setState({ keyword: '' });
     this.inputRef.current.focus();
   }
@@ -73,7 +78,7 @@ class CourseAdd extends SemiPureComponent {
           {
             keyword &&
             this.searchCourses(keyword).map(course => (
-              <Course course={course} onClick={() => this.handleAddCourse(course)} key={course.id}
+              <Course courseId={course.id} onClick={() => this.handleAddCourse(course)} key={course.id}
                       pinnedCrns={pinnedCrns}/>
             ))
           }
