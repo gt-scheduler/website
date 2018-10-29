@@ -57,7 +57,7 @@ class App extends Component {
       return groups;
     };
 
-    axios.get('./courses.json')
+    axios.get('https://jasonpark.me/gt-schedule-crawler/courses.json')
       .then(res => {
         const crns = {};
         const courses = res.data;
