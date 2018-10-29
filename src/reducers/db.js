@@ -1,24 +1,20 @@
 import { combineActions, createAction, handleActions } from 'redux-actions';
 
-const prefix = 'OSCAR';
+const prefix = 'DB';
 
-const setCourses = createAction(`${prefix}/SET_COURSES`, courses => ({ courses }));
-const setCrns = createAction(`${prefix}/SET_CRNS`, crns => ({ crns }));
+const setOscar = createAction(`${prefix}/SET_OSCAR`, oscar => ({ oscar }));
 
 export const actions = {
-  setCourses,
-  setCrns,
+  setOscar,
 };
 
 const defaultState = {
-  courses: {},
-  crns: {},
+  oscar: null,
 };
 
 export default handleActions({
   [combineActions(
-    setCourses,
-    setCrns,
+    setOscar,
   )]: (state, { payload }) => ({
     ...state,
     ...payload,

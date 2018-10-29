@@ -19,34 +19,18 @@ class CourseAdd extends SemiPureComponent {
     this.handlePressEnter = this.handlePressEnter.bind(this);
   }
 
-  searchCourses(keyword) {
-    const { courses } = this.props.oscar;
-    const [, inputSubject, inputNumber] = /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
-    if (inputSubject || inputNumber) {
-      return Object.values(courses).filter(course => {
-        const [subject, number] = course.id.split(' ');
-        if (inputSubject && inputNumber) {
-          return subject === inputSubject && number.startsWith(inputNumber);
-        } else if (inputSubject) {
-          return subject.startsWith(inputSubject);
-        } else {
-          return number.startsWith(inputNumber);
-        }
-      });
-    } else {
-      return [];
-    }
-  }
-
   handleChangeKeyword(e) {
     const keyword = e.target.value;
     this.setState({ keyword });
   }
 
   handlePressEnter(e) {
+    const { oscar } = this.props.db;
+    const { keyword } = this.state;
+
     if (e.key === 'Enter') {
       e.preventDefault();
-      const courses = this.searchCourses(this.state.keyword);
+      const courses = oscar.searchCourses(keyword);
       if (courses.length) this.handleAddCourse(courses[0]);
     }
   }
@@ -66,6 +50,7 @@ class CourseAdd extends SemiPureComponent {
 
   render() {
     const { className } = this.props;
+    const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
     const { keyword } = this.state;
 
@@ -77,7 +62,7 @@ class CourseAdd extends SemiPureComponent {
         <div className="autocomplete">
           {
             keyword &&
-            this.searchCourses(keyword).map(course => (
+            oscar.searchCourses(keyword).map(course => (
               <Course courseId={course.id} onClick={() => this.handleAddCourse(course)} key={course.id}
                       pinnedCrns={pinnedCrns}/>
             ))
@@ -89,4 +74,4 @@ class CourseAdd extends SemiPureComponent {
 }
 
 
-export default connect(({ oscar, user }) => ({ oscar, user }), actions)(CourseAdd);
+export default connect(({ db, user }) => ({ db, user }), actions)(CourseAdd);

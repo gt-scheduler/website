@@ -10,9 +10,9 @@ class Section extends SemiPureComponent {
   render() {
     const { className, crn, overlay, preview } = this.props;
     const { mobile } = this.props.env;
-    const { crns } = this.props.oscar;
+    const { oscar } = this.props.db;
 
-    const section = crns[crn];
+    const section = oscar.findSection(crn);
 
     return (
       <div className={classes('Section', mobile && 'mobile', overlay && 'overlay', className)}>
@@ -23,12 +23,12 @@ class Section extends SemiPureComponent {
                    style={{
                      top: (meeting.period.start - OPEN) / (CLOSE - OPEN) * 100 + '%',
                      height: (meeting.period.end - meeting.period.start) / (CLOSE - OPEN) * 100 + '%',
-                     backgroundColor: meeting.course.color,
+                     backgroundColor: section.course.color,
                    }}>
                 {
                   !preview &&
                   <div className="meeting-wrapper">
-                    <span className="course_id">{meeting.course.id}{mobile ? '' : ` ${meeting.section.id}`}</span>
+                    <span className="course_id">{section.course.id}{mobile ? '' : ` ${section.id}`}</span>
                     <span className="period">{periodToString(meeting.period)}</span>
                     {
                       !mobile &&
@@ -50,4 +50,4 @@ class Section extends SemiPureComponent {
 }
 
 
-export default connect(({ env, oscar }) => ({ env, oscar }), actions)(Section);
+export default connect(({ env, db }) => ({ env, db }), actions)(Section);

@@ -4,10 +4,11 @@ import axios from 'axios';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
-import { classes, getRandomColor, isMobile, stringToTime } from '../../utils';
+import { classes, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import { Calendar, Combinations, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
+import { Oscar } from '../../beans';
 import './stylesheet.scss';
 
 class App extends SemiPureComponent {
@@ -16,7 +17,6 @@ class App extends SemiPureComponent {
 
     this.state = {
       overlayCrns: [],
-      loaded: false,
       tabIndex: 0,
     };
 
@@ -28,82 +28,10 @@ class App extends SemiPureComponent {
   }
 
   componentDidMount() {
-    const distinct = sections => {
-      let groups = {};
-      sections.forEach(section => {
-        const sectionGroupMeetings = section.meetings.map(({ days, period }) => ({ days, period }));
-        const sectionGroupHash = JSON.stringify(sectionGroupMeetings);
-        const sectionGroup = groups[sectionGroupHash];
-        if (sectionGroup) {
-          sectionGroup.sections.push(section);
-        } else {
-          groups[sectionGroupHash] = {
-            hash: sectionGroupHash,
-            meetings: sectionGroupMeetings,
-            sections: [section],
-          };
-        }
-      });
-      return groups;
-    };
-
     axios.get('https://jasonpark.me/gt-schedule-crawler/courses.json')
       .then(res => {
-        const crns = {};
-        const courses = res.data;
-        Object.keys(courses).forEach(courseId => {
-          const course = courses[courseId];
-          course.id = courseId;
-          course.color = getRandomColor(32, 160);
-          Object.keys(course.sections).forEach(sectionId => {
-            const section = course.sections[sectionId];
-            section.id = sectionId;
-            section.course = course;
-            const instructors = [];
-            section.meetings.forEach(meeting => instructors.push(...meeting.instructors));
-            section.instructors = [...new Set(instructors)];
-            crns[section.crn] = section;
-            section.meetings.forEach(meeting => {
-              meeting.course = course;
-              meeting.section = section;
-              const { days, period } = meeting;
-              if (days === '&nbsp;') {
-                meeting.days = [];
-              } else {
-                meeting.days = [...days];
-              }
-              if (period === 'TBA') {
-                meeting.period = undefined;
-              } else {
-                const [start, end] = period.split(' - ');
-                meeting.period = {
-                  start: stringToTime(start),
-                  end: stringToTime(end),
-                };
-              }
-            });
-          });
-          const sections = Object.values(course.sections);
-          const lectures = sections.filter(section => section.credits > 0);
-          const labs = sections.filter(section => section.credits === 0);
-          course.hasLab = !course.id.startsWith('VIP') && lectures.length && labs.length;
-          if (course.hasLab) {
-            course.lectures = lectures;
-            course.labs = labs;
-            course.lectures.forEach(lecture => lecture.labs = course.labs.filter(lab => lab.id.startsWith(lecture.id)));
-            course.labs.forEach(lab => lab.lectures = course.lectures.filter(lecture => lab.id.startsWith(lecture.id)));
-            if (course.lectures.every(lecture => !lecture.labs.length)) {
-              course.lectures.forEach(lecture => lecture.labs = course.labs);
-              course.labs.forEach(lab => lab.lectures = course.lectures);
-            }
-          } else {
-            course.sectionGroups = distinct(sections);
-          }
-        });
-
-        this.props.setCourses(courses);
-        this.props.setCrns(crns);
-        this.setState({ loaded: true });
+        const oscar = new Oscar(res.data);
+        this.props.setOscar(oscar);
       });
 
     window.addEventListener('resize', this.handleResize);
@@ -114,9 +42,9 @@ class App extends SemiPureComponent {
   }
 
   getTotalCredits() {
-    const { crns } = this.props.oscar;
+    const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
-    return pinnedCrns.reduce((credits, crn) => credits + crns[crn].credits, 0);
+    return pinnedCrns.reduce((credits, crn) => credits + oscar.findSection(crn).credits, 0);
   }
 
   handleResize(e) {
@@ -154,11 +82,11 @@ class App extends SemiPureComponent {
 
   render() {
     const { mobile } = this.props.env;
-    const { courses } = this.props.oscar;
+    const { oscar } = this.props.db;
     const { pinnedCrns, desiredCourses } = this.props.user;
-    const { overlayCrns, loaded, tabIndex } = this.state;
+    const { overlayCrns, tabIndex } = this.state;
 
-    return loaded && (
+    return oscar && (
       <div className={classes('App', mobile && 'mobile')}>
         {
           !mobile &&
@@ -200,9 +128,9 @@ class App extends SemiPureComponent {
               <div className="course-list">
                 {
                   desiredCourses.map(courseId => {
-                    const course = courses[courseId];
                     return (
-                      <Course courseId={courseId} expandable key={course.id} onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                      <Course courseId={courseId} expandable key={courseId}
+                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
                     );
                   })
                 }
@@ -238,4 +166,4 @@ class App extends SemiPureComponent {
   }
 }
 
-export default connect(({ env, oscar, user }) => ({ env, oscar, user }), actions)(App);
+export default connect(({ env, db, user }) => ({ env, db, user }), actions)(App);

@@ -47,11 +47,11 @@ class Course extends SemiPureComponent {
 
   render() {
     const { className, courseId, expandable, onClick, onSetOverlayCrns } = this.props;
-    const { courses } = this.props.oscar;
+    const { oscar } = this.props.db;
     const { pinnedCrns, excludedCrns } = this.props.user;
     const { expanded } = this.state;
 
-    const course = courses[courseId];
+    const course = oscar.findCourse(courseId);
 
     return (
       <div className={classes('Course', className)} style={{ backgroundColor: course.color }} key={course.id}
@@ -127,4 +127,4 @@ class Course extends SemiPureComponent {
 }
 
 
-export default connect(({ oscar, user }) => ({ oscar, user }), actions)(Course);
+export default connect(({ db, user }) => ({ db, user }), actions)(Course);

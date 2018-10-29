@@ -7,7 +7,7 @@ import './stylesheet.scss';
 
 class Combinations extends SemiPureComponent {
   getCombinations() {
-    const { courses, crns } = this.props.oscar;
+    const { oscar } = this.props.db;
     const { desiredCourses, pinnedCrns, excludedCrns } = this.props.user;
 
     const combinations = [];
@@ -16,10 +16,10 @@ class Combinations extends SemiPureComponent {
         combinations.push(combination);
         return;
       }
-      const course = courses[desiredCourses[courseIndex]];
+      const course = oscar.findCourse(desiredCourses[courseIndex]);
       const isIncluded = section => !excludedCrns.includes(section.crn);
       const isPinned = section => pinnedCrns.includes(section.crn);
-      const hasConflict = section => [...pinnedCrns, ...combination].some(crn => hasConflictBetween(crns[crn], section));
+      const hasConflict = section => [...pinnedCrns, ...combination].some(crn => hasConflictBetween(oscar.findSection(crn), section));
       if (course.hasLab) {
         const pinnedLectures = course.lectures.filter(isPinned);
         const pinnedLabs = course.labs.filter(isPinned);
@@ -96,4 +96,4 @@ class Combinations extends SemiPureComponent {
 }
 
 
-export default connect(({ oscar, user }) => ({ oscar, user }), actions)(Combinations);
+export default connect(({ db, user }) => ({ db, user }), actions)(Combinations);
