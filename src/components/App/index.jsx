@@ -1,28 +1,23 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
-import Cookies from 'js-cookie';
-import { classes, getRandomColor, hasConflictBetween, stringToTime } from '../../utils';
+import { classes, getRandomColor, isMobile, stringToTime } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import { Calendar, Combinations, Course, CourseAdd } from '../';
+import { Calendar, Combinations, Course, CourseAdd, SemiPureComponent } from '../';
+import { actions } from '../../reducers';
 import './stylesheet.scss';
 
-class App extends Component {
+class App extends SemiPureComponent {
   constructor(props) {
     super(props);
 
-    this.courses = {};
-    this.crns = {};
-
     this.state = {
-      ...this.loadData(),
-      combinations: [],
       overlayCrns: [],
       loaded: false,
       tabIndex: 0,
-      mobile: this.isMobile(),
     };
 
     this.captureRef = React.createRef();
@@ -111,9 +106,9 @@ class App extends Component {
           }
         });
 
-        this.courses = courses;
-        this.crns = crns;
-        this.updateCombinations({ loaded: true });
+        this.props.setCourses(courses);
+        this.props.setCrns(crns);
+        this.setState({ loaded: true });
       });
 
     window.addEventListener('resize', this.handleResize);
@@ -123,154 +118,59 @@ class App extends Component {
     window.removeEventListener('resize', this.handleResize);
   }
 
-  saveData({ desiredCourses = [], pinnedCrns = [], excludedCrns = [] }) {
-    Cookies.set('data', JSON.stringify({ desiredCourses, pinnedCrns, excludedCrns }), { expires: 365 });
-  }
-
-  loadData() {
-    let json = null;
-    try {
-      json = JSON.parse(Cookies.get('data'));
-    } catch (e) {
-      json = {};
-    }
-    const { desiredCourses = [], pinnedCrns = [], excludedCrns = [] } = json;
-    return { desiredCourses, pinnedCrns, excludedCrns };
-  }
-
-  updateCombinations(dispatch) {
-    this.setState(state => {
-      const update = typeof dispatch === 'function' ? dispatch(state) : dispatch;
-      const updatedState = { ...state, ...update };
-      const { desiredCourses, pinnedCrns, excludedCrns } = updatedState;
-      this.saveData(updatedState);
-      const combinations = [];
-      const dfs = (courseIndex = 0, combination = []) => {
-        if (courseIndex === desiredCourses.length) {
-          combinations.push(combination);
-          return;
-        }
-        const course = this.courses[desiredCourses[courseIndex]];
-        const isIncluded = section => !excludedCrns.includes(section.crn);
-        const isPinned = section => pinnedCrns.includes(section.crn);
-        const hasConflict = section => [...pinnedCrns, ...combination].some(crn => hasConflictBetween(this.crns[crn], section));
-        if (course.hasLab) {
-          const pinnedLectures = course.lectures.filter(isPinned);
-          const pinnedLabs = course.labs.filter(isPinned);
-          if (pinnedLabs.length) {
-            pinnedLabs.forEach(lab => {
-              lab.lectures.filter(isIncluded).forEach(lecture => {
-                if (isPinned(lecture)) {
-                  dfs(courseIndex + 1, combination);
-                } else {
-                  if (hasConflict(lecture)) return;
-                  dfs(courseIndex + 1, [...combination, lecture.crn]);
-                }
-              });
-            });
-          } else if (pinnedLectures.length) {
-            pinnedLectures.forEach(lecture => {
-              lecture.labs.filter(isIncluded).forEach(lab => {
-                if (hasConflict(lab)) return;
-                dfs(courseIndex + 1, [...combination, lab.crn]);
-              });
-            });
-          } else {
-            course.lectures.filter(isIncluded).forEach(lecture => {
-              if (hasConflict(lecture)) return;
-              lecture.labs.filter(isIncluded).forEach(lab => {
-                if (hasConflict(lab)) return;
-                dfs(courseIndex + 1, [...combination, lecture.crn, lab.crn]);
-              });
-            });
-          }
-        } else {
-          const sections = Object.values(course.sections);
-          if (sections.some(isPinned)) {
-            dfs(courseIndex + 1, combination);
-          } else {
-            Object.values(course.sectionGroups).forEach(sectionGroup => {
-              const section = sectionGroup.sections.find(isIncluded);
-              if (!section || hasConflict(section)) return;
-              dfs(courseIndex + 1, [...combination, section.crn]);
-            });
-          }
-        }
-      };
-      dfs();
-      return { ...update, combinations };
-    });
-  }
-
   getTotalCredits() {
-    const { pinnedCrns } = this.state;
-    return pinnedCrns.reduce((credits, crn) => credits + this.crns[crn].credits, 0);
-  }
-
-  isMobile() {
-    return window.innerWidth < 768;
+    const { crns } = this.props.oscar;
+    const { pinnedCrns } = this.props.user;
+    return pinnedCrns.reduce((credits, crn) => credits + crns[crn].credits, 0);
   }
 
   handleResize(e) {
-    const mobile = this.isMobile();
-    this.setState({ mobile });
+    const { mobile } = this.props.env;
+    const nextMobile = isMobile();
+    if (mobile !== nextMobile) {
+      this.props.setMobile(nextMobile);
+    }
   }
 
   handleRemoveCourse(course) {
-    this.updateCombinations(state => {
-      const desiredCourses = state.desiredCourses.filter(courseId => courseId !== course.id);
-      const pinnedCrns = state.pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn));
-      const excludedCrns = state.excludedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn));
-      return { desiredCourses, pinnedCrns, excludedCrns };
-    });
+    const { desiredCourses, pinnedCrns, excludedCrns } = this.props.user;
+    this.props.setDesiredCourses(desiredCourses.filter(courseId => courseId !== course.id));
+    this.props.setPinnedCrns(pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
+    this.props.setExcludedCrns(excludedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
   }
 
   handleAddCourse(course) {
-    this.updateCombinations(state => {
-      const { desiredCourses, excludedCrns } = state;
-      if (!desiredCourses.includes(course.id)) {
-        const tbaCrns = Object.values(course.sections)
-          .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
-          .map(section => section.crn);
-        return {
-          desiredCourses: [...desiredCourses, course.id],
-          excludedCrns: [...excludedCrns, ...tbaCrns],
-        };
-      }
-      return {};
-    });
+    const { desiredCourses, excludedCrns } = this.props.user;
+    if (desiredCourses.includes(course.id)) return;
+    const tbaCrns = Object.values(course.sections)
+      .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
+      .map(section => section.crn);
+    this.props.setDesiredCourses([...desiredCourses, course.id]);
+    this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
   }
 
   handleTogglePinned(section) {
-    this.updateCombinations(state => {
-      const { pinnedCrns, excludedCrns } = state;
-      if (pinnedCrns.includes(section.crn)) {
-        return { pinnedCrns: pinnedCrns.filter(crn => crn !== section.crn) };
-      } else {
-        return {
-          pinnedCrns: [...pinnedCrns, section.crn],
-          excludedCrns: excludedCrns.filter(crn => crn !== section.crn),
-        };
-      }
-    });
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    if (pinnedCrns.includes(section.crn)) {
+      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+    } else {
+      this.props.setPinnedCrns([...pinnedCrns, section.crn]);
+      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
+    }
   }
 
   handleToggleExcluded(section) {
-    this.updateCombinations(state => {
-      const { pinnedCrns, excludedCrns } = state;
-      if (excludedCrns.includes(section.crn)) {
-        return { excludedCrns: excludedCrns.filter(crn => crn !== section.crn) };
-      } else {
-        return {
-          excludedCrns: [...excludedCrns, section.crn],
-          pinnedCrns: pinnedCrns.filter(crn => crn !== section.crn),
-        };
-      }
-    });
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    if (excludedCrns.includes(section.crn)) {
+      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
+    } else {
+      this.props.setExcludedCrns([...excludedCrns, section.crn]);
+      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+    }
   }
 
   handleSetPinnedCrns(pinnedCrns) {
-    this.updateCombinations({ pinnedCrns });
+    this.props.setPinnedCrns(pinnedCrns);
   }
 
   handleSetOverlayCrns(overlayCrns) {
@@ -295,18 +195,21 @@ class App extends Component {
   }
 
   render() {
-    const { pinnedCrns, excludedCrns, desiredCourses, combinations, overlayCrns, loaded, tabIndex, mobile } = this.state;
+    const { mobile } = this.props.env;
+    const { courses } = this.props.oscar;
+    const { pinnedCrns, desiredCourses } = this.props.user;
+    const { overlayCrns, loaded, tabIndex } = this.state;
 
     return loaded && (
       <div className={classes('App', mobile && 'mobile')}>
         {
           !mobile &&
           <div className="calendar-container">
-            <Calendar pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
+            <Calendar overlayCrns={overlayCrns}/>
           </div>
         }
         <div className="capture-container" ref={this.captureRef}>
-          <Calendar className="fake-calendar" pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
+          <Calendar className="fake-calendar"/>
         </div>
         <div className="sidebar">
           {
@@ -339,20 +242,18 @@ class App extends Component {
               <div className="course-list">
                 {
                   desiredCourses.map(courseId => {
-                    const course = this.courses[courseId];
+                    const course = courses[courseId];
                     return (
                       <Course course={course} expandable key={course.id}
                               onRemove={this.handleRemoveCourse}
                               onTogglePinned={this.handleTogglePinned}
                               onToggleExcluded={this.handleToggleExcluded}
-                              onSetOverlayCrns={this.handleSetOverlayCrns}
-                              pinnedCrns={pinnedCrns}
-                              excludedCrns={excludedCrns}/>
+                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
                     );
                   })
                 }
               </div>
-              <CourseAdd courses={this.courses} pinnedCrns={pinnedCrns} onAddCourse={this.handleAddCourse}/>
+              <CourseAdd onAddCourse={this.handleAddCourse}/>
             </div>
             <div className={classes('combinations-container', tabIndex === 1 && 'active')}>
               {
@@ -361,15 +262,14 @@ class App extends Component {
                   Reset Sections
                 </div>
               }
-              <Combinations className="combinations" combinations={combinations}
-                            crns={this.crns} pinnedCrns={pinnedCrns}
+              <Combinations className="combinations"
                             onSetOverlayCrns={this.handleSetOverlayCrns}
                             onSetPinnedCrns={this.handleSetPinnedCrns}/>
             </div>
             {
               mobile &&
-              <div className={classes('mobile', 'calendar-container', tabIndex === 2 && 'active')}>
-                <Calendar mobile pinnedCrns={pinnedCrns} overlayCrns={overlayCrns} crns={this.crns}/>
+              <div className={classes('calendar-container', tabIndex === 2 && 'active')}>
+                <Calendar overlayCrns={overlayCrns}/>
               </div>
             }
           </div>
@@ -386,5 +286,4 @@ class App extends Component {
   }
 }
 
-
-export default App;
+export default connect(({ env, oscar, user }) => ({ env, oscar, user }), actions)(App);

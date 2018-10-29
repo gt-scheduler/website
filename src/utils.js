@@ -34,6 +34,14 @@ const hasConflictBetween = (section1, section2) =>
 
 const classes = (...classList) => classList.filter(c => c).join(' ');
 
+const isMobile = () => window.innerWidth < 768;
+
+const shallowCompareEntries = (a, b) => {
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  return aKeys.length === bKeys.length && aKeys.every(key => key in b && a[key] === b[key]);
+};
+
 export {
   stringToTime,
   timeToString,
@@ -42,4 +50,6 @@ export {
   getRandomColor,
   hasConflictBetween,
   classes,
+  isMobile,
+  shallowCompareEntries,
 };

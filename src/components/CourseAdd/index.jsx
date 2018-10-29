@@ -1,9 +1,11 @@
-import React, { PureComponent } from 'react';
-import { Course } from '../';
+import React from 'react';
+import { connect } from 'react-redux';
+import { Course, SemiPureComponent } from '../';
 import { classes } from '../../utils';
+import { actions } from '../../reducers';
 import './stylesheet.scss';
 
-class CourseAdd extends PureComponent {
+class CourseAdd extends SemiPureComponent {
   constructor(props) {
     super(props);
 
@@ -19,7 +21,7 @@ class CourseAdd extends PureComponent {
   }
 
   searchCourses(keyword) {
-    const { courses } = this.props;
+    const { courses } = this.props.oscar;
     const [, inputSubject, inputNumber] = /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
     if (inputSubject || inputNumber) {
       return Object.values(courses).filter(course => {
@@ -58,7 +60,8 @@ class CourseAdd extends PureComponent {
   }
 
   render() {
-    const { className, pinnedCrns } = this.props;
+    const { className } = this.props;
+    const { pinnedCrns } = this.props.user;
     const { keyword } = this.state;
 
     return (
@@ -81,4 +84,4 @@ class CourseAdd extends PureComponent {
 }
 
 
-export default CourseAdd;
+export default connect(({ oscar, user }) => ({ oscar, user }), actions)(CourseAdd);

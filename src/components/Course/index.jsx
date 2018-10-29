@@ -1,8 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { classes, periodToString } from '../../utils';
+import { actions } from '../../reducers';
+import { SemiPureComponent } from '../';
 import './stylesheet.scss';
 
-class Course extends Component {
+class Course extends SemiPureComponent {
   constructor(props) {
     super(props);
 
@@ -16,7 +19,8 @@ class Course extends Component {
   }
 
   render() {
-    const { className, course, expandable, onClick, onRemove, onTogglePinned, onToggleExcluded, onSetOverlayCrns, pinnedCrns, excludedCrns } = this.props;
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    const { className, course, expandable, onClick, onRemove, onTogglePinned, onToggleExcluded, onSetOverlayCrns } = this.props;
     const { expanded } = this.state;
 
     return (
@@ -93,4 +97,4 @@ class Course extends Component {
 }
 
 
-export default Course;
+export default connect(({ user }) => ({ user }), actions)(Course);

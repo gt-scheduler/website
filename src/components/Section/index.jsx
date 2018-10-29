@@ -1,11 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { classes, periodToString } from '../../utils';
 import { CLOSE, OPEN } from '../../constants';
+import { SemiPureComponent } from '../';
+import { actions } from '../../reducers';
 import './stylesheet.scss';
 
-class Section extends Component {
+class Section extends SemiPureComponent {
   render() {
-    const { className, section, overlay, preview, mobile } = this.props;
+    const { className, section, overlay, preview } = this.props;
+    const { mobile } = this.props.env;
 
     return (
       <div className={classes('Section', mobile && 'mobile', overlay && 'overlay', className)}>
@@ -43,4 +47,4 @@ class Section extends Component {
 }
 
 
-export default Section;
+export default connect(({ env }) => ({ env }), actions)(Section);

@@ -1,12 +1,17 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { CLOSE, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils';
-import { Section } from '../';
+import { actions } from '../../reducers';
+import { Section, SemiPureComponent } from '../';
 import './stylesheet.scss';
 
-class Calendar extends Component {
+class Calendar extends SemiPureComponent {
   render() {
-    const { className, pinnedCrns, overlayCrns, crns, preview, mobile } = this.props;
+    const { className, overlayCrns, preview } = this.props;
+    const { mobile } = this.props.env;
+    const { crns } = this.props.oscar;
+    const { pinnedCrns } = this.props.user;
 
     return (
       <div className={classes('Calendar', mobile && 'mobile', preview && 'preview', className)}>
@@ -48,12 +53,13 @@ class Calendar extends Component {
         <div className="meetings">
           {
             pinnedCrns.map(crn => (
-              <Section key={crn} mobile={mobile} section={crns[crn]} preview={preview}/>
+              <Section key={crn} section={crns[crn]} preview={preview}/>
             ))
           }
           {
+            overlayCrns &&
             overlayCrns.filter(crn => !pinnedCrns.includes(crn)).map(crn => (
-              <Section key={crn} mobile={mobile} section={crns[crn]} overlay preview={preview}/>
+              <Section key={crn} section={crns[crn]} overlay={!preview} preview={preview}/>
             ))
           }
         </div>
@@ -63,4 +69,4 @@ class Calendar extends Component {
 }
 
 
-export default Calendar;
+export default connect(({ env, oscar, user }) => ({ env, oscar, user }), actions)(Calendar);

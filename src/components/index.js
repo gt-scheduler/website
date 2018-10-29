@@ -1,3 +1,4 @@
+export { default as SemiPureComponent } from './SemiPureComponent';
 export { default as App } from './App';
 export { default as Calendar } from './Calendar';
 export { default as Combinations } from './Combinations';
