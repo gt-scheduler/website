@@ -57,21 +57,6 @@
       }
     }
 
-    .button {
-      display: block;
-      text-align: center;
-      padding: 8px;
-      font-size: .8em;
-      font-weight: bold;
-      background-color: $color-light;
-      color: $color-darker;
-      cursor: pointer;
-
-      &:hover {
-        color: black;
-      }
-    }
-
     .scroller {
       flex: 1;
       overflow-y: scroll;
@@ -96,11 +81,6 @@
       }
 
       .combinations-container {
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-
         > * {
           border-bottom: 1px solid $color-dark;
         }

@@ -1,12 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
 import { classes, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import { Calendar, Combinations, Course, CourseAdd, SemiPureComponent } from '../';
+import { Button, Calendar, CombinationsContainer, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import { Oscar } from '../../beans';
 import './stylesheet.scss';
@@ -53,10 +52,6 @@ class App extends SemiPureComponent {
     if (mobile !== nextMobile) {
       this.props.setMobile(nextMobile);
     }
-  }
-
-  handleSetPinnedCrns(pinnedCrns) {
-    this.props.setPinnedCrns(pinnedCrns);
   }
 
   handleSetOverlayCrns(overlayCrns) {
@@ -121,9 +116,9 @@ class App extends SemiPureComponent {
             <div className={classes('courses-container', tabIndex === 0 && 'active')}>
               {
                 pinnedCrns.length > 0 &&
-                <CopyToClipboard className="button" text={pinnedCrns.join(', ')}>
+                <Button text={pinnedCrns.join(', ')}>
                   <span>{pinnedCrns.join(', ')}</span>
-                </CopyToClipboard>
+                </Button>
               }
               <div className="course-list">
                 {
@@ -137,15 +132,8 @@ class App extends SemiPureComponent {
               </div>
               <CourseAdd/>
             </div>
-            <div className={classes('combinations-container', tabIndex === 1 && 'active')}>
-              {
-                pinnedCrns.length > 0 &&
-                <div className="button" onClick={() => this.handleSetPinnedCrns([])}>
-                  Reset Sections
-                </div>
-              }
-              <Combinations className="combinations" onSetOverlayCrns={this.handleSetOverlayCrns}/>
-            </div>
+            <CombinationsContainer className={classes('combinations-container', tabIndex === 1 && 'active')}
+                                   onSetOverlayCrns={this.handleSetOverlayCrns}/>
             {
               mobile &&
               <div className={classes('calendar-container', tabIndex === 2 && 'active')}>
@@ -153,13 +141,12 @@ class App extends SemiPureComponent {
               </div>
             }
           </div>
-          <div className="button" onClick={this.handleDownload}>
+          <Button onClick={this.handleDownload}>
             Download as PNG
-          </div>
-          <a className="button" href="https://github.com/parkjs814/gt-scheduler" rel="noopener noreferrer"
-             target="_blank">
+          </Button>
+          <Button href="https://github.com/parkjs814/gt-scheduler" rel="noopener noreferrer" target="_blank">
             Fork me on GitHub
-          </a>
+          </Button>
         </div>
       </div>
     );

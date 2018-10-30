@@ -1,0 +1,16 @@
+@import "../../variables";
+
+.Button {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  font-size: .8em;
+  font-weight: bold;
+  background-color: $color-light;
+  color: $color-darker;
+  cursor: pointer;
+
+  &:hover {
+    color: black;
+  }
+}

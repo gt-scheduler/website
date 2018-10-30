@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { CLOSE, OPEN } from '../../constants';
+import { CLOSE, OPEN, DAYS } from '../../constants';
 import { classes, timeToShortString } from '../../utils';
 import { actions } from '../../reducers';
 import { Section, SemiPureComponent } from '../';
@@ -39,7 +39,7 @@ class Calendar extends SemiPureComponent {
           !preview &&
           <div className="days">
             {
-              ['M', 'T', 'W', 'R', 'F'].map(day => (
+              DAYS.map(day => (
                 <div className="day" key={day}>
                     <span className="label">
                       {day}

@@ -1,0 +1,56 @@
+@import "../../variables";
+
+.CombinationsContainer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  .sorting-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0;
+
+    select {
+      align-self: stretch;
+      flex: 1;
+      padding: 8px;
+    }
+
+    &:after {
+      position: absolute;
+      right: 8px;
+      content: '▼';
+    }
+  }
+
+  .combinations {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: -1px;
+
+    .combination {
+      flex: 1 0 160px;
+      display: flex;
+      border-top: 1px solid $color-dark;
+      border-bottom: 1px solid $color-dark;
+
+      .number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: $color-dark;
+        width: 2em;
+        color: white;
+        font-size: .8em;
+        font-weight: bold;
+      }
+
+      .preview {
+        flex: 1;
+        cursor: pointer;
+      }
+    }
+  }
+}
