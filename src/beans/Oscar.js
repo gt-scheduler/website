@@ -77,8 +77,7 @@ class Oscar {
           });
         }
       } else {
-        const sections = Object.values(course.sections);
-        if (sections.some(isPinned)) {
+        if (course.sections.some(isPinned)) {
           dfs(courseIndex + 1, crns);
         } else {
           Object.values(course.sectionGroups).forEach(sectionGroup => {

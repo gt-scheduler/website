@@ -38,7 +38,7 @@ class CourseAdd extends SemiPureComponent {
   handleAddCourse(course) {
     const { desiredCourses, excludedCrns } = this.props.user;
     if (desiredCourses.includes(course.id)) return;
-    const tbaCrns = Object.values(course.sections)
+    const tbaCrns = course.sections
       .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
       .map(section => section.crn);
     this.props.setDesiredCourses([...desiredCourses, course.id]);

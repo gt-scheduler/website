@@ -17,8 +17,8 @@ class Course extends SemiPureComponent {
   handleRemoveCourse(course) {
     const { desiredCourses, pinnedCrns, excludedCrns } = this.props.user;
     this.props.setDesiredCourses(desiredCourses.filter(courseId => courseId !== course.id));
-    this.props.setPinnedCrns(pinnedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
-    this.props.setExcludedCrns(excludedCrns.filter(crn => !Object.values(course.sections).some(section => section.crn === crn)));
+    this.props.setPinnedCrns(pinnedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
+    this.props.setExcludedCrns(excludedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
   }
 
   handleTogglePinned(section) {
@@ -60,7 +60,7 @@ class Course extends SemiPureComponent {
           <div className="row">
             <span className="course_id">{course.id}</span>
             <span className="section_ids">
-              {Object.values(course.sections).filter(section => pinnedCrns.includes(section.crn)).map(section => section.id).join(', ')}
+              {course.sections.filter(section => pinnedCrns.includes(section.crn)).map(section => section.id).join(', ')}
             </span>
           </div>
           <div className="row">
@@ -75,7 +75,7 @@ class Course extends SemiPureComponent {
           expanded &&
           <div className="sections">
             {
-              Object.values(course.sections).map(section => {
+              course.sections.map(section => {
                 const excluded = excludedCrns.includes(section.crn);
                 const pinned = pinnedCrns.includes(section.crn);
                 return (
