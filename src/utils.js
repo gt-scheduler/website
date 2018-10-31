@@ -1,3 +1,5 @@
+import { DAYS } from './constants';
+
 const stringToTime = string => {
   const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
   return ((ampm === 'p' ? 12 : 0) + Number.parseInt(hour % 12)) * 60 + Number.parseInt(minute);
@@ -25,11 +27,18 @@ const getRandomColor = (from = 0, to = 256) => {
   return hex;
 };
 
+const getContentClassName = (color = '#BBBBBB') => {
+  const r = parseInt(color.substring(1, 3), 16);
+  const g = parseInt(color.substring(3, 5), 16);
+  const b = parseInt(color.substring(5, 7), 16);
+  return r * .299 + g * .587 + b * .114 > 128 ? 'dark-content' : 'light-content';
+};
+
 const hasConflictBetween = (section1, section2) =>
   section1.meetings.some(meeting1 =>
     section2.meetings.some(meeting2 =>
       meeting1.period && meeting2.period &&
-      ['M', 'T', 'W', 'R', 'F'].some(day => meeting1.days.includes(day) && meeting2.days.includes(day)) &&
+      DAYS.some(day => meeting1.days.includes(day) && meeting2.days.includes(day)) &&
       meeting1.period.start < meeting2.period.end && meeting2.period.start < meeting1.period.end));
 
 const classes = (...classList) => classList.filter(c => c).join(' ');
@@ -57,6 +66,7 @@ export {
   timeToShortString,
   periodToString,
   getRandomColor,
+  getContentClassName,
   hasConflictBetween,
   classes,
   isMobile,

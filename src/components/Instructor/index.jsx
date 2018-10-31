@@ -63,7 +63,7 @@ class Instructor extends SemiPureComponent {
   }
 
   render() {
-    const { className, course, name, sections, onSetOverlayCrns } = this.props;
+    const { className, color, name, sections, onSetOverlayCrns } = this.props;
     const { pinnedCrns, excludedCrns } = this.props.user;
     const { expanded } = this.state;
 
@@ -72,17 +72,18 @@ class Instructor extends SemiPureComponent {
 
     return (
       <div className={classes('Instructor', className)}>
-        <ActionRow className={classes('name', instructorExcluded && 'excluded', instructorPinned && 'pinned')}
-                   actions={[
-                     { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
-                     !['TBA', 'Not Assigned'].includes(name) && {
-                       icon: faInfoCircle,
-                       href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(simplifyName(name))}`,
-                     },
-                     instructorExcluded ?
-                       { icon: faCheck, onClick: () => this.handleIncludeAll() } :
-                       { icon: faBan, onClick: () => this.handleExcludeAll() },
-                   ]} color={course.color}>
+        <ActionRow
+          className={classes('name', 'divider-bottom', instructorExcluded && 'strikethrough', !instructorPinned && 'inactive')}
+          actions={[
+            { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
+            !['TBA', 'Not Assigned'].includes(name) && {
+              icon: faInfoCircle,
+              href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(simplifyName(name))}`,
+            },
+            instructorExcluded ?
+              { icon: faCheck, onClick: () => this.handleIncludeAll() } :
+              { icon: faBan, onClick: () => this.handleExcludeAll() },
+          ]} color={color}>
           {name || 'Not Assigned'}
         </ActionRow>
         {
@@ -93,16 +94,17 @@ class Instructor extends SemiPureComponent {
                 const excluded = excludedCrns.includes(section.crn);
                 const pinned = pinnedCrns.includes(section.crn);
                 return (
-                  <ActionRow className={classes('section', excluded && 'excluded', pinned && 'pinned')}
-                             onMouseEnter={() => onSetOverlayCrns([section.crn])}
-                             onMouseLeave={() => onSetOverlayCrns([])} actions={[
+                  <ActionRow
+                    className={classes('section', 'divider-bottom', excluded && 'strikethrough', !pinned && 'inactive')}
+                    onMouseEnter={() => onSetOverlayCrns([section.crn])}
+                    onMouseLeave={() => onSetOverlayCrns([])} actions={[
                     { icon: pinned ? faTimes : faThumbtack, onClick: () => this.handleTogglePinned(section) },
                     {
                       icon: faInfoCircle,
                       href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201902&crn_in=${section.crn}`,
                     },
                     { icon: excluded ? faCheck : faBan, onClick: () => this.handleToggleExcluded(section) },
-                  ]} color={course.color} key={section.id}>
+                  ]} color={color} key={section.id}>
                     <div className="section-header">
                       <span className="section_id">{section.id}</span>
                     </div>

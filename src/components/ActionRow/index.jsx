@@ -11,7 +11,7 @@ class ActionRow extends Component {
     return (
       <div className={classes('ActionRow', className)} {...restProps}>
         {children}
-        <div className="actions">
+        <div className={classes('actions', 'default')}>
           {
             actions.filter(action => action).map(({ className, icon, ...restProps }, i) => {
               const props = {

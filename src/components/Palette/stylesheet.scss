@@ -1,0 +1,18 @@
+@import "../../variables";
+
+.Palette {
+  display: flex;
+  flex-direction: column;
+
+  .palette-row {
+    flex: 1;
+    display: flex;
+
+    .color {
+      position: relative;
+      flex: 1;
+      display: flex;
+      cursor: pointer;
+    }
+  }
+}

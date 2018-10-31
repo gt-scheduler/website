@@ -2,7 +2,15 @@ $calendar-height: 840px;
 $calendar-width: 720px;
 $time-width: 48px;
 $day-height: 40px;
+
 $color-lighter: #EEEEEE;
 $color-light: #DDDDDD;
 $color-dark: #BBBBBB;
 $color-darker: #666666;
+
+$text-color-light: $color-lighter;
+$text-color-dark: #333333;
+
+$opacity-inactive: .6;
+$opacity-disabled: .38;
+$opacity-divider: .2;

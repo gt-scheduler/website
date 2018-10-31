@@ -1,4 +1,3 @@
-import { getRandomColor } from '../utils';
 import { Section } from './';
 
 class Course {
@@ -6,7 +5,6 @@ class Course {
     this.id = courseId;
     [this.subject, this.number] = this.id.split(' ');
     this.title = data.title;
-    this.color = getRandomColor(32, 160);
     this.sections = Object.keys(data.sections).map(sectionId => new Section(this, sectionId, data.sections[sectionId]));
 
     const lectures = this.sections.filter(section => section.credits > 0);

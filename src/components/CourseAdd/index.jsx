@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Course, SemiPureComponent } from '../';
-import { classes } from '../../utils';
+import { classes, getRandomColor } from '../../utils';
 import { actions } from '../../reducers';
 import './stylesheet.scss';
 
@@ -36,13 +36,14 @@ class CourseAdd extends SemiPureComponent {
   }
 
   handleAddCourse(course) {
-    const { desiredCourses, excludedCrns } = this.props.user;
+    const { desiredCourses, excludedCrns, colorMap } = this.props.user;
     if (desiredCourses.includes(course.id)) return;
     const tbaCrns = course.sections
       .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
       .map(section => section.crn);
     this.props.setDesiredCourses([...desiredCourses, course.id]);
     this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
+    this.props.setColorMap({ ...colorMap, [course.id]: getRandomColor() });
 
     this.setState({ keyword: '' });
     this.inputRef.current.focus();
@@ -51,7 +52,7 @@ class CourseAdd extends SemiPureComponent {
   render() {
     const { className } = this.props;
     const { oscar } = this.props.db;
-    const { pinnedCrns } = this.props.user;
+    const { desiredCourses, pinnedCrns } = this.props.user;
     const { keyword } = this.state;
 
     return (
@@ -61,8 +62,7 @@ class CourseAdd extends SemiPureComponent {
                placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
         <div className="autocomplete">
           {
-            keyword &&
-            oscar.searchCourses(keyword).map(course => (
+            oscar.searchCourses(keyword).filter(course => !desiredCourses.includes(course.id)).map(course => (
               <Course key={course.id} courseId={course.id} pinnedCrns={pinnedCrns}
                       onAddCourse={() => this.handleAddCourse(course)}/>
             ))
