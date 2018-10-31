@@ -36,7 +36,7 @@ class Course extends SemiPureComponent {
 
     const instructorMap = {};
     course.sections.forEach(section => {
-      const [primaryInstructor] = section.instructors;
+      const [primaryInstructor = 'Not Assigned'] = section.instructors;
       if (!(primaryInstructor in instructorMap)) {
         instructorMap[primaryInstructor] = [];
       }

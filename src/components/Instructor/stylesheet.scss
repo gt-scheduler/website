@@ -7,11 +7,26 @@
 
   .name {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     padding: 8px;
     color: rgba(white, .5);
     font-weight: bold;
     border-bottom: 1px solid rgba(white, .2);
+
+    &.excluded {
+      .exclude {
+        color: white;
+      }
+
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: white;
+      }
+    }
 
     &.pinned {
       color: white;

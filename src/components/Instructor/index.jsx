@@ -72,17 +72,18 @@ class Instructor extends SemiPureComponent {
 
     return (
       <div className={classes('Instructor', className)}>
-        <ActionRow className={classes('name', instructorPinned && 'pinned')} actions={[
-          { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
-          name !== 'TBA' && {
-            icon: faInfoCircle,
-            href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(simplifyName(name))}`,
-          },
-          instructorExcluded ?
-            { icon: faCheck, onClick: () => this.handleIncludeAll() } :
-            { icon: faBan, onClick: () => this.handleExcludeAll() },
-        ]} color={course.color}>
-          {name}
+        <ActionRow className={classes('name', instructorExcluded && 'excluded', instructorPinned && 'pinned')}
+                   actions={[
+                     { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
+                     !['TBA', 'Not Assigned'].includes(name) && {
+                       icon: faInfoCircle,
+                       href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(simplifyName(name))}`,
+                     },
+                     instructorExcluded ?
+                       { icon: faCheck, onClick: () => this.handleIncludeAll() } :
+                       { icon: faBan, onClick: () => this.handleExcludeAll() },
+                   ]} color={course.color}>
+          {name || 'Not Assigned'}
         </ActionRow>
         {
           expanded &&
