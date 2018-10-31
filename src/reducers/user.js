@@ -1,5 +1,6 @@
 import { combineActions, createAction, handleActions } from 'redux-actions';
 import Cookies from 'js-cookie';
+import { getRandomColor } from '../utils';
 
 const prefix = 'USER';
 
@@ -27,6 +28,11 @@ const loadData = () => {
     json = {};
   }
   const { desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {} } = json;
+  desiredCourses.forEach(courseId => {
+    if (!(courseId in colorMap)) {
+      colorMap[courseId] = getRandomColor();
+    }
+  });
   return { desiredCourses, pinnedCrns, excludedCrns, colorMap };
 };
 
