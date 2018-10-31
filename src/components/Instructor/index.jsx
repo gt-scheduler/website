@@ -1,0 +1,132 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import {
+  faAngleDown,
+  faAngleUp,
+  faBan,
+  faCheck,
+  faInfoCircle,
+  faThumbtack,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
+import { classes, periodToString, simplifyName, unique } from '../../utils';
+import { actions } from '../../reducers';
+import { ActionRow, SemiPureComponent } from '../';
+import './stylesheet.scss';
+
+class Instructor extends SemiPureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expanded: true,
+    };
+  }
+
+  handleTogglePinned(section) {
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    if (pinnedCrns.includes(section.crn)) {
+      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+    } else {
+      this.props.setPinnedCrns([...pinnedCrns, section.crn]);
+      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
+    }
+  }
+
+  handleToggleExcluded(section) {
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    if (excludedCrns.includes(section.crn)) {
+      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
+    } else {
+      this.props.setExcludedCrns([...excludedCrns, section.crn]);
+      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+    }
+  }
+
+  handleExcludeAll() {
+    const { sections } = this.props;
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    const crns = sections.map(section => section.crn);
+    this.props.setExcludedCrns(unique([...excludedCrns, ...crns]));
+    this.props.setPinnedCrns(pinnedCrns.filter(crn => !crns.includes(crn)));
+  }
+
+  handleIncludeAll() {
+    const { sections } = this.props;
+    const { excludedCrns } = this.props.user;
+    const crns = sections.map(section => section.crn);
+    this.props.setExcludedCrns(excludedCrns.filter(crn => !crns.includes(crn)));
+  }
+
+  handleToggleExpanded(expanded = !this.state.expanded) {
+    this.setState({ expanded });
+  }
+
+  render() {
+    const { className, course, name, sections, onSetOverlayCrns } = this.props;
+    const { pinnedCrns, excludedCrns } = this.props.user;
+    const { expanded } = this.state;
+
+    const instructorExcluded = sections.every(section => excludedCrns.includes(section.crn));
+    const instructorPinned = sections.some(section => pinnedCrns.includes(section.crn));
+
+    return (
+      <div className={classes('Instructor', className)}>
+        <ActionRow className={classes('name', instructorPinned && 'pinned')} actions={[
+          { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
+          name !== 'TBA' && {
+            icon: faInfoCircle,
+            href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(simplifyName(name))}`,
+          },
+          instructorExcluded ?
+            { icon: faCheck, onClick: () => this.handleIncludeAll() } :
+            { icon: faBan, onClick: () => this.handleExcludeAll() },
+        ]} color={course.color}>
+          {name}
+        </ActionRow>
+        {
+          expanded &&
+          <div className="sections">
+            {
+              sections.map(section => {
+                const excluded = excludedCrns.includes(section.crn);
+                const pinned = pinnedCrns.includes(section.crn);
+                return (
+                  <ActionRow className={classes('section', excluded && 'excluded', pinned && 'pinned')}
+                             onMouseEnter={() => onSetOverlayCrns([section.crn])}
+                             onMouseLeave={() => onSetOverlayCrns([])} actions={[
+                    { icon: pinned ? faTimes : faThumbtack, onClick: () => this.handleTogglePinned(section) },
+                    {
+                      icon: faInfoCircle,
+                      href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201902&crn_in=${section.crn}`,
+                    },
+                    { icon: excluded ? faCheck : faBan, onClick: () => this.handleToggleExcluded(section) },
+                  ]} color={course.color} key={section.id}>
+                    <div className="section-header">
+                      <span className="section_id">{section.id}</span>
+                    </div>
+                    <div className="meetings">
+                      {
+                        section.meetings.map((meeting, i) => {
+                          return (
+                            <div className="meeting" key={i}>
+                              <span className="days">{meeting.days.join('')}</span>
+                              <span className="period">{periodToString(meeting.period)}</span>
+                            </div>
+                          );
+                        })
+                      }
+                    </div>
+                  </ActionRow>
+                );
+              })
+            }
+          </div>
+        }
+      </div>
+    );
+  }
+}
+
+
+export default connect(({ user }) => ({ user }), actions)(Instructor);

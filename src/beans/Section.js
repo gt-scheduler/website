@@ -1,4 +1,4 @@
-import { stringToTime } from '../utils';
+import { stringToTime, unique } from '../utils';
 
 class Section {
   constructor(course, sectionId, data) {
@@ -12,10 +12,10 @@ class Section {
         start: stringToTime(period.split(' - ')[0]),
         end: stringToTime(period.split(' - ')[1]),
       },
-      instructors,
+      instructors: instructors.map(instructor => instructor.replace(/ \(P\)$/, '')),
       where,
     }));
-    this.instructors = [...new Set(this.meetings.reduce((instructors, meeting) => [...instructors, ...meeting.instructors], []))];
+    this.instructors = unique(this.meetings.reduce((instructors, meeting) => [...instructors, ...meeting.instructors], []));
   }
 }
 

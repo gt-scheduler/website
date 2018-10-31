@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { CLOSE, OPEN, DAYS } from '../../constants';
+import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils';
 import { actions } from '../../reducers';
-import { Section, SemiPureComponent } from '../';
+import { SemiPureComponent, TimeBlocks } from '../';
 import './stylesheet.scss';
 
 class Calendar extends SemiPureComponent {
@@ -52,13 +52,13 @@ class Calendar extends SemiPureComponent {
         <div className="meetings">
           {
             pinnedCrns.map(crn => (
-              <Section key={crn} crn={crn} preview={preview}/>
+              <TimeBlocks key={crn} crn={crn} preview={preview}/>
             ))
           }
           {
             overlayCrns &&
             overlayCrns.filter(crn => !pinnedCrns.includes(crn)).map(crn => (
-              <Section key={crn} crn={crn} overlay={!preview} preview={preview}/>
+              <TimeBlocks key={crn} crn={crn} overlay={!preview} preview={preview}/>
             ))
           }
         </div>

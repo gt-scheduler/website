@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { classes, periodToString } from '../../utils';
+import { faAngleDown, faAngleUp, faInfoCircle, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { classes } from '../../utils';
 import { actions } from '../../reducers';
-import { SemiPureComponent } from '../';
+import { ActionRow, Instructor, SemiPureComponent } from '../';
 import './stylesheet.scss';
 
 class Course extends SemiPureComponent {
@@ -21,42 +22,39 @@ class Course extends SemiPureComponent {
     this.props.setExcludedCrns(excludedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
   }
 
-  handleTogglePinned(section) {
-    const { pinnedCrns, excludedCrns } = this.props.user;
-    if (pinnedCrns.includes(section.crn)) {
-      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
-    } else {
-      this.props.setPinnedCrns([...pinnedCrns, section.crn]);
-      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
-    }
-  }
-
-  handleToggleExcluded(section) {
-    const { pinnedCrns, excludedCrns } = this.props.user;
-    if (excludedCrns.includes(section.crn)) {
-      this.props.setExcludedCrns(excludedCrns.filter(crn => crn !== section.crn));
-    } else {
-      this.props.setExcludedCrns([...excludedCrns, section.crn]);
-      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
-    }
-  }
-
   handleToggleExpanded(expanded = !this.state.expanded) {
     this.setState({ expanded });
   }
 
   render() {
-    const { className, courseId, expandable, onClick, onSetOverlayCrns } = this.props;
+    const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
     const { oscar } = this.props.db;
-    const { pinnedCrns, excludedCrns } = this.props.user;
+    const { pinnedCrns } = this.props.user;
     const { expanded } = this.state;
 
     const course = oscar.findCourse(courseId);
 
+    const instructorMap = {};
+    course.sections.forEach(section => {
+      const [primaryInstructor] = section.instructors;
+      if (!(primaryInstructor in instructorMap)) {
+        instructorMap[primaryInstructor] = [];
+      }
+      instructorMap[primaryInstructor].push(section);
+    });
+
     return (
-      <div className={classes('Course', className)} style={{ backgroundColor: course.color }} key={course.id}
-           onClick={onClick}>
-        <div className="course-header" onClick={expandable ? () => this.handleToggleExpanded() : undefined}>
+      <div className={classes('Course', className)} style={{ backgroundColor: course.color }} key={course.id}>
+        <ActionRow className="course-header" actions={[
+          onAddCourse ?
+            { icon: faPlus, onClick: onAddCourse } :
+            { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
+          {
+            icon: faInfoCircle,
+            href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=201902&subj_code_in=${course.subject}&crse_numb_in=${course.number}`,
+          },
+          !onAddCourse && { icon: faTrash, onClick: () => this.handleRemoveCourse(course) },
+        ]} color={course.color}>
           <div className="row">
             <span className="course_id">{course.id}</span>
             <span className="section_ids">
@@ -65,60 +63,20 @@ class Course extends SemiPureComponent {
           </div>
           <div className="row">
             <span className="course_title" dangerouslySetInnerHTML={{ __html: course.title }}/>
-            {
-              expandable &&
-              <span className="toggle">{expanded ? '-' : '+'}</span>
-            }
+            <span className="section_crns">
+              {course.sections.filter(section => pinnedCrns.includes(section.crn)).map(section => section.crn).join(', ')}
+            </span>
           </div>
-        </div>
+        </ActionRow>
         {
           expanded &&
-          <div className="sections">
+          <div className="course-body">
             {
-              course.sections.map(section => {
-                const excluded = excludedCrns.includes(section.crn);
-                const pinned = pinnedCrns.includes(section.crn);
-                return (
-                  <div className={classes('section', excluded && 'excluded', pinned && 'pinned')}
-                       key={section.id} onClick={() => this.handleTogglePinned(section)}
-                       onMouseEnter={() => onSetOverlayCrns([section.crn])}
-                       onMouseLeave={() => onSetOverlayCrns([])}>
-                    <div className="section-header">
-                      <span className="section_id">{section.id}</span>
-                      <span className="instructors">{section.instructors.join(', ')}</span>
-                    </div>
-                    {
-                      !excluded &&
-                      <div className="meetings">
-                        {
-                          section.meetings.map((meeting, i) => {
-                            return (
-                              <div className="meeting" key={i}>
-                                <span className="days">{meeting.days.join('')}</span>
-                                <span className="period">{periodToString(meeting.period)}</span>
-                              </div>
-                            );
-                          })
-                        }
-                      </div>
-                    }
-                    <div className="actions">
-                      <div className="exclude"
-                           onClick={e => {
-                             e.stopPropagation();
-                             this.handleToggleExcluded(section);
-                           }}>{excluded ? 'Include' : 'Exclude'}</div>
-                    </div>
-                  </div>
-                );
-              })
+              Object.keys(instructorMap).map(name => (
+                <Instructor key={name} course={course} name={name} sections={instructorMap[name]}
+                            onSetOverlayCrns={onSetOverlayCrns}/>
+              ))
             }
-          </div>
-        }
-        {
-          expanded &&
-          <div className="actions section-actions">
-            <div className="dim" onClick={() => this.handleRemoveCourse(course)}>Remove</div>
           </div>
         }
       </div>

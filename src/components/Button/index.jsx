@@ -13,7 +13,7 @@ class Button extends Component {
     };
 
     return 'href' in props ? (
-      <a {...props}/>
+      <a {...props} rel="noopener noreferrer" target="_blank"/>
     ) : 'text' in props ? (
       <CopyToClipboard {...props}/>
     ) : (

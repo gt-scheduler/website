@@ -6,7 +6,7 @@ import { SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import './stylesheet.scss';
 
-class Section extends SemiPureComponent {
+class TimeBlocks extends SemiPureComponent {
   render() {
     const { className, crn, overlay, preview } = this.props;
     const { mobile } = this.props.env;
@@ -15,7 +15,7 @@ class Section extends SemiPureComponent {
     const section = oscar.findSection(crn);
 
     return (
-      <div className={classes('Section', mobile && 'mobile', overlay && 'overlay', className)}>
+      <div className={classes('TimeBlocks', mobile && 'mobile', overlay && 'overlay', className)}>
         {
           section.meetings.map((meeting, i) => meeting.period && (
             meeting.days.map(day => (
@@ -50,4 +50,4 @@ class Section extends SemiPureComponent {
 }
 
 
-export default connect(({ env, db }) => ({ env, db }), actions)(Section);
+export default connect(({ env, db }) => ({ env, db }), actions)(TimeBlocks);

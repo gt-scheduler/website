@@ -114,12 +114,6 @@ class App extends SemiPureComponent {
           </div>
           <div className="scroller">
             <div className={classes('courses-container', tabIndex === 0 && 'active')}>
-              {
-                pinnedCrns.length > 0 &&
-                <Button text={pinnedCrns.join(', ')}>
-                  <span>{pinnedCrns.join(', ')}</span>
-                </Button>
-              }
               <div className="course-list">
                 {
                   desiredCourses.map(courseId => {
@@ -141,10 +135,16 @@ class App extends SemiPureComponent {
               </div>
             }
           </div>
+          {
+            pinnedCrns.length > 0 &&
+            <Button text={pinnedCrns.join(', ')}>
+              <span>Copy CRNs</span>
+            </Button>
+          }
           <Button onClick={this.handleDownload}>
             Download as PNG
           </Button>
-          <Button href="https://github.com/parkjs814/gt-scheduler" rel="noopener noreferrer" target="_blank">
+          <Button href="https://github.com/parkjs814/gt-scheduler">
             Fork me on GitHub
           </Button>
         </div>

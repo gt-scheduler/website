@@ -42,6 +42,15 @@ const shallowCompareEntries = (a, b) => {
   return aKeys.length === bKeys.length && aKeys.every(key => key in b && a[key] === b[key]);
 };
 
+const simplifyName = name => {
+  const tokens = name.split(' ');
+  const firstName = tokens.shift();
+  const lastName = tokens.pop();
+  return [firstName, lastName].join(' ');
+};
+
+const unique = array => [...new Set(array)];
+
 export {
   stringToTime,
   timeToString,
@@ -52,4 +61,6 @@ export {
   classes,
   isMobile,
   shallowCompareEntries,
+  simplifyName,
+  unique,
 };

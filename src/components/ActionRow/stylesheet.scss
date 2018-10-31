@@ -1,0 +1,53 @@
+@import "../../variables";
+
+.ActionRow {
+  position: relative;
+
+  .actions {
+    position: absolute;
+    display: flex;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    visibility: hidden;
+
+    .action {
+      display: flex;
+      justify-content: flex-end;
+      color: $color-light;
+      cursor: pointer;
+
+      &:first-child {
+        flex: 1;
+
+        .icon {
+          padding-left: 16px;
+        }
+      }
+
+      &:last-child {
+
+        .icon {
+          padding-right: 16px;
+        }
+      }
+
+      .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .8em;
+        padding: 8px;
+      }
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+
+  &:hover .actions {
+    visibility: visible;
+  }
+}

@@ -63,8 +63,8 @@ class CourseAdd extends SemiPureComponent {
           {
             keyword &&
             oscar.searchCourses(keyword).map(course => (
-              <Course courseId={course.id} onClick={() => this.handleAddCourse(course)} key={course.id}
-                      pinnedCrns={pinnedCrns}/>
+              <Course key={course.id} courseId={course.id} pinnedCrns={pinnedCrns}
+                      onAddCourse={() => this.handleAddCourse(course)}/>
             ))
           }
         </div>
