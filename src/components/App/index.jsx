@@ -32,7 +32,7 @@ class App extends SemiPureComponent {
   componentDidMount() {
     const { term } = this.props.user;
     if (term) this.loadOscar(term);
-    axios.get('https://jasonpark.me/gt-schedule-crawler/term_ins.json')
+    axios.get('https://jasonpark.me/gt-schedule-crawler/terms.json')
       .then(res => {
         const terms = res.data.reverse();
         if (!term) {
@@ -80,20 +80,15 @@ class App extends SemiPureComponent {
     const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
     const cal = ics();
-    const range = {
-      from: new Date('Jan 07, 2019'), // TODO: parse the date ranges of semesters
-      to: new Date('May 02, 2019'),
-    };
-    range.from.setHours(0);
-    range.to.setHours(23, 59, 59, 999);
     pinnedCrns.forEach(crn => {
       const section = oscar.findSection(crn);
       section.meetings.forEach(meeting => {
         if (!meeting.period || !meeting.days.length) return;
+        const dateRange = oscar.dateRanges[meeting.dateRangeIndex];
         const subject = section.course.id;
         const description = section.course.title;
         const location = meeting.where;
-        const begin = new Date(range.from);
+        const begin = new Date(dateRange.from);
         while (!meeting.days.includes(['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()])) {
           begin.setDate(begin.getDate() + 1);
         }
@@ -102,7 +97,7 @@ class App extends SemiPureComponent {
         end.setHours(meeting.period.end / 60 | 0, meeting.period.end % 60);
         const rrule = {
           freq: 'WEEKLY',
-          until: range.to,
+          until: dateRange.to,
           byday: meeting.days.map(day => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);

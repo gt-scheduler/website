@@ -3,7 +3,15 @@ import { hasConflictBetween } from '../utils';
 
 class Oscar {
   constructor(data) {
-    this.courses = Object.keys(data).map(courseId => new Course(courseId, data[courseId]));
+    const { courses, dateRanges } = data;
+
+    this.courses = Object.keys(courses).map(courseId => new Course(courseId, courses[courseId]));
+    this.dateRanges = dateRanges.map(dateRange => {
+      const [from, to] = dateRange.split(' - ').map(v => new Date(v));
+      from.setHours(0);
+      to.setHours(23, 59, 59, 999);
+      return { from, to };
+    });
     this.courseMap = {};
     this.crnMap = {};
     this.courses.forEach(course => {
@@ -100,7 +108,7 @@ class Oscar {
         crns,
         startMap,
         endMap,
-      }
+      };
     });
   }
 
