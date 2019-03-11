@@ -37,8 +37,7 @@ class App extends SemiPureComponent {
         const terms = res.data.reverse();
         if (!term) {
           const recentTerm = terms[0];
-          this.props.setTerm(recentTerm);
-          this.loadOscar(recentTerm);
+          this.handleChangeSemester(recentTerm);
         }
         this.setState({ terms });
       });
@@ -51,6 +50,7 @@ class App extends SemiPureComponent {
   }
 
   loadOscar(term) {
+    this.props.setOscar(null);
     axios.get(`https://jasonpark.me/gt-schedule-crawler/${term}.json`)
       .then(res => {
         const oscar = new Oscar(res.data);
@@ -128,9 +128,9 @@ class App extends SemiPureComponent {
     this.setState({ tabIndex });
   }
 
-  handleChangeSemester = e => {
-    const term = e.target.value;
+  handleChangeSemester(term) {
     this.props.setTerm(term);
+    this.loadOscar(term);
   };
 
   render() {
@@ -165,7 +165,7 @@ class App extends SemiPureComponent {
             </div>
           }
           <div className="title">
-            <select className="primary" onChange={this.handleChangeSemester} value={term}>
+            <select className="primary" onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
               {
                 terms.map(term => {
                   const year = term.substring(0, 4);
