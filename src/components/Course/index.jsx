@@ -43,7 +43,7 @@ class Course extends SemiPureComponent {
   render() {
     const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
     const { oscar } = this.props.db;
-    const { pinnedCrns, colorMap } = this.props.user;
+    const { term, pinnedCrns, colorMap } = this.props.user;
     const { expanded, paletteShown } = this.state;
 
     const course = oscar.findCourse(courseId);
@@ -61,7 +61,7 @@ class Course extends SemiPureComponent {
 
     const infoAction = {
       icon: faInfoCircle,
-      href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=201902&subj_code_in=${course.subject}&crse_numb_in=${course.number}`,
+      href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`,
     };
 
 

@@ -64,7 +64,7 @@ class Instructor extends SemiPureComponent {
 
   render() {
     const { className, color, name, sections, onSetOverlayCrns } = this.props;
-    const { pinnedCrns, excludedCrns } = this.props.user;
+    const { term, pinnedCrns, excludedCrns } = this.props.user;
     const { expanded } = this.state;
 
     const instructorExcluded = sections.every(section => excludedCrns.includes(section.crn));
@@ -101,7 +101,7 @@ class Instructor extends SemiPureComponent {
                     { icon: pinned ? faTimes : faThumbtack, onClick: () => this.handleTogglePinned(section) },
                     {
                       icon: faInfoCircle,
-                      href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=201902&crn_in=${section.crn}`,
+                      href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
                     },
                     { icon: excluded ? faCheck : faBan, onClick: () => this.handleToggleExcluded(section) },
                   ]} color={color} key={section.id}>
