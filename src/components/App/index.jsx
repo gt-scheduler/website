@@ -16,6 +16,7 @@ class App extends SemiPureComponent {
     super(props);
 
     this.state = {
+      terms: [],
       overlayCrns: [],
       tabIndex: 0,
     };
@@ -29,10 +30,17 @@ class App extends SemiPureComponent {
   }
 
   componentDidMount() {
-    axios.get('https://jasonpark.me/gt-schedule-crawler/courses.json')
+    const { term } = this.props.user;
+    if (term) this.loadOscar(term);
+    axios.get('https://jasonpark.me/gt-schedule-crawler/term_ins.json')
       .then(res => {
-        const oscar = new Oscar(res.data);
-        this.props.setOscar(oscar);
+        const terms = res.data.reverse();
+        if (!term) {
+          const recentTerm = terms[0];
+          this.props.setTerm(recentTerm);
+          this.loadOscar(recentTerm);
+        }
+        this.setState({ terms });
       });
 
     window.addEventListener('resize', this.handleResize);
@@ -40,6 +48,14 @@ class App extends SemiPureComponent {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+  }
+
+  loadOscar(term) {
+    axios.get(`https://jasonpark.me/gt-schedule-crawler/${term}.json`)
+      .then(res => {
+        const oscar = new Oscar(res.data);
+        this.props.setOscar(oscar);
+      });
   }
 
   getTotalCredits() {
@@ -65,7 +81,7 @@ class App extends SemiPureComponent {
     const { pinnedCrns } = this.props.user;
     const cal = ics();
     const range = {
-      from: new Date('Jan 07, 2019'),
+      from: new Date('Jan 07, 2019'), // TODO: parse the date ranges of semesters
       to: new Date('May 02, 2019'),
     };
     range.from.setHours(0);
@@ -112,11 +128,16 @@ class App extends SemiPureComponent {
     this.setState({ tabIndex });
   }
 
+  handleChangeSemester = e => {
+    const term = e.target.value;
+    this.props.setTerm(term);
+  };
+
   render() {
     const { mobile } = this.props.env;
     const { oscar } = this.props.db;
-    const { pinnedCrns, desiredCourses } = this.props.user;
-    const { overlayCrns, tabIndex } = this.state;
+    const { term, pinnedCrns, desiredCourses } = this.props.user;
+    const { terms, overlayCrns, tabIndex } = this.state;
 
     return oscar && (
       <div className={classes('App', mobile && 'mobile')}>
@@ -144,7 +165,17 @@ class App extends SemiPureComponent {
             </div>
           }
           <div className="title">
-            <span className="primary">Spring 2019</span>
+            <select className="primary" onChange={this.handleChangeSemester} value={term}>
+              {
+                terms.map(term => {
+                  const year = term.substring(0, 4);
+                  const semester = { '02': 'Spring', '05': 'Summer', '08': 'Fall' }[term.substring(4)];
+                  return (
+                    <option key={term} value={term}>{semester} {year}</option>
+                  );
+                })
+              }
+            </select>
             <span className="secondary">
               {this.getTotalCredits()} Credits
             </span>
