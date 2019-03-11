@@ -52,6 +52,12 @@ class CombinationsContainer extends SemiPureComponent {
     this.props.setPinnedCrns(pinnedCrns);
   }
 
+  handleResetPinnedCrns() {
+    if (window.confirm('Are you sure to reset sections you selected?')) {
+      this.handleSetPinnedCrns([]);
+    }
+  }
+
   handleChangeSortingOptionIndex(e) {
     const sortingOptionIndex = e.target.value;
     this.setState({ sortingOptionIndex });
@@ -73,7 +79,7 @@ class CombinationsContainer extends SemiPureComponent {
       <div className={classes('CombinationsContainer', className)}>
         {
           pinnedCrns.length > 0 &&
-          <Button onClick={() => this.handleSetPinnedCrns([])}>
+          <Button onClick={() => this.handleResetPinnedCrns()}>
             Reset Sections
           </Button>
         }

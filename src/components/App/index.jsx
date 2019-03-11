@@ -134,17 +134,20 @@ class App extends SemiPureComponent {
     const { term, pinnedCrns, desiredCourses } = this.props.user;
     const { terms, overlayCrns, tabIndex } = this.state;
 
-    return oscar && (
+    return (
       <div className={classes('App', mobile && 'mobile')}>
         {
           !mobile &&
           <div className="calendar-container">
-            <Calendar overlayCrns={overlayCrns}/>
+            <Calendar overlayCrns={overlayCrns} empty={!oscar}/>
           </div>
         }
-        <div className="capture-container" ref={this.captureRef}>
-          <Calendar className="fake-calendar"/>
-        </div>
+        {
+          oscar &&
+          <div className="capture-container" ref={this.captureRef}>
+            <Calendar className="fake-calendar"/>
+          </div>
+        }
         <div className="sidebar">
           {
             mobile &&
@@ -160,59 +163,75 @@ class App extends SemiPureComponent {
             </div>
           }
           <div className="title">
-            <select className="primary" onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
-              {
-                terms.map(term => {
-                  const year = term.substring(0, 4);
-                  const semester = { '02': 'Spring', '05': 'Summer', '08': 'Fall' }[term.substring(4)];
-                  return (
-                    <option key={term} value={term}>{semester} {year}</option>
-                  );
-                })
-              }
-            </select>
-            <span className="secondary">
-              {this.getTotalCredits()} Credits
-            </span>
-          </div>
-          <div className="scroller">
-            <div className={classes('courses-container', tabIndex === 0 && 'active')}>
-              <div className="course-list">
+            <Button className="term">
+              <select onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
                 {
-                  desiredCourses.map(courseId => {
+                  terms.map(term => {
+                    const year = term.substring(0, 4);
+                    const semester = { '02': 'Spring', '05': 'Summer', '08': 'Fall' }[term.substring(4)];
                     return (
-                      <Course courseId={courseId} expandable key={courseId}
-                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                      <option key={term} value={term}>{semester} {year}</option>
                     );
                   })
                 }
+              </select>
+            </Button>
+            {
+              oscar &&
+              <span className="secondary">
+                {this.getTotalCredits()} Credits
+              </span>
+            }
+          </div>
+          <div className="scroller">
+            {
+              oscar &&
+              <div className={classes('courses-container', tabIndex === 0 && 'active')}>
+                <div className="course-list">
+                  {
+                    desiredCourses.map(courseId => {
+                      return (
+                        <Course courseId={courseId} expandable key={courseId}
+                                onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                      );
+                    })
+                  }
+                </div>
+                <CourseAdd/>
               </div>
-              <CourseAdd/>
-            </div>
-            <CombinationsContainer className={classes('combinations-container', tabIndex === 1 && 'active')}
-                                   onSetOverlayCrns={this.handleSetOverlayCrns}/>
+            }
+            {
+              oscar &&
+              <CombinationsContainer className={classes('combinations-container', tabIndex === 1 && 'active')}
+                                     onSetOverlayCrns={this.handleSetOverlayCrns}/>
+            }
             {
               mobile &&
               <div className={classes('calendar-container', tabIndex === 2 && 'active')}>
-                <Calendar overlayCrns={overlayCrns}/>
+                <Calendar overlayCrns={overlayCrns} empty={!oscar}/>
               </div>
             }
           </div>
           {
-            pinnedCrns.length > 0 &&
-            <Button text={pinnedCrns.join(', ')}>
-              <span>Copy CRNs</span>
-            </Button>
+            oscar &&
+            <div className="button-container">
+              {
+                pinnedCrns.length > 0 &&
+                <Button text={pinnedCrns.join(', ')}>
+                  <span>Copy CRNs</span>
+                </Button>
+              }
+              <Button onClick={this.handleExport}>
+                Export Calendar
+              </Button>
+              <Button onClick={this.handleDownload}>
+                Download as PNG
+              </Button>
+              <Button href="https://github.com/parkjs814/gt-scheduler">
+                Fork me on GitHub
+              </Button>
+            </div>
           }
-          <Button onClick={this.handleExport}>
-            Export Calendar
-          </Button>
-          <Button onClick={this.handleDownload}>
-            Download as PNG
-          </Button>
-          <Button href="https://github.com/parkjs814/gt-scheduler">
-            Fork me on GitHub
-          </Button>
         </div>
       </div>
     );

@@ -8,7 +8,7 @@ import './stylesheet.scss';
 
 class Calendar extends SemiPureComponent {
   render() {
-    const { className, overlayCrns, preview } = this.props;
+    const { className, overlayCrns, preview, empty } = this.props;
     const { mobile } = this.props.env;
     const { pinnedCrns } = this.props.user;
 
@@ -49,19 +49,22 @@ class Calendar extends SemiPureComponent {
             }
           </div>
         }
-        <div className="meetings">
-          {
-            pinnedCrns.map(crn => (
-              <TimeBlocks key={crn} crn={crn} preview={preview}/>
-            ))
-          }
-          {
-            overlayCrns &&
-            overlayCrns.filter(crn => !pinnedCrns.includes(crn)).map(crn => (
-              <TimeBlocks key={crn} crn={crn} overlay={!preview} preview={preview}/>
-            ))
-          }
-        </div>
+        {
+          !empty &&
+          <div className="meetings">
+            {
+              pinnedCrns.map(crn => (
+                <TimeBlocks key={crn} crn={crn} preview={preview}/>
+              ))
+            }
+            {
+              overlayCrns &&
+              overlayCrns.filter(crn => !pinnedCrns.includes(crn)).map(crn => (
+                <TimeBlocks key={crn} crn={crn} overlay={!preview} preview={preview}/>
+              ))
+            }
+          </div>
+        }
       </div>
     );
   }
