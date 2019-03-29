@@ -1,4 +1,4 @@
-import { Course } from './';
+import { Course, SortingOption } from './';
 import { hasConflictBetween } from '../utils';
 
 class Oscar {
@@ -20,6 +20,28 @@ class Oscar {
         this.crnMap[section.crn] = section;
       });
     });
+    this.sortingOptions = [
+      new SortingOption('Most Compact', combination => {
+        const { startMap, endMap } = combination;
+        const diffs = Object.keys(startMap).map(day => endMap[day] - startMap[day]);
+        const sum = diffs.reduce((sum, min) => sum + min, 0);
+        return +sum;
+      }),
+      new SortingOption('Earliest Ending', combination => {
+        const { endMap } = combination;
+        const ends = Object.values(endMap);
+        const sum = ends.reduce((sum, end) => sum + end, 0);
+        const avg = sum / ends.length;
+        return +avg;
+      }),
+      new SortingOption('Latest Beginning', combination => {
+        const { startMap } = combination;
+        const starts = Object.values(startMap);
+        const sum = starts.reduce((sum, min) => sum + min, 0);
+        const avg = sum / starts.length;
+        return -avg;
+      }),
+    ];
   }
 
   findCourse(courseId) {
@@ -110,6 +132,14 @@ class Oscar {
         endMap,
       };
     });
+  }
+
+  sortCombinations(combinations, sortingOptionIndex){
+    const sortingOption = this.sortingOptions[sortingOptionIndex];
+    return combinations.map(combination => ({
+      ...combination,
+      factor: sortingOption.calculateFactor(combination),
+    })).sort((a, b) => a.factor - b.factor);
   }
 
   iterateTimeBlocks(crns, callback) {

@@ -11,6 +11,7 @@
     "dom-to-image": "^2.6.0",
     "fast-html-parser": "^1.0.1",
     "file-saver": "^2.0.0-rc.4",
+    "github-fork-ribbon-css": "^0.2.1",
     "js-cookie": "^2.2.0",
     "memoize-one": "^4.0.2",
     "node-sass": "^4.9.4",

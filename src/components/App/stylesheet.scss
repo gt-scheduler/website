@@ -34,30 +34,27 @@
     width: 256px;
     border-left: 1px solid $color-dark;
 
-    > * {
-      border-bottom: 1px solid $color-dark;
-    }
-
-    .title {
-      flex-shrink: 0;
-      padding-right: 8px;
+    .header {
+      position: relative;
       font-weight: bold;
       background-color: $color-light;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      border-bottom: 1px solid $color-dark;
 
-      .term {
+      .primary {
         position: relative;
+        flex: 1;
         display: flex;
         align-items: center;
         padding: 0;
+        background: none;
 
         select {
           align-self: stretch;
           flex: 1;
-          padding: 8px 32px 8px 8px;
-          font-size: 1.4em;
+          padding: 8px 24px 8px 8px;
+          font-size: 1.2em;
         }
 
         &:after {
@@ -69,6 +66,8 @@
       }
 
       .secondary {
+        position: absolute;
+        right: 24px;
         font-size: .8em;
         color: $color-darker;
       }
@@ -80,7 +79,21 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+    }
 
+    .footer {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+
+      > * {
+        border-top: 1px solid $color-dark;
+      }
+    }
+  }
+
+  .sidebar-courses {
+    .scroller {
       .courses-container {
         flex-shrink: 0;
         display: flex;
@@ -96,21 +109,36 @@
           flex-direction: column;
         }
       }
+    }
+  }
 
-      .combinations-container {
-        > * {
-          border-bottom: 1px solid $color-dark;
+  .sidebar-combinations {
+    .header {
+      .sorting-option {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0;
+
+        select {
+          align-self: stretch;
+          flex: 1;
+          padding: 8px 32px 8px 8px;
+        }
+
+        &:after {
+          position: absolute;
+          right: 8px;
+          content: '▼';
         }
       }
     }
 
-    .button-container {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-
-      > * {
-        border-bottom: 1px solid $color-dark;
+    .scroller {
+      .combinations-container {
+        > * {
+          border-bottom: 1px solid $color-dark;
+        }
       }
     }
   }
@@ -170,5 +198,9 @@
         }
       }
     }
+  }
+
+  .github-fork-ribbon:before {
+    background-color: $color-darker;
   }
 }

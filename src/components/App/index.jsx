@@ -3,12 +3,14 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
+import memoizeOne from 'memoize-one';
 import ics from '../../libs/ics';
 import { classes, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import { Button, Calendar, CombinationsContainer, Course, CourseAdd, SemiPureComponent } from '../';
+import { Button, Calendar, Combinations, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import { Oscar } from '../../beans';
+import 'github-fork-ribbon-css/gh-fork-ribbon.css';
 import './stylesheet.scss';
 
 class App extends SemiPureComponent {
@@ -27,6 +29,8 @@ class App extends SemiPureComponent {
     this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
     this.handleExport = this.handleExport.bind(this);
     this.handleDownload = this.handleDownload.bind(this);
+    this.handleResetPinnedCrns = this.handleResetPinnedCrns.bind(this);
+    this.handleChangeSortingOptionIndex = this.handleChangeSortingOptionIndex.bind(this);
   }
 
   componentDidMount() {
@@ -54,6 +58,8 @@ class App extends SemiPureComponent {
     axios.get(`https://jasonpark.me/gt-schedule-crawler/${term}.json`)
       .then(res => {
         const oscar = new Oscar(res.data);
+        this.memoizedGetCombinations = memoizeOne(oscar.getCombinations.bind(oscar));
+        this.memoizedSortCombinations = memoizeOne(oscar.sortCombinations.bind(oscar));
         this.props.setOscar(oscar);
       });
   }
@@ -128,42 +134,83 @@ class App extends SemiPureComponent {
     this.loadOscar(term);
   };
 
+  handleResetPinnedCrns() {
+    if (window.confirm('Are you sure to reset sections you selected?')) {
+      this.props.setPinnedCrns([]);
+    }
+  }
+
+  handleChangeSortingOptionIndex(e) {
+    const sortingOptionIndex = e.target.value;
+    this.props.setSortingOptionIndex(sortingOptionIndex);
+  }
+
   render() {
     const { mobile } = this.props.env;
     const { oscar } = this.props.db;
-    const { term, pinnedCrns, desiredCourses } = this.props.user;
+    const { term, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex } = this.props.user;
     const { terms, overlayCrns, tabIndex } = this.state;
+
+    if (!oscar) return null;
+
+    const combinations = this.memoizedGetCombinations(desiredCourses, pinnedCrns, excludedCrns);
+    const sortedCombinations = this.memoizedSortCombinations(combinations, sortingOptionIndex);
 
     return (
       <div className={classes('App', mobile && 'mobile')}>
+        <div className="calendar-container">
+          <Calendar overlayCrns={overlayCrns} empty={!oscar}/>
+        </div>
+        <div className="capture-container" ref={this.captureRef}>
+          <Calendar className="fake-calendar"/>
+        </div>
         {
-          !mobile &&
-          <div className="calendar-container">
-            <Calendar overlayCrns={overlayCrns} empty={!oscar}/>
+          mobile &&
+          <div className="tab-container">
+            {
+              ['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
+                <div className={classes('tab', tabIndex === i && 'active')} onClick={() => this.handleChangeTab(i)}
+                     key={i}>
+                  {tabTitle}
+                </div>
+              ))
+            }
           </div>
         }
-        {
-          oscar &&
-          <div className="capture-container" ref={this.captureRef}>
-            <Calendar className="fake-calendar"/>
+        <div className="sidebar sidebar-combinations">
+          <div className="header">
+            <span className="secondary">
+              {combinations.length} Combos
+            </span>
+            <Button className="primary">
+              <select onChange={this.handleChangeSortingOptionIndex} value={sortingOptionIndex}>
+                {
+                  oscar.sortingOptions.map((sortingOption, i) => (
+                    <option key={i} value={i}>{sortingOption.label}</option>
+                  ))
+                }
+              </select>
+            </Button>
           </div>
-        }
-        <div className="sidebar">
-          {
-            mobile &&
-            <div className="tab-container">
-              {
-                ['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
-                  <div className={classes('tab', tabIndex === i && 'active')} onClick={() => this.handleChangeTab(i)}
-                       key={i}>
-                    {tabTitle}
-                  </div>
-                ))
-              }
-            </div>
-          }
-          <div className="title">
-            <Button className="term">
+          <div className="scroller">
+            <Combinations className={classes('combinations-container', tabIndex === 1 && 'active')}
+                          onSetOverlayCrns={this.handleSetOverlayCrns} combinations={sortedCombinations}/>
+          </div>
+          <div className="footer">
+            {
+              pinnedCrns.length > 0 &&
+              <Button onClick={this.handleResetPinnedCrns}>
+                Reset Sections
+              </Button>
+            }
+          </div>
+        </div>
+        <div className="sidebar sidebar-courses">
+          <div className="header">
+            <span className="secondary">
+              {this.getTotalCredits()} Credits
+            </span>
+            <Button className="primary">
               <select onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
                 {
                   terms.map(term => {
@@ -176,63 +223,38 @@ class App extends SemiPureComponent {
                 }
               </select>
             </Button>
-            {
-              oscar &&
-              <span className="secondary">
-                {this.getTotalCredits()} Credits
-              </span>
-            }
           </div>
           <div className="scroller">
-            {
-              oscar &&
-              <div className={classes('courses-container', tabIndex === 0 && 'active')}>
-                <div className="course-list">
-                  {
-                    desiredCourses.map(courseId => {
-                      return (
-                        <Course courseId={courseId} expandable key={courseId}
-                                onSetOverlayCrns={this.handleSetOverlayCrns}/>
-                      );
-                    })
-                  }
-                </div>
-                <CourseAdd/>
+            <div className={classes('courses-container', tabIndex === 0 && 'active')}>
+              <div className="course-list">
+                {
+                  desiredCourses.map(courseId => {
+                    return (
+                      <Course courseId={courseId} expandable key={courseId}
+                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                    );
+                  })
+                }
               </div>
-            }
-            {
-              oscar &&
-              <CombinationsContainer className={classes('combinations-container', tabIndex === 1 && 'active')}
-                                     onSetOverlayCrns={this.handleSetOverlayCrns}/>
-            }
-            {
-              mobile &&
-              <div className={classes('calendar-container', tabIndex === 2 && 'active')}>
-                <Calendar overlayCrns={overlayCrns} empty={!oscar}/>
-              </div>
-            }
-          </div>
-          {
-            oscar &&
-            <div className="button-container">
-              {
-                pinnedCrns.length > 0 &&
-                <Button text={pinnedCrns.join(', ')}>
-                  <span>Copy CRNs</span>
-                </Button>
-              }
-              <Button onClick={this.handleExport}>
-                Export Calendar
-              </Button>
-              <Button onClick={this.handleDownload}>
-                Download as PNG
-              </Button>
-              <Button href="https://github.com/parkjs814/gt-scheduler">
-                Fork me on GitHub
-              </Button>
+              <CourseAdd/>
             </div>
-          }
+          </div>
+          <div className="footer">
+            <Button text={pinnedCrns.join(', ')}>
+              <span>Copy CRNs</span>
+            </Button>
+            <Button onClick={this.handleDownload}>
+              Download as PNG
+            </Button>
+            <Button onClick={this.handleExport}>
+              Export Calendar
+            </Button>
+          </div>
         </div>
+        <a className="github-fork-ribbon left-bottom fixed"
+           href="https://github.com/parkjs814/gt-scheduler"
+           target="_blank" rel="noopener noreferrer"
+           data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
       </div>
     );
   }
