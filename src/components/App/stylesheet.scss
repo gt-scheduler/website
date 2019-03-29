@@ -163,6 +163,10 @@
     }
   }
 
+  .github-fork-ribbon:before {
+    background-color: $color-darker;
+  }
+
   &.mobile {
     flex-direction: column-reverse;
 
@@ -202,9 +206,9 @@
       width: auto;
       border-left: none;
     }
-  }
 
-  .github-fork-ribbon:before {
-    background-color: $color-darker;
+    .github-fork-ribbon {
+      display: none;
+    }
   }
 }
