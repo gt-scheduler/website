@@ -15,10 +15,6 @@ class Calendar extends SemiPureComponent {
     return (
       <div className={classes('Calendar', mobile && 'mobile', preview && 'preview', className)}>
         {
-          preview &&
-          <img className="ratio" src="5x2.png" alt=""/>
-        }
-        {
           !preview &&
           <div className="times">
             {

@@ -4,13 +4,15 @@ import axios from 'axios';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
 import memoizeOne from 'memoize-one';
+import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
 import ics from '../../libs/ics';
 import { classes, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import { Button, Calendar, Combinations, Course, CourseAdd, SemiPureComponent } from '../';
+import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import { Oscar } from '../../beans';
 import 'github-fork-ribbon-css/gh-fork-ribbon.css';
+import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 class App extends SemiPureComponent {
@@ -24,13 +26,6 @@ class App extends SemiPureComponent {
     };
 
     this.captureRef = React.createRef();
-
-    this.handleResize = this.handleResize.bind(this);
-    this.handleSetOverlayCrns = this.handleSetOverlayCrns.bind(this);
-    this.handleExport = this.handleExport.bind(this);
-    this.handleDownload = this.handleDownload.bind(this);
-    this.handleResetPinnedCrns = this.handleResetPinnedCrns.bind(this);
-    this.handleChangeSortingOptionIndex = this.handleChangeSortingOptionIndex.bind(this);
   }
 
   componentDidMount() {
@@ -70,19 +65,19 @@ class App extends SemiPureComponent {
     return pinnedCrns.reduce((credits, crn) => credits + oscar.findSection(crn).credits, 0);
   }
 
-  handleResize(e) {
+  handleResize = e => {
     const { mobile } = this.props.env;
     const nextMobile = isMobile();
     if (mobile !== nextMobile) {
       this.props.setMobile(nextMobile);
     }
-  }
+  };
 
-  handleSetOverlayCrns(overlayCrns) {
+  handleSetOverlayCrns = overlayCrns => {
     this.setState({ overlayCrns });
-  }
+  };
 
-  handleExport() {
+  handleExport = () => {
     const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
     const cal = ics();
@@ -110,9 +105,9 @@ class App extends SemiPureComponent {
       });
     });
     cal.download('gt-scheduler');
-  }
+  };
 
-  handleDownload() {
+  handleDownload = () => {
     const { current } = this.captureRef;
     domtoimage.toPng(current, {
       width: current.offsetWidth * PNG_SCALE_FACTOR,
@@ -123,27 +118,31 @@ class App extends SemiPureComponent {
         'transform-origin': 'top left',
       },
     }).then(blob => saveAs(blob, 'schedule.png'));
-  }
+  };
 
-  handleChangeTab(tabIndex) {
+  handleChangeTab = tabIndex => {
     this.setState({ tabIndex });
-  }
+  };
 
-  handleChangeSemester(term) {
+  handleChangeSemester = term => {
     this.props.setTerm(term);
     this.loadOscar(term);
   };
 
-  handleResetPinnedCrns() {
+  handleSetPinnedCrns = pinnedCrns => {
+    this.props.setPinnedCrns(pinnedCrns);
+  };
+
+  handleResetPinnedCrns = () => {
     if (window.confirm('Are you sure to reset sections you selected?')) {
       this.props.setPinnedCrns([]);
     }
-  }
+  };
 
-  handleChangeSortingOptionIndex(e) {
+  handleChangeSortingOptionIndex = e => {
     const sortingOptionIndex = e.target.value;
     this.props.setSortingOptionIndex(sortingOptionIndex);
-  }
+  };
 
   render() {
     const { mobile } = this.props.env;
@@ -193,16 +192,33 @@ class App extends SemiPureComponent {
             </Button>
           </div>
           <div className="scroller">
-            <Combinations className={classes('combinations-container', tabIndex === 1 && 'active')}
-                          onSetOverlayCrns={this.handleSetOverlayCrns} combinations={sortedCombinations}/>
+            <AutoSizer>
+              {({ width, height }) => (
+                <List
+                  width={width}
+                  height={height}
+                  rowCount={sortedCombinations.length}
+                  rowHeight={100}
+                  rowRenderer={({ index, key, style }) => {
+                    const { crns } = sortedCombinations[index];
+                    return (
+                      <div className="combination" key={key} style={style}
+                           onMouseEnter={() => this.handleSetOverlayCrns(crns)}
+                           onMouseLeave={() => this.handleSetOverlayCrns([])}
+                           onClick={() => this.handleSetPinnedCrns([...pinnedCrns, ...crns])}>
+                        <div className="number">{index + 1}</div>
+                        <Calendar className="calendar-preview" overlayCrns={crns} preview/>
+                      </div>
+                    );
+                  }}
+                />
+              )}
+            </AutoSizer>
           </div>
           <div className="footer">
-            {
-              pinnedCrns.length > 0 &&
-              <Button onClick={this.handleResetPinnedCrns}>
-                Reset Sections
-              </Button>
-            }
+            <Button onClick={this.handleResetPinnedCrns} disabled={pinnedCrns.length === 0}>
+              Reset Sections
+            </Button>
           </div>
         </div>
         <div className="sidebar sidebar-courses">
@@ -225,28 +241,26 @@ class App extends SemiPureComponent {
             </Button>
           </div>
           <div className="scroller">
-            <div className={classes('courses-container', tabIndex === 0 && 'active')}>
-              <div className="course-list">
-                {
-                  desiredCourses.map(courseId => {
-                    return (
-                      <Course courseId={courseId} expandable key={courseId}
-                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
-                    );
-                  })
-                }
-              </div>
-              <CourseAdd/>
+            <div className="course-list">
+              {
+                desiredCourses.map(courseId => {
+                  return (
+                    <Course courseId={courseId} expandable key={courseId}
+                            onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                  );
+                })
+              }
             </div>
+            <CourseAdd/>
           </div>
           <div className="footer">
-            <Button text={pinnedCrns.join(', ')}>
+            <Button text={pinnedCrns.join(', ')} disabled={pinnedCrns.length === 0}>
               <span>Copy CRNs</span>
             </Button>
-            <Button onClick={this.handleDownload}>
+            <Button onClick={this.handleDownload} disabled={pinnedCrns.length === 0}>
               Download as PNG
             </Button>
-            <Button onClick={this.handleExport}>
+            <Button onClick={this.handleExport} disabled={pinnedCrns.length === 0}>
               Export Calendar
             </Button>
           </div>

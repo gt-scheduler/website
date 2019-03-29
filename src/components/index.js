@@ -3,7 +3,6 @@ export { default as ActionRow } from './ActionRow';
 export { default as App } from './App';
 export { default as Button } from './Button';
 export { default as Calendar } from './Calendar';
-export { default as Combinations } from './Combinations';
 export { default as Course } from './Course';
 export { default as CourseAdd } from './CourseAdd';
 export { default as Instructor } from './Instructor';

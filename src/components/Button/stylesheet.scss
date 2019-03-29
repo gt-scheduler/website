@@ -9,8 +9,15 @@
   background-color: $color-light;
   color: $color-darker;
   cursor: pointer;
+  border: none;
+  outline: none;
 
   &:hover {
     color: black;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: $color-dark;
   }
 }

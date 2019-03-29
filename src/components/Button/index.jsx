@@ -5,19 +5,23 @@ import './stylesheet.scss';
 
 class Button extends Component {
   render() {
-    const { className, ...restProps } = this.props;
+    const { className, disabled, ...restProps } = this.props;
 
     const props = {
       className: classes('Button', className),
       ...restProps,
     };
 
-    return 'href' in props ? (
+    return disabled ? (
+      <button className={props.className} disabled>
+        {props.children}
+      </button>
+    ) : 'href' in props ? (
       <a {...props} rel="noopener noreferrer" target="_blank"/>
     ) : 'text' in props ? (
       <CopyToClipboard {...props}/>
     ) : (
-      <div {...props}/>
+      <button {...props}/>
     );
   }
 }
