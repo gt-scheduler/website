@@ -157,12 +157,110 @@ class App extends SemiPureComponent {
 
     return (
       <div className={classes('App', mobile && 'mobile')}>
-        <div className="calendar-container">
-          <Calendar overlayCrns={overlayCrns} empty={!oscar}/>
-        </div>
+        {
+          (!mobile || tabIndex === 2) &&
+          <div className="calendar-container">
+            <Calendar overlayCrns={overlayCrns}/>
+          </div>
+        }
         <div className="capture-container" ref={this.captureRef}>
           <Calendar className="fake-calendar"/>
         </div>
+        {
+          (!mobile || tabIndex === 1) &&
+          <div className="sidebar sidebar-combinations">
+            <div className="header">
+            <span className="secondary">
+              {combinations.length} Combos
+            </span>
+              <Button className="primary">
+                <select onChange={this.handleChangeSortingOptionIndex} value={sortingOptionIndex}>
+                  {
+                    oscar.sortingOptions.map((sortingOption, i) => (
+                      <option key={i} value={i}>{sortingOption.label}</option>
+                    ))
+                  }
+                </select>
+              </Button>
+            </div>
+            <div className="scroller">
+              <AutoSizer>
+                {({ width, height }) => (
+                  <List
+                    width={width}
+                    height={height}
+                    rowCount={sortedCombinations.length}
+                    rowHeight={100}
+                    rowRenderer={({ index, key, style }) => {
+                      const { crns } = sortedCombinations[index];
+                      return (
+                        <div className="combination" key={key} style={style}
+                             onMouseEnter={() => this.handleSetOverlayCrns(crns)}
+                             onMouseLeave={() => this.handleSetOverlayCrns([])}
+                             onClick={() => this.handleSetPinnedCrns([...pinnedCrns, ...crns])}>
+                          <div className="number">{index + 1}</div>
+                          <Calendar className="calendar-preview" overlayCrns={crns} preview/>
+                        </div>
+                      );
+                    }}
+                  />
+                )}
+              </AutoSizer>
+            </div>
+            <div className="footer">
+              <Button onClick={this.handleResetPinnedCrns} disabled={pinnedCrns.length === 0}>
+                Reset Sections
+              </Button>
+            </div>
+          </div>
+        }
+        {
+          (!mobile || tabIndex === 0) &&
+          <div className="sidebar sidebar-courses">
+            <div className="header">
+            <span className="secondary">
+              {this.getTotalCredits()} Credits
+            </span>
+              <Button className="primary">
+                <select onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
+                  {
+                    terms.map(term => {
+                      const year = term.substring(0, 4);
+                      const semester = { '02': 'Spring', '05': 'Summer', '08': 'Fall' }[term.substring(4)];
+                      return (
+                        <option key={term} value={term}>{semester} {year}</option>
+                      );
+                    })
+                  }
+                </select>
+              </Button>
+            </div>
+            <div className="scroller">
+              <div className="course-list">
+                {
+                  desiredCourses.map(courseId => {
+                    return (
+                      <Course courseId={courseId} expandable key={courseId}
+                              onSetOverlayCrns={this.handleSetOverlayCrns}/>
+                    );
+                  })
+                }
+              </div>
+              <CourseAdd/>
+            </div>
+            <div className="footer">
+              <Button text={pinnedCrns.join(', ')} disabled={pinnedCrns.length === 0}>
+                <span>Copy CRNs</span>
+              </Button>
+              <Button onClick={this.handleDownload} disabled={pinnedCrns.length === 0}>
+                Download as PNG
+              </Button>
+              <Button onClick={this.handleExport} disabled={pinnedCrns.length === 0}>
+                Export Calendar
+              </Button>
+            </div>
+          </div>
+        }
         {
           mobile &&
           <div className="tab-container">
@@ -176,95 +274,6 @@ class App extends SemiPureComponent {
             }
           </div>
         }
-        <div className="sidebar sidebar-combinations">
-          <div className="header">
-            <span className="secondary">
-              {combinations.length} Combos
-            </span>
-            <Button className="primary">
-              <select onChange={this.handleChangeSortingOptionIndex} value={sortingOptionIndex}>
-                {
-                  oscar.sortingOptions.map((sortingOption, i) => (
-                    <option key={i} value={i}>{sortingOption.label}</option>
-                  ))
-                }
-              </select>
-            </Button>
-          </div>
-          <div className="scroller">
-            <AutoSizer>
-              {({ width, height }) => (
-                <List
-                  width={width}
-                  height={height}
-                  rowCount={sortedCombinations.length}
-                  rowHeight={100}
-                  rowRenderer={({ index, key, style }) => {
-                    const { crns } = sortedCombinations[index];
-                    return (
-                      <div className="combination" key={key} style={style}
-                           onMouseEnter={() => this.handleSetOverlayCrns(crns)}
-                           onMouseLeave={() => this.handleSetOverlayCrns([])}
-                           onClick={() => this.handleSetPinnedCrns([...pinnedCrns, ...crns])}>
-                        <div className="number">{index + 1}</div>
-                        <Calendar className="calendar-preview" overlayCrns={crns} preview/>
-                      </div>
-                    );
-                  }}
-                />
-              )}
-            </AutoSizer>
-          </div>
-          <div className="footer">
-            <Button onClick={this.handleResetPinnedCrns} disabled={pinnedCrns.length === 0}>
-              Reset Sections
-            </Button>
-          </div>
-        </div>
-        <div className="sidebar sidebar-courses">
-          <div className="header">
-            <span className="secondary">
-              {this.getTotalCredits()} Credits
-            </span>
-            <Button className="primary">
-              <select onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
-                {
-                  terms.map(term => {
-                    const year = term.substring(0, 4);
-                    const semester = { '02': 'Spring', '05': 'Summer', '08': 'Fall' }[term.substring(4)];
-                    return (
-                      <option key={term} value={term}>{semester} {year}</option>
-                    );
-                  })
-                }
-              </select>
-            </Button>
-          </div>
-          <div className="scroller">
-            <div className="course-list">
-              {
-                desiredCourses.map(courseId => {
-                  return (
-                    <Course courseId={courseId} expandable key={courseId}
-                            onSetOverlayCrns={this.handleSetOverlayCrns}/>
-                  );
-                })
-              }
-            </div>
-            <CourseAdd/>
-          </div>
-          <div className="footer">
-            <Button text={pinnedCrns.join(', ')} disabled={pinnedCrns.length === 0}>
-              <span>Copy CRNs</span>
-            </Button>
-            <Button onClick={this.handleDownload} disabled={pinnedCrns.length === 0}>
-              Download as PNG
-            </Button>
-            <Button onClick={this.handleExport} disabled={pinnedCrns.length === 0}>
-              Export Calendar
-            </Button>
-          </div>
-        </div>
         <a className="github-fork-ribbon left-bottom fixed"
            href="https://github.com/parkjs814/gt-scheduler"
            target="_blank" rel="noopener noreferrer"

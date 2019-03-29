@@ -164,59 +164,43 @@
   }
 
   &.mobile {
-    flex-direction: column;
+    flex-direction: column-reverse;
+
+    .tab-container {
+      flex-shrink: 0;
+      display: flex;
+      border-bottom: none;
+
+      .tab {
+        flex: 1;
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        border-right: 1px solid $color-dark;
+        font-weight: bold;
+        background-color: $color-lighter;
+        color: $color-darker;
+        cursor: pointer;
+        border-bottom: 1px solid $color-dark;
+
+        &.active {
+          background-color: $color-light;
+          color: black;
+          border-top: 1px solid $color-dark;
+          border-bottom: none;
+        }
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
 
     .sidebar {
       flex: 1;
       width: auto;
       border-left: none;
-
-      .tab-container {
-        flex-shrink: 0;
-        display: flex;
-        border-bottom: none;
-
-        .tab {
-          flex: 1;
-          padding: 16px;
-          display: flex;
-          justify-content: center;
-          align-content: center;
-          border-right: 1px solid $color-dark;
-          font-weight: bold;
-          background-color: $color-lighter;
-          color: $color-darker;
-          cursor: pointer;
-          border-bottom: 1px solid $color-dark;
-
-          &.active {
-            background-color: $color-light;
-            color: black;
-            border-top: 1px solid $color-dark;
-            border-bottom: none;
-          }
-
-          &:last-child {
-            border-right: none;
-          }
-        }
-      }
-
-      .scroller {
-        .calendar-container,
-        .courses-container,
-        .combinations-container {
-          display: none;
-
-          &.active {
-            display: flex;
-          }
-        }
-
-        .calendar-container {
-          background-color: white;
-        }
-      }
     }
   }
 
