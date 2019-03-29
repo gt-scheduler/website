@@ -10,10 +10,6 @@ class CombinationsContainer extends SemiPureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {
-      sortingOptionIndex: 0,
-    };
-
     this.sortingOptions = [{
       label: 'Most Compact',
       calculateFactor: combination => {
@@ -60,13 +56,12 @@ class CombinationsContainer extends SemiPureComponent {
 
   handleChangeSortingOptionIndex(e) {
     const sortingOptionIndex = e.target.value;
-    this.setState({ sortingOptionIndex });
+    this.props.setSortingOptionIndex(sortingOptionIndex);
   }
 
   render() {
     const { className, onSetOverlayCrns } = this.props;
-    const { desiredCourses, pinnedCrns, excludedCrns } = this.props.user;
-    const { sortingOptionIndex } = this.state;
+    const { desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex } = this.props.user;
 
     const combinations = this.memoizedGetCombinations(desiredCourses, pinnedCrns, excludedCrns);
     const sortingOption = this.sortingOptions[sortingOptionIndex];

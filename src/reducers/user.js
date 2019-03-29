@@ -9,6 +9,7 @@ const setDesiredCourses = createAction(`${prefix}/SET_DESIRED_COURSES`, desiredC
 const setPinnedCrns = createAction(`${prefix}/SET_PINNED_CRNS`, pinnedCrns => ({ pinnedCrns }));
 const setExcludedCrns = createAction(`${prefix}/SET_EXCLUDED_CRNS`, excludedCrns => ({ excludedCrns }));
 const setColorMap = createAction(`${prefix}/SET_COLOR_MAP`, colorMap => ({ colorMap }));
+const setSortingOptionIndex = createAction(`${prefix}/SET_SORTING_OPTION_INDEX`, sortingOptionIndex => ({ sortingOptionIndex }));
 
 export const actions = {
   setTerm,
@@ -16,11 +17,18 @@ export const actions = {
   setPinnedCrns,
   setExcludedCrns,
   setColorMap,
+  setSortingOptionIndex,
 };
 
-const saveData = ({ term, desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {} }) => {
+const saveData = ({ term, desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {}, sortingOptionIndex = 0 }) => {
   Cookies.set('term', term);
-  Cookies.set(term, JSON.stringify({ desiredCourses, pinnedCrns, excludedCrns, colorMap }), { expires: 365 });
+  Cookies.set(term, JSON.stringify({
+    desiredCourses,
+    pinnedCrns,
+    excludedCrns,
+    colorMap,
+    sortingOptionIndex,
+  }), { expires: 365 });
 };
 
 const loadData = (term = Cookies.get('term')) => {
@@ -30,13 +38,13 @@ const loadData = (term = Cookies.get('term')) => {
   } catch (e) {
     json = {};
   }
-  const { desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {} } = json;
+  const { desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {}, sortingOptionIndex = 0 } = json;
   desiredCourses.forEach(courseId => {
     if (!(courseId in colorMap)) {
       colorMap[courseId] = getRandomColor();
     }
   });
-  return { term, desiredCourses, pinnedCrns, excludedCrns, colorMap };
+  return { term, desiredCourses, pinnedCrns, excludedCrns, colorMap, sortingOptionIndex };
 };
 
 (function migrate201902() {
@@ -56,6 +64,7 @@ export default handleActions({
     setPinnedCrns,
     setExcludedCrns,
     setColorMap,
+    setSortingOptionIndex,
   )]: (state, { payload }) => {
     const newState = {
       ...state,
