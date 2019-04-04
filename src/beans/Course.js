@@ -1,13 +1,13 @@
 import { Section } from './';
 
 class Course {
-  constructor(courseId, data) {
+  constructor(oscar, courseId, data) {
     const [title, sections] = data;
 
     this.id = courseId;
     [this.subject, this.number] = this.id.split(' ');
     this.title = title;
-    this.sections = Object.keys(sections).map(sectionId => new Section(this, sectionId, sections[sectionId]));
+    this.sections = Object.keys(sections).map(sectionId => new Section(oscar, this, sectionId, sections[sectionId]));
 
     const lectures = this.sections.filter(section => section.credits > 0);
     const labs = this.sections.filter(section => section.credits === 0);

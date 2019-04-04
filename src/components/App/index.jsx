@@ -85,11 +85,11 @@ class App extends SemiPureComponent {
       const section = oscar.findSection(crn);
       section.meetings.forEach(meeting => {
         if (!meeting.period || !meeting.days.length) return;
-        const dateRange = oscar.dateRanges[meeting.dateRangeIndex];
+        const { from, to } = meeting.dateRange;
         const subject = section.course.id;
         const description = section.course.title;
         const location = meeting.where;
-        const begin = new Date(dateRange.from);
+        const begin = new Date(from);
         while (!meeting.days.includes(['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()])) {
           begin.setDate(begin.getDate() + 1);
         }
@@ -98,7 +98,7 @@ class App extends SemiPureComponent {
         end.setHours(meeting.period.end / 60 | 0, meeting.period.end % 60);
         const rrule = {
           freq: 'WEEKLY',
-          until: dateRange.to,
+          until: to,
           byday: meeting.days.map(day => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);

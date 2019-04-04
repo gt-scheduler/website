@@ -3,15 +3,16 @@ import { hasConflictBetween } from '../utils';
 
 class Oscar {
   constructor(data) {
-    const { courses, dateRanges } = data;
+    const { courses, dateRanges, scheduleTypes } = data;
 
-    this.courses = Object.keys(courses).map(courseId => new Course(courseId, courses[courseId]));
     this.dateRanges = dateRanges.map(dateRange => {
       const [from, to] = dateRange.split(' - ').map(v => new Date(v));
       from.setHours(0);
       to.setHours(23, 59, 59, 999);
       return { from, to };
     });
+    this.scheduleTypes = scheduleTypes;
+    this.courses = Object.keys(courses).map(courseId => new Course(this, courseId, courses[courseId]));
     this.courseMap = {};
     this.crnMap = {};
     this.courses.forEach(course => {
@@ -134,7 +135,7 @@ class Oscar {
     });
   }
 
-  sortCombinations(combinations, sortingOptionIndex){
+  sortCombinations(combinations, sortingOptionIndex) {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
     return combinations.map(combination => ({
       ...combination,
