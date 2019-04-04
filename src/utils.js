@@ -64,6 +64,28 @@ const isLab = section => section.scheduleType.includes('Lab');
 
 const isLecture = section => section.scheduleType.includes('Lecture');
 
+const getSemesterName = term => {
+  const year = term.substring(0, 4);
+  const semester = (() => {
+    switch (Number.parseInt(term.substring(4))) {
+      case 1:
+        return 'Winter';
+      case 2:
+      case 3:
+        return 'Spring';
+      case 5:
+      case 6:
+        return 'Summer';
+      case 8:
+      case 9:
+        return 'Fall';
+      default:
+        return 'Unknown';
+    }
+  })();
+  return `${semester} ${year}`;
+};
+
 export {
   stringToTime,
   timeToString,
@@ -79,4 +101,5 @@ export {
   unique,
   isLab,
   isLecture,
+  getSemesterName,
 };

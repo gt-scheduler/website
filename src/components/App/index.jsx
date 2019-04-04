@@ -6,7 +6,7 @@ import saveAs from 'file-saver';
 import memoizeOne from 'memoize-one';
 import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
 import ics from '../../libs/ics';
-import { classes, isMobile } from '../../utils';
+import { classes, getSemesterName, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
@@ -224,13 +224,9 @@ class App extends SemiPureComponent {
               <Button className="primary">
                 <select onChange={e => this.handleChangeSemester(e.target.value)} value={term}>
                   {
-                    terms.map(term => {
-                      const year = term.substring(0, 4);
-                      const semester = { '02': 'Spring', '05': 'Summer', '08': 'Fall' }[term.substring(4)];
-                      return (
-                        <option key={term} value={term}>{semester} {year}</option>
-                      );
-                    })
+                    terms.map(term => (
+                      <option key={term} value={term}>{getSemesterName(term)}</option>
+                    ))
                   }
                 </select>
               </Button>
