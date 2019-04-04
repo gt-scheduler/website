@@ -64,7 +64,6 @@ class Course extends SemiPureComponent {
       href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`,
     };
 
-
     return (
       <div className={classes('Course', textClassName, 'default', className)} style={{ backgroundColor: color }}
            key={course.id}>
@@ -110,6 +109,5 @@ class Course extends SemiPureComponent {
     );
   }
 }
-
 
 export default connect(({ db, user }) => ({ db, user }), actions)(Course);

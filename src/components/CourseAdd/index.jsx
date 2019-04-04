@@ -73,5 +73,4 @@ class CourseAdd extends SemiPureComponent {
   }
 }
 
-
 export default connect(({ db, user }) => ({ db, user }), actions)(CourseAdd);

@@ -131,5 +131,4 @@ class Instructor extends SemiPureComponent {
   }
 }
 
-
 export default connect(({ user }) => ({ user }), actions)(Instructor);

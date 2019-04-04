@@ -66,5 +66,4 @@ class Calendar extends SemiPureComponent {
   }
 }
 
-
 export default connect(({ env, user }) => ({ env, user }), actions)(Calendar);

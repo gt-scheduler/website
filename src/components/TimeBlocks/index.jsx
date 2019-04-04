@@ -52,5 +52,4 @@ class TimeBlocks extends SemiPureComponent {
   }
 }
 
-
 export default connect(({ env, db, user }) => ({ env, db, user }), actions)(TimeBlocks);
