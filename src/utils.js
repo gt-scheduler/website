@@ -60,6 +60,10 @@ const simplifyName = name => {
 
 const unique = array => [...new Set(array)];
 
+const isLab = section => section.scheduleType.includes('Lab');
+
+const isLecture = section => section.scheduleType.includes('Lecture');
+
 export {
   stringToTime,
   timeToString,
@@ -73,4 +77,6 @@ export {
   shallowCompareEntries,
   simplifyName,
   unique,
+  isLab,
+  isLecture,
 };

@@ -1,4 +1,5 @@
 import { Section } from './';
+import { isLab, isLecture } from '../utils';
 
 class Course {
   constructor(oscar, courseId, data) {
@@ -9,18 +10,19 @@ class Course {
     this.title = title;
     this.sections = Object.keys(sections).map(sectionId => new Section(oscar, this, sectionId, sections[sectionId]));
 
-    const lectures = this.sections.filter(section => section.credits > 0);
-    const labs = this.sections.filter(section => section.credits === 0);
-    this.hasLab = !this.id.startsWith('VIP') && lectures.length && labs.length;
+    const onlyLectures = this.sections.filter(section => isLecture(section) && !isLab(section));
+    const onlyLabs = this.sections.filter(section => isLab(section) && !isLecture(section));
+    this.hasLab = onlyLectures.length && onlyLabs.length;
     if (this.hasLab) {
-      this.lectures = lectures;
-      this.labs = labs;
-      this.lectures.forEach(lecture => lecture.labs = this.labs.filter(lab => lab.id.startsWith(lecture.id)));
-      this.labs.forEach(lab => lab.lectures = this.lectures.filter(lecture => lab.id.startsWith(lecture.id)));
-      if (this.lectures.every(lecture => !lecture.labs.length)) {
-        this.lectures.forEach(lecture => lecture.labs = this.labs);
-        this.labs.forEach(lab => lab.lectures = this.lectures);
-      }
+      onlyLectures.forEach(lecture => lecture.associatedLabs = onlyLabs.filter(lab => lab.id.startsWith(lecture.id)));
+      onlyLabs.forEach(lab => lab.associatedLectures = onlyLectures.filter(lecture => lab.id.startsWith(lecture.id)));
+      const lonelyLectures = onlyLectures.filter(lecture => !lecture.associatedLabs.length);
+      const lonelyLabs = onlyLabs.filter(lab => !lab.associatedLectures.length);
+      lonelyLectures.forEach(lecture => lecture.associatedLabs = lonelyLabs);
+      lonelyLabs.forEach(lab => lab.associatedLectures = lonelyLectures);
+      this.onlyLectures = onlyLectures;
+      this.onlyLabs = onlyLabs;
+      this.allInOnes = this.sections.filter(section => isLecture(section) && isLab(section));
     } else {
       this.sectionGroups = this.distinct(this.sections);
     }

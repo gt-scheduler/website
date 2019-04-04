@@ -79,33 +79,32 @@ class Oscar {
       const isPinned = section => pinnedCrns.includes(section.crn);
       const hasConflict = section => [...pinnedCrns, ...crns].some(crn => hasConflictBetween(this.findSection(crn), section));
       if (course.hasLab) {
-        const pinnedLectures = course.lectures.filter(isPinned);
-        const pinnedLabs = course.labs.filter(isPinned);
-        if (pinnedLabs.length) {
-          pinnedLabs.forEach(lab => {
-            lab.lectures.filter(isIncluded).forEach(lecture => {
-              if (isPinned(lecture)) {
-                dfs(courseIndex + 1, crns);
-              } else {
-                if (hasConflict(lecture)) return;
-                dfs(courseIndex + 1, [...crns, lecture.crn]);
-              }
-            });
+        const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
+        const pinnedOnlyLab = course.onlyLabs.find(isPinned);
+        const pinnedAllInOne = course.allInOnes.find(isPinned);
+        if ((pinnedOnlyLecture && pinnedOnlyLab) || pinnedAllInOne) {
+          dfs(courseIndex + 1, crns);
+        } else if (pinnedOnlyLecture) {
+          pinnedOnlyLecture.associatedLabs.filter(isIncluded).forEach(lab => {
+            if (hasConflict(lab)) return;
+            dfs(courseIndex + 1, [...crns, lab.crn]);
           });
-        } else if (pinnedLectures.length) {
-          pinnedLectures.forEach(lecture => {
-            lecture.labs.filter(isIncluded).forEach(lab => {
-              if (hasConflict(lab)) return;
-              dfs(courseIndex + 1, [...crns, lab.crn]);
-            });
+        } else if (pinnedOnlyLab) {
+          pinnedOnlyLab.associatedLectures.filter(isIncluded).forEach(lecture => {
+            if (hasConflict(lecture)) return;
+            dfs(courseIndex + 1, [...crns, lecture.crn]);
           });
         } else {
-          course.lectures.filter(isIncluded).forEach(lecture => {
+          course.onlyLectures.filter(isIncluded).forEach(lecture => {
             if (hasConflict(lecture)) return;
-            lecture.labs.filter(isIncluded).forEach(lab => {
+            lecture.associatedLabs.filter(isIncluded).forEach(lab => {
               if (hasConflict(lab)) return;
               dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
             });
+          });
+          course.allInOnes.filter(isIncluded).forEach(section => {
+            if (hasConflict(section)) return;
+            dfs(courseIndex + 1, [...crns, section.crn]);
           });
         }
       } else {
