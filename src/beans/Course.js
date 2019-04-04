@@ -1,5 +1,5 @@
 import { Section } from './';
-import { isLab, isLecture } from '../utils';
+import { hasConflictBetween, isLab, isLecture } from '../utils';
 
 class Course {
   constructor(oscar, courseId, data) {
@@ -18,8 +18,8 @@ class Course {
       onlyLabs.forEach(lab => lab.associatedLectures = onlyLectures.filter(lecture => lab.id.startsWith(lecture.id)));
       const lonelyLectures = onlyLectures.filter(lecture => !lecture.associatedLabs.length);
       const lonelyLabs = onlyLabs.filter(lab => !lab.associatedLectures.length);
-      lonelyLectures.forEach(lecture => lecture.associatedLabs = lonelyLabs);
-      lonelyLabs.forEach(lab => lab.associatedLectures = lonelyLectures);
+      lonelyLectures.forEach(lecture => lecture.associatedLabs = lonelyLabs.filter(lab => !hasConflictBetween(lecture, lab)));
+      lonelyLabs.forEach(lab => lab.associatedLectures = lonelyLectures.filter(lecture => !hasConflictBetween(lecture, lab)));
       this.onlyLectures = onlyLectures;
       this.onlyLabs = onlyLabs;
       this.allInOnes = this.sections.filter(section => isLecture(section) && isLab(section));
