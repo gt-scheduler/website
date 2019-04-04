@@ -3,7 +3,7 @@ import { hasConflictBetween } from '../utils';
 
 class Oscar {
   constructor(data) {
-    const { courses, dateRanges, scheduleTypes } = data;
+    const { courses, dateRanges, scheduleTypes, campuses } = data;
 
     this.dateRanges = dateRanges.map(dateRange => {
       const [from, to] = dateRange.split(' - ').map(v => new Date(v));
@@ -12,6 +12,7 @@ class Oscar {
       return { from, to };
     });
     this.scheduleTypes = scheduleTypes;
+    this.campuses = campuses;
     this.courses = Object.keys(courses).map(courseId => new Course(this, courseId, courses[courseId]));
     this.courseMap = {};
     this.crnMap = {};
