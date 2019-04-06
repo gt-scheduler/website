@@ -8,9 +8,9 @@ import './stylesheet.scss';
 
 class TimeBlocks extends SemiPureComponent {
   render() {
-    const { className, crn, overlay, preview } = this.props;
+    const { className, crn, overlay, preview, capture } = this.props;
     const { oscar } = this.props.db;
-    const { mobile } = this.props.env;
+    const mobile = this.props.env.mobile && !capture;
     const { colorMap } = this.props.user;
 
     const section = oscar.findSection(crn);

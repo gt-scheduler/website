@@ -164,7 +164,7 @@ class App extends SemiPureComponent {
           </div>
         }
         <div className="capture-container" ref={this.captureRef}>
-          <Calendar className="fake-calendar"/>
+          <Calendar className="fake-calendar" capture/>
         </div>
         {
           (!mobile || tabIndex === 1) &&
