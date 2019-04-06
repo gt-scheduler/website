@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { combineReducers, createStore } from 'redux';
 import * as reducers from './reducers';
 import App from './components/App';
+import 'normalize.css'
 import './stylesheet.scss';
 
 const store = createStore(combineReducers(reducers));
