@@ -1,10 +1,20 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { faAngleDown, faAngleUp, faInfoCircle, faPalette, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { classes, getContentClassName } from '../../utils';
-import { actions } from '../../reducers';
-import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
-import './stylesheet.scss';
+import React from "react";
+import { connect } from "react-redux";
+import {
+  faAngleDown,
+  faAngleUp,
+  faInfoCircle,
+  faPalette,
+  faPlus,
+  faTrash
+} from "@fortawesome/free-solid-svg-icons";
+import { classes, getContentClassName } from "../../utils";
+import { actions } from "../../reducers";
+import { ActionRow, Instructor, Palette, SemiPureComponent } from "../";
+import "./stylesheet.scss";
+import axios from "axios";
+import cheerio from "cheerio";
+import DisplayGpa from "../DisplayGpa";
 
 class Course extends SemiPureComponent {
   constructor(props) {
@@ -12,17 +22,32 @@ class Course extends SemiPureComponent {
 
     this.state = {
       expanded: false,
-      paletteShown: false,
+      paletteShown: false
     };
 
     this.handleSelectColor = this.handleSelectColor.bind(this);
   }
 
   handleRemoveCourse(course) {
-    const { desiredCourses, pinnedCrns, excludedCrns, colorMap } = this.props.user;
-    this.props.setDesiredCourses(desiredCourses.filter(courseId => courseId !== course.id));
-    this.props.setPinnedCrns(pinnedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
-    this.props.setExcludedCrns(excludedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
+    const {
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      colorMap
+    } = this.props.user;
+    this.props.setDesiredCourses(
+      desiredCourses.filter(courseId => courseId !== course.id)
+    );
+    this.props.setPinnedCrns(
+      pinnedCrns.filter(
+        crn => !course.sections.some(section => section.crn === crn)
+      )
+    );
+    this.props.setExcludedCrns(
+      excludedCrns.filter(
+        crn => !course.sections.some(section => section.crn === crn)
+      )
+    );
     this.props.setColorMap({ ...colorMap, [course.id]: undefined });
   }
 
@@ -52,7 +77,7 @@ class Course extends SemiPureComponent {
 
     const instructorMap = {};
     course.sections.forEach(section => {
-      const [primaryInstructor = 'Not Assigned'] = section.instructors;
+      const [primaryInstructor = "Not Assigned"] = section.instructors;
       if (!(primaryInstructor in instructorMap)) {
         instructorMap[primaryInstructor] = [];
       }
@@ -61,53 +86,96 @@ class Course extends SemiPureComponent {
 
     const infoAction = {
       icon: faInfoCircle,
-      href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`,
+      href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`
     };
 
     return (
-      <div className={classes('Course', textClassName, 'default', className)} style={{ backgroundColor: color }}
-           key={course.id}>
-        <ActionRow className={classes('course-header', expanded && 'divider-bottom')} actions={onAddCourse ? [
-          { icon: faPlus, onClick: onAddCourse },
-          infoAction,
-        ] : [
-          { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
-          infoAction,
-          { icon: faPalette, onClick: () => this.handleTogglePaletteShown() },
-          { icon: faTrash, onClick: () => this.handleRemoveCourse(course) },
-        ]} color={color}>
-          <div className="row">
-            <span className="course_id">{course.id}</span>
-            <span className="section_ids">
-              {course.sections.filter(section => pinnedCrns.includes(section.crn)).map(section => section.id).join(', ')}
-            </span>
-          </div>
-          <div className="row">
-            <span className="course_title" dangerouslySetInnerHTML={{ __html: course.title }}/>
-            <span className="section_crns">
-              {course.sections.filter(section => pinnedCrns.includes(section.crn)).map(section => section.crn).join(', ')}
-            </span>
-          </div>
-          {
-            paletteShown &&
-            <Palette className="palette" onSelectColor={this.handleSelectColor} color={color}
-                     onMouseLeave={() => this.handleTogglePaletteShown(false)}/>
+      <div
+        className={classes("Course", textClassName, "default", className)}
+        style={{ backgroundColor: color }}
+        key={course.id}
+      >
+        <ActionRow
+          className={classes("course-header", expanded && "divider-bottom")}
+          actions={
+            onAddCourse
+              ? [{ icon: faPlus, onClick: onAddCourse }, infoAction]
+              : [
+                  {
+                    icon: expanded ? faAngleUp : faAngleDown,
+                    onClick: () => this.handleToggleExpanded()
+                  },
+                  infoAction,
+                  {
+                    icon: faPalette,
+                    onClick: () => this.handleTogglePaletteShown()
+                  },
+                  {
+                    icon: faTrash,
+                    onClick: () => this.handleRemoveCourse(course)
+                  }
+                ]
           }
-        </ActionRow>
-        {
-          expanded &&
-          <div className="course-body">
-            {
-              Object.keys(instructorMap).map(name => (
-                <Instructor key={name} color={color} name={name} sections={instructorMap[name]}
-                            onSetOverlayCrns={onSetOverlayCrns}/>
-              ))
-            }
+          color={color}
+        >
+          <div className="row">
+            <span className="course_id" style={{ fontWeight: 750 }}>
+              {course.id}
+              {this.props.fromClass === "course-list" ? (
+                <DisplayGpa courseId={courseId} />
+              ) : (
+                <div></div>
+              )}
+            </span>
+
+            <span className="section_ids">
+              {course.sections
+                .filter(section => pinnedCrns.includes(section.crn))
+                .map(section => section.id)
+                .join(", ")}
+            </span>
           </div>
-        }
+          <div className="row">
+            <span
+              className="course_title"
+              style={{ fontWeight: 700, fontStyle: "italic" }}
+              dangerouslySetInnerHTML={{ __html: course.title }}
+            />
+            <span className="section_crns">
+              {course.sections
+                .filter(section => pinnedCrns.includes(section.crn))
+                .map(section => section.crn)
+                .join(", ")}
+            </span>
+            {paletteShown && (
+              <Palette
+                className="palette"
+                onSelectColor={this.handleSelectColor}
+                color={color}
+                onMouseLeave={() => this.handleTogglePaletteShown(false)}
+              />
+            )}
+          </div>
+        </ActionRow>
+        {expanded && (
+          <div className="course-body">
+            {Object.keys(instructorMap).map(name => (
+              <Instructor
+                key={name}
+                color={color}
+                name={name}
+                sections={instructorMap[name]}
+                onSetOverlayCrns={onSetOverlayCrns}
+              />
+            ))}
+          </div>
+        )}
       </div>
     );
   }
 }
 
-export default connect(({ db, user }) => ({ db, user }), actions)(Course);
+export default connect(
+  ({ db, user }) => ({ db, user }),
+  actions
+)(Course);
