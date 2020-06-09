@@ -9,6 +9,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.10",
+    "@progress/kendo-react-popup": "^3.14.0",
     "ajv": "^6.12.2",
     "axios": "^0.18.1",
     "cheerio": "^1.0.0-rc.3",
@@ -33,6 +34,7 @@
     "redux-actions": "^2.6.5",
     "request": "^2.88.2",
     "rmp-api": "0.0.1-security",
+    "semantic-ui-react": "^0.88.2",
     "typescript": "^3.9.3",
     "underscore": "^1.10.2"
   },

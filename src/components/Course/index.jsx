@@ -12,9 +12,9 @@ import { classes, getContentClassName } from "../../utils";
 import { actions } from "../../reducers";
 import { ActionRow, Instructor, Palette, SemiPureComponent } from "../";
 import "./stylesheet.scss";
-import axios from "axios";
 import cheerio from "cheerio";
-import DisplayGpa from "../DisplayGpa";
+import $ from "jquery";
+import CanvasJSReact from "../../beans/canvasjs-2.3.2/canvasjs.react";
 
 class Course extends SemiPureComponent {
   constructor(props) {
@@ -22,7 +22,9 @@ class Course extends SemiPureComponent {
 
     this.state = {
       expanded: false,
-      paletteShown: false
+      infoExpanded: false,
+      paletteShown: false,
+      critiqueData: {}
     };
 
     this.handleSelectColor = this.handleSelectColor.bind(this);
@@ -52,7 +54,10 @@ class Course extends SemiPureComponent {
   }
 
   handleToggleExpanded(expanded = !this.state.expanded) {
-    this.setState({ expanded });
+    this.setState({
+      expanded: expanded,
+      infoExpanded: false
+    });
   }
 
   handleSelectColor(color) {
@@ -64,16 +69,173 @@ class Course extends SemiPureComponent {
   handleTogglePaletteShown(paletteShown = !this.state.paletteShown) {
     this.setState({ paletteShown });
   }
+  handleInfoExpanded(infoExpanded = !this.state.infoExpanded) {
+    this.setState({
+      infoExpanded: infoExpanded,
+      expanded: false
+    });
+  }
+
+  componentDidMount() {
+    if (this.props.fromClass === "course-list") {
+      let courseString = this.props.courseId.replace(" ", "%20");
+      $.ajax({
+        url: `https://cors-anywhere.herokuapp.com/http://critique.gatech.edu/course.php?id=${courseString}`,
+        type: "GET",
+        dataType: "html",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "text/html"
+        },
+        success: res => {
+          // console.log(res);
+          const $ = cheerio.load(res);
+          let info = {
+            avgGpa: Number(
+              $(
+                "div.center-table > table.table > tbody > tr :nth-child(2)",
+                res
+              ).text()
+            ),
+            a: Number(
+              $(
+                "div.center-table > table.table > tbody > tr :nth-child(3)",
+                res
+              ).text()
+            ),
+            b: Number(
+              $(
+                "div.center-table > table.table > tbody > tr :nth-child(4)",
+                res
+              ).text()
+            ),
+            c: Number(
+              $(
+                "div.center-table > table.table > tbody > tr :nth-child(5)",
+                res
+              ).text()
+            ),
+            d: Number(
+              $(
+                "div.center-table > table.table > tbody > tr :nth-child(6)",
+                res
+              ).text()
+            ),
+            f: Number(
+              $(
+                "div.center-table > table.table > tbody > tr :nth-child(7)",
+                res
+              ).text()
+            ),
+            instructors: []
+          };
+
+          $("table#dataTable > tbody > tr", res).each((i, element) => {
+            let item = {
+              profName: $(element)
+                .find("td:nth-child(1)")
+                .text(),
+              classSize: $(element)
+                .find("td:nth-child(2)")
+                .text(),
+              avgGpa: $(element)
+                .find("td:nth-child(3)")
+                .text(),
+              a: $(element)
+                .find("td:nth-child(4)")
+                .text(),
+              b: $(element)
+                .find("td:nth-child(5)")
+                .text(),
+              c: $(element)
+                .find("td:nth-child(6)")
+                .text(),
+              d: $(element)
+                .find("td:nth-child(7)")
+                .text(),
+              f: $(element)
+                .find("td:nth-child(8)")
+                .text(),
+              w: $(element)
+                .find("td:nth-child(9)")
+                .text()
+            };
+            let newArr = info.instructors;
+            newArr.push(item);
+            info.instructors = newArr;
+          });
+
+          this.setState({ critiqueData: info });
+          console.log(this.state.critiqueData);
+        },
+        error: error => {
+          console.log(error);
+        }
+      });
+    }
+  }
+
+  value2color = (
+    value = this.state.critiqueData.avgGpa,
+    min = 2.5,
+    max = 4.0
+  ) => {
+    var base = max - min;
+
+    if (base == 0) {
+      value = 100;
+    } else {
+      value = ((value - min) / base) * 100;
+    }
+    var r,
+      g,
+      b = 0;
+    if (value < 50) {
+      r = 255;
+      g = Math.round(5.1 * value);
+    } else {
+      g = 255;
+      r = Math.round(510 - 5.1 * value);
+    }
+    return `rgba(${r}, ${g}, ${b}, 0.7)`;
+  };
 
   render() {
     const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
     const { oscar } = this.props.db;
     const { term, pinnedCrns, colorMap } = this.props.user;
-    const { expanded, paletteShown } = this.state;
+    const { expanded, paletteShown, infoExpanded } = this.state;
 
     const course = oscar.findCourse(courseId);
     const color = colorMap[course.id];
     const textClassName = getContentClassName(color);
+
+    const options = {
+      animationEnabled: true,
+      theme: "dark2",
+      title: {
+        text: "Grade Distribution"
+      },
+      axisX: {
+        title: "Letter Grade",
+        reversed: true
+      },
+      axisY: {
+        title: "Percentage"
+      },
+      data: [
+        {
+          type: "bar",
+          dataPoints: [
+            { y: this.state.critiqueData.a, label: "A" },
+            { y: this.state.critiqueData.b, label: "B" },
+            { y: this.state.critiqueData.c, label: "C" },
+            { y: this.state.critiqueData.d, label: "D" },
+            { y: this.state.critiqueData.f, label: "F" }
+          ]
+        }
+      ]
+    };
 
     const instructorMap = {};
     course.sections.forEach(section => {
@@ -105,7 +267,10 @@ class Course extends SemiPureComponent {
                     icon: expanded ? faAngleUp : faAngleDown,
                     onClick: () => this.handleToggleExpanded()
                   },
-                  infoAction,
+                  {
+                    icon: faInfoCircle,
+                    onClick: () => this.handleInfoExpanded()
+                  },
                   {
                     icon: faPalette,
                     onClick: () => this.handleTogglePaletteShown()
@@ -120,9 +285,23 @@ class Course extends SemiPureComponent {
         >
           <div className="row">
             <span className="course_id" style={{ fontWeight: 750 }}>
-              {course.id}
+              {course.id} <br />
               {this.props.fromClass === "course-list" ? (
-                <DisplayGpa courseId={courseId} />
+                <div
+                  style={{
+                    display: !this.state.infoExpanded ? "inline-block" : "none"
+                  }}
+                >
+                  <div className="labelAverage">Average GPA:</div>
+                  <div
+                    className="gpa"
+                    style={{ backgroundColor: this.value2color() }}
+                  >
+                    {this.state.critiqueData.avgGpa
+                      ? this.state.critiqueData.avgGpa
+                      : "N/A"}
+                  </div>
+                </div>
               ) : (
                 <div></div>
               )}
@@ -157,6 +336,27 @@ class Course extends SemiPureComponent {
             )}
           </div>
         </ActionRow>
+
+        {this.props.fromClass === "course-list" && infoExpanded ? (
+          <div className="course-info">
+            <div>
+              <div className="labelAverage">Average GPA:</div>
+              <div
+                className="gpa"
+                style={{ backgroundColor: this.value2color() }}
+              >
+                {this.state.critiqueData.avgGpa
+                  ? this.state.critiqueData.avgGpa
+                  : "N/A"}
+              </div>
+              <CanvasJSReact.CanvasJSChart
+                containerProps={{ height: "300px" }}
+                options={options}
+              />
+            </div>
+          </div>
+        ) : null}
+
         {expanded && (
           <div className="course-body">
             {Object.keys(instructorMap).map(name => (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./stylesheet.scss";
 import axios from "axios";
 import cheerio from "cheerio";
 import $ from "jquery";
@@ -6,12 +7,15 @@ import styled from "@emotion/styled";
 
 const DisplayGpa = props => {
   const [background, setBackground] = useState();
-  const [courseId, setCourseId] = useState(props.courseId);
-  const [gpa, setGpa] = useState(0);
+  const [gpa, setGpa] = useState(props.gpa);
   const [url, setUrl] = useState("");
   const errMessage = "GPA could not be accessed, try again later";
 
   useEffect(() => {
+    // getAverageGpa(props.courseId);
+  }, []);
+
+  const getAverageGpa = courseId => {
     let courseString = courseId.replace(" ", "%20");
     $.ajax({
       url: `https://cors-anywhere.herokuapp.com/http://critique.gatech.edu/course.php?id=${courseString}`,
@@ -45,7 +49,7 @@ const DisplayGpa = props => {
         setGpa("Error");
       }
     });
-  }, []);
+  };
 
   const setColor = value => {
     setBackground(value2color(value, 2.5, 4.0));
@@ -69,37 +73,16 @@ const DisplayGpa = props => {
       g = 255;
       r = Math.round(510 - 5.1 * value);
     }
-    var h = r * 0x10000 + g * 0x100 + b * 0x1;
-    return "#" + ("000000" + h.toString(16)).slice(-6);
+    return `rgba(${r}, ${g}, ${b}, 0.7)`;
   };
 
-  const NormalText = styled.div`
-    font-weight: 500;
-    display: inline-block;
-    font-size: 13px;
-    height: 22px;
-    line-height: 18px;
-  `;
-
-  const TextBox = styled.div`
-    background-color: ${background};
-    width: 40px;
-    height: 22px;
-    margin-left: 8px;
-    line-height: 19px;
-    text-align: center;
-    color: white;
-    font-weight: 500;
-    border: 2px solid #202020;
-    display: inline-block;
-    font-size: 13px;
-  `;
-
   return (
-    <div>
-      <NormalText>Average GPA:</NormalText>
-      <TextBox>{gpa}</TextBox>
-    </div>
+    <>
+      <div className="label">Average GPA:</div>
+      <div className="gpa" style={{ backgroundColor: background }}>
+        {gpa}
+      </div>
+    </>
   );
 };
 
