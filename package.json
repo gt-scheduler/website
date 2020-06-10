@@ -1,8 +1,8 @@
 {
-  "name": "gt-scheduler",
-  "version": "0.1.0",
+  "name": "gt-scheduler-v2",
+  "version": "2.0.0",
   "private": true,
-  "homepage": "https://abhitirumala.github.io/gt-scheduler-v2/",
+  "homepage": "https://www.gtscheduler.tech/",
   "dependencies": {
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
