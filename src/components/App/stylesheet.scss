@@ -11,6 +11,14 @@
   overflow: hidden;
   background-color: #303030;
 
+  .collapsed {
+    label {
+      overflow: visible;
+      display: inline-block;
+      transform: rotate(-90deg);
+    }
+  }
+
   .calendar-container {
     flex: 1;
     overflow-y: auto;

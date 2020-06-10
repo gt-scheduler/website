@@ -393,6 +393,7 @@ class Course extends SemiPureComponent {
                 name={name}
                 sections={instructorMap[name]}
                 onSetOverlayCrns={onSetOverlayCrns}
+                instructorData={this.state.critiqueData.instructors}
               />
             ))}
           </div>

@@ -23,7 +23,9 @@ class App extends SemiPureComponent {
     this.state = {
       terms: [],
       overlayCrns: [],
-      tabIndex: 0
+      tabIndex: 0,
+      configCollapsed: false,
+      courseListCollapsed: false
     };
 
     this.captureRef = React.createRef();
@@ -199,78 +201,107 @@ class App extends SemiPureComponent {
         <div className="capture-container" ref={this.captureRef}>
           <Calendar className="fake-calendar" capture />
         </div>
-        {(!mobile || tabIndex === 1) && (
-          <ResizePanel
-            direction="w"
-            style={{
-              flexGrow: "1",
-              width: "auto",
-              minWidth: "200px",
-              maxWidth: "350px"
-            }}
-          >
-            <div className="sidebar sidebar-combinations">
-              <div className="header">
-                <span className="secondary">{combinations.length} Combos</span>
-                <Button className="primary">
-                  <select
-                    onChange={this.handleChangeSortingOptionIndex}
-                    value={sortingOptionIndex}
+        {(!mobile || tabIndex === 1) &&
+          (this.state.configCollapsed ? (
+            <Button
+              className="reset collapsed"
+              onClick={() =>
+                this.setState({
+                  configCollapsed: !this.state.configCollapsed
+                })
+              }
+            >
+              <label>Expand </label>
+            </Button>
+          ) : (
+            <ResizePanel
+              direction="w"
+              style={{
+                flexGrow: "1",
+                width: "auto",
+                minWidth: "200px",
+                maxWidth: "350px"
+              }}
+            >
+              <div className="sidebar sidebar-combinations">
+                <div className="header">
+                  <span className="secondary">
+                    {combinations.length} Combos
+                  </span>
+                  <Button className="primary">
+                    <select
+                      onChange={this.handleChangeSortingOptionIndex}
+                      value={sortingOptionIndex}
+                    >
+                      {oscar.sortingOptions.map((sortingOption, i) => (
+                        <option key={i} value={i}>
+                          {sortingOption.label}
+                        </option>
+                      ))}
+                    </select>
+                  </Button>
+                </div>
+                <div className="scroller">
+                  <AutoSizer>
+                    {({ width, height }) => (
+                      <List
+                        width={width}
+                        height={height}
+                        rowCount={sortedCombinations.length}
+                        rowHeight={100}
+                        rowRenderer={({ index, key, style }) => {
+                          const { crns } = sortedCombinations[index];
+                          return (
+                            <div
+                              className="combination"
+                              key={key}
+                              style={style}
+                              onMouseEnter={() =>
+                                this.handleSetOverlayCrns(crns)
+                              }
+                              onMouseLeave={() => this.handleSetOverlayCrns([])}
+                              onClick={() =>
+                                this.handleSetPinnedCrns([
+                                  ...pinnedCrns,
+                                  ...crns
+                                ])
+                              }
+                            >
+                              <div className="number">{index + 1}</div>
+                              <Calendar
+                                className="calendar-preview"
+                                overlayCrns={crns}
+                                preview
+                              />
+                            </div>
+                          );
+                        }}
+                      />
+                    )}
+                  </AutoSizer>
+                </div>
+                <div className="footer">
+                  <Button
+                    className="reset"
+                    onClick={this.handleResetPinnedCrns}
+                    disabled={pinnedCrns.length === 0}
                   >
-                    {oscar.sortingOptions.map((sortingOption, i) => (
-                      <option key={i} value={i}>
-                        {sortingOption.label}
-                      </option>
-                    ))}
-                  </select>
-                </Button>
+                    Reset Sections
+                  </Button>
+                  <Button
+                    className="reset"
+                    onClick={() =>
+                      this.setState({
+                        configCollapsed: !this.state.configCollapsed
+                      })
+                    }
+                  >
+                    Collapse Column
+                  </Button>
+                </div>
               </div>
-              <div className="scroller">
-                <AutoSizer>
-                  {({ width, height }) => (
-                    <List
-                      width={width}
-                      height={height}
-                      rowCount={sortedCombinations.length}
-                      rowHeight={100}
-                      rowRenderer={({ index, key, style }) => {
-                        const { crns } = sortedCombinations[index];
-                        return (
-                          <div
-                            className="combination"
-                            key={key}
-                            style={style}
-                            onMouseEnter={() => this.handleSetOverlayCrns(crns)}
-                            onMouseLeave={() => this.handleSetOverlayCrns([])}
-                            onClick={() =>
-                              this.handleSetPinnedCrns([...pinnedCrns, ...crns])
-                            }
-                          >
-                            <div className="number">{index + 1}</div>
-                            <Calendar
-                              className="calendar-preview"
-                              overlayCrns={crns}
-                              preview
-                            />
-                          </div>
-                        );
-                      }}
-                    />
-                  )}
-                </AutoSizer>
-              </div>
-              <div className="footer">
-                <Button
-                  className="reset"
-                  onClick={this.handleResetPinnedCrns}
-                  disabled={pinnedCrns.length === 0}
-                >
-                  Reset Sections
-                </Button>
-              </div>
-            </div>
-          </ResizePanel>
-        )}
+            </ResizePanel>
+          ))}
         {(!mobile || tabIndex === 0) && (
           <ResizePanel
             direction="w"
