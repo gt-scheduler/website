@@ -28,6 +28,7 @@
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.1",
     "react-redux": "^5.1.2",
+    "react-resize-panel": "^0.3.5",
     "react-scripts": "^3.4.1",
     "react-virtualized": "^9.21.2",
     "redux": "^4.0.5",

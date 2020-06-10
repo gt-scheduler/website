@@ -5,6 +5,7 @@ import domtoimage from "dom-to-image";
 import saveAs from "file-saver";
 import memoizeOne from "memoize-one";
 import { AutoSizer, List } from "react-virtualized/dist/commonjs";
+import ResizePanel from "react-resize-panel";
 import ics from "../../libs/ics";
 import { classes, getSemesterName, isMobile } from "../../utils";
 import { PNG_SCALE_FACTOR } from "../../constants";
@@ -199,123 +200,143 @@ class App extends SemiPureComponent {
           <Calendar className="fake-calendar" capture />
         </div>
         {(!mobile || tabIndex === 1) && (
-          <div className="sidebar sidebar-combinations">
-            <div className="header">
-              <span className="secondary">{combinations.length} Combos</span>
-              <Button className="primary">
-                <select
-                  onChange={this.handleChangeSortingOptionIndex}
-                  value={sortingOptionIndex}
+          <ResizePanel
+            direction="w"
+            style={{
+              flexGrow: "1",
+              width: "auto",
+              minWidth: "200px",
+              maxWidth: "350px"
+            }}
+          >
+            <div className="sidebar sidebar-combinations">
+              <div className="header">
+                <span className="secondary">{combinations.length} Combos</span>
+                <Button className="primary">
+                  <select
+                    onChange={this.handleChangeSortingOptionIndex}
+                    value={sortingOptionIndex}
+                  >
+                    {oscar.sortingOptions.map((sortingOption, i) => (
+                      <option key={i} value={i}>
+                        {sortingOption.label}
+                      </option>
+                    ))}
+                  </select>
+                </Button>
+              </div>
+              <div className="scroller">
+                <AutoSizer>
+                  {({ width, height }) => (
+                    <List
+                      width={width}
+                      height={height}
+                      rowCount={sortedCombinations.length}
+                      rowHeight={100}
+                      rowRenderer={({ index, key, style }) => {
+                        const { crns } = sortedCombinations[index];
+                        return (
+                          <div
+                            className="combination"
+                            key={key}
+                            style={style}
+                            onMouseEnter={() => this.handleSetOverlayCrns(crns)}
+                            onMouseLeave={() => this.handleSetOverlayCrns([])}
+                            onClick={() =>
+                              this.handleSetPinnedCrns([...pinnedCrns, ...crns])
+                            }
+                          >
+                            <div className="number">{index + 1}</div>
+                            <Calendar
+                              className="calendar-preview"
+                              overlayCrns={crns}
+                              preview
+                            />
+                          </div>
+                        );
+                      }}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
+              <div className="footer">
+                <Button
+                  className="reset"
+                  onClick={this.handleResetPinnedCrns}
+                  disabled={pinnedCrns.length === 0}
                 >
-                  {oscar.sortingOptions.map((sortingOption, i) => (
-                    <option key={i} value={i}>
-                      {sortingOption.label}
-                    </option>
-                  ))}
-                </select>
-              </Button>
+                  Reset Sections
+                </Button>
+              </div>
             </div>
-            <div className="scroller">
-              <AutoSizer>
-                {({ width, height }) => (
-                  <List
-                    width={width}
-                    height={height}
-                    rowCount={sortedCombinations.length}
-                    rowHeight={100}
-                    rowRenderer={({ index, key, style }) => {
-                      const { crns } = sortedCombinations[index];
-                      return (
-                        <div
-                          className="combination"
-                          key={key}
-                          style={style}
-                          onMouseEnter={() => this.handleSetOverlayCrns(crns)}
-                          onMouseLeave={() => this.handleSetOverlayCrns([])}
-                          onClick={() =>
-                            this.handleSetPinnedCrns([...pinnedCrns, ...crns])
-                          }
-                        >
-                          <div className="number">{index + 1}</div>
-                          <Calendar
-                            className="calendar-preview"
-                            overlayCrns={crns}
-                            preview
-                          />
-                        </div>
-                      );
-                    }}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-            <div className="footer">
-              <Button
-                className="reset"
-                onClick={this.handleResetPinnedCrns}
-                disabled={pinnedCrns.length === 0}
-              >
-                Reset Sections
-              </Button>
-            </div>
-          </div>
+          </ResizePanel>
         )}
         {(!mobile || tabIndex === 0) && (
-          <div className="sidebar sidebar-courses">
-            <div className="header">
-              <span className="secondary">
-                {this.getTotalCredits()} Credits
-              </span>
-              <Button className="primary">
-                <select
-                  onChange={e => this.handleChangeSemester(e.target.value)}
-                  value={term}
-                >
-                  {terms.map(term => (
-                    <option key={term} value={term}>
-                      {getSemesterName(term)}
-                    </option>
-                  ))}
-                </select>
-              </Button>
-            </div>
-            <div className="scroller">
-              <div className="course-list">
-                {desiredCourses.map(courseId => {
-                  return (
-                    <Course
-                      courseId={courseId}
-                      expandable
-                      key={courseId}
-                      onSetOverlayCrns={this.handleSetOverlayCrns}
-                      fromClass="course-list"
-                    />
-                  );
-                })}
+          <ResizePanel
+            direction="w"
+            style={{
+              flexGrow: "1",
+              width: "200px",
+              minWidth: "200px",
+              maxWidth: "350px"
+            }}
+          >
+            <div className="sidebar sidebar-courses">
+              <div className="header">
+                <span className="secondary">
+                  {this.getTotalCredits()} Credits
+                </span>
+                <Button className="primary">
+                  <select
+                    onChange={e => this.handleChangeSemester(e.target.value)}
+                    value={term}
+                  >
+                    {terms.map(term => (
+                      <option key={term} value={term}>
+                        {getSemesterName(term)}
+                      </option>
+                    ))}
+                  </select>
+                </Button>
               </div>
-              <CourseAdd />
+              <div className="scroller">
+                <div className="course-list">
+                  {desiredCourses.map(courseId => {
+                    return (
+                      <Course
+                        courseId={courseId}
+                        expandable
+                        key={courseId}
+                        onSetOverlayCrns={this.handleSetOverlayCrns}
+                        fromClass="course-list"
+                      />
+                    );
+                  })}
+                </div>
+                <CourseAdd />
+              </div>
+              <div className="footer">
+                <Button
+                  text={pinnedCrns.join(", ")}
+                  disabled={pinnedCrns.length === 0}
+                >
+                  <span>Copy CRNs</span>
+                </Button>
+                <Button
+                  onClick={this.handleDownload}
+                  disabled={pinnedCrns.length === 0}
+                >
+                  Download as PNG
+                </Button>
+                <Button
+                  onClick={this.handleExport}
+                  disabled={pinnedCrns.length === 0}
+                >
+                  Export Calendar
+                </Button>
+              </div>
             </div>
-            <div className="footer">
-              <Button
-                text={pinnedCrns.join(", ")}
-                disabled={pinnedCrns.length === 0}
-              >
-                <span>Copy CRNs</span>
-              </Button>
-              <Button
-                onClick={this.handleDownload}
-                disabled={pinnedCrns.length === 0}
-              >
-                Download as PNG
-              </Button>
-              <Button
-                onClick={this.handleExport}
-                disabled={pinnedCrns.length === 0}
-              >
-                Export Calendar
-              </Button>
-            </div>
-          </div>
+          </ResizePanel>
         )}
         {mobile && (
           <div className="tab-container">
