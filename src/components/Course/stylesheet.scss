@@ -3,7 +3,7 @@
 .Course {
   display: flex;
   flex-direction: column;
-  background-color: $color-dark;
+  background-color: rgba(255, 255, 255, 0.68);
 
   .course-header {
     position: relative;
@@ -67,7 +67,7 @@
   }
   .course-info {
     text-align: center;
-    background-color: rgb(50, 55, 58);
+    background-color: #32373a;
 
     .labelAverage {
       font-weight: bold;
@@ -94,6 +94,7 @@
 
   .labelAverage {
     font-weight: 500;
+    font-style: italic;
     display: inline-block;
     font-size: 13px;
     height: 22px;

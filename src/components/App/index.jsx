@@ -251,6 +251,7 @@ class App extends SemiPureComponent {
             </div>
             <div className="footer">
               <Button
+                className="reset"
                 onClick={this.handleResetPinnedCrns}
                 disabled={pinnedCrns.length === 0}
               >
@@ -331,7 +332,7 @@ class App extends SemiPureComponent {
         )}
         <a
           className="github-fork-ribbon left-bottom fixed"
-          href="https://github.com/parkjs814/gt-scheduler"
+          href="https://github.com/abhitirumala/gt-scheduler-v2"
           target="_blank"
           rel="noopener noreferrer"
           data-ribbon="Fork me on GitHub"

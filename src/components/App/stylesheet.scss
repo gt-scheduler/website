@@ -9,7 +9,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: white;
+  background-color: #303030;
 
   .calendar-container {
     flex: 1;
@@ -18,11 +18,15 @@
     justify-content: center;
   }
 
+  .reset {
+    box-shadow: inset -10px 0 8px -2px #242424;
+  }
+
   .capture-container {
     position: absolute;
     top: 0;
     left: 100vw;
-    background-color: white;
+    background-color: #212121;
 
     .fake-calendar {
       width: $calendar-width;
@@ -30,19 +34,24 @@
   }
 
   .sidebar {
-    background-color: $color-lighter;
+    background-color: #303030;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     width: 256px;
-    border-left: 1px solid $color-dark;
+    border-left: 1px solid #212121;
+    box-shadow: -10px 0 8px -2px #242424;
 
     .header {
       position: relative;
-      background-color: $color-light;
+      background-color: #121212;
       display: flex;
       align-items: center;
-      border-bottom: 1px solid $color-dark;
+      border-bottom: 1px solid #212121;
+
+      :hover {
+        color: white;
+      }
 
       .primary {
         position: relative;
@@ -62,7 +71,7 @@
         &:after {
           position: absolute;
           right: 8px;
-          content: '▼';
+          content: "▼";
           font-size: 1em;
         }
       }
@@ -70,8 +79,8 @@
       .secondary {
         position: absolute;
         right: 24px;
-        font-size: .8em;
-        color: $color-darker;
+        font-size: 0.8em;
+        color: rgba(255, 255, 255, 0.7);
       }
     }
 
@@ -89,7 +98,7 @@
       align-items: stretch;
 
       > * {
-        border-top: 1px solid $color-dark;
+        border-top: 1px solid #212121;
       }
     }
   }
@@ -102,7 +111,7 @@
       align-items: stretch;
 
       > * {
-        border-bottom: 1px solid $color-dark;
+        border-bottom: 1px solid #212121;
       }
 
       .course-list {
@@ -129,7 +138,7 @@
         &:after {
           position: absolute;
           right: 8px;
-          content: '▼';
+          content: "▼";
         }
       }
     }
@@ -139,7 +148,7 @@
 
       .combination {
         display: flex;
-        border-bottom: 1px solid $color-dark;
+        border-bottom: 1px solid black;
         height: 100px;
         align-items: stretch;
 
@@ -147,10 +156,10 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: $color-dark;
+          background-color: #212121;
           width: 2.4em;
-          color: white;
-          font-size: .8em;
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 0.8em;
           font-weight: bold;
         }
 

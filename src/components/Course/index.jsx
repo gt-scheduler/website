@@ -182,7 +182,7 @@ class Course extends SemiPureComponent {
   ) => {
     var base = max - min;
 
-    if (base == 0) {
+    if (base === 0) {
       value = 100;
     } else {
       value = ((value - min) / base) * 100;
@@ -212,7 +212,9 @@ class Course extends SemiPureComponent {
 
     const options = {
       animationEnabled: true,
+      animationDuration: 500,
       theme: "dark2",
+      zoomEnabled: true,
       title: {
         text: "Grade Distribution"
       },
@@ -225,13 +227,38 @@ class Course extends SemiPureComponent {
       },
       data: [
         {
-          type: "bar",
+          type: "pie",
+          indexLabelPlacement: "inside",
+          indexLabelFontSize: 16,
+          indexLabelFontStyle: "bold",
+          yValueFormatString: "##%",
+          explodeOnClick: true,
           dataPoints: [
-            { y: this.state.critiqueData.a, label: "A" },
-            { y: this.state.critiqueData.b, label: "B" },
-            { y: this.state.critiqueData.c, label: "C" },
-            { y: this.state.critiqueData.d, label: "D" },
-            { y: this.state.critiqueData.f, label: "F" }
+            {
+              y: this.state.critiqueData.a / 100,
+              indexLabel: "A",
+              color: "#388E3C"
+            },
+            {
+              y: this.state.critiqueData.b / 100,
+              indexLabel: "B",
+              color: "#CDDC39"
+            },
+            {
+              y: this.state.critiqueData.c / 100,
+              indexLabel: "C",
+              color: "#FFA000"
+            },
+            {
+              y: this.state.critiqueData.d / 100,
+              indexLabel: "D",
+              color: "#FF5722"
+            },
+            {
+              y: this.state.critiqueData.f / 100,
+              indexLabel: "F",
+              color: "#D32F2F"
+            }
           ]
         }
       ]

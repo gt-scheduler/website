@@ -6,14 +6,15 @@
   position: relative;
   height: $calendar-height;
   margin: $day-height 24px 24px $time-width;
-  background-color: $color-lighter;
-  border-bottom: 1px solid $color-light;
-  border-right: 1px solid $color-light;
+  background-color: #303030;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
 
   &.preview {
     margin: 0;
     height: auto;
     border: none;
+    background-color: #424242;
+    box-shadow: inset -10px 0 8px -2px #242424;
   }
 
   .ratio {
@@ -35,25 +36,26 @@
     .time {
       position: relative;
       flex: 1;
-      margin-top: -.5em;
+      margin-top: -0.5em;
 
       .label {
         display: block;
         width: $time-width;
         padding-right: 8px;
-        font-size: .8em;
+        font-size: 0.8em;
         font-weight: bold;
         text-align: right;
+        color: rgba(255, 255, 255, 0.7);
       }
 
       &:after {
-        content: '';
+        content: "";
         position: absolute;
         left: $time-width;
         right: 0;
-        top: .5em;
+        top: 0.5em;
         height: 1px;
-        background-color: $color-light;
+        background-color: rgba(255, 255, 255, 0.2);
       }
     }
   }
@@ -80,20 +82,22 @@
         align-items: flex-end;
         justify-content: center;
         padding-bottom: 8px;
+        color: rgba(255, 255, 255, 0.7);
       }
 
       &:after {
-        content: '';
+        content: "";
         position: absolute;
         top: $day-height;
         bottom: 0;
         width: 1px;
-        background-color: $color-light;
+        background-color: rgba(255, 255, 255, 0.2);
       }
     }
   }
 
-  .meetings {
+  .meeting {
+    box-shadow: 2px 8px 8px 3px #242424;
   }
 
   &.mobile {

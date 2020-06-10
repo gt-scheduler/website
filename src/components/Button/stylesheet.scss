@@ -4,16 +4,16 @@
   display: block;
   text-align: center;
   padding: 8px;
-  font-size: .8em;
+  font-size: 0.8em;
   font-weight: bold;
-  background-color: $color-light;
-  color: $color-darker;
+  background-color: #282828;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   border: none;
   outline: none;
 
   &:hover {
-    color: black;
+    color: white;
   }
 
   &:disabled {

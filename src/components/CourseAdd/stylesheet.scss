@@ -8,8 +8,13 @@
     font-size: inherit;
   }
 
+  input[type="text"] {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
   .autocomplete {
     display: flex;
     flex-direction: column;
+    color: rgba(255, 255, 255, 0.8);
   }
 }
