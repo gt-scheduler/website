@@ -31,6 +31,8 @@ I plan to have many more features coming soon!
 - More Graphs and Data Visualizations
 - More UI improvements!
 
+![GT Scheduler Split Theme](https://raw.githubusercontent.com/abhitirumala/gt-scheduler-v2/master/public/image.png)
+
 ## Credits
 
 Credits to **Jason Park** (https://github.com/64json/gt-scheduler) for initially developing the web application and helping the Georgia Tech Community in scheduling their courses.
