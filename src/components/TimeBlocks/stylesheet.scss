@@ -1,6 +1,83 @@
 @import "../../variables";
 
-.TimeBlocks {
+.App.light .TimeBlocks {
+  transition: 1s ease;
+
+  &.overlay {
+    .meeting {
+      opacity: $opacity-disabled;
+    }
+  }
+
+  .meeting {
+    position: absolute;
+    width: 20%;
+    height: 100px;
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: $color-dark;
+
+    .meeting-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      padding: 0 8px;
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.72em;
+      }
+
+      .course_id {
+        font-weight: bold;
+        font-size: 0.8em;
+      }
+    }
+
+    &.M {
+      left: 0;
+    }
+
+    &.T {
+      left: 20%;
+    }
+
+    &.W {
+      left: 40%;
+    }
+
+    &.R {
+      left: 60%;
+    }
+
+    &.F {
+      left: 80%;
+    }
+  }
+
+  &.mobile {
+    .meeting {
+      .meeting-wrapper {
+        padding: 2px;
+
+        span {
+          white-space: normal;
+          overflow: visible;
+        }
+      }
+    }
+  }
+}
+
+.App.dark .TimeBlocks {
+  transition: 1s ease;
+
   &.overlay {
     .meeting {
       opacity: $opacity-disabled;

@@ -1,9 +1,128 @@
 @import "../../variables";
 
-.Course {
+.App.light .Course {
+  display: flex;
+  flex-direction: column;
+  background-color: $color-dark;
+  transition: 1s ease;
+
+  .course-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .course_id {
+        flex: 1;
+        font-weight: bold;
+        margin-right: 8px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .section_ids {
+        font-weight: bold;
+        white-space: nowrap;
+      }
+    }
+
+    .row {
+      .course_title {
+        flex: 1;
+        font-size: 0.8em;
+        margin-right: 8px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .section_crns {
+        font-size: 0.8em;
+        white-space: nowrap;
+      }
+    }
+
+    .palette {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1;
+    }
+  }
+
+  .course-body {
+    display: flex;
+    flex-direction: column;
+  }
+  .course-info {
+    text-align: center;
+    background-color: rgb(50, 55, 58);
+    border-radius: 3px;
+    border-color: rgb(50, 55, 58);
+
+    .labelAverage {
+      font-weight: bold;
+      display: inline-block;
+      font-size: 20px;
+      height: 35px;
+      line-height: 28px;
+      color: white;
+    }
+
+    .gpa {
+      width: 50px;
+      height: 30px;
+      margin-left: 8px;
+      line-height: 28px;
+      text-align: center;
+      color: white;
+      font-weight: 500;
+      border: 2px solid #202020;
+      display: inline-block;
+      font-size: 18px;
+    }
+  }
+
+  .labelAverage {
+    font-weight: 500;
+    font-style: italic;
+    display: inline-block;
+    font-size: 13px;
+    height: 22px;
+    line-height: 18px;
+  }
+
+  .gpa {
+    width: 40px;
+    height: 22px;
+    margin-left: 8px;
+    line-height: 19px;
+    text-align: center;
+    color: white;
+    font-weight: 500;
+    border: 2px solid #202020;
+    display: inline-block;
+    font-size: 13px;
+  }
+}
+
+.App.dark .Course {
   display: flex;
   flex-direction: column;
   background-color: rgba(255, 255, 255, 0.68);
+  transition: 1s ease;
 
   .course-header {
     position: relative;

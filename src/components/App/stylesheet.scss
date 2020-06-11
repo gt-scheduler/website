@@ -1,6 +1,246 @@
 @import "../../variables";
 
-.App {
+.App.light {
+  position: fixed;
+  display: flex;
+  align-items: stretch;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: white;
+  transition: 1s ease;
+
+  .collapsed {
+    label {
+      overflow: visible;
+      display: inline-block;
+      transform: rotate(-90deg);
+    }
+  }
+
+  .calendar-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .reset {
+    box-shadow: inset -6px 0 5px -1px #808080;
+  }
+
+  .capture-container {
+    position: absolute;
+    top: 0;
+    left: 100vw;
+    background-color: white;
+
+    .fake-calendar {
+      width: $calendar-width;
+    }
+  }
+
+  .sidebar {
+    background-color: $color-lighter;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: stretch;
+    max-width: 450px;
+    min-width: 200px;
+    border-left: 1px solid $color-dark;
+    box-shadow: -6px 0 5px -1px #808080;
+    transition: 1s ease;
+
+    .header {
+      position: relative;
+      background-color: $color-light;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid $color-dark;
+      transition: 1s ease;
+
+      .primary {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0;
+        background: none;
+
+        select {
+          align-self: stretch;
+          flex: 1;
+          padding: 8px 24px 8px 8px;
+          font-size: 1.2em;
+        }
+
+        &:after {
+          position: absolute;
+          right: 8px;
+          content: "▼";
+          font-size: 1em;
+        }
+      }
+
+      .secondary {
+        position: absolute;
+        right: 24px;
+        font-size: 0.8em;
+        color: $color-darker;
+      }
+    }
+
+    .scroller {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .footer {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+
+      > * {
+        border-top: 1px solid $color-dark;
+      }
+    }
+  }
+
+  .sidebar-courses {
+    min-width: 256px;
+
+    .scroller {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+
+      > * {
+        border-bottom: 1px solid $color-dark;
+      }
+
+      .course-list {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .sidebar-combinations {
+    .header {
+      .sorting-option {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0;
+
+        select {
+          align-self: stretch;
+          flex: 1;
+          padding: 8px 32px 8px 8px;
+        }
+
+        &:after {
+          position: absolute;
+          right: 8px;
+          content: "▼";
+        }
+      }
+    }
+
+    .scroller {
+      margin-bottom: -1px;
+
+      .combination {
+        display: flex;
+        border-bottom: 1px solid $color-dark;
+        height: 100px;
+        align-items: stretch;
+
+        .number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: $color-dark;
+          width: 2.4em;
+          color: white;
+          font-size: 0.8em;
+          font-weight: bold;
+          transition: 1s ease;
+        }
+
+        .calendar-preview {
+          flex: 1;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .footer {
+      position: relative;
+    }
+  }
+
+  .github-fork-ribbon:before {
+    background-color: $color-darker;
+  }
+
+  &.mobile {
+    flex-direction: column-reverse;
+
+    .tab-container {
+      flex-shrink: 0;
+      display: flex;
+      border-bottom: none;
+
+      .tab {
+        flex: 1;
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        border-right: 1px solid $color-dark;
+        font-weight: bold;
+        background-color: $color-lighter;
+        color: $color-darker;
+        cursor: pointer;
+        border-bottom: 1px solid $color-dark;
+        transition: 1s ease;
+
+        &.active {
+          background-color: $color-light;
+          color: black;
+          border-top: 1px solid $color-dark;
+          border-bottom: none;
+          transition: 1s ease;
+        }
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+
+    .sidebar {
+      flex: 1;
+      width: auto;
+      max-width: none;
+      border-left: none;
+    }
+
+    .github-fork-ribbon {
+      display: none;
+    }
+  }
+}
+
+.App.dark {
   position: fixed;
   display: flex;
   align-items: stretch;
@@ -10,6 +250,7 @@
   height: 100%;
   overflow: hidden;
   background-color: #303030;
+  transition: 1s ease;
 
   .collapsed {
     label {
@@ -47,10 +288,11 @@
     flex-direction: column;
     flex-grow: 1;
     align-items: stretch;
-    max-width: 350px;
+    max-width: 450px;
     min-width: 200px;
     border-left: 1px solid #212121;
     box-shadow: -10px 0 8px -2px #242424;
+    transition: 1s ease;
 
     .header {
       position: relative;
@@ -58,6 +300,7 @@
       display: flex;
       align-items: center;
       border-bottom: 1px solid #212121;
+      transition: 1s ease;
 
       :hover {
         color: white;
@@ -119,6 +362,7 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      min-width: 256px;
 
       > * {
         border-bottom: 1px solid #212121;
@@ -171,6 +415,7 @@
           color: rgba(255, 255, 255, 0.7);
           font-size: 0.8em;
           font-weight: bold;
+          transition: 1s ease;
         }
 
         .calendar-preview {
@@ -203,18 +448,21 @@
         display: flex;
         justify-content: center;
         align-content: center;
-        border-right: 1px solid $color-dark;
+        border-right: 1px solid #121212;
         font-weight: bold;
-        background-color: $color-lighter;
-        color: $color-darker;
+        background-color: #303030;
+        color: rgba(255, 255, 255, 0.7);
         cursor: pointer;
-        border-bottom: 1px solid $color-dark;
+        border-bottom: 1px solid #121212;
+        border-top: 1px solid #121212;
+        transition: 1s ease;
 
         &.active {
-          background-color: $color-light;
-          color: black;
-          border-top: 1px solid $color-dark;
+          background-color: #121212;
+          color: rgba(255, 255, 255, 0.7);
+          border-top: 1px solid #121212;
           border-bottom: none;
+          transition: 1s ease;
         }
 
         &:last-child {
@@ -226,6 +474,7 @@
     .sidebar {
       flex: 1;
       width: auto;
+      max-width: none;
       border-left: none;
     }
 

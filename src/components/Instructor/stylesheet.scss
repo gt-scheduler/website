@@ -1,9 +1,10 @@
 @import "../../variables";
 
-.Instructor {
+.App.light .Instructor {
   display: flex;
   flex-direction: column;
   margin-left: 8px;
+  transition: 1s ease;
 
   .name {
     display: flex;
@@ -49,12 +50,76 @@
           justify-content: flex-end;
 
           .days {
-            font-size: .8em;
+            font-size: 0.8em;
             margin-right: 8px;
           }
 
           .period {
-            font-size: .8em;
+            font-size: 0.8em;
+            min-width: 8em;
+          }
+        }
+      }
+    }
+  }
+}
+
+.App.dark .Instructor {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+  transition: 1s ease;
+
+  .name {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    font-weight: bold;
+  }
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    margin-left: 8px;
+
+    .section {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 8px;
+
+      .section-header {
+        display: flex;
+
+        .section_id {
+          flex: 1;
+          font-weight: bold;
+          margin-right: 8px;
+        }
+
+        .instructors {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .meetings {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .meeting {
+          display: flex;
+          justify-content: flex-end;
+
+          .days {
+            font-size: 0.8em;
+            margin-right: 8px;
+          }
+
+          .period {
+            font-size: 0.8em;
             min-width: 8em;
           }
         }

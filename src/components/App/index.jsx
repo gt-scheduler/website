@@ -9,7 +9,14 @@ import ResizePanel from "react-resize-panel";
 import ics from "../../libs/ics";
 import { classes, getSemesterName, isMobile } from "../../utils";
 import { PNG_SCALE_FACTOR } from "../../constants";
-import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from "../";
+import {
+  Button,
+  Calendar,
+  Course,
+  CourseAdd,
+  SemiPureComponent,
+  ConditionalWrapper
+} from "../";
 import { actions } from "../../reducers";
 import { Oscar } from "../../beans";
 import "github-fork-ribbon-css/gh-fork-ribbon.css";
@@ -25,7 +32,8 @@ class App extends SemiPureComponent {
       overlayCrns: [],
       tabIndex: 0,
       configCollapsed: false,
-      courseListCollapsed: false
+      courseListCollapsed: false,
+      selectedStyle: "light"
     };
 
     this.captureRef = React.createRef();
@@ -47,6 +55,12 @@ class App extends SemiPureComponent {
 
     window.addEventListener("resize", this.handleResize);
   }
+
+  handleThemeChange = () => {
+    this.setState({
+      selectedStyle: this.state.selectedStyle === "light" ? "dark" : "light"
+    });
+  };
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.handleResize);
@@ -177,7 +191,7 @@ class App extends SemiPureComponent {
       excludedCrns,
       sortingOptionIndex
     } = this.props.user;
-    const { terms, overlayCrns, tabIndex } = this.state;
+    const { terms, overlayCrns, tabIndex, selectedStyle } = this.state;
 
     if (!oscar) return null;
 
@@ -192,7 +206,7 @@ class App extends SemiPureComponent {
     );
 
     return (
-      <div className={classes("App", mobile && "mobile")}>
+      <div className={classes("App", mobile && "mobile", selectedStyle)}>
         {(!mobile || tabIndex === 2) && (
           <div className="calendar-container">
             <Calendar overlayCrns={overlayCrns} />
@@ -214,14 +228,21 @@ class App extends SemiPureComponent {
               <label>Expand </label>
             </Button>
           ) : (
-            <ResizePanel
-              direction="w"
-              style={{
-                flexGrow: "1",
-                width: "auto",
-                minWidth: "200px",
-                maxWidth: "350px"
-              }}
+            <ConditionalWrapper
+              condition={!mobile}
+              wrapper={children => (
+                <ResizePanel
+                  direction="w"
+                  style={{
+                    flexGrow: "1",
+                    width: "auto",
+                    minWidth: "200px",
+                    maxWidth: "450px"
+                  }}
+                >
+                  {children}
+                </ResizePanel>
+              )}
             >
               <div className="sidebar sidebar-combinations">
                 <div className="header">
@@ -300,17 +321,24 @@ class App extends SemiPureComponent {
                   </Button>
                 </div>
               </div>
-            </ResizePanel>
+            </ConditionalWrapper>
           ))}
         {(!mobile || tabIndex === 0) && (
-          <ResizePanel
-            direction="w"
-            style={{
-              flexGrow: "1",
-              width: "200px",
-              minWidth: "200px",
-              maxWidth: "350px"
-            }}
+          <ConditionalWrapper
+            condition={!mobile}
+            wrapper={children => (
+              <ResizePanel
+                direction="w"
+                style={{
+                  flexGrow: "1",
+                  width: "auto",
+                  minWidth: "275px",
+                  maxWidth: "450px"
+                }}
+              >
+                {children}
+              </ResizePanel>
+            )}
           >
             <div className="sidebar sidebar-courses">
               <div className="header">
@@ -365,9 +393,12 @@ class App extends SemiPureComponent {
                 >
                   Export Calendar
                 </Button>
+                <Button onClick={this.handleThemeChange}>
+                  {selectedStyle === "light" ? "Dark" : "Light"} Theme
+                </Button>
               </div>
             </div>
-          </ResizePanel>
+          </ConditionalWrapper>
         )}
         {mobile && (
           <div className="tab-container">

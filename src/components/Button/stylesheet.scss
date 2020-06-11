@@ -1,6 +1,29 @@
 @import "../../variables";
 
-.Button {
+.App.light .Button {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.8em;
+  font-weight: bold;
+  background-color: $color-light;
+  color: $color-darker;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: 1s ease;
+
+  &:hover {
+    color: black;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: $color-dark;
+  }
+}
+
+.App.dark .Button {
   display: block;
   text-align: center;
   padding: 8px;
@@ -11,6 +34,7 @@
   cursor: pointer;
   border: none;
   outline: none;
+  transition: 1s ease;
 
   &:hover {
     color: white;
