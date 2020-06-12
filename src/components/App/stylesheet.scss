@@ -23,8 +23,65 @@
   .calendar-container {
     flex: 1;
     overflow-y: auto;
-    display: flex;
+    display: flex table;
     justify-content: center;
+
+    box-shadow: inset -6px 0 5px -1px #808080;
+
+    transition: 1s ease;
+
+    .titlebar {
+      display: block;
+      height: 75px;
+      background-color: $color-lighter;
+      overflow: hidden;
+      box-shadow: inset -6px 0 5px -1px #808080;
+      transition: 1s ease;
+
+      .icon {
+        float: right;
+        background-color: none;
+        padding-top: 10px;
+        font-size: 25px;
+        text-align: center;
+        color: $color-darker;
+        transition: 1s ease;
+        padding-right: 10px;
+
+        label {
+          font-size: 15px;
+          font-style: italic;
+        }
+      }
+
+      .icon:hover {
+        color: black;
+        transition: 0.5s ease;
+      }
+
+      .features {
+        float: left;
+        display: block;
+        color: $color-darker;
+        font-size: 20px;
+        font-weight: bold;
+        padding-top: 28px;
+        padding-left: 10px;
+        transition: 0.5s ease;
+      }
+
+      .features:hover {
+        color: black;
+        font-weight: bolder;
+        transition: 0.5s ease;
+      }
+
+      img {
+        float: left;
+        height: 72px;
+        padding-left: 10px;
+      }
+    }
   }
 
   .reset {
@@ -61,6 +118,7 @@
       align-items: center;
       border-bottom: 1px solid $color-dark;
       transition: 1s ease;
+      box-shadow: -6px 0 5px -1px #808080;
 
       .primary {
         position: relative;
@@ -123,6 +181,7 @@
 
       > * {
         border-bottom: 1px solid $color-dark;
+        transition: 1s ease;
       }
 
       .course-list {
@@ -162,6 +221,7 @@
         border-bottom: 1px solid $color-dark;
         height: 100px;
         align-items: stretch;
+        transition: 1s ease;
 
         .number {
           display: flex;
@@ -263,8 +323,63 @@
   .calendar-container {
     flex: 1;
     overflow-y: auto;
-    display: flex;
+    display: flex table;
     justify-content: center;
+    box-shadow: inset -6px 0 5px -1px #242424;
+    transition: 1s ease;
+
+    .titlebar {
+      display: block;
+      height: 75px;
+      background-color: #121212;
+      overflow: hidden;
+      box-shadow: inset -6px 0 5px -1px #101010;
+      transition: 1s ease;
+
+      .icon {
+        float: right;
+        background-color: none;
+        padding-top: 10px;
+        font-size: 25px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        transition: 0.5s ease;
+        padding-right: 10px;
+
+        label {
+          font-size: 15px;
+          font-style: italic;
+        }
+      }
+
+      .icon:hover {
+        color: rgba(255, 255, 255, 1);
+        transition: 0.5s ease;
+      }
+
+      .features {
+        float: left;
+        display: block;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 20px;
+        font-weight: bold;
+        padding-top: 28px;
+        padding-left: 10px;
+        transition: 0.5s ease;
+      }
+
+      .features:hover {
+        color: rgba(255, 255, 255, 1);
+        font-weight: bolder;
+        transition: 0.5s ease;
+      }
+
+      img {
+        float: left;
+        height: 70px;
+        padding-left: 10px;
+      }
+    }
   }
 
   .reset {
@@ -319,6 +434,11 @@
           flex: 1;
           padding: 8px 24px 8px 8px;
           font-size: 1.2em;
+          color: black;
+        }
+
+        .selected-option {
+          color: rgba(255, 255, 255, 0.7);
         }
 
         &:after {
@@ -366,6 +486,7 @@
 
       > * {
         border-bottom: 1px solid #212121;
+        transition: 1s ease;
       }
 
       .course-list {
@@ -405,6 +526,7 @@
         border-bottom: 1px solid black;
         height: 100px;
         align-items: stretch;
+        transition: 1s ease;
 
         .number {
           display: flex;

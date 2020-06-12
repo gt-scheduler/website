@@ -4,6 +4,8 @@ import axios from "axios";
 import domtoimage from "dom-to-image";
 import saveAs from "file-saver";
 import memoizeOne from "memoize-one";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAdjust } from "@fortawesome/free-solid-svg-icons";
 import { AutoSizer, List } from "react-virtualized/dist/commonjs";
 import ResizePanel from "react-resize-panel";
 import ics from "../../libs/ics";
@@ -15,13 +17,15 @@ import {
   Course,
   CourseAdd,
   SemiPureComponent,
-  ConditionalWrapper
+  ConditionalWrapper,
 } from "../";
 import { actions } from "../../reducers";
 import { Oscar } from "../../beans";
 import "github-fork-ribbon-css/gh-fork-ribbon.css";
 import "react-virtualized/styles.css";
 import "./stylesheet.scss";
+import logoLight from "./logo-light.png";
+import logoDark from "./logo-dark.png";
 
 class App extends SemiPureComponent {
   constructor(props) {
@@ -33,7 +37,7 @@ class App extends SemiPureComponent {
       tabIndex: 0,
       configCollapsed: false,
       courseListCollapsed: false,
-      selectedStyle: "light"
+      selectedStyle: "dark",
     };
 
     this.captureRef = React.createRef();
@@ -44,7 +48,7 @@ class App extends SemiPureComponent {
     if (term) this.loadOscar(term);
     axios
       .get("https://jasonpark.me/gt-schedule-crawler/terms.json")
-      .then(res => {
+      .then((res) => {
         const terms = res.data.reverse();
         if (!term) {
           const recentTerm = terms[0];
@@ -58,7 +62,7 @@ class App extends SemiPureComponent {
 
   handleThemeChange = () => {
     this.setState({
-      selectedStyle: this.state.selectedStyle === "light" ? "dark" : "light"
+      selectedStyle: this.state.selectedStyle === "light" ? "dark" : "light",
     });
   };
 
@@ -70,7 +74,7 @@ class App extends SemiPureComponent {
     this.props.setOscar(null);
     axios
       .get(`https://jasonpark.me/gt-schedule-crawler/${term}.json`)
-      .then(res => {
+      .then((res) => {
         const oscar = new Oscar(res.data);
         this.memoizedGetCombinations = memoizeOne(
           oscar.getCombinations.bind(oscar)
@@ -91,7 +95,7 @@ class App extends SemiPureComponent {
     );
   }
 
-  handleResize = e => {
+  handleResize = (e) => {
     const { mobile } = this.props.env;
     const nextMobile = isMobile();
     if (mobile !== nextMobile) {
@@ -99,7 +103,7 @@ class App extends SemiPureComponent {
     }
   };
 
-  handleSetOverlayCrns = overlayCrns => {
+  handleSetOverlayCrns = (overlayCrns) => {
     this.setState({ overlayCrns });
   };
 
@@ -107,9 +111,9 @@ class App extends SemiPureComponent {
     const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
     const cal = ics();
-    pinnedCrns.forEach(crn => {
+    pinnedCrns.forEach((crn) => {
       const section = oscar.findSection(crn);
-      section.meetings.forEach(meeting => {
+      section.meetings.forEach((meeting) => {
         if (!meeting.period || !meeting.days.length) return;
         const { from, to } = meeting.dateRange;
         const subject = section.course.id;
@@ -133,8 +137,8 @@ class App extends SemiPureComponent {
           freq: "WEEKLY",
           until: to,
           byday: meeting.days.map(
-            day => ({ M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" }[day])
-          )
+            (day) => ({ M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" }[day])
+          ),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
       });
@@ -151,22 +155,22 @@ class App extends SemiPureComponent {
         style: {
           left: 0,
           transform: `scale(${PNG_SCALE_FACTOR})`,
-          "transform-origin": "top left"
-        }
+          "transform-origin": "top left",
+        },
       })
-      .then(blob => saveAs(blob, "schedule.png"));
+      .then((blob) => saveAs(blob, "schedule.png"));
   };
 
-  handleChangeTab = tabIndex => {
+  handleChangeTab = (tabIndex) => {
     this.setState({ tabIndex });
   };
 
-  handleChangeSemester = term => {
+  handleChangeSemester = (term) => {
     this.props.setTerm(term);
     this.loadOscar(term);
   };
 
-  handleSetPinnedCrns = pinnedCrns => {
+  handleSetPinnedCrns = (pinnedCrns) => {
     this.props.setPinnedCrns(pinnedCrns);
   };
 
@@ -176,7 +180,7 @@ class App extends SemiPureComponent {
     }
   };
 
-  handleChangeSortingOptionIndex = e => {
+  handleChangeSortingOptionIndex = (e) => {
     const sortingOptionIndex = e.target.value;
     this.props.setSortingOptionIndex(sortingOptionIndex);
   };
@@ -189,7 +193,7 @@ class App extends SemiPureComponent {
       desiredCourses,
       pinnedCrns,
       excludedCrns,
-      sortingOptionIndex
+      sortingOptionIndex,
     } = this.props.user;
     const { terms, overlayCrns, tabIndex, selectedStyle } = this.state;
 
@@ -209,6 +213,29 @@ class App extends SemiPureComponent {
       <div className={classes("App", mobile && "mobile", selectedStyle)}>
         {(!mobile || tabIndex === 2) && (
           <div className="calendar-container">
+            {!mobile && (
+              <div className="titlebar">
+                <img
+                  src={selectedStyle === "light" ? logoLight : logoDark}
+                  alt="GT Scheduler Logo"
+                />
+                <a
+                  className="features"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://github.com/abhitirumala/gt-scheduler-v2#gt-scheduler-v20"
+                >
+                  What's New
+                </a>
+                <span className="icon" onClick={this.handleThemeChange}>
+                  <FontAwesomeIcon fixedWidth icon={faAdjust} size="2.5x" />
+                  <br />
+                  <label>
+                    {selectedStyle === "light" ? "Dark" : "Light"} Theme
+                  </label>
+                </span>
+              </div>
+            )}
             <Calendar overlayCrns={overlayCrns} />
           </div>
         )}
@@ -221,7 +248,7 @@ class App extends SemiPureComponent {
               className="reset collapsed"
               onClick={() =>
                 this.setState({
-                  configCollapsed: !this.state.configCollapsed
+                  configCollapsed: !this.state.configCollapsed,
                 })
               }
             >
@@ -230,14 +257,14 @@ class App extends SemiPureComponent {
           ) : (
             <ConditionalWrapper
               condition={!mobile}
-              wrapper={children => (
+              wrapper={(children) => (
                 <ResizePanel
                   direction="w"
                   style={{
                     flexGrow: "1",
                     width: "auto",
                     minWidth: "200px",
-                    maxWidth: "450px"
+                    maxWidth: "450px",
                   }}
                 >
                   {children}
@@ -253,6 +280,7 @@ class App extends SemiPureComponent {
                     <select
                       onChange={this.handleChangeSortingOptionIndex}
                       value={sortingOptionIndex}
+                      className="selected-option"
                     >
                       {oscar.sortingOptions.map((sortingOption, i) => (
                         <option key={i} value={i}>
@@ -284,7 +312,7 @@ class App extends SemiPureComponent {
                               onClick={() =>
                                 this.handleSetPinnedCrns([
                                   ...pinnedCrns,
-                                  ...crns
+                                  ...crns,
                                 ])
                               }
                             >
@@ -313,7 +341,7 @@ class App extends SemiPureComponent {
                     className="reset"
                     onClick={() =>
                       this.setState({
-                        configCollapsed: !this.state.configCollapsed
+                        configCollapsed: !this.state.configCollapsed,
                       })
                     }
                   >
@@ -326,14 +354,14 @@ class App extends SemiPureComponent {
         {(!mobile || tabIndex === 0) && (
           <ConditionalWrapper
             condition={!mobile}
-            wrapper={children => (
+            wrapper={(children) => (
               <ResizePanel
                 direction="w"
                 style={{
                   flexGrow: "1",
                   width: "auto",
                   minWidth: "275px",
-                  maxWidth: "450px"
+                  maxWidth: "450px",
                 }}
               >
                 {children}
@@ -347,10 +375,11 @@ class App extends SemiPureComponent {
                 </span>
                 <Button className="primary">
                   <select
-                    onChange={e => this.handleChangeSemester(e.target.value)}
+                    onChange={(e) => this.handleChangeSemester(e.target.value)}
                     value={term}
+                    className="selected-option"
                   >
-                    {terms.map(term => (
+                    {terms.map((term) => (
                       <option key={term} value={term}>
                         {getSemesterName(term)}
                       </option>
@@ -360,7 +389,7 @@ class App extends SemiPureComponent {
               </div>
               <div className="scroller">
                 <div className="course-list">
-                  {desiredCourses.map(courseId => {
+                  {desiredCourses.map((courseId) => {
                     return (
                       <Course
                         courseId={courseId}
@@ -392,9 +421,6 @@ class App extends SemiPureComponent {
                   disabled={pinnedCrns.length === 0}
                 >
                   Export Calendar
-                </Button>
-                <Button onClick={this.handleThemeChange}>
-                  {selectedStyle === "light" ? "Dark" : "Light"} Theme
                 </Button>
               </div>
             </div>
