@@ -12,6 +12,21 @@
   background-color: white;
   transition: 1s ease;
 
+  .customHandle {
+    cursor: ew-resize;
+    width: 10px;
+    height: 100px;
+    background: white;
+    border: 2px solid $color-dark;
+    border-radius: 10px;
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    box-shadow: -6px 0 5px -1px #aaaaaa;
+    transition: 1s ease;
+  }
+
   .collapsed {
     label {
       overflow: visible;
@@ -26,7 +41,7 @@
     display: flex table;
     justify-content: center;
 
-    box-shadow: inset -6px 0 5px -1px #808080;
+    box-shadow: inset -6px 0 5px -1px #aaaaaa;
 
     transition: 1s ease;
 
@@ -35,7 +50,7 @@
       height: 75px;
       background-color: $color-lighter;
       overflow: hidden;
-      box-shadow: inset -6px 0 5px -1px #808080;
+      box-shadow: inset -6px 0 5px -1px #aaaaaa;
       transition: 1s ease;
 
       .icon {
@@ -85,7 +100,7 @@
   }
 
   .reset {
-    box-shadow: inset -6px 0 5px -1px #808080;
+    box-shadow: inset -6px 0 5px -1px #aaaaaa;
   }
 
   .capture-container {
@@ -108,7 +123,7 @@
     max-width: 450px;
     min-width: 200px;
     border-left: 1px solid $color-dark;
-    box-shadow: -6px 0 5px -1px #808080;
+    box-shadow: -6px 0 5px -1px #aaaaaa;
     transition: 1s ease;
 
     .header {
@@ -118,7 +133,7 @@
       align-items: center;
       border-bottom: 1px solid $color-dark;
       transition: 1s ease;
-      box-shadow: -6px 0 5px -1px #808080;
+      box-shadow: -6px 0 5px -1px #aaaaaa;
 
       .primary {
         position: relative;
@@ -192,6 +207,7 @@
   }
 
   .sidebar-combinations {
+    min-width: 230px;
     .header {
       .sorting-option {
         position: relative;
@@ -312,6 +328,21 @@
   background-color: #303030;
   transition: 1s ease;
 
+  .customHandle {
+    cursor: ew-resize;
+    width: 10px;
+    height: 100px;
+    background: $color-darker;
+    border: 2px solid #303030;
+    border-radius: 10px;
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    box-shadow: -6px 0 5px -1px #242424;
+    transition: 1s ease;
+  }
+
   .collapsed {
     label {
       overflow: visible;
@@ -364,7 +395,7 @@
         font-size: 20px;
         font-weight: bold;
         padding-top: 28px;
-        padding-left: 10px;
+        padding-left: 12px;
         transition: 0.5s ease;
       }
 
@@ -497,6 +528,7 @@
   }
 
   .sidebar-combinations {
+    min-width: 230px;
     .header {
       .sorting-option {
         position: relative;

@@ -263,9 +263,10 @@ class App extends SemiPureComponent {
                   style={{
                     flexGrow: '1',
                     width: 'auto',
-                    minWidth: '200px',
+                    minWidth: '230px',
                     maxWidth: '450px',
                   }}
+                  handleClass="customHandle"
                 >
                   {children}
                 </ResizePanel>
@@ -363,6 +364,7 @@ class App extends SemiPureComponent {
                   minWidth: '275px',
                   maxWidth: '450px',
                 }}
+                handleClass="customHandle"
               >
                 {children}
               </ResizePanel>
