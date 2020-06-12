@@ -1,16 +1,16 @@
-import React from "react";
-import { connect } from "react-redux";
-import { Course, SemiPureComponent } from "../";
-import { classes, getRandomColor } from "../../utils";
-import { actions } from "../../reducers";
-import "./stylesheet.scss";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Course, SemiPureComponent } from '../';
+import { classes, getRandomColor } from '../../utils';
+import { actions } from '../../reducers';
+import './stylesheet.scss';
 
 class CourseAdd extends SemiPureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
-      keyword: ""
+      keyword: '',
     };
 
     this.inputRef = React.createRef();
@@ -28,7 +28,7 @@ class CourseAdd extends SemiPureComponent {
     const { oscar } = this.props.db;
     const { keyword } = this.state;
 
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       const courses = oscar.searchCourses(keyword);
       if (courses.length) this.handleAddCourse(courses[0]);
@@ -40,18 +40,18 @@ class CourseAdd extends SemiPureComponent {
     if (desiredCourses.includes(course.id)) return;
     const tbaCrns = course.sections
       .filter(
-        section =>
+        (section) =>
           !section.meetings.length ||
           section.meetings.some(
-            meeting => !meeting.days.length || !meeting.period
+            (meeting) => !meeting.days.length || !meeting.period
           )
       )
-      .map(section => section.crn);
+      .map((section) => section.crn);
     this.props.setDesiredCourses([...desiredCourses, course.id]);
     this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
     this.props.setColorMap({ ...colorMap, [course.id]: getRandomColor() });
 
-    this.setState({ keyword: "" });
+    this.setState({ keyword: '' });
     this.inputRef.current.focus();
   }
 
@@ -62,7 +62,7 @@ class CourseAdd extends SemiPureComponent {
     const { keyword } = this.state;
 
     return (
-      <div className={classes("CourseAdd", className)}>
+      <div className={classes('CourseAdd', className)}>
         <input
           type="text"
           ref={this.inputRef}
@@ -75,8 +75,8 @@ class CourseAdd extends SemiPureComponent {
         <div className="autocomplete">
           {oscar
             .searchCourses(keyword)
-            .filter(course => !desiredCourses.includes(course.id))
-            .map(course => (
+            .filter((course) => !desiredCourses.includes(course.id))
+            .map((course) => (
               <Course
                 key={course.id}
                 courseId={course.id}
@@ -91,7 +91,4 @@ class CourseAdd extends SemiPureComponent {
   }
 }
 
-export default connect(
-  ({ db, user }) => ({ db, user }),
-  actions
-)(CourseAdd);
+export default connect(({ db, user }) => ({ db, user }), actions)(CourseAdd);

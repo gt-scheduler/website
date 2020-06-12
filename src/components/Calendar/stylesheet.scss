@@ -1,4 +1,4 @@
-@import "../../variables";
+@import '../../variables';
 
 .App.light .Calendar {
   flex: 1;
@@ -49,7 +49,7 @@
       }
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         left: $time-width;
         right: 0;
@@ -85,7 +85,7 @@
       }
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         top: $day-height;
         bottom: 0;
@@ -154,7 +154,7 @@
       }
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         left: $time-width;
         right: 0;
@@ -191,7 +191,7 @@
       }
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         top: $day-height;
         bottom: 0;

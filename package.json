@@ -1,6 +1,6 @@
 {
   "name": "gt-scheduler-v2",
-  "version": "2.0.0",
+  "version": "0.1.0",
   "private": true,
   "homepage": "https://gtscheduler.tech/",
   "dependencies": {

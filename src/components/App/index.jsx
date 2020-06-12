@@ -1,16 +1,16 @@
-import React from "react";
-import { connect } from "react-redux";
-import axios from "axios";
-import domtoimage from "dom-to-image";
-import saveAs from "file-saver";
-import memoizeOne from "memoize-one";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAdjust } from "@fortawesome/free-solid-svg-icons";
-import { AutoSizer, List } from "react-virtualized/dist/commonjs";
-import ResizePanel from "react-resize-panel";
-import ics from "../../libs/ics";
-import { classes, getSemesterName, isMobile } from "../../utils";
-import { PNG_SCALE_FACTOR } from "../../constants";
+import React from 'react';
+import { connect } from 'react-redux';
+import axios from 'axios';
+import domtoimage from 'dom-to-image';
+import saveAs from 'file-saver';
+import memoizeOne from 'memoize-one';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAdjust } from '@fortawesome/free-solid-svg-icons';
+import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
+import ResizePanel from 'react-resize-panel';
+import ics from '../../libs/ics';
+import { classes, getSemesterName, isMobile } from '../../utils';
+import { PNG_SCALE_FACTOR } from '../../constants';
 import {
   Button,
   Calendar,
@@ -18,14 +18,14 @@ import {
   CourseAdd,
   SemiPureComponent,
   ConditionalWrapper,
-} from "../";
-import { actions } from "../../reducers";
-import { Oscar } from "../../beans";
-import "github-fork-ribbon-css/gh-fork-ribbon.css";
-import "react-virtualized/styles.css";
-import "./stylesheet.scss";
-import logoLight from "./logo-light.png";
-import logoDark from "./logo-dark.png";
+} from '../';
+import { actions } from '../../reducers';
+import { Oscar } from '../../beans';
+import 'github-fork-ribbon-css/gh-fork-ribbon.css';
+import 'react-virtualized/styles.css';
+import './stylesheet.scss';
+import logoLight from './logo-light.png';
+import logoDark from './logo-dark.png';
 
 class App extends SemiPureComponent {
   constructor(props) {
@@ -37,7 +37,7 @@ class App extends SemiPureComponent {
       tabIndex: 0,
       configCollapsed: false,
       courseListCollapsed: false,
-      selectedStyle: "dark",
+      selectedStyle: 'dark',
     };
 
     this.captureRef = React.createRef();
@@ -47,7 +47,7 @@ class App extends SemiPureComponent {
     const { term } = this.props.user;
     if (term) this.loadOscar(term);
     axios
-      .get("https://jasonpark.me/gt-schedule-crawler/terms.json")
+      .get('https://jasonpark.me/gt-schedule-crawler/terms.json')
       .then((res) => {
         const terms = res.data.reverse();
         if (!term) {
@@ -57,17 +57,17 @@ class App extends SemiPureComponent {
         this.setState({ terms });
       });
 
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener('resize', this.handleResize);
   }
 
   handleThemeChange = () => {
     this.setState({
-      selectedStyle: this.state.selectedStyle === "light" ? "dark" : "light",
+      selectedStyle: this.state.selectedStyle === 'light' ? 'dark' : 'light',
     });
   };
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResize);
+    window.removeEventListener('resize', this.handleResize);
   }
 
   loadOscar(term) {
@@ -122,7 +122,7 @@ class App extends SemiPureComponent {
         const begin = new Date(from);
         while (
           !meeting.days.includes(
-            ["-", "M", "T", "W", "R", "F", "-"][begin.getDay()]
+            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()]
           )
         ) {
           begin.setDate(begin.getDate() + 1);
@@ -134,16 +134,16 @@ class App extends SemiPureComponent {
         const end = new Date(begin);
         end.setHours((meeting.period.end / 60) | 0, meeting.period.end % 60);
         const rrule = {
-          freq: "WEEKLY",
+          freq: 'WEEKLY',
           until: to,
           byday: meeting.days.map(
-            (day) => ({ M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" }[day])
+            (day) => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])
           ),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
       });
     });
-    cal.download("gt-scheduler");
+    cal.download('gt-scheduler');
   };
 
   handleDownload = () => {
@@ -155,10 +155,10 @@ class App extends SemiPureComponent {
         style: {
           left: 0,
           transform: `scale(${PNG_SCALE_FACTOR})`,
-          "transform-origin": "top left",
+          'transform-origin': 'top left',
         },
       })
-      .then((blob) => saveAs(blob, "schedule.png"));
+      .then((blob) => saveAs(blob, 'schedule.png'));
   };
 
   handleChangeTab = (tabIndex) => {
@@ -175,7 +175,7 @@ class App extends SemiPureComponent {
   };
 
   handleResetPinnedCrns = () => {
-    if (window.confirm("Are you sure to reset sections you selected?")) {
+    if (window.confirm('Are you sure to reset sections you selected?')) {
       this.props.setPinnedCrns([]);
     }
   };
@@ -210,13 +210,13 @@ class App extends SemiPureComponent {
     );
 
     return (
-      <div className={classes("App", mobile && "mobile", selectedStyle)}>
+      <div className={classes('App', mobile && 'mobile', selectedStyle)}>
         {(!mobile || tabIndex === 2) && (
           <div className="calendar-container">
             {!mobile && (
               <div className="titlebar">
                 <img
-                  src={selectedStyle === "light" ? logoLight : logoDark}
+                  src={selectedStyle === 'light' ? logoLight : logoDark}
                   alt="GT Scheduler Logo"
                 />
                 <a
@@ -231,7 +231,7 @@ class App extends SemiPureComponent {
                   <FontAwesomeIcon fixedWidth icon={faAdjust} size="2.5x" />
                   <br />
                   <label>
-                    {selectedStyle === "light" ? "Dark" : "Light"} Theme
+                    {selectedStyle === 'light' ? 'Dark' : 'Light'} Theme
                   </label>
                 </span>
               </div>
@@ -261,10 +261,10 @@ class App extends SemiPureComponent {
                 <ResizePanel
                   direction="w"
                   style={{
-                    flexGrow: "1",
-                    width: "auto",
-                    minWidth: "200px",
-                    maxWidth: "450px",
+                    flexGrow: '1',
+                    width: 'auto',
+                    minWidth: '200px',
+                    maxWidth: '450px',
                   }}
                 >
                   {children}
@@ -358,10 +358,10 @@ class App extends SemiPureComponent {
               <ResizePanel
                 direction="w"
                 style={{
-                  flexGrow: "1",
-                  width: "auto",
-                  minWidth: "275px",
-                  maxWidth: "450px",
+                  flexGrow: '1',
+                  width: 'auto',
+                  minWidth: '275px',
+                  maxWidth: '450px',
                 }}
               >
                 {children}
@@ -405,7 +405,7 @@ class App extends SemiPureComponent {
               </div>
               <div className="footer">
                 <Button
-                  text={pinnedCrns.join(", ")}
+                  text={pinnedCrns.join(', ')}
                   disabled={pinnedCrns.length === 0}
                 >
                   <span>Copy CRNs</span>
@@ -428,9 +428,9 @@ class App extends SemiPureComponent {
         )}
         {mobile && (
           <div className="tab-container">
-            {["Courses", "Combinations", "Calendar"].map((tabTitle, i) => (
+            {['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
               <div
-                className={classes("tab", tabIndex === i && "active")}
+                className={classes('tab', tabIndex === i && 'active')}
                 onClick={() => this.handleChangeTab(i)}
                 key={i}
               >

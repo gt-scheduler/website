@@ -1,5 +1,5 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 import {
   faAngleDown,
   faAngleUp,
@@ -8,11 +8,11 @@ import {
   faInfoCircle,
   faThumbtack,
   faTimes,
-} from "@fortawesome/free-solid-svg-icons";
-import { classes, periodToString, simplifyName, unique } from "../../utils";
-import { actions } from "../../reducers";
-import { ActionRow, SemiPureComponent } from "../";
-import "./stylesheet.scss";
+} from '@fortawesome/free-solid-svg-icons';
+import { classes, periodToString, simplifyName, unique } from '../../utils';
+import { actions } from '../../reducers';
+import { ActionRow, SemiPureComponent } from '../';
+import './stylesheet.scss';
 
 class Instructor extends SemiPureComponent {
   constructor(props) {
@@ -20,19 +20,19 @@ class Instructor extends SemiPureComponent {
 
     this.state = {
       expanded: true,
-      profGpa: "...",
+      profGpa: '...',
     };
   }
 
   componentDidMount() {
     let instructorAverages = this.props.instructorData.filter((prof) => {
-      let lastName1 = prof.profName.split(",")[0].toLowerCase();
-      let profNameArr = this.props.name.split(" ");
+      let lastName1 = prof.profName.split(',')[0].toLowerCase();
+      let profNameArr = this.props.name.split(' ');
       let lastName2 = profNameArr[profNameArr.length - 1].toLowerCase();
       return lastName1 === lastName2;
     });
 
-    let profGpa = instructorAverages[0] ? instructorAverages[0].avgGpa : "N/A";
+    let profGpa = instructorAverages[0] ? instructorAverages[0].avgGpa : 'N/A';
 
     this.setState({ profGpa });
   }
@@ -97,11 +97,11 @@ class Instructor extends SemiPureComponent {
     if (value < 50) {
       r = 255;
       g = Math.round(5.1 * value);
-      textColor = g < 128 ? "#121212" : "white";
+      textColor = g < 128 ? '#121212' : 'white';
     } else {
       g = 255;
       r = Math.round(510 - 5.1 * value);
-      textColor = "#121212";
+      textColor = '#121212';
     }
     return {
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
@@ -122,20 +122,20 @@ class Instructor extends SemiPureComponent {
     );
 
     return (
-      <div className={classes("Instructor", className)}>
+      <div className={classes('Instructor', className)}>
         <ActionRow
           className={classes(
-            "name",
-            "divider-bottom",
-            instructorExcluded && "strikethrough",
-            !instructorPinned && "inactive"
+            'name',
+            'divider-bottom',
+            instructorExcluded && 'strikethrough',
+            !instructorPinned && 'inactive'
           )}
           actions={[
             {
               icon: expanded ? faAngleUp : faAngleDown,
               onClick: () => this.handleToggleExpanded(),
             },
-            !["TBA", "Not Assigned"].includes(name) && {
+            !['TBA', 'Not Assigned'].includes(name) && {
               icon: faInfoCircle,
               href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
                 simplifyName(name)
@@ -147,9 +147,9 @@ class Instructor extends SemiPureComponent {
           ]}
           color={color}
         >
-          {name || "Not Assigned"}
-          {name !== "TBA" &&
-            (profGpa !== "N/A" ? (
+          {name || 'Not Assigned'}
+          {name !== 'TBA' &&
+            (profGpa !== 'N/A' ? (
               <div className="avgGpa">
                 <div className="labelAverage">Average GPA:</div>
                 <div className="gpa" style={this.value2color()}>
@@ -170,10 +170,10 @@ class Instructor extends SemiPureComponent {
               return (
                 <ActionRow
                   className={classes(
-                    "section",
-                    "divider-bottom",
-                    excluded && "strikethrough",
-                    !pinned && "inactive"
+                    'section',
+                    'divider-bottom',
+                    excluded && 'strikethrough',
+                    !pinned && 'inactive'
                   )}
                   onMouseEnter={() => onSetOverlayCrns([section.crn])}
                   onMouseLeave={() => onSetOverlayCrns([])}
@@ -201,7 +201,7 @@ class Instructor extends SemiPureComponent {
                     {section.meetings.map((meeting, i) => {
                       return (
                         <div className="meeting" key={i}>
-                          <span className="days">{meeting.days.join("")}</span>
+                          <span className="days">{meeting.days.join('')}</span>
                           <span className="period">
                             {periodToString(meeting.period)}
                           </span>

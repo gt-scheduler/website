@@ -10,17 +10,29 @@ class Section {
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex];
     this.campus = oscar.campuses[campusIndex];
-    this.meetings = meetings.map(([period, days, where, instructors, dateRangeIndex]) => ({
-      period: period === 'TBA' ? undefined : {
-        start: stringToTime(period.split(' - ')[0]),
-        end: stringToTime(period.split(' - ')[1]),
-      },
-      days: days === '&nbsp;' ? [] : [...days],
-      where,
-      instructors: instructors.map(instructor => instructor.replace(/ \(P\)$/, '')),
-      dateRange: oscar.dateRanges[dateRangeIndex],
-    }));
-    this.instructors = unique(this.meetings.reduce((instructors, meeting) => [...instructors, ...meeting.instructors], []));
+    this.meetings = meetings.map(
+      ([period, days, where, instructors, dateRangeIndex]) => ({
+        period:
+          period === 'TBA'
+            ? undefined
+            : {
+                start: stringToTime(period.split(' - ')[0]),
+                end: stringToTime(period.split(' - ')[1]),
+              },
+        days: days === '&nbsp;' ? [] : [...days],
+        where,
+        instructors: instructors.map((instructor) =>
+          instructor.replace(/ \(P\)$/, '')
+        ),
+        dateRange: oscar.dateRanges[dateRangeIndex],
+      })
+    );
+    this.instructors = unique(
+      this.meetings.reduce(
+        (instructors, meeting) => [...instructors, ...meeting.instructors],
+        []
+      )
+    );
   }
 }
 

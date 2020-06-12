@@ -1,4 +1,4 @@
-@import "../../variables";
+@import '../../variables';
 
 .App.light {
   position: fixed;
@@ -138,7 +138,7 @@
         &:after {
           position: absolute;
           right: 8px;
-          content: "▼";
+          content: '▼';
           font-size: 1em;
         }
       }
@@ -208,7 +208,7 @@
         &:after {
           position: absolute;
           right: 8px;
-          content: "▼";
+          content: '▼';
         }
       }
     }
@@ -444,7 +444,7 @@
         &:after {
           position: absolute;
           right: 8px;
-          content: "▼";
+          content: '▼';
           font-size: 1em;
         }
       }
@@ -513,7 +513,7 @@
         &:after {
           position: absolute;
           right: 8px;
-          content: "▼";
+          content: '▼';
         }
       }
     }

@@ -4,12 +4,26 @@ import { getRandomColor } from '../utils';
 
 const prefix = 'USER';
 
-const setTerm = createAction(`${prefix}/SET_TERM`, term => loadData(term));
-const setDesiredCourses = createAction(`${prefix}/SET_DESIRED_COURSES`, desiredCourses => ({ desiredCourses }));
-const setPinnedCrns = createAction(`${prefix}/SET_PINNED_CRNS`, pinnedCrns => ({ pinnedCrns }));
-const setExcludedCrns = createAction(`${prefix}/SET_EXCLUDED_CRNS`, excludedCrns => ({ excludedCrns }));
-const setColorMap = createAction(`${prefix}/SET_COLOR_MAP`, colorMap => ({ colorMap }));
-const setSortingOptionIndex = createAction(`${prefix}/SET_SORTING_OPTION_INDEX`, sortingOptionIndex => ({ sortingOptionIndex }));
+const setTerm = createAction(`${prefix}/SET_TERM`, (term) => loadData(term));
+const setDesiredCourses = createAction(
+  `${prefix}/SET_DESIRED_COURSES`,
+  (desiredCourses) => ({ desiredCourses })
+);
+const setPinnedCrns = createAction(
+  `${prefix}/SET_PINNED_CRNS`,
+  (pinnedCrns) => ({ pinnedCrns })
+);
+const setExcludedCrns = createAction(
+  `${prefix}/SET_EXCLUDED_CRNS`,
+  (excludedCrns) => ({ excludedCrns })
+);
+const setColorMap = createAction(`${prefix}/SET_COLOR_MAP`, (colorMap) => ({
+  colorMap,
+}));
+const setSortingOptionIndex = createAction(
+  `${prefix}/SET_SORTING_OPTION_INDEX`,
+  (sortingOptionIndex) => ({ sortingOptionIndex })
+);
 
 export const actions = {
   setTerm,
@@ -20,15 +34,26 @@ export const actions = {
   setSortingOptionIndex,
 };
 
-const saveData = ({ term, desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {}, sortingOptionIndex = 0 }) => {
+const saveData = ({
+  term,
+  desiredCourses = [],
+  pinnedCrns = [],
+  excludedCrns = [],
+  colorMap = {},
+  sortingOptionIndex = 0,
+}) => {
   Cookies.set('term', term);
-  Cookies.set(term, JSON.stringify({
-    desiredCourses,
-    pinnedCrns,
-    excludedCrns,
-    colorMap,
-    sortingOptionIndex,
-  }), { expires: 365 });
+  Cookies.set(
+    term,
+    JSON.stringify({
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      colorMap,
+      sortingOptionIndex,
+    }),
+    { expires: 365 }
+  );
 };
 
 const loadData = (term = Cookies.get('term')) => {
@@ -38,13 +63,26 @@ const loadData = (term = Cookies.get('term')) => {
   } catch (e) {
     json = {};
   }
-  const { desiredCourses = [], pinnedCrns = [], excludedCrns = [], colorMap = {}, sortingOptionIndex = 0 } = json;
-  desiredCourses.forEach(courseId => {
+  const {
+    desiredCourses = [],
+    pinnedCrns = [],
+    excludedCrns = [],
+    colorMap = {},
+    sortingOptionIndex = 0,
+  } = json;
+  desiredCourses.forEach((courseId) => {
     if (!(courseId in colorMap)) {
       colorMap[courseId] = getRandomColor();
     }
   });
-  return { term, desiredCourses, pinnedCrns, excludedCrns, colorMap, sortingOptionIndex };
+  return {
+    term,
+    desiredCourses,
+    pinnedCrns,
+    excludedCrns,
+    colorMap,
+    sortingOptionIndex,
+  };
 };
 
 (function migrate201902() {
@@ -57,20 +95,23 @@ const loadData = (term = Cookies.get('term')) => {
 })();
 const defaultState = loadData();
 
-export default handleActions({
-  [combineActions(
-    setTerm,
-    setDesiredCourses,
-    setPinnedCrns,
-    setExcludedCrns,
-    setColorMap,
-    setSortingOptionIndex,
-  )]: (state, { payload }) => {
-    const newState = {
-      ...state,
-      ...payload,
-    };
-    saveData(newState);
-    return newState;
+export default handleActions(
+  {
+    [combineActions(
+      setTerm,
+      setDesiredCourses,
+      setPinnedCrns,
+      setExcludedCrns,
+      setColorMap,
+      setSortingOptionIndex
+    )]: (state, { payload }) => {
+      const newState = {
+        ...state,
+        ...payload,
+      };
+      saveData(newState);
+      return newState;
+    },
   },
-}, defaultState);
+  defaultState
+);
