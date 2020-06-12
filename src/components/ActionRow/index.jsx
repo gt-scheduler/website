@@ -13,7 +13,7 @@ class ActionRow extends Component {
         {children}
         <div className={classes("actions", "default")}>
           {actions
-            .filter(action => action)
+            .filter((action) => action)
             .map(({ className, icon, ...restProps }, i) => {
               const props = {
                 key: i,
@@ -23,7 +23,7 @@ class ActionRow extends Component {
                     <FontAwesomeIcon fixedWidth icon={icon} />
                   </div>
                 ),
-                ...restProps
+                ...restProps,
               };
               return "href" in props ? (
                 <a {...props} rel="noopener noreferrer" target="_blank" />

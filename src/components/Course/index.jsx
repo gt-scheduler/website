@@ -6,7 +6,7 @@ import {
   faInfoCircle,
   faPalette,
   faPlus,
-  faTrash
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { classes, getContentClassName } from "../../utils";
 import { actions } from "../../reducers";
@@ -24,7 +24,7 @@ class Course extends SemiPureComponent {
       expanded: false,
       infoExpanded: false,
       paletteShown: false,
-      critiqueData: {}
+      critiqueData: "",
     };
 
     this.handleSelectColor = this.handleSelectColor.bind(this);
@@ -35,19 +35,19 @@ class Course extends SemiPureComponent {
       desiredCourses,
       pinnedCrns,
       excludedCrns,
-      colorMap
+      colorMap,
     } = this.props.user;
     this.props.setDesiredCourses(
-      desiredCourses.filter(courseId => courseId !== course.id)
+      desiredCourses.filter((courseId) => courseId !== course.id)
     );
     this.props.setPinnedCrns(
       pinnedCrns.filter(
-        crn => !course.sections.some(section => section.crn === crn)
+        (crn) => !course.sections.some((section) => section.crn === crn)
       )
     );
     this.props.setExcludedCrns(
       excludedCrns.filter(
-        crn => !course.sections.some(section => section.crn === crn)
+        (crn) => !course.sections.some((section) => section.crn === crn)
       )
     );
     this.props.setColorMap({ ...colorMap, [course.id]: undefined });
@@ -56,7 +56,7 @@ class Course extends SemiPureComponent {
   handleToggleExpanded(expanded = !this.state.expanded) {
     this.setState({
       expanded: expanded,
-      infoExpanded: false
+      infoExpanded: false,
     });
   }
 
@@ -70,24 +70,27 @@ class Course extends SemiPureComponent {
     this.setState({ paletteShown });
   }
   handleInfoExpanded(infoExpanded = !this.state.infoExpanded) {
-    this.setState({
-      infoExpanded: infoExpanded,
-      expanded: false
-    });
+    if (this.state.critiqueData.avgGpa) {
+      this.setState({
+        infoExpanded: infoExpanded,
+        expanded: false,
+      });
+    }
   }
 
   componentDidMount() {
     if (this.props.fromClass === "course-list") {
       let courseString = this.props.courseId.replace(" ", "%20");
+      console.log("Retreiving...");
       $.ajax({
         url: `https://cors-anywhere.herokuapp.com/http://critique.gatech.edu/course.php?id=${courseString}`,
         type: "GET",
         dataType: "html",
         headers: {
           "X-Requested-With": "XMLHttpRequest",
-          "Content-Type": "text/html"
+          "Content-Type": "text/html",
         },
-        success: res => {
+        success: (res) => {
           // console.log(res);
           const $ = cheerio.load(res);
           let info = {
@@ -127,38 +130,20 @@ class Course extends SemiPureComponent {
                 res
               ).text()
             ),
-            instructors: []
+            instructors: [],
           };
 
           $("table#dataTable > tbody > tr", res).each((i, element) => {
             let item = {
-              profName: $(element)
-                .find("td:nth-child(1)")
-                .text(),
-              classSize: $(element)
-                .find("td:nth-child(2)")
-                .text(),
-              avgGpa: $(element)
-                .find("td:nth-child(3)")
-                .text(),
-              a: $(element)
-                .find("td:nth-child(4)")
-                .text(),
-              b: $(element)
-                .find("td:nth-child(5)")
-                .text(),
-              c: $(element)
-                .find("td:nth-child(6)")
-                .text(),
-              d: $(element)
-                .find("td:nth-child(7)")
-                .text(),
-              f: $(element)
-                .find("td:nth-child(8)")
-                .text(),
-              w: $(element)
-                .find("td:nth-child(9)")
-                .text()
+              profName: $(element).find("td:nth-child(1)").text(),
+              classSize: $(element).find("td:nth-child(2)").text(),
+              avgGpa: $(element).find("td:nth-child(3)").text(),
+              a: $(element).find("td:nth-child(4)").text(),
+              b: $(element).find("td:nth-child(5)").text(),
+              c: $(element).find("td:nth-child(6)").text(),
+              d: $(element).find("td:nth-child(7)").text(),
+              f: $(element).find("td:nth-child(8)").text(),
+              w: $(element).find("td:nth-child(9)").text(),
             };
             let newArr = info.instructors;
             newArr.push(item);
@@ -168,9 +153,9 @@ class Course extends SemiPureComponent {
           this.setState({ critiqueData: info });
           console.log(this.state.critiqueData);
         },
-        error: error => {
+        error: (error) => {
           console.log(error);
-        }
+        },
       });
     }
   }
@@ -190,21 +175,27 @@ class Course extends SemiPureComponent {
     var r,
       g,
       b = 0;
+    let textColor;
     if (value < 50) {
       r = 255;
       g = Math.round(5.1 * value);
+      textColor = g < 128 ? "#121212" : "white";
     } else {
       g = 255;
       r = Math.round(510 - 5.1 * value);
+      textColor = "#121212";
     }
-    return `rgba(${r}, ${g}, ${b}, 0.7)`;
+    return {
+      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
+      color: textColor,
+    };
   };
 
   render() {
     const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
     const { oscar } = this.props.db;
     const { term, pinnedCrns, colorMap } = this.props.user;
-    const { expanded, paletteShown, infoExpanded } = this.state;
+    const { expanded, paletteShown, infoExpanded, critiqueData } = this.state;
 
     const course = oscar.findCourse(courseId);
     const color = colorMap[course.id];
@@ -216,14 +207,14 @@ class Course extends SemiPureComponent {
       theme: "dark2",
       zoomEnabled: true,
       title: {
-        text: "Grade Distribution"
+        text: "Grade Distribution",
       },
       axisX: {
         title: "Letter Grade",
-        reversed: true
+        reversed: true,
       },
       axisY: {
-        title: "Percentage"
+        title: "Percentage",
       },
       data: [
         {
@@ -237,35 +228,35 @@ class Course extends SemiPureComponent {
             {
               y: this.state.critiqueData.a / 100,
               indexLabel: "A",
-              color: "#388E3C"
+              color: "#388E3C",
             },
             {
               y: this.state.critiqueData.b / 100,
               indexLabel: "B",
-              color: "#CDDC39"
+              color: "#CDDC39",
             },
             {
               y: this.state.critiqueData.c / 100,
               indexLabel: "C",
-              color: "#FFA000"
+              color: "#FFA000",
             },
             {
               y: this.state.critiqueData.d / 100,
               indexLabel: "D",
-              color: "#FF5722"
+              color: "#FF5722",
             },
             {
               y: this.state.critiqueData.f / 100,
               indexLabel: "F",
-              color: "#D32F2F"
-            }
-          ]
-        }
-      ]
+              color: "#D32F2F",
+            },
+          ],
+        },
+      ],
     };
 
     const instructorMap = {};
-    course.sections.forEach(section => {
+    course.sections.forEach((section) => {
       const [primaryInstructor = "Not Assigned"] = section.instructors;
       if (!(primaryInstructor in instructorMap)) {
         instructorMap[primaryInstructor] = [];
@@ -275,7 +266,7 @@ class Course extends SemiPureComponent {
 
     const infoAction = {
       icon: faInfoCircle,
-      href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`
+      href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`,
     };
 
     return (
@@ -292,20 +283,20 @@ class Course extends SemiPureComponent {
               : [
                   {
                     icon: expanded ? faAngleUp : faAngleDown,
-                    onClick: () => this.handleToggleExpanded()
+                    onClick: () => this.handleToggleExpanded(),
                   },
                   {
                     icon: faInfoCircle,
-                    onClick: () => this.handleInfoExpanded()
+                    onClick: () => this.handleInfoExpanded(),
                   },
                   {
                     icon: faPalette,
-                    onClick: () => this.handleTogglePaletteShown()
+                    onClick: () => this.handleTogglePaletteShown(),
                   },
                   {
                     icon: faTrash,
-                    onClick: () => this.handleRemoveCourse(course)
-                  }
+                    onClick: () => this.handleRemoveCourse(course),
+                  },
                 ]
           }
           color={color}
@@ -316,18 +307,24 @@ class Course extends SemiPureComponent {
               {this.props.fromClass === "course-list" ? (
                 <div
                   style={{
-                    display: !this.state.infoExpanded ? "inline-block" : "none"
+                    display: !this.state.infoExpanded ? "inline-block" : "none",
                   }}
                 >
-                  <div className="labelAverage">Average GPA:</div>
-                  <div
-                    className="gpa"
-                    style={{ backgroundColor: this.value2color() }}
-                  >
-                    {this.state.critiqueData.avgGpa
-                      ? this.state.critiqueData.avgGpa
-                      : "N/A"}
-                  </div>
+                  {critiqueData.avgGpa ? (
+                    <div className="avgGpa">
+                      <div className="labelAverage">Average GPA:</div>
+                      <div
+                        className="gpa"
+                        style={this.value2color(critiqueData.avgGpa)}
+                      >
+                        {critiqueData.avgGpa}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="avgGpa">
+                      <div className="labelAverage">Stats Not Available</div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div></div>
@@ -336,8 +333,8 @@ class Course extends SemiPureComponent {
 
             <span className="section_ids">
               {course.sections
-                .filter(section => pinnedCrns.includes(section.crn))
-                .map(section => section.id)
+                .filter((section) => pinnedCrns.includes(section.crn))
+                .map((section) => section.id)
                 .join(", ")}
             </span>
           </div>
@@ -349,8 +346,8 @@ class Course extends SemiPureComponent {
             />
             <span className="section_crns">
               {course.sections
-                .filter(section => pinnedCrns.includes(section.crn))
-                .map(section => section.crn)
+                .filter((section) => pinnedCrns.includes(section.crn))
+                .map((section) => section.crn)
                 .join(", ")}
             </span>
             {paletteShown && (
@@ -364,13 +361,15 @@ class Course extends SemiPureComponent {
           </div>
         </ActionRow>
 
-        {this.props.fromClass === "course-list" && infoExpanded ? (
+        {this.props.fromClass === "course-list" &&
+        critiqueData.avgGpa &&
+        infoExpanded ? (
           <div className="course-info">
             <div>
               <div className="labelAverage">Average GPA:</div>
               <div
                 className="gpa"
-                style={{ backgroundColor: this.value2color() }}
+                style={this.value2color(critiqueData.avgGpa)}
               >
                 {this.state.critiqueData.avgGpa
                   ? this.state.critiqueData.avgGpa
@@ -384,9 +383,9 @@ class Course extends SemiPureComponent {
           </div>
         ) : null}
 
-        {expanded && (
+        {critiqueData && expanded && (
           <div className="course-body">
-            {Object.keys(instructorMap).map(name => (
+            {Object.keys(instructorMap).map((name) => (
               <Instructor
                 key={name}
                 color={color}
@@ -403,7 +402,4 @@ class Course extends SemiPureComponent {
   }
 }
 
-export default connect(
-  ({ db, user }) => ({ db, user }),
-  actions
-)(Course);
+export default connect(({ db, user }) => ({ db, user }), actions)(Course);
