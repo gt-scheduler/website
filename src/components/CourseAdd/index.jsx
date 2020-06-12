@@ -40,13 +40,13 @@ class CourseAdd extends SemiPureComponent {
     if (desiredCourses.includes(course.id)) return;
     const tbaCrns = course.sections
       .filter(
-        (section) =>
+        section =>
           !section.meetings.length ||
           section.meetings.some(
-            (meeting) => !meeting.days.length || !meeting.period
+            meeting => !meeting.days.length || !meeting.period
           )
       )
-      .map((section) => section.crn);
+      .map(section => section.crn);
     this.props.setDesiredCourses([...desiredCourses, course.id]);
     this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
     this.props.setColorMap({ ...colorMap, [course.id]: getRandomColor() });
@@ -75,8 +75,8 @@ class CourseAdd extends SemiPureComponent {
         <div className="autocomplete">
           {oscar
             .searchCourses(keyword)
-            .filter((course) => !desiredCourses.includes(course.id))
-            .map((course) => (
+            .filter(course => !desiredCourses.includes(course.id))
+            .map(course => (
               <Course
                 key={course.id}
                 courseId={course.id}

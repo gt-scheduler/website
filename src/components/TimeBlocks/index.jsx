@@ -29,7 +29,7 @@ class TimeBlocks extends SemiPureComponent {
         {section.meetings.map(
           (meeting, i) =>
             meeting.period &&
-            meeting.days.map((day) => (
+            meeting.days.map(day => (
               <div
                 className={classes('meeting', textClassName, 'default', day)}
                 key={[i, day].join('-')}

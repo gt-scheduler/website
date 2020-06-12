@@ -38,16 +38,16 @@ class Course extends SemiPureComponent {
       colorMap,
     } = this.props.user;
     this.props.setDesiredCourses(
-      desiredCourses.filter((courseId) => courseId !== course.id)
+      desiredCourses.filter(courseId => courseId !== course.id)
     );
     this.props.setPinnedCrns(
       pinnedCrns.filter(
-        (crn) => !course.sections.some((section) => section.crn === crn)
+        crn => !course.sections.some(section => section.crn === crn)
       )
     );
     this.props.setExcludedCrns(
       excludedCrns.filter(
-        (crn) => !course.sections.some((section) => section.crn === crn)
+        crn => !course.sections.some(section => section.crn === crn)
       )
     );
     this.props.setColorMap({ ...colorMap, [course.id]: undefined });
@@ -90,7 +90,7 @@ class Course extends SemiPureComponent {
           'X-Requested-With': 'XMLHttpRequest',
           'Content-Type': 'text/html',
         },
-        success: (res) => {
+        success: res => {
           // console.log(res);
           const $ = cheerio.load(res);
           let info = {
@@ -153,7 +153,7 @@ class Course extends SemiPureComponent {
           this.setState({ critiqueData: info });
           console.log(this.state.critiqueData);
         },
-        error: (error) => {
+        error: error => {
           console.log(error);
         },
       });
@@ -256,7 +256,7 @@ class Course extends SemiPureComponent {
     };
 
     const instructorMap = {};
-    course.sections.forEach((section) => {
+    course.sections.forEach(section => {
       const [primaryInstructor = 'Not Assigned'] = section.instructors;
       if (!(primaryInstructor in instructorMap)) {
         instructorMap[primaryInstructor] = [];
@@ -333,8 +333,8 @@ class Course extends SemiPureComponent {
 
             <span className="section_ids">
               {course.sections
-                .filter((section) => pinnedCrns.includes(section.crn))
-                .map((section) => section.id)
+                .filter(section => pinnedCrns.includes(section.crn))
+                .map(section => section.id)
                 .join(', ')}
             </span>
           </div>
@@ -346,8 +346,8 @@ class Course extends SemiPureComponent {
             />
             <span className="section_crns">
               {course.sections
-                .filter((section) => pinnedCrns.includes(section.crn))
-                .map((section) => section.crn)
+                .filter(section => pinnedCrns.includes(section.crn))
+                .map(section => section.crn)
                 .join(', ')}
             </span>
             {paletteShown && (
@@ -385,7 +385,7 @@ class Course extends SemiPureComponent {
 
         {critiqueData && expanded && (
           <div className="course-body">
-            {Object.keys(instructorMap).map((name) => (
+            {Object.keys(instructorMap).map(name => (
               <Instructor
                 key={name}
                 color={color}
