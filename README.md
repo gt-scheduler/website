@@ -2,7 +2,7 @@
 
 GT (Georgia Tech) Scheduler Version 2.0 is a comprehensive platform for Semester Planning and Course Scheduling!
 
-With GT Scheduler V2.0 you get immediate access to course critique evaluations, professor information (coming soon), and your degree requirements (coming soon)!
+With GT Scheduler V2.0 you get immediate access to course critique evaluations, professor information, and your degree requirements (coming soon)!
 
 ## What's New
 
