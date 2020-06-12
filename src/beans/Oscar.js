@@ -5,8 +5,8 @@ class Oscar {
   constructor(data) {
     const { courses, dateRanges, scheduleTypes, campuses } = data;
 
-    this.dateRanges = dateRanges.map((dateRange) => {
-      const [from, to] = dateRange.split(' - ').map((v) => new Date(v));
+    this.dateRanges = dateRanges.map(dateRange => {
+      const [from, to] = dateRange.split(' - ').map(v => new Date(v));
       from.setHours(0);
       to.setHours(23, 59, 59, 999);
       return { from, to };
@@ -14,33 +14,33 @@ class Oscar {
     this.scheduleTypes = scheduleTypes;
     this.campuses = campuses;
     this.courses = Object.keys(courses).map(
-      (courseId) => new Course(this, courseId, courses[courseId])
+      courseId => new Course(this, courseId, courses[courseId])
     );
     this.courseMap = {};
     this.crnMap = {};
-    this.courses.forEach((course) => {
+    this.courses.forEach(course => {
       this.courseMap[course.id] = course;
-      course.sections.forEach((section) => {
+      course.sections.forEach(section => {
         this.crnMap[section.crn] = section;
       });
     });
     this.sortingOptions = [
-      new SortingOption('Most Compact', (combination) => {
+      new SortingOption('Most Compact', combination => {
         const { startMap, endMap } = combination;
         const diffs = Object.keys(startMap).map(
-          (day) => endMap[day] - startMap[day]
+          day => endMap[day] - startMap[day]
         );
         const sum = diffs.reduce((sum, min) => sum + min, 0);
         return +sum;
       }),
-      new SortingOption('Earliest Ending', (combination) => {
+      new SortingOption('Earliest Ending', combination => {
         const { endMap } = combination;
         const ends = Object.values(endMap);
         const sum = ends.reduce((sum, end) => sum + end, 0);
         const avg = sum / ends.length;
         return +avg;
       }),
-      new SortingOption('Latest Beginning', (combination) => {
+      new SortingOption('Latest Beginning', combination => {
         const { startMap } = combination;
         const starts = Object.values(startMap);
         const sum = starts.reduce((sum, min) => sum + min, 0);
@@ -63,13 +63,12 @@ class Oscar {
       /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
     if (subject && number) {
       return this.courses.filter(
-        (course) =>
-          course.subject === subject && course.number.startsWith(number)
+        course => course.subject === subject && course.number.startsWith(number)
       );
     } else if (subject) {
-      return this.courses.filter((course) => course.subject === subject);
+      return this.courses.filter(course => course.subject === subject);
     } else if (number) {
-      return this.courses.filter((course) => course.number.startsWith(number));
+      return this.courses.filter(course => course.number.startsWith(number));
     } else {
       return [];
     }
@@ -83,10 +82,10 @@ class Oscar {
         return;
       }
       const course = this.findCourse(desiredCourses[courseIndex]);
-      const isIncluded = (section) => !excludedCrns.includes(section.crn);
-      const isPinned = (section) => pinnedCrns.includes(section.crn);
-      const hasConflict = (section) =>
-        [...pinnedCrns, ...crns].some((crn) =>
+      const isIncluded = section => !excludedCrns.includes(section.crn);
+      const isPinned = section => pinnedCrns.includes(section.crn);
+      const hasConflict = section =>
+        [...pinnedCrns, ...crns].some(crn =>
           hasConflictBetween(this.findSection(crn), section)
         );
       if (course.hasLab) {
@@ -96,26 +95,26 @@ class Oscar {
         if ((pinnedOnlyLecture && pinnedOnlyLab) || pinnedAllInOne) {
           dfs(courseIndex + 1, crns);
         } else if (pinnedOnlyLecture) {
-          pinnedOnlyLecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+          pinnedOnlyLecture.associatedLabs.filter(isIncluded).forEach(lab => {
             if (hasConflict(lab)) return;
             dfs(courseIndex + 1, [...crns, lab.crn]);
           });
         } else if (pinnedOnlyLab) {
           pinnedOnlyLab.associatedLectures
             .filter(isIncluded)
-            .forEach((lecture) => {
+            .forEach(lecture => {
               if (hasConflict(lecture)) return;
               dfs(courseIndex + 1, [...crns, lecture.crn]);
             });
         } else {
-          course.onlyLectures.filter(isIncluded).forEach((lecture) => {
+          course.onlyLectures.filter(isIncluded).forEach(lecture => {
             if (hasConflict(lecture)) return;
-            lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+            lecture.associatedLabs.filter(isIncluded).forEach(lab => {
               if (hasConflict(lab)) return;
               dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
             });
           });
-          course.allInOnes.filter(isIncluded).forEach((section) => {
+          course.allInOnes.filter(isIncluded).forEach(section => {
             if (hasConflict(section)) return;
             dfs(courseIndex + 1, [...crns, section.crn]);
           });
@@ -124,7 +123,7 @@ class Oscar {
         if (course.sections.some(isPinned)) {
           dfs(courseIndex + 1, crns);
         } else {
-          Object.values(course.sectionGroups).forEach((sectionGroup) => {
+          Object.values(course.sectionGroups).forEach(sectionGroup => {
             const section = sectionGroup.sections.find(isIncluded);
             if (!section || hasConflict(section)) return;
             dfs(courseIndex + 1, [...crns, section.crn]);
@@ -133,7 +132,7 @@ class Oscar {
       }
     };
     dfs();
-    return crnsList.map((crns) => {
+    return crnsList.map(crns => {
       const startMap = {};
       const endMap = {};
       this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
@@ -153,7 +152,7 @@ class Oscar {
   sortCombinations(combinations, sortingOptionIndex) {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
     return combinations
-      .map((combination) => ({
+      .map(combination => ({
         ...combination,
         factor: sortingOption.calculateFactor(combination),
       }))
@@ -161,11 +160,11 @@ class Oscar {
   }
 
   iterateTimeBlocks(crns, callback) {
-    crns.forEach((crn) => {
+    crns.forEach(crn => {
       this.findSection(crn).meetings.forEach(
-        (meeting) =>
+        meeting =>
           meeting.period &&
-          meeting.days.forEach((day) => {
+          meeting.days.forEach(day => {
             callback(day, meeting.period);
           })
       );

@@ -4,25 +4,24 @@ import { getRandomColor } from '../utils';
 
 const prefix = 'USER';
 
-const setTerm = createAction(`${prefix}/SET_TERM`, (term) => loadData(term));
+const setTerm = createAction(`${prefix}/SET_TERM`, term => loadData(term));
 const setDesiredCourses = createAction(
   `${prefix}/SET_DESIRED_COURSES`,
-  (desiredCourses) => ({ desiredCourses })
+  desiredCourses => ({ desiredCourses })
 );
-const setPinnedCrns = createAction(
-  `${prefix}/SET_PINNED_CRNS`,
-  (pinnedCrns) => ({ pinnedCrns })
-);
+const setPinnedCrns = createAction(`${prefix}/SET_PINNED_CRNS`, pinnedCrns => ({
+  pinnedCrns,
+}));
 const setExcludedCrns = createAction(
   `${prefix}/SET_EXCLUDED_CRNS`,
-  (excludedCrns) => ({ excludedCrns })
+  excludedCrns => ({ excludedCrns })
 );
-const setColorMap = createAction(`${prefix}/SET_COLOR_MAP`, (colorMap) => ({
+const setColorMap = createAction(`${prefix}/SET_COLOR_MAP`, colorMap => ({
   colorMap,
 }));
 const setSortingOptionIndex = createAction(
   `${prefix}/SET_SORTING_OPTION_INDEX`,
-  (sortingOptionIndex) => ({ sortingOptionIndex })
+  sortingOptionIndex => ({ sortingOptionIndex })
 );
 
 export const actions = {
@@ -70,7 +69,7 @@ const loadData = (term = Cookies.get('term')) => {
     colorMap = {},
     sortingOptionIndex = 0,
   } = json;
-  desiredCourses.forEach((courseId) => {
+  desiredCourses.forEach(courseId => {
     if (!(courseId in colorMap)) {
       colorMap[courseId] = getRandomColor();
     }

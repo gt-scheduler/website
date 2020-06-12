@@ -21,7 +21,7 @@ class Section {
               },
         days: days === '&nbsp;' ? [] : [...days],
         where,
-        instructors: instructors.map((instructor) =>
+        instructors: instructors.map(instructor =>
           instructor.replace(/ \(P\)$/, '')
         ),
         dateRange: oscar.dateRanges[dateRangeIndex],
