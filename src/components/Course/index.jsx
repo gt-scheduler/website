@@ -12,6 +12,7 @@ import { classes, getContentClassName } from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
 import './stylesheet.scss';
+import { fetchCourseCritique } from '../../beans/fetchCourseCritique';
 import cheerio from 'cheerio';
 import $ from 'jquery';
 import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
@@ -24,7 +25,7 @@ class Course extends SemiPureComponent {
       expanded: false,
       infoExpanded: false,
       paletteShown: false,
-      critiqueData: '',
+      critiqueData: 'Loading...',
     };
 
     this.handleSelectColor = this.handleSelectColor.bind(this);
@@ -80,82 +81,10 @@ class Course extends SemiPureComponent {
 
   componentDidMount() {
     if (this.props.fromClass === 'course-list') {
-      let courseString = this.props.courseId.replace(' ', '%20');
-      console.log('Retreiving...');
-      $.ajax({
-        url: `https://cors-anywhere.herokuapp.com/http://critique.gatech.edu/course.php?id=${courseString}`,
-        type: 'GET',
-        dataType: 'html',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'text/html',
-        },
-        success: res => {
-          // console.log(res);
-          const $ = cheerio.load(res);
-          let info = {
-            avgGpa: Number(
-              $(
-                'div.center-table > table.table > tbody > tr :nth-child(2)',
-                res
-              ).text()
-            ),
-            a: Number(
-              $(
-                'div.center-table > table.table > tbody > tr :nth-child(3)',
-                res
-              ).text()
-            ),
-            b: Number(
-              $(
-                'div.center-table > table.table > tbody > tr :nth-child(4)',
-                res
-              ).text()
-            ),
-            c: Number(
-              $(
-                'div.center-table > table.table > tbody > tr :nth-child(5)',
-                res
-              ).text()
-            ),
-            d: Number(
-              $(
-                'div.center-table > table.table > tbody > tr :nth-child(6)',
-                res
-              ).text()
-            ),
-            f: Number(
-              $(
-                'div.center-table > table.table > tbody > tr :nth-child(7)',
-                res
-              ).text()
-            ),
-            instructors: [],
-          };
-
-          $('table#dataTable > tbody > tr', res).each((i, element) => {
-            let item = {
-              profName: $(element).find('td:nth-child(1)').text(),
-              classSize: $(element).find('td:nth-child(2)').text(),
-              avgGpa: $(element).find('td:nth-child(3)').text(),
-              a: $(element).find('td:nth-child(4)').text(),
-              b: $(element).find('td:nth-child(5)').text(),
-              c: $(element).find('td:nth-child(6)').text(),
-              d: $(element).find('td:nth-child(7)').text(),
-              f: $(element).find('td:nth-child(8)').text(),
-              w: $(element).find('td:nth-child(9)').text(),
-            };
-            let newArr = info.instructors;
-            newArr.push(item);
-            info.instructors = newArr;
-          });
-
-          this.setState({ critiqueData: info });
-          console.log(this.state.critiqueData);
-        },
-        error: error => {
-          console.log(error);
-        },
+      fetchCourseCritique(this.props.courseId).then(critiqueData => {
+        this.setState({
+          critiqueData,
+        });
       });
     }
   }
@@ -322,7 +251,11 @@ class Course extends SemiPureComponent {
                     </div>
                   ) : (
                     <div className="avgGpa">
-                      <div className="labelAverage">Stats Not Available</div>
+                      <div className="labelAverage">
+                        {critiqueData === 'Loading...'
+                          ? 'Loading...'
+                          : 'Stats Not Available'}
+                      </div>
                     </div>
                   )}
                 </div>

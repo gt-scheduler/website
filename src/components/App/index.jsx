@@ -26,6 +26,7 @@ import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import logoLight from './logo-light.png';
 import logoDark from './logo-dark.png';
+import { storedCritiques } from '../../beans/fetchCourseCritique';
 
 class App extends SemiPureComponent {
   constructor(props) {
@@ -89,10 +90,42 @@ class App extends SemiPureComponent {
   getTotalCredits() {
     const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
-    return pinnedCrns.reduce(
-      (credits, crn) => credits + oscar.findSection(crn).credits,
-      0
-    );
+    pinnedCrns.reduce((credits, crn) => {
+      return credits + oscar.findSection(crn).credits;
+    }, 0);
+  }
+
+  getAverageGpa() {
+    if (this.props.user.pinnedCrns.length > 0) {
+      const { oscar } = this.props.db;
+      const { pinnedCrns } = this.props.user;
+      const classes = Object.keys(storedCritiques);
+      let weightedSum = 0;
+      let creditSum = 1;
+
+      pinnedCrns.forEach(element => {
+        let id = oscar.findSection(element).course.id;
+        if (id in storedCritiques) {
+          let credits = oscar.findSection(element).credits;
+          weightedSum +=
+            (storedCritiques[id].avgGpa ? storedCritiques[id].avgGpa : 3.595) *
+            credits;
+          creditSum += credits;
+        }
+      });
+
+      // const weightedSum = pinnedCrns.reduce((sum, crn) => {
+      //   let id = oscar.findSection(crn).course.id;
+      //   if (storedCritiques[id]) {
+      //     let credits = oscar.findSection(crn).credits;
+      //     console.log(classes[id]);
+      //     return sum + storedCritiques[id].avgGpa * credits;
+      //   }
+      // }, 0);
+
+      return '' + weightedSum / (creditSum - 1);
+    }
+    return '';
   }
 
   handleResize = e => {
@@ -406,6 +439,7 @@ class App extends SemiPureComponent {
                 <CourseAdd />
               </div>
               <div className="footer">
+                <div style={{ color: 'white' }}>{this.getAverageGpa()}</div>
                 <Button
                   text={pinnedCrns.join(', ')}
                   disabled={pinnedCrns.length === 0}
