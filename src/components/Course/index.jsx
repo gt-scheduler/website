@@ -107,35 +107,39 @@ class Course extends SemiPureComponent {
           let lastName = item.profName.split(',')[0].toLowerCase();
           return lastName === oscarProfName.toLowerCase();
         })[0];
-        return {
-          type: 'bar',
-          yValueFormatString: '##%',
-          showInLegend: true,
-          legendText: oscarProfName,
-          color: getRandomColor(),
-          dataPoints: [
-            {
-              y: profValues.a / 100,
-              label: 'A',
-            },
-            {
-              y: profValues.b / 100,
-              label: 'B',
-            },
-            {
-              y: profValues.c / 100,
-              label: 'C',
-            },
-            {
-              y: profValues.d / 100,
-              label: 'D',
-            },
-            {
-              y: profValues.f / 100,
-              label: 'F',
-            },
-          ],
-        };
+        try {
+          return {
+            type: 'bar',
+            yValueFormatString: '##%',
+            showInLegend: true,
+            legendText: oscarProfName,
+            color: getRandomColor(),
+            dataPoints: [
+              {
+                y: profValues.a / 100,
+                label: 'A',
+              },
+              {
+                y: profValues.b / 100,
+                label: 'B',
+              },
+              {
+                y: profValues.c / 100,
+                label: 'C',
+              },
+              {
+                y: profValues.d / 100,
+                label: 'D',
+              },
+              {
+                y: profValues.f / 100,
+                label: 'F',
+              },
+            ],
+          };
+        } catch (err) {
+          return null;
+        }
       });
 
       return matchProfCritiques;
@@ -145,42 +149,46 @@ class Course extends SemiPureComponent {
   }
 
   showProfessorGpa() {
-    const { pinnedCrns } = this.props.user;
-    const { oscar } = this.props.db;
-    const courseCrns = pinnedCrns.filter(
-      crn => oscar.findSection(crn).course.id === this.props.courseId
-    );
-    let matchProfCritiques = courseCrns.map(crn => {
-      let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
-      oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
-      let profValues = this.state.critiqueData.instructors.filter(item => {
-        let lastName = item.profName.split(',')[0].toLowerCase();
-        return lastName === oscarProfName;
-      })[0];
-      return {
-        instructor: oscar.findSection(crn).instructors[0],
-        gpa: profValues.avgGpa,
-      };
-    });
-
-    matchProfCritiques = Array.from(
-      new Set(matchProfCritiques.map(a => a.instructor))
-    ).map(instructor => {
-      return matchProfCritiques.find(a => a.instructor === instructor);
-    });
-
-    matchProfCritiques = matchProfCritiques.map(item => {
-      return (
-        <div className="avgGpa">
-          <div className="labelAverage course">{item.instructor}:</div>
-          <div className="gpa course" style={this.value2color(item.gpa)}>
-            {item.gpa}
-          </div>
-        </div>
+    try {
+      const { pinnedCrns } = this.props.user;
+      const { oscar } = this.props.db;
+      const courseCrns = pinnedCrns.filter(
+        crn => oscar.findSection(crn).course.id === this.props.courseId
       );
-    });
+      let matchProfCritiques = courseCrns.map(crn => {
+        let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
+        oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
+        let profValues = this.state.critiqueData.instructors.filter(item => {
+          let lastName = item.profName.split(',')[0].toLowerCase();
+          return lastName === oscarProfName;
+        })[0];
+        return {
+          instructor: oscar.findSection(crn).instructors[0],
+          gpa: profValues.avgGpa,
+        };
+      });
 
-    return matchProfCritiques;
+      matchProfCritiques = Array.from(
+        new Set(matchProfCritiques.map(a => a.instructor))
+      ).map(instructor => {
+        return matchProfCritiques.find(a => a.instructor === instructor);
+      });
+
+      matchProfCritiques = matchProfCritiques.map(item => {
+        return (
+          <div className="avgGpa">
+            <div className="labelAverage course">{item.instructor}:</div>
+            <div className="gpa course" style={this.value2color(item.gpa)}>
+              {item.gpa}
+            </div>
+          </div>
+        );
+      });
+
+      return matchProfCritiques;
+    } catch (err) {
+      return null;
+    }
   }
 
   value2color = (

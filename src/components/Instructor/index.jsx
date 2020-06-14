@@ -148,14 +148,14 @@ class Instructor extends SemiPureComponent {
           {name || 'Not Assigned'}
           {name !== 'TBA' &&
             (profGpa !== 'N/A' ? (
-              <div className="avgGpa">
+              <div className="avgGpa course">
                 <div className="labelAverage">Average GPA:</div>
                 <div className="gpa" style={this.value2color()}>
                   {profGpa}
                 </div>
               </div>
             ) : (
-              <div className="avgGpa">
+              <div className="avgGpa course">
                 <div className="labelAverage">Stats Not Available</div>
               </div>
             ))}
