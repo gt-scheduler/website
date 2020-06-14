@@ -16,6 +16,7 @@ import { fetchCourseCritique } from '../../beans/fetchCourseCritique';
 import cheerio from 'cheerio';
 import $ from 'jquery';
 import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
+import { getRandomColor } from '../../utils';
 
 class Course extends SemiPureComponent {
   constructor(props) {
@@ -89,6 +90,99 @@ class Course extends SemiPureComponent {
     }
   }
 
+  showGpaDistGraph() {
+    const { pinnedCrns } = this.props.user;
+    const { oscar } = this.props.db;
+    const courseCrns = pinnedCrns.filter(
+      crn => oscar.findSection(crn).course.id === this.props.courseId
+    );
+    if (
+      this.state.critiqueData instanceof Object &&
+      this.state.critiqueData.avgGpa
+    ) {
+      const matchProfCritiques = courseCrns.map(crn => {
+        let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
+        oscarProfName = oscarProfName[oscarProfName.length - 1];
+        let profValues = this.state.critiqueData.instructors.filter(item => {
+          let lastName = item.profName.split(',')[0].toLowerCase();
+          return lastName === oscarProfName.toLowerCase();
+        })[0];
+        return {
+          type: 'bar',
+          yValueFormatString: '##%',
+          showInLegend: true,
+          legendText: oscarProfName,
+          color: getRandomColor(),
+          dataPoints: [
+            {
+              y: profValues.a / 100,
+              label: 'A',
+            },
+            {
+              y: profValues.b / 100,
+              label: 'B',
+            },
+            {
+              y: profValues.c / 100,
+              label: 'C',
+            },
+            {
+              y: profValues.d / 100,
+              label: 'D',
+            },
+            {
+              y: profValues.f / 100,
+              label: 'F',
+            },
+          ],
+        };
+      });
+
+      return matchProfCritiques;
+    }
+
+    return [];
+  }
+
+  showProfessorGpa() {
+    const { pinnedCrns } = this.props.user;
+    const { oscar } = this.props.db;
+    const courseCrns = pinnedCrns.filter(
+      crn => oscar.findSection(crn).course.id === this.props.courseId
+    );
+    let matchProfCritiques = courseCrns.map(crn => {
+      let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
+      oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
+      let profValues = this.state.critiqueData.instructors.filter(item => {
+        let lastName = item.profName.split(',')[0].toLowerCase();
+        return lastName === oscarProfName;
+      })[0];
+      return {
+        instructor: oscar.findSection(crn).instructors[0],
+        gpa: profValues.avgGpa,
+      };
+    });
+
+    matchProfCritiques = Array.from(
+      new Set(matchProfCritiques.map(a => a.instructor))
+    ).map(instructor => {
+      return matchProfCritiques.find(a => a.instructor === instructor);
+    });
+
+    matchProfCritiques = matchProfCritiques.map(item => {
+      return (
+        <div className="avgGpa">
+          <div className="labelAverage course">{item.instructor}:</div>
+          <div className="gpa course" style={this.value2color(item.gpa)}>
+            {item.gpa}
+          </div>
+        </div>
+      );
+    });
+
+    return matchProfCritiques;
+  }
+
   value2color = (
     value = this.state.critiqueData.avgGpa,
     min = 2.5,
@@ -136,7 +230,9 @@ class Course extends SemiPureComponent {
       theme: 'dark2',
       zoomEnabled: true,
       title: {
-        text: 'Grade Distribution',
+        text: 'Average Grade Distribution',
+        fontSize: 16,
+        fontFamily: 'arial',
       },
       axisX: {
         title: 'Letter Grade',
@@ -181,6 +277,59 @@ class Course extends SemiPureComponent {
             },
           ],
         },
+      ],
+    };
+
+    const options2 = {
+      animationEnabled: true,
+      theme: 'dark2',
+      zoomEnabled: true,
+      title: {
+        text: 'Grade Distributions by Professor',
+        fontSize: 16,
+        fontFamily: 'arial',
+      },
+      axisY: {
+        title: 'Percentage',
+        labelFormatter: function (e) {
+          return CanvasJSReact.CanvasJS.formatNumber(e.value, '##%');
+        },
+      },
+      axisX: {
+        title: 'Letter Grade',
+        reversed: true,
+      },
+      data: [
+        {
+          type: 'bar',
+          yValueFormatString: '##%',
+          showInLegend: true,
+          legendText: 'Course Average',
+          color: this.props.user.colorMap[this.props.courseId],
+          dataPoints: [
+            {
+              y: critiqueData.a / 100,
+              label: 'A',
+            },
+            {
+              y: critiqueData.b / 100,
+              label: 'B',
+            },
+            {
+              y: critiqueData.c / 100,
+              label: 'C',
+            },
+            {
+              y: critiqueData.d / 100,
+              label: 'D',
+            },
+            {
+              y: critiqueData.f / 100,
+              label: 'F',
+            },
+          ],
+        },
+        ...this.showGpaDistGraph(),
       ],
     };
 
@@ -236,19 +385,22 @@ class Course extends SemiPureComponent {
               {this.props.fromClass === 'course-list' ? (
                 <div
                   style={{
-                    display: !this.state.infoExpanded ? 'inline-block' : 'none',
+                    display: 'inline-block',
                   }}
                 >
                   {critiqueData.avgGpa ? (
-                    <div className="avgGpa">
-                      <div className="labelAverage course">Average GPA:</div>
-                      <div
-                        className="gpa course"
-                        style={this.value2color(critiqueData.avgGpa)}
-                      >
-                        {critiqueData.avgGpa}
+                    <>
+                      <div className="avgGpa">
+                        <div className="labelAverage course">Average GPA:</div>
+                        <div
+                          className="gpa course"
+                          style={this.value2color(critiqueData.avgGpa)}
+                        >
+                          {critiqueData.avgGpa}
+                        </div>
                       </div>
-                    </div>
+                      {this.showProfessorGpa()}
+                    </>
                   ) : (
                     <div className="avgGpa">
                       <div className="labelAverage course">
@@ -299,17 +451,12 @@ class Course extends SemiPureComponent {
         infoExpanded ? (
           <div className="course-info">
             <div>
-              <div className="labelAverage">Average GPA:</div>
-              <div
-                className="gpa"
-                style={this.value2color(critiqueData.avgGpa)}
-              >
-                {this.state.critiqueData.avgGpa
-                  ? this.state.critiqueData.avgGpa
-                  : 'N/A'}
-              </div>
               <CanvasJSReact.CanvasJSChart
                 containerProps={{ height: '300px' }}
+                options={options2}
+              />
+              <CanvasJSReact.CanvasJSChart
+                containerProps={{ height: '200px' }}
                 options={options}
               />
             </div>

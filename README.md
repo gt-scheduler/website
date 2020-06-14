@@ -2,7 +2,7 @@
 
 GT (Georgia Tech) Scheduler Version 2.0 is a comprehensive platform for Semester Planning and Course Scheduling!
 
-With GT Scheduler V2.0 you get immediate access to course critique evaluations, professor information, and your degree requirements (coming soon)!
+With GT Scheduler V2.0 you get immediate access to course critique evaluations, professor information and data, and more!
 
 ## What's New
 
@@ -11,6 +11,10 @@ In Version 2.0, users have access to many more features:
 ### 1. Course Critique Integration
 
 Click the info Icon on the right side of the course to get detailed grade information from critique.gatech.edu
+
+View detailed graphs showing **grade distributions and comparisons** among different professors and the course averages!
+
+After selecting your sections, take a look at the **Cummulative Average GPA**!
 
 ### 2. Dark Mode Support
 
@@ -24,7 +28,6 @@ Resize-able and Collapse-able Columns, Material Design in both Light Mode and Da
 
 I plan to have many more features coming soon!
 
-- Instructor-specific critiques
 - Viewing and Tracking your Degree Requirements by major
 - Add "No Class" Time Blocks
 - Comprehensive Course Difficulty
@@ -35,4 +38,4 @@ I plan to have many more features coming soon!
 
 ## Credits
 
-Credits to **Jason Park** (https://github.com/64json/gt-scheduler) for initially developing the web application and helping the Georgia Tech Community in scheduling their courses.
+Credits to **Jason Park** (https://github.com/64json/gt-scheduler) for initially developing the popular web application and helping the Georgia Tech Community in making course registration an easier task.

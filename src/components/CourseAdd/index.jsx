@@ -69,7 +69,7 @@ class CourseAdd extends SemiPureComponent {
           value={keyword}
           onChange={this.handleChangeKeyword}
           className="keyword"
-          placeholder="XX 0000"
+          placeholder="Add a Course - XX 0000"
           onKeyPress={this.handlePressEnter}
         />
         <div className="autocomplete">

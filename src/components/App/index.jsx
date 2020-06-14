@@ -89,7 +89,7 @@ class App extends SemiPureComponent {
   getTotalCredits() {
     const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
-    pinnedCrns.reduce((credits, crn) => {
+    return pinnedCrns.reduce((credits, crn) => {
       return credits + oscar.findSection(crn).credits;
     }, 0);
   }
@@ -329,7 +329,8 @@ class App extends SemiPureComponent {
               <div className="sidebar sidebar-combinations">
                 <div className="header">
                   <span className="secondary">
-                    {combinations.length} Combos
+                    {combinations.length}{' '}
+                    {combinations.length === 1 ? 'Combo' : 'Combos'}
                   </span>
                   <Button className="primary">
                     <select
