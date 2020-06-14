@@ -100,7 +100,7 @@ class Course extends SemiPureComponent {
       this.state.critiqueData instanceof Object &&
       this.state.critiqueData.avgGpa
     ) {
-      const matchProfCritiques = courseCrns.map(crn => {
+      let matchProfCritiques = courseCrns.map(crn => {
         let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
         oscarProfName = oscarProfName[oscarProfName.length - 1];
         let profValues = this.state.critiqueData.instructors.filter(item => {
@@ -135,12 +135,18 @@ class Course extends SemiPureComponent {
                 y: profValues.f / 100,
                 label: 'F',
               },
+              {
+                y: profValues.w / 100,
+                label: 'W',
+              },
             ],
           };
         } catch (err) {
           return null;
         }
       });
+
+      matchProfCritiques = matchProfCritiques.filter(item => item !== null);
 
       return matchProfCritiques;
     }
@@ -149,46 +155,48 @@ class Course extends SemiPureComponent {
   }
 
   showProfessorGpa() {
-    try {
-      const { pinnedCrns } = this.props.user;
-      const { oscar } = this.props.db;
-      const courseCrns = pinnedCrns.filter(
-        crn => oscar.findSection(crn).course.id === this.props.courseId
-      );
-      let matchProfCritiques = courseCrns.map(crn => {
-        let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
-        oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
-        let profValues = this.state.critiqueData.instructors.filter(item => {
-          let lastName = item.profName.split(',')[0].toLowerCase();
-          return lastName === oscarProfName;
-        })[0];
+    const { pinnedCrns } = this.props.user;
+    const { oscar } = this.props.db;
+    const courseCrns = pinnedCrns.filter(
+      crn => oscar.findSection(crn).course.id === this.props.courseId
+    );
+    let matchProfCritiques = courseCrns.map(crn => {
+      let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
+      oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
+      let profValues = this.state.critiqueData.instructors.filter(item => {
+        let lastName = item.profName.split(',')[0].toLowerCase();
+        return lastName === oscarProfName;
+      })[0];
+      try {
         return {
           instructor: oscar.findSection(crn).instructors[0],
           gpa: profValues.avgGpa,
         };
-      });
+      } catch (err) {
+        return null;
+      }
+    });
 
-      matchProfCritiques = Array.from(
-        new Set(matchProfCritiques.map(a => a.instructor))
-      ).map(instructor => {
-        return matchProfCritiques.find(a => a.instructor === instructor);
-      });
+    matchProfCritiques = matchProfCritiques.filter(item => item !== null);
 
-      matchProfCritiques = matchProfCritiques.map(item => {
-        return (
-          <div className="avgGpa">
-            <div className="labelAverage course">{item.instructor}:</div>
-            <div className="gpa course" style={this.value2color(item.gpa)}>
-              {item.gpa}
-            </div>
+    matchProfCritiques = Array.from(
+      new Set(matchProfCritiques.map(a => a.instructor))
+    ).map(instructor => {
+      return matchProfCritiques.find(a => a.instructor === instructor);
+    });
+
+    matchProfCritiques = matchProfCritiques.map(item => {
+      return (
+        <div className="avgGpa">
+          <div className="labelAverage course">{item.instructor}:</div>
+          <div className="gpa course" style={this.value2color(item.gpa)}>
+            {item.gpa}
           </div>
-        );
-      });
+        </div>
+      );
+    });
 
-      return matchProfCritiques;
-    } catch (err) {
-      return null;
-    }
+    return matchProfCritiques;
   }
 
   value2color = (
@@ -334,6 +342,10 @@ class Course extends SemiPureComponent {
             {
               y: critiqueData.f / 100,
               label: 'F',
+            },
+            {
+              y: 0,
+              label: 'W',
             },
           ],
         },
