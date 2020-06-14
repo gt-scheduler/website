@@ -210,19 +210,21 @@
       border: 2px solid #202020;
       display: inline-block;
       font-size: 18px;
+      transition: 1s ease;
     }
   }
 
-  .labelAverage {
+  .labelAverage.course {
     font-weight: 500;
     font-style: italic;
     display: inline-block;
     font-size: 13px;
     height: 22px;
+    color: black;
     line-height: 18px;
   }
 
-  .gpa {
+  .gpa.course {
     width: 40px;
     height: 22px;
     margin-left: 8px;
@@ -233,5 +235,6 @@
     border: 2px solid #202020;
     display: inline-block;
     font-size: 13px;
+    transition: 1s ease;
   }
 }

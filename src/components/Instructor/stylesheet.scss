@@ -81,6 +81,30 @@
     padding-top: 5px;
     padding-bottom: 3px;
     padding-left: 5px;
+
+    .labelAverage {
+      font-weight: 500;
+      font-style: italic;
+      display: inline-block;
+      font-size: 13px;
+      height: 22px;
+      color: #202020;
+      line-height: 18px;
+    }
+
+    .gpa {
+      width: 40px;
+      height: 22px;
+      margin-left: 8px;
+      line-height: 19px;
+      text-align: center;
+      color: white;
+      font-weight: 500;
+      border: 2px solid #202020;
+      display: inline-block;
+      font-size: 13px;
+      transition: 1s ease;
+    }
   }
 
   .sections {

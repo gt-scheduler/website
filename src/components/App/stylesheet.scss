@@ -12,6 +12,38 @@
   background-color: white;
   transition: 1s ease;
 
+  .avgGpa.sum {
+    text-align: center;
+    background-color: $color-light;
+    transition: 1s ease;
+
+    .labelAverage {
+      font-weight: 500;
+      font-style: italic;
+      display: inline-block;
+      font-size: 16px;
+      color: $color-darker;
+      height: 22px;
+      line-height: 18px;
+      transition: 1s ease;
+    }
+
+    .gpa {
+      width: 50px;
+      height: 30px;
+      display: inline-block;
+      margin-left: 8px;
+      line-height: 27px;
+      text-align: center;
+      color: white;
+      font-weight: 500;
+      border: 2px solid #424242;
+      display: inline-block;
+      font-size: 16px;
+      transition: 0.5s ease;
+    }
+  }
+
   .customHandle {
     cursor: ew-resize;
     width: 10px;
@@ -327,6 +359,38 @@
   overflow: hidden;
   background-color: #303030;
   transition: 1s ease;
+
+  .avgGpa.sum {
+    text-align: center;
+    background-color: #282828;
+    transition: 1s ease;
+
+    .labelAverage {
+      font-weight: 500;
+      font-style: italic;
+      display: inline-block;
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.7);
+      height: 22px;
+      line-height: 18px;
+      transition: 1s ease;
+    }
+
+    .gpa {
+      width: 50px;
+      height: 30px;
+      display: inline-block;
+      margin-left: 8px;
+      line-height: 27px;
+      text-align: center;
+      color: white;
+      font-weight: 500;
+      border: 2px solid #202020;
+      display: inline-block;
+      font-size: 16px;
+      transition: 0.5s ease;
+    }
+  }
 
   .customHandle {
     cursor: ew-resize;

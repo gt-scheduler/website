@@ -26,7 +26,6 @@ import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import logoLight from './logo-light.png';
 import logoDark from './logo-dark.png';
-import { storedCritiques } from '../../beans/fetchCourseCritique';
 
 class App extends SemiPureComponent {
   constructor(props) {
@@ -99,34 +98,56 @@ class App extends SemiPureComponent {
     if (this.props.user.pinnedCrns.length > 0) {
       const { oscar } = this.props.db;
       const { pinnedCrns } = this.props.user;
-      const classes = Object.keys(storedCritiques);
       let weightedSum = 0;
       let creditSum = 1;
 
       pinnedCrns.forEach(element => {
         let id = oscar.findSection(element).course.id;
+
+        const { storedCritiques } = require('../../beans/fetchCourseCritique');
         if (id in storedCritiques) {
           let credits = oscar.findSection(element).credits;
-          weightedSum +=
-            (storedCritiques[id].avgGpa ? storedCritiques[id].avgGpa : 3.595) *
-            credits;
+          let gpa =
+            storedCritiques[id].avgGpa === 0.0
+              ? 3.595
+              : storedCritiques[id].avgGpa;
+          weightedSum += gpa * credits;
           creditSum += credits;
         }
       });
-
-      // const weightedSum = pinnedCrns.reduce((sum, crn) => {
-      //   let id = oscar.findSection(crn).course.id;
-      //   if (storedCritiques[id]) {
-      //     let credits = oscar.findSection(crn).credits;
-      //     console.log(classes[id]);
-      //     return sum + storedCritiques[id].avgGpa * credits;
-      //   }
-      // }, 0);
-
-      return '' + weightedSum / (creditSum - 1);
+      return Number.isNaN(weightedSum / (creditSum - 1))
+        ? null
+        : Math.round((weightedSum / (creditSum - 1)) * 100) / 100;
     }
-    return '';
+    return null;
   }
+
+  value2color = (value = this.getAverageGpa(), min = 2.5, max = 4.0) => {
+    var base = max - min;
+
+    if (base === 0) {
+      value = 100;
+    } else {
+      value = ((value - min) / base) * 100;
+    }
+    var r,
+      g,
+      b = 0;
+    let textColor;
+    if (value < 50) {
+      r = 255;
+      g = Math.round(5.1 * value);
+      textColor = g > 128 ? '#121212' : 'white';
+    } else {
+      g = 255;
+      r = Math.round(510 - 5.1 * value);
+      textColor = '#121212';
+    }
+    return {
+      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
+      color: textColor,
+    };
+  };
 
   handleResize = e => {
     const { mobile } = this.props.env;
@@ -439,7 +460,17 @@ class App extends SemiPureComponent {
                 <CourseAdd />
               </div>
               <div className="footer">
-                <div style={{ color: 'white' }}>{this.getAverageGpa()}</div>
+                {this.getAverageGpa() ? (
+                  <div className="avgGpa sum">
+                    <div className="labelAverage sum">
+                      Cumulative Average GPA:
+                    </div>
+                    <div className="gpa sum" style={this.value2color()}>
+                      {this.getAverageGpa()}
+                    </div>
+                  </div>
+                ) : null}
+
                 <Button
                   text={pinnedCrns.join(', ')}
                   disabled={pinnedCrns.length === 0}

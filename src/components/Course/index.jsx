@@ -241,9 +241,9 @@ class Course extends SemiPureComponent {
                 >
                   {critiqueData.avgGpa ? (
                     <div className="avgGpa">
-                      <div className="labelAverage">Average GPA:</div>
+                      <div className="labelAverage course">Average GPA:</div>
                       <div
-                        className="gpa"
+                        className="gpa course"
                         style={this.value2color(critiqueData.avgGpa)}
                       >
                         {critiqueData.avgGpa}
@@ -251,7 +251,7 @@ class Course extends SemiPureComponent {
                     </div>
                   ) : (
                     <div className="avgGpa">
-                      <div className="labelAverage">
+                      <div className="labelAverage course">
                         {critiqueData === 'Loading...'
                           ? 'Loading...'
                           : 'Stats Not Available'}
