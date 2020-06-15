@@ -34,7 +34,7 @@ I plan to have many more features coming soon!
 - More Graphs and Data Visualizations
 - More UI improvements!
 
-![GT Scheduler Split Theme](https://raw.githubusercontent.com/abhitirumala/gt-scheduler-v2/master/public/image.png)
+![GT Scheduler Split Theme](https://raw.githubusercontent.com/abhitirumala/gt-scheduler-v2/master/public/image.jpg)
 
 ## Credits
 
