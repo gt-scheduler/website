@@ -6,7 +6,7 @@
   position: relative;
   height: $calendar-height;
   margin: $day-height 24px 24px $time-width;
-  background-color: $color-lighter;
+  background-color: $color-light-lighter;
   transition: 1s ease;
 
   &.preview {
@@ -104,22 +104,22 @@
 }
 
 .App.light .Calendar {
-  border-bottom: 1px solid $color-light;
-  border-right: 1px solid $color-light;
+  border-bottom: 1px solid $color-light-light;
+  border-right: 1px solid $color-light-light;
 
   &.preview {
-    box-shadow: inset -6px 0 5px -1px #aaaaaa;
+    box-shadow: inset -6px 0 5px -1px $shadow-light;
   }
 
   .times .time {
     &:after {
-      background-color: $color-light;
+      background-color: $color-light-light;
     }
   }
 
   .days .day {
     &:after {
-      background-color: $color-light;
+      background-color: $color-light-light;
     }
   }
 
@@ -129,18 +129,18 @@
 }
 
 .App.dark .Calendar {
-  background-color: #303030;
+  background-color: $color-dark-light;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   border-right: 1px solid rgba(255, 255, 255, 0.2);
 
   &.preview {
-    background-color: #424242;
-    box-shadow: inset -10px 0 8px -2px #242424;
+    background-color: $color-dark-lighter;
+    box-shadow: inset -10px 0 8px -2px $color-dark-dark;
   }
 
   .times .time {
     .label {
-      color: rgba(255, 255, 255, 0.7);
+      color: $text-dark;
     }
 
     &:after {
@@ -150,7 +150,7 @@
 
   .days .day {
     .label {
-      color: rgba(255, 255, 255, 0.7);
+      color: $text-dark;
     }
 
     &:after {
@@ -159,6 +159,6 @@
   }
 
   .meeting {
-    box-shadow: 0px 10px 10px 0px #242424;
+    box-shadow: 0px 10px 10px 0px $color-dark-dark;
   }
 }

@@ -3,7 +3,7 @@
 .Course {
   display: flex;
   flex-direction: column;
-  background-color: $color-dark;
+  background-color: $color-light-dark;
   transition: 1s ease;
 
   .course-header {
@@ -75,7 +75,7 @@
     .labelAverage {
       font-weight: bold;
       display: inline-block;
-      font-size: 20px;
+      font-size: 1.25em;
       height: 35px;
       line-height: 28px;
       color: white;
@@ -91,7 +91,7 @@
       font-weight: 500;
       border: 2px solid #202020;
       display: inline-block;
-      font-size: 18px;
+      font-size: 1.125em;
     }
   }
 
@@ -99,9 +99,9 @@
     font-weight: 500;
     font-style: italic;
     display: inline-block;
-    font-size: 13px;
+    font-size: 0.813em;
     height: 22px;
-    line-height: 18px;
+    line-height: 0.813em;
   }
 
   .gpa {
@@ -114,6 +114,6 @@
     font-weight: 500;
     border: 2px solid #202020;
     display: inline-block;
-    font-size: 13px;
+    font-size: 0.813em;
   }
 }

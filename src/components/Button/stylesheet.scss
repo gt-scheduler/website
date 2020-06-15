@@ -13,13 +13,13 @@
 
   &:disabled {
     cursor: default;
-    color: $color-dark;
+    color: $color-light-dark;
   }
 }
 
 .App.light .Button {
-  background-color: $color-light;
-  color: $color-darker;
+  background-color: $color-light-light;
+  color: $color-light-darker;
 
   &:hover {
     color: black;
@@ -27,8 +27,8 @@
 }
 
 .App.dark .Button {
-  background-color: #282828;
-  color: rgba(255, 255, 255, 0.7);
+  background-color: $color-dark-dark;
+  color: $text-dark;
 
   &:hover {
     color: white;

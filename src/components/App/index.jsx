@@ -11,14 +11,7 @@ import ResizePanel from 'react-resize-panel';
 import ics from '../../libs/ics';
 import { classes, getSemesterName, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import {
-  Button,
-  Calendar,
-  Course,
-  CourseAdd,
-  SemiPureComponent,
-  ConditionalWrapper,
-} from '../';
+import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import { Oscar } from '../../beans';
 import 'github-fork-ribbon-css/gh-fork-ribbon.css';
@@ -123,25 +116,25 @@ class App extends SemiPureComponent {
   }
 
   value2color = (value = this.getAverageGpa(), min = 2.5, max = 4.0) => {
-    var base = max - min;
+    let base = max - min;
 
     if (base === 0) {
       value = 100;
     } else {
       value = ((value - min) / base) * 100;
     }
-    var r,
+    let r,
       g,
       b = 0;
     let textColor;
     if (value < 50) {
       r = 255;
       g = Math.round(5.1 * value);
-      textColor = g > 128 ? '#121212' : 'white';
+      textColor = g > 128 ? '$color-dark-darker' : 'white';
     } else {
       g = 255;
       r = Math.round(510 - 5.1 * value);
-      textColor = '#121212';
+      textColor = '$color-dark-darker';
     }
     return {
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
@@ -521,6 +514,9 @@ class App extends SemiPureComponent {
     );
   }
 }
+
+const ConditionalWrapper = ({ condition, wrapper, children }) =>
+  condition ? wrapper(children) : children;
 
 export default connect(
   ({ env, db, user }) => ({ env, db, user }),

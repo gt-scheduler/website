@@ -13,8 +13,6 @@ import { actions } from '../../reducers';
 import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
 import './stylesheet.scss';
 import { fetchCourseCritique } from '../../beans/fetchCourseCritique';
-import cheerio from 'cheerio';
-import $ from 'jquery';
 import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
 import { getRandomColor } from '../../utils';
 
@@ -204,25 +202,25 @@ class Course extends SemiPureComponent {
     min = 2.5,
     max = 4.0
   ) => {
-    var base = max - min;
+    let base = max - min;
 
     if (base === 0) {
       value = 100;
     } else {
       value = ((value - min) / base) * 100;
     }
-    var r,
+    let r,
       g,
       b = 0;
     let textColor;
     if (value < 50) {
       r = 255;
       g = Math.round(5.1 * value);
-      textColor = g > 128 ? '#121212' : 'white';
+      textColor = g > 128 ? '$color-dark-darker' : 'white';
     } else {
       g = 255;
       r = Math.round(510 - 5.1 * value);
-      textColor = '#121212';
+      textColor = '$color-dark-darker';
     }
     return {
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,

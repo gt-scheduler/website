@@ -19,7 +19,7 @@
       font-weight: 500;
       font-style: italic;
       display: inline-block;
-      font-size: 16px;
+      font-size: 1em;
       height: 22px;
       line-height: 18px;
       transition: 1s ease;
@@ -35,7 +35,7 @@
       color: white;
       font-weight: 500;
       display: inline-block;
-      font-size: 16px;
+      font-size: 1em;
       transition: 0.5s ease;
     }
   }
@@ -77,13 +77,13 @@
         float: right;
         background-color: none;
         padding-top: 10px;
-        font-size: 25px;
+        font-size: 1.5em;
         text-align: center;
         transition: 1s ease;
         padding-right: 10px;
 
         label {
-          font-size: 15px;
+          font-size: 0.938em;
           font-style: italic;
         }
       }
@@ -95,7 +95,7 @@
       .features {
         float: left;
         display: block;
-        font-size: 20px;
+        font-size: 1.25em;
         font-weight: bold;
         padding-top: 28px;
         transition: 0.5s ease;
@@ -238,7 +238,7 @@
           font-size: 0.8em;
           font-weight: bold;
           transition: 1s ease;
-          color: rgba(255, 255, 255, 0.7);
+          color: $text-dark;
         }
 
         .calendar-preview {
@@ -254,7 +254,7 @@
   }
 
   .github-fork-ribbon:before {
-    background-color: $color-darker;
+    background-color: $color-light-darker;
   }
 
   &.mobile {
@@ -303,32 +303,32 @@
   background-color: white;
 
   .avgGpa.sum {
-    background-color: $color-light;
+    background-color: $color-light-light;
 
     .labelAverage {
-      color: $color-darker;
+      color: $color-light-darker;
     }
 
     .gpa {
-      border: 2px solid #424242;
+      border: 2px solid $color-dark-lighter;
     }
   }
 
   .customHandle {
     background: white;
-    border: 2px solid $color-dark;
-    box-shadow: -6px 0 5px -1px #aaaaaa;
+    border: 2px solid $color-light-dark;
+    box-shadow: -6px 0 5px -1px $shadow-light;
   }
 
   .calendar-container {
-    box-shadow: inset -6px 0 5px -1px #aaaaaa;
+    box-shadow: inset -6px 0 5px -1px $shadow-light;
 
     .titlebar {
-      background-color: $color-lighter;
-      box-shadow: inset -6px 0 5px -1px #aaaaaa;
+      background-color: $color-light-lighter;
+      box-shadow: inset -6px 0 5px -1px $shadow-light;
 
       .icon {
-        color: $color-darker;
+        color: $color-light-darker;
       }
 
       .icon:hover {
@@ -336,7 +336,7 @@
       }
 
       .features {
-        color: $color-darker;
+        color: $color-light-darker;
         padding-left: 10px;
       }
 
@@ -351,7 +351,7 @@
   }
 
   .reset {
-    box-shadow: inset -6px 0 5px -1px #aaaaaa;
+    box-shadow: inset -6px 0 5px -1px $shadow-light;
   }
 
   .capture-container {
@@ -359,24 +359,24 @@
   }
 
   .sidebar {
-    background-color: $color-lighter;
-    border-left: 1px solid $color-dark;
-    box-shadow: -6px 0 5px -1px #aaaaaa;
+    background-color: $color-light-lighter;
+    border-left: 1px solid $color-light-dark;
+    box-shadow: -6px 0 5px -1px $shadow-light;
 
     .header {
-      background-color: $color-light;
-      border-bottom: 1px solid $color-dark;
+      background-color: $color-light-light;
+      border-bottom: 1px solid $color-light-dark;
       transition: 1s ease;
-      box-shadow: -6px 0 5px -1px #aaaaaa;
+      box-shadow: -6px 0 5px -1px $shadow-light;
 
       .secondary {
-        color: $color-darker;
+        color: $color-light-darker;
       }
     }
 
     .footer {
       > * {
-        border-top: 1px solid $color-dark;
+        border-top: 1px solid $color-light-dark;
       }
     }
   }
@@ -384,16 +384,16 @@
   .sidebar-courses {
     .scroller {
       > * {
-        border-bottom: 1px solid $color-dark;
+        border-bottom: 1px solid $color-light-dark;
         transition: 1s ease;
       }
     }
   }
 
   .sidebar-combinations .scroller .combination {
-    border-bottom: 1px solid $color-dark;
+    border-bottom: 1px solid $color-light-dark;
     .number {
-      background-color: $color-dark;
+      background-color: $color-light-dark;
       color: white;
     }
   }
@@ -401,15 +401,15 @@
   &.mobile {
     .tab-container {
       .tab {
-        border-right: 1px solid $color-dark;
-        background-color: $color-lighter;
-        color: $color-darker;
-        border-bottom: 1px solid $color-dark;
+        border-right: 1px solid $color-light-dark;
+        background-color: $color-light-lighter;
+        color: $color-light-darker;
+        border-bottom: 1px solid $color-light-dark;
 
         &.active {
-          background-color: $color-light;
+          background-color: $color-light-light;
           color: black;
-          border-top: 1px solid $color-dark;
+          border-top: 1px solid $color-light-dark;
         }
       }
     }
@@ -417,13 +417,13 @@
 }
 
 .App.dark {
-  background-color: #303030;
+  background-color: $color-dark-light;
 
   .avgGpa.sum {
-    background-color: #282828;
+    background-color: $color-dark-dark;
 
     .labelAverage {
-      color: rgba(255, 255, 255, 0.7);
+      color: $text-dark;
     }
 
     .gpa {
@@ -432,20 +432,20 @@
   }
 
   .customHandle {
-    background: $color-darker;
-    border: 2px solid #303030;
-    box-shadow: -6px 0 5px -1px #242424;
+    background: $color-light-darker;
+    border: 2px solid $color-dark-light;
+    box-shadow: -6px 0 5px -1px $color-dark-dark;
   }
 
   .calendar-container {
-    box-shadow: inset -6px 0 5px -1px #242424;
+    box-shadow: inset -6px 0 5px -1px $color-dark-dark;
 
     .titlebar {
-      background-color: #121212;
+      background-color: $color-dark-darker;
       box-shadow: inset -6px 0 5px -1px #101010;
 
       .icon {
-        color: rgba(255, 255, 255, 0.7);
+        color: $text-dark;
       }
 
       .icon:hover {
@@ -453,7 +453,7 @@
       }
 
       .features {
-        color: rgba(255, 255, 255, 0.7);
+        color: $text-dark;
         padding-left: 12px;
       }
 
@@ -468,23 +468,23 @@
   }
 
   .reset {
-    box-shadow: inset -10px 0 8px -2px #242424;
+    box-shadow: inset -10px 0 8px -2px $color-dark-dark;
   }
 
   .capture-container {
-    background-color: #212121;
+    background-color: $color-dark-dark;
   }
 
   .sidebar {
-    background-color: #303030;
-    border-left: 1px solid #212121;
-    box-shadow: -10px 0 8px -2px #242424;
+    background-color: $color-dark-light;
+    border-left: 1px solid $color-dark-dark;
+    box-shadow: -10px 0 8px -2px $color-dark-dark;
 
     .header {
-      background-color: #121212;
-      border-bottom: 1px solid #212121;
+      background-color: $color-dark-darker;
+      border-bottom: 1px solid $color-dark-dark;
       transition: 1s ease;
-      box-shadow: -6px 0 5px -1px #242424;
+      box-shadow: -6px 0 5px -1px $color-dark-dark;
 
       :hover {
         color: white;
@@ -496,18 +496,18 @@
         }
 
         .selected-option {
-          color: rgba(255, 255, 255, 0.7);
+          color: $text-dark;
         }
       }
 
       .secondary {
-        color: rgba(255, 255, 255, 0.7);
+        color: $text-dark;
       }
     }
 
     .footer {
       > * {
-        border-top: 1px solid #212121;
+        border-top: 1px solid $color-dark-dark;
       }
     }
   }
@@ -515,7 +515,7 @@
   .sidebar-courses {
     .scroller {
       > * {
-        border-bottom: 1px solid #212121;
+        border-bottom: 1px solid $color-dark-dark;
       }
     }
   }
@@ -524,23 +524,23 @@
     border-bottom: 1px solid black;
 
     .number {
-      background-color: #212121;
-      color: rgba(255, 255, 255, 0.7);
+      background-color: $color-dark-dark;
+      color: $text-dark;
     }
   }
 
   &.mobile {
     .tab-container {
       .tab {
-        border-right: 1px solid #121212;
-        background-color: #303030;
-        color: rgba(255, 255, 255, 0.7);
-        border-bottom: 1px solid #121212;
+        border-right: 1px solid $color-dark-darker;
+        background-color: $color-dark-light;
+        color: $text-dark;
+        border-bottom: 1px solid $color-dark-darker;
 
         &.active {
-          background-color: #121212;
-          color: rgba(255, 255, 255, 0.7);
-          border-top: 1px solid #121212;
+          background-color: $color-dark-darker;
+          color: $text-dark;
+          border-top: 1px solid $color-dark-darker;
         }
       }
     }
