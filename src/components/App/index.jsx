@@ -82,6 +82,7 @@ class App extends SemiPureComponent {
   getTotalCredits() {
     const { oscar } = this.props.db;
     const { pinnedCrns } = this.props.user;
+
     return pinnedCrns.reduce((credits, crn) => {
       return credits + oscar.findSection(crn).credits;
     }, 0);
@@ -141,7 +142,6 @@ class App extends SemiPureComponent {
       color: textColor,
     };
   };
-
   handleResize = (e) => {
     const { mobile } = this.props.env;
     const nextMobile = isMobile();
@@ -242,7 +242,9 @@ class App extends SemiPureComponent {
       excludedCrns,
       sortingOptionIndex,
     } = this.props.user;
+
     const { terms, overlayCrns, tabIndex, selectedStyle } = this.state;
+
 
     if (!oscar) return null;
 
@@ -257,6 +259,7 @@ class App extends SemiPureComponent {
     );
 
     return (
+
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
         {(!mobile || tabIndex === 2) && (
           <div className="calendar-container">
@@ -283,6 +286,7 @@ class App extends SemiPureComponent {
                 </span>
               </div>
             )}
+
             <Calendar overlayCrns={overlayCrns} />
           </div>
         )}
@@ -502,7 +506,9 @@ class App extends SemiPureComponent {
         )}
         <a
           className="github-fork-ribbon left-bottom fixed"
-          href="https://github.com/abhitirumala/gt-scheduler-v2"
+
+          href="https://github.com/parkjs814/gt-scheduler"
+
           target="_blank"
           rel="noopener noreferrer"
           data-ribbon="Fork me on GitHub"
