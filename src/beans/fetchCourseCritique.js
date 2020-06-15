@@ -1,5 +1,5 @@
 import cheerio from 'cheerio';
-import $ from 'jquery';
+import axios from 'axios';
 
 var storedCritiques = {};
 
@@ -14,16 +14,15 @@ const removeCourse = (courseId) => {
 
 const fetchCourseCritique = async (courseId) => {
   let courseString = courseId.replace(' ', '%20');
-  // console.log('Retreiving...');
-  return await $.ajax({
+  return await axios({
     url: `https://cors-anywhere.herokuapp.com/http://critique.gatech.edu/course.php?id=${courseString}`,
-    type: 'GET',
-    dataType: 'html',
+    method: 'get',
     headers: {
       'X-Requested-With': 'XMLHttpRequest',
       'Content-Type': 'text/html',
     },
   })
+    .then((response) => response.data)
     .then(handleParse)
     .then((res) => {
       addCourse(courseId, res);
