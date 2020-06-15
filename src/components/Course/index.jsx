@@ -1,6 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { faAngleDown, faAngleUp, faInfoCircle, faPalette, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleDown,
+  faAngleUp,
+  faInfoCircle,
+  faPalette,
+  faPlus,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { classes, getContentClassName } from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
@@ -19,10 +26,25 @@ class Course extends SemiPureComponent {
   }
 
   handleRemoveCourse(course) {
-    const { desiredCourses, pinnedCrns, excludedCrns, colorMap } = this.props.user;
-    this.props.setDesiredCourses(desiredCourses.filter(courseId => courseId !== course.id));
-    this.props.setPinnedCrns(pinnedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
-    this.props.setExcludedCrns(excludedCrns.filter(crn => !course.sections.some(section => section.crn === crn)));
+    const {
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      colorMap,
+    } = this.props.user;
+    this.props.setDesiredCourses(
+      desiredCourses.filter((courseId) => courseId !== course.id)
+    );
+    this.props.setPinnedCrns(
+      pinnedCrns.filter(
+        (crn) => !course.sections.some((section) => section.crn === crn)
+      )
+    );
+    this.props.setExcludedCrns(
+      excludedCrns.filter(
+        (crn) => !course.sections.some((section) => section.crn === crn)
+      )
+    );
     this.props.setColorMap({ ...colorMap, [course.id]: undefined });
   }
 
@@ -51,7 +73,7 @@ class Course extends SemiPureComponent {
     const textClassName = getContentClassName(color);
 
     const instructorMap = {};
-    course.sections.forEach(section => {
+    course.sections.forEach((section) => {
       const [primaryInstructor = 'Not Assigned'] = section.instructors;
       if (!(primaryInstructor in instructorMap)) {
         instructorMap[primaryInstructor] = [];
@@ -65,46 +87,77 @@ class Course extends SemiPureComponent {
     };
 
     return (
-      <div className={classes('Course', textClassName, 'default', className)} style={{ backgroundColor: color }}
-           key={course.id}>
-        <ActionRow className={classes('course-header', expanded && 'divider-bottom')} actions={onAddCourse ? [
-          { icon: faPlus, onClick: onAddCourse },
-          infoAction,
-        ] : [
-          { icon: expanded ? faAngleUp : faAngleDown, onClick: () => this.handleToggleExpanded() },
-          infoAction,
-          { icon: faPalette, onClick: () => this.handleTogglePaletteShown() },
-          { icon: faTrash, onClick: () => this.handleRemoveCourse(course) },
-        ]} color={color}>
+      <div
+        className={classes('Course', textClassName, 'default', className)}
+        style={{ backgroundColor: color }}
+        key={course.id}
+      >
+        <ActionRow
+          className={classes('course-header', expanded && 'divider-bottom')}
+          actions={
+            onAddCourse
+              ? [{ icon: faPlus, onClick: onAddCourse }, infoAction]
+              : [
+                  {
+                    icon: expanded ? faAngleUp : faAngleDown,
+                    onClick: () => this.handleToggleExpanded(),
+                  },
+                  infoAction,
+                  {
+                    icon: faPalette,
+                    onClick: () => this.handleTogglePaletteShown(),
+                  },
+                  {
+                    icon: faTrash,
+                    onClick: () => this.handleRemoveCourse(course),
+                  },
+                ]
+          }
+          color={color}
+        >
           <div className="row">
             <span className="course_id">{course.id}</span>
             <span className="section_ids">
-              {course.sections.filter(section => pinnedCrns.includes(section.crn)).map(section => section.id).join(', ')}
+              {course.sections
+                .filter((section) => pinnedCrns.includes(section.crn))
+                .map((section) => section.id)
+                .join(', ')}
             </span>
           </div>
           <div className="row">
-            <span className="course_title" dangerouslySetInnerHTML={{ __html: course.title }}/>
+            <span
+              className="course_title"
+              dangerouslySetInnerHTML={{ __html: course.title }}
+            />
             <span className="section_crns">
-              {course.sections.filter(section => pinnedCrns.includes(section.crn)).map(section => section.crn).join(', ')}
+              {course.sections
+                .filter((section) => pinnedCrns.includes(section.crn))
+                .map((section) => section.crn)
+                .join(', ')}
             </span>
           </div>
-          {
-            paletteShown &&
-            <Palette className="palette" onSelectColor={this.handleSelectColor} color={color}
-                     onMouseLeave={() => this.handleTogglePaletteShown(false)}/>
-          }
+          {paletteShown && (
+            <Palette
+              className="palette"
+              onSelectColor={this.handleSelectColor}
+              color={color}
+              onMouseLeave={() => this.handleTogglePaletteShown(false)}
+            />
+          )}
         </ActionRow>
-        {
-          expanded &&
+        {expanded && (
           <div className="course-body">
-            {
-              Object.keys(instructorMap).map(name => (
-                <Instructor key={name} color={color} name={name} sections={instructorMap[name]}
-                            onSetOverlayCrns={onSetOverlayCrns}/>
-              ))
-            }
+            {Object.keys(instructorMap).map((name) => (
+              <Instructor
+                key={name}
+                color={color}
+                name={name}
+                sections={instructorMap[name]}
+                onSetOverlayCrns={onSetOverlayCrns}
+              />
+            ))}
           </div>
-        }
+        )}
       </div>
     );
   }

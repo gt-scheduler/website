@@ -1,4 +1,4 @@
-@import "../../variables";
+@import '../../variables';
 
 .Course {
   display: flex;
@@ -38,7 +38,7 @@
     .row {
       .course_title {
         flex: 1;
-        font-size: .8em;
+        font-size: 0.8em;
         margin-right: 8px;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -46,7 +46,7 @@
       }
 
       .section_crns {
-        font-size: .8em;
+        font-size: 0.8em;
         white-space: nowrap;
       }
     }
