@@ -35,7 +35,7 @@ class Calendar extends SemiPureComponent {
         )}
         {!preview && (
           <div className="days">
-            {DAYS.map(day => (
+            {DAYS.map((day) => (
               <div className="day" key={day}>
                 <span className="label">{day}</span>
               </div>
@@ -43,7 +43,7 @@ class Calendar extends SemiPureComponent {
           </div>
         )}
         <div className="meetings">
-          {pinnedCrns.map(crn => (
+          {pinnedCrns.map((crn) => (
             <TimeBlocks
               key={crn}
               crn={crn}
@@ -53,8 +53,8 @@ class Calendar extends SemiPureComponent {
           ))}
           {overlayCrns &&
             overlayCrns
-              .filter(crn => !pinnedCrns.includes(crn))
-              .map(crn => (
+              .filter((crn) => !pinnedCrns.includes(crn))
+              .map((crn) => (
                 <TimeBlocks
                   key={crn}
                   crn={crn}

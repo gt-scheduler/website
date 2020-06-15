@@ -9,51 +9,53 @@ class Course {
     [this.subject, this.number] = this.id.split(' ');
     this.title = title;
     this.sections = Object.keys(sections).map(
-      sectionId => new Section(oscar, this, sectionId, sections[sectionId])
+      (sectionId) => new Section(oscar, this, sectionId, sections[sectionId])
     );
 
     //this.gpa = this.fetchGpa(courseId);
 
     const onlyLectures = this.sections.filter(
-      section => isLecture(section) && !isLab(section)
+      (section) => isLecture(section) && !isLab(section)
     );
     const onlyLabs = this.sections.filter(
-      section => isLab(section) && !isLecture(section)
+      (section) => isLab(section) && !isLecture(section)
     );
     this.hasLab = onlyLectures.length && onlyLabs.length;
     if (this.hasLab) {
       onlyLectures.forEach(
-        lecture =>
-          (lecture.associatedLabs = onlyLabs.filter(lab =>
+        (lecture) =>
+          (lecture.associatedLabs = onlyLabs.filter((lab) =>
             lab.id.startsWith(lecture.id)
           ))
       );
       onlyLabs.forEach(
-        lab =>
-          (lab.associatedLectures = onlyLectures.filter(lecture =>
+        (lab) =>
+          (lab.associatedLectures = onlyLectures.filter((lecture) =>
             lab.id.startsWith(lecture.id)
           ))
       );
       const lonelyLectures = onlyLectures.filter(
-        lecture => !lecture.associatedLabs.length
+        (lecture) => !lecture.associatedLabs.length
       );
-      const lonelyLabs = onlyLabs.filter(lab => !lab.associatedLectures.length);
+      const lonelyLabs = onlyLabs.filter(
+        (lab) => !lab.associatedLectures.length
+      );
       lonelyLectures.forEach(
-        lecture =>
+        (lecture) =>
           (lecture.associatedLabs = lonelyLabs.filter(
-            lab => !hasConflictBetween(lecture, lab)
+            (lab) => !hasConflictBetween(lecture, lab)
           ))
       );
       lonelyLabs.forEach(
-        lab =>
+        (lab) =>
           (lab.associatedLectures = lonelyLectures.filter(
-            lecture => !hasConflictBetween(lecture, lab)
+            (lecture) => !hasConflictBetween(lecture, lab)
           ))
       );
       this.onlyLectures = onlyLectures;
       this.onlyLabs = onlyLabs;
       this.allInOnes = this.sections.filter(
-        section => isLecture(section) && isLab(section)
+        (section) => isLecture(section) && isLab(section)
       );
     } else {
       this.sectionGroups = this.distinct(this.sections);
@@ -62,7 +64,7 @@ class Course {
 
   distinct(sections) {
     let groups = {};
-    sections.forEach(section => {
+    sections.forEach((section) => {
       const sectionGroupMeetings = section.meetings.map(({ days, period }) => ({
         days,
         period,

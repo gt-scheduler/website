@@ -25,7 +25,7 @@ class Instructor extends SemiPureComponent {
   }
 
   componentDidMount() {
-    let instructorAverages = this.props.instructorData.filter(prof => {
+    let instructorAverages = this.props.instructorData.filter((prof) => {
       let lastName1 = prof.profName.split(',')[0].toLowerCase();
       let profNameArr = this.props.name.split(' ');
       let lastName2 = profNameArr[profNameArr.length - 1].toLowerCase();
@@ -40,11 +40,11 @@ class Instructor extends SemiPureComponent {
   handleTogglePinned(section) {
     const { pinnedCrns, excludedCrns } = this.props.user;
     if (pinnedCrns.includes(section.crn)) {
-      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+      this.props.setPinnedCrns(pinnedCrns.filter((crn) => crn !== section.crn));
     } else {
       this.props.setPinnedCrns([...pinnedCrns, section.crn]);
       this.props.setExcludedCrns(
-        excludedCrns.filter(crn => crn !== section.crn)
+        excludedCrns.filter((crn) => crn !== section.crn)
       );
     }
   }
@@ -53,27 +53,29 @@ class Instructor extends SemiPureComponent {
     const { pinnedCrns, excludedCrns } = this.props.user;
     if (excludedCrns.includes(section.crn)) {
       this.props.setExcludedCrns(
-        excludedCrns.filter(crn => crn !== section.crn)
+        excludedCrns.filter((crn) => crn !== section.crn)
       );
     } else {
       this.props.setExcludedCrns([...excludedCrns, section.crn]);
-      this.props.setPinnedCrns(pinnedCrns.filter(crn => crn !== section.crn));
+      this.props.setPinnedCrns(pinnedCrns.filter((crn) => crn !== section.crn));
     }
   }
 
   handleExcludeAll() {
     const { sections } = this.props;
     const { pinnedCrns, excludedCrns } = this.props.user;
-    const crns = sections.map(section => section.crn);
+    const crns = sections.map((section) => section.crn);
     this.props.setExcludedCrns(unique([...excludedCrns, ...crns]));
-    this.props.setPinnedCrns(pinnedCrns.filter(crn => !crns.includes(crn)));
+    this.props.setPinnedCrns(pinnedCrns.filter((crn) => !crns.includes(crn)));
   }
 
   handleIncludeAll() {
     const { sections } = this.props;
     const { excludedCrns } = this.props.user;
-    const crns = sections.map(section => section.crn);
-    this.props.setExcludedCrns(excludedCrns.filter(crn => !crns.includes(crn)));
+    const crns = sections.map((section) => section.crn);
+    this.props.setExcludedCrns(
+      excludedCrns.filter((crn) => !crns.includes(crn))
+    );
   }
 
   handleToggleExpanded(expanded = !this.state.expanded) {
@@ -112,10 +114,10 @@ class Instructor extends SemiPureComponent {
     const { term, pinnedCrns, excludedCrns } = this.props.user;
     const { expanded, profGpa } = this.state;
 
-    const instructorExcluded = sections.every(section =>
+    const instructorExcluded = sections.every((section) =>
       excludedCrns.includes(section.crn)
     );
-    const instructorPinned = sections.some(section =>
+    const instructorPinned = sections.some((section) =>
       pinnedCrns.includes(section.crn)
     );
 
@@ -162,7 +164,7 @@ class Instructor extends SemiPureComponent {
         </ActionRow>
         {expanded && (
           <div className="sections">
-            {sections.map(section => {
+            {sections.map((section) => {
               const excluded = excludedCrns.includes(section.crn);
               const pinned = pinnedCrns.includes(section.crn);
               return (

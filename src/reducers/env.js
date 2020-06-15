@@ -3,7 +3,7 @@ import { isMobile } from '../utils';
 
 const prefix = 'ENV';
 
-const setMobile = createAction(`${prefix}/SET_MOBILE`, mobile => ({
+const setMobile = createAction(`${prefix}/SET_MOBILE`, (mobile) => ({
   mobile,
 }));
 

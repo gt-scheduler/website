@@ -8,11 +8,11 @@ const addCourse = (courseId, critique) => {
   console.log(storedCritiques);
 };
 
-const removeCourse = courseId => {
+const removeCourse = (courseId) => {
   delete storedCritiques[courseId];
 };
 
-const fetchCourseCritique = async courseId => {
+const fetchCourseCritique = async (courseId) => {
   let courseString = courseId.replace(' ', '%20');
   // console.log('Retreiving...');
   return await $.ajax({
@@ -25,13 +25,13 @@ const fetchCourseCritique = async courseId => {
     },
   })
     .then(handleParse)
-    .then(res => {
+    .then((res) => {
       addCourse(courseId, res);
       return res;
     });
 };
 
-const handleParse = res => {
+const handleParse = (res) => {
   // console.log(res);
   const $ = cheerio.load(res);
   let info = {

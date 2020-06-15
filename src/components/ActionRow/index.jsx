@@ -13,7 +13,7 @@ class ActionRow extends Component {
         {children}
         <div className={classes('actions', 'default')}>
           {actions
-            .filter(action => action)
+            .filter((action) => action)
             .map(({ className, icon, ...restProps }, i) => {
               const props = {
                 key: i,

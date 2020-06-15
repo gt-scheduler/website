@@ -1,6 +1,6 @@
 import { DAYS } from './constants';
 
-const stringToTime = string => {
+const stringToTime = (string) => {
   const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
   return (
     ((ampm === 'p' ? 12 : 0) + Number.parseInt(hour % 12)) * 60 +
@@ -16,12 +16,12 @@ const timeToString = (time, ampm = true) => {
   }${ampm ? ` ${hour < 12 ? 'a' : 'p'}m` : ''}`;
 };
 
-const timeToShortString = time => {
+const timeToShortString = (time) => {
   const hour = (time / 60) | 0;
   return `${hour > 12 ? hour - 12 : hour}${hour < 12 ? 'a' : 'p'}m`;
 };
 
-const periodToString = period =>
+const periodToString = (period) =>
   period
     ? `${timeToString(period.start, false)} - ${timeToString(period.end)}`
     : 'TBA';
@@ -45,20 +45,20 @@ const getContentClassName = (color = '#BBBBBB') => {
 };
 
 const hasConflictBetween = (section1, section2) =>
-  section1.meetings.some(meeting1 =>
+  section1.meetings.some((meeting1) =>
     section2.meetings.some(
-      meeting2 =>
+      (meeting2) =>
         meeting1.period &&
         meeting2.period &&
         DAYS.some(
-          day => meeting1.days.includes(day) && meeting2.days.includes(day)
+          (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
         ) &&
         meeting1.period.start < meeting2.period.end &&
         meeting2.period.start < meeting1.period.end
     )
   );
 
-const classes = (...classList) => classList.filter(c => c).join(' ');
+const classes = (...classList) => classList.filter((c) => c).join(' ');
 
 const isMobile = () => window.innerWidth < 768;
 
@@ -67,24 +67,24 @@ const shallowCompareEntries = (a, b) => {
   const bKeys = Object.keys(b);
   return (
     aKeys.length === bKeys.length &&
-    aKeys.every(key => key in b && a[key] === b[key])
+    aKeys.every((key) => key in b && a[key] === b[key])
   );
 };
 
-const simplifyName = name => {
+const simplifyName = (name) => {
   const tokens = name.split(' ');
   const firstName = tokens.shift();
   const lastName = tokens.pop();
   return [firstName, lastName].join(' ');
 };
 
-const unique = array => [...new Set(array)];
+const unique = (array) => [...new Set(array)];
 
-const isLab = section => section.scheduleType.includes('Lab');
+const isLab = (section) => section.scheduleType.includes('Lab');
 
-const isLecture = section => section.scheduleType.includes('Lecture');
+const isLecture = (section) => section.scheduleType.includes('Lecture');
 
-const getSemesterName = term => {
+const getSemesterName = (term) => {
   const year = term.substring(0, 4);
   const semester = (() => {
     switch (Number.parseInt(term.substring(4))) {

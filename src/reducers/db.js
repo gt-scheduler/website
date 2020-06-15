@@ -2,7 +2,7 @@ import { combineActions, createAction, handleActions } from 'redux-actions';
 
 const prefix = 'DB';
 
-const setOscar = createAction(`${prefix}/SET_OSCAR`, oscar => ({ oscar }));
+const setOscar = createAction(`${prefix}/SET_OSCAR`, (oscar) => ({ oscar }));
 
 export const actions = {
   setOscar,

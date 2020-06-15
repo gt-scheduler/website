@@ -40,16 +40,16 @@ class Course extends SemiPureComponent {
       colorMap,
     } = this.props.user;
     this.props.setDesiredCourses(
-      desiredCourses.filter(courseId => courseId !== course.id)
+      desiredCourses.filter((courseId) => courseId !== course.id)
     );
     this.props.setPinnedCrns(
       pinnedCrns.filter(
-        crn => !course.sections.some(section => section.crn === crn)
+        (crn) => !course.sections.some((section) => section.crn === crn)
       )
     );
     this.props.setExcludedCrns(
       excludedCrns.filter(
-        crn => !course.sections.some(section => section.crn === crn)
+        (crn) => !course.sections.some((section) => section.crn === crn)
       )
     );
     this.props.setColorMap({ ...colorMap, [course.id]: undefined });
@@ -82,7 +82,7 @@ class Course extends SemiPureComponent {
 
   componentDidMount() {
     if (this.props.fromClass === 'course-list') {
-      fetchCourseCritique(this.props.courseId).then(critiqueData => {
+      fetchCourseCritique(this.props.courseId).then((critiqueData) => {
         this.setState({
           critiqueData,
         });
@@ -94,16 +94,16 @@ class Course extends SemiPureComponent {
     const { pinnedCrns } = this.props.user;
     const { oscar } = this.props.db;
     const courseCrns = pinnedCrns.filter(
-      crn => oscar.findSection(crn).course.id === this.props.courseId
+      (crn) => oscar.findSection(crn).course.id === this.props.courseId
     );
     if (
       this.state.critiqueData instanceof Object &&
       this.state.critiqueData.avgGpa
     ) {
-      let matchProfCritiques = courseCrns.map(crn => {
+      let matchProfCritiques = courseCrns.map((crn) => {
         let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
         oscarProfName = oscarProfName[oscarProfName.length - 1];
-        let profValues = this.state.critiqueData.instructors.filter(item => {
+        let profValues = this.state.critiqueData.instructors.filter((item) => {
           let lastName = item.profName.split(',')[0].toLowerCase();
           return lastName === oscarProfName.toLowerCase();
         })[0];
@@ -146,7 +146,7 @@ class Course extends SemiPureComponent {
         }
       });
 
-      matchProfCritiques = matchProfCritiques.filter(item => item !== null);
+      matchProfCritiques = matchProfCritiques.filter((item) => item !== null);
 
       return matchProfCritiques;
     }
@@ -158,12 +158,12 @@ class Course extends SemiPureComponent {
     const { pinnedCrns } = this.props.user;
     const { oscar } = this.props.db;
     const courseCrns = pinnedCrns.filter(
-      crn => oscar.findSection(crn).course.id === this.props.courseId
+      (crn) => oscar.findSection(crn).course.id === this.props.courseId
     );
-    let matchProfCritiques = courseCrns.map(crn => {
+    let matchProfCritiques = courseCrns.map((crn) => {
       let oscarProfName = oscar.findSection(crn).instructors[0].split(' ');
       oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
-      let profValues = this.state.critiqueData.instructors.filter(item => {
+      let profValues = this.state.critiqueData.instructors.filter((item) => {
         let lastName = item.profName.split(',')[0].toLowerCase();
         return lastName === oscarProfName;
       })[0];
@@ -177,15 +177,15 @@ class Course extends SemiPureComponent {
       }
     });
 
-    matchProfCritiques = matchProfCritiques.filter(item => item !== null);
+    matchProfCritiques = matchProfCritiques.filter((item) => item !== null);
 
     matchProfCritiques = Array.from(
-      new Set(matchProfCritiques.map(a => a.instructor))
-    ).map(instructor => {
-      return matchProfCritiques.find(a => a.instructor === instructor);
+      new Set(matchProfCritiques.map((a) => a.instructor))
+    ).map((instructor) => {
+      return matchProfCritiques.find((a) => a.instructor === instructor);
     });
 
-    matchProfCritiques = matchProfCritiques.map(item => {
+    matchProfCritiques = matchProfCritiques.map((item) => {
       return (
         <div className="avgGpa">
           <div className="labelAverage course">{item.instructor}:</div>
@@ -354,7 +354,7 @@ class Course extends SemiPureComponent {
     };
 
     const instructorMap = {};
-    course.sections.forEach(section => {
+    course.sections.forEach((section) => {
       const [primaryInstructor = 'Not Assigned'] = section.instructors;
       if (!(primaryInstructor in instructorMap)) {
         instructorMap[primaryInstructor] = [];
@@ -438,8 +438,8 @@ class Course extends SemiPureComponent {
 
             <span className="section_ids">
               {course.sections
-                .filter(section => pinnedCrns.includes(section.crn))
-                .map(section => section.id)
+                .filter((section) => pinnedCrns.includes(section.crn))
+                .map((section) => section.id)
                 .join(', ')}
             </span>
           </div>
@@ -451,8 +451,8 @@ class Course extends SemiPureComponent {
             />
             <span className="section_crns">
               {course.sections
-                .filter(section => pinnedCrns.includes(section.crn))
-                .map(section => section.crn)
+                .filter((section) => pinnedCrns.includes(section.crn))
+                .map((section) => section.crn)
                 .join(', ')}
             </span>
             {paletteShown && (
@@ -485,7 +485,7 @@ class Course extends SemiPureComponent {
 
         {critiqueData && expanded && (
           <div className="course-body">
-            {Object.keys(instructorMap).map(name => (
+            {Object.keys(instructorMap).map((name) => (
               <Instructor
                 key={name}
                 color={color}

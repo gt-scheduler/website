@@ -53,7 +53,7 @@ class Palette extends Component {
           ],
         ].map((colors, i) => (
           <div className="palette-row" key={i}>
-            {colors.map(paletteColor => (
+            {colors.map((paletteColor) => (
               <div
                 className={classes('color', paletteColor === color && 'frame')}
                 key={paletteColor}
