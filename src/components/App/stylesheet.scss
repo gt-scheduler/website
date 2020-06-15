@@ -1,6 +1,6 @@
 @import '../../variables';
 
-.App.light {
+.App {
   position: fixed;
   display: flex;
   align-items: stretch;
@@ -9,12 +9,10 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: white;
   transition: 1s ease;
 
   .avgGpa.sum {
     text-align: center;
-    background-color: $color-light;
     transition: 1s ease;
 
     .labelAverage {
@@ -22,7 +20,6 @@
       font-style: italic;
       display: inline-block;
       font-size: 16px;
-      color: $color-darker;
       height: 22px;
       line-height: 18px;
       transition: 1s ease;
@@ -37,7 +34,6 @@
       text-align: center;
       color: white;
       font-weight: 500;
-      border: 2px solid #424242;
       display: inline-block;
       font-size: 16px;
       transition: 0.5s ease;
@@ -48,14 +44,11 @@
     cursor: ew-resize;
     width: 10px;
     height: 100px;
-    background: white;
-    border: 2px solid $color-dark;
     border-radius: 10px;
     text-align: center;
     overflow: hidden;
     display: flex;
     align-items: center;
-    box-shadow: -6px 0 5px -1px #aaaaaa;
     transition: 1s ease;
   }
 
@@ -72,17 +65,12 @@
     overflow-y: auto;
     display: flex table;
     justify-content: center;
-
-    box-shadow: inset -6px 0 5px -1px #aaaaaa;
-
     transition: 1s ease;
 
     .titlebar {
       display: block;
       height: 75px;
-      background-color: $color-lighter;
       overflow: hidden;
-      box-shadow: inset -6px 0 5px -1px #aaaaaa;
       transition: 1s ease;
 
       .icon {
@@ -91,7 +79,6 @@
         padding-top: 10px;
         font-size: 25px;
         text-align: center;
-        color: $color-darker;
         transition: 1s ease;
         padding-right: 10px;
 
@@ -102,44 +89,34 @@
       }
 
       .icon:hover {
-        color: black;
         transition: 0.5s ease;
       }
 
       .features {
         float: left;
         display: block;
-        color: $color-darker;
         font-size: 20px;
         font-weight: bold;
         padding-top: 28px;
-        padding-left: 10px;
         transition: 0.5s ease;
       }
 
       .features:hover {
-        color: black;
         font-weight: bolder;
         transition: 0.5s ease;
       }
 
       img {
         float: left;
-        height: 72px;
         padding-left: 10px;
       }
     }
-  }
-
-  .reset {
-    box-shadow: inset -6px 0 5px -1px #aaaaaa;
   }
 
   .capture-container {
     position: absolute;
     top: 0;
     left: 100vw;
-    background-color: white;
 
     .fake-calendar {
       width: $calendar-width;
@@ -147,25 +124,18 @@
   }
 
   .sidebar {
-    background-color: $color-lighter;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     align-items: stretch;
     max-width: 450px;
     min-width: 200px;
-    border-left: 1px solid $color-dark;
-    box-shadow: -6px 0 5px -1px #aaaaaa;
     transition: 1s ease;
 
     .header {
       position: relative;
-      background-color: $color-light;
       display: flex;
       align-items: center;
-      border-bottom: 1px solid $color-dark;
-      transition: 1s ease;
-      box-shadow: -6px 0 5px -1px #aaaaaa;
 
       .primary {
         position: relative;
@@ -194,7 +164,6 @@
         position: absolute;
         right: 24px;
         font-size: 0.8em;
-        color: $color-darker;
       }
     }
 
@@ -210,10 +179,6 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-
-      > * {
-        border-top: 1px solid $color-dark;
-      }
     }
   }
 
@@ -225,11 +190,6 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-
-      > * {
-        border-bottom: 1px solid $color-dark;
-        transition: 1s ease;
-      }
 
       .course-list {
         display: flex;
@@ -266,7 +226,6 @@
 
       .combination {
         display: flex;
-        border-bottom: 1px solid $color-dark;
         height: 100px;
         align-items: stretch;
         transition: 1s ease;
@@ -275,12 +234,11 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: $color-dark;
           width: 2.4em;
-          color: white;
           font-size: 0.8em;
           font-weight: bold;
           transition: 1s ease;
+          color: rgba(255, 255, 255, 0.7);
         }
 
         .calendar-preview {
@@ -313,18 +271,11 @@
         display: flex;
         justify-content: center;
         align-content: center;
-        border-right: 1px solid $color-dark;
         font-weight: bold;
-        background-color: $color-lighter;
-        color: $color-darker;
         cursor: pointer;
-        border-bottom: 1px solid $color-dark;
         transition: 1s ease;
 
         &.active {
-          background-color: $color-light;
-          color: black;
-          border-top: 1px solid $color-dark;
           border-bottom: none;
           transition: 1s ease;
         }
@@ -348,131 +299,170 @@
   }
 }
 
-.App.dark {
-  position: fixed;
-  display: flex;
-  align-items: stretch;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background-color: #303030;
-  transition: 1s ease;
+.App.light {
+  background-color: white;
 
   .avgGpa.sum {
-    text-align: center;
-    background-color: #282828;
-    transition: 1s ease;
+    background-color: $color-light;
 
     .labelAverage {
-      font-weight: 500;
-      font-style: italic;
-      display: inline-block;
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.7);
-      height: 22px;
-      line-height: 18px;
-      transition: 1s ease;
+      color: $color-darker;
     }
 
     .gpa {
-      width: 50px;
-      height: 30px;
-      display: inline-block;
-      margin-left: 8px;
-      line-height: 27px;
-      text-align: center;
-      color: white;
-      font-weight: 500;
-      border: 2px solid #202020;
-      display: inline-block;
-      font-size: 16px;
-      transition: 0.5s ease;
+      border: 2px solid #424242;
     }
   }
 
   .customHandle {
-    cursor: ew-resize;
-    width: 10px;
-    height: 100px;
-    background: $color-darker;
-    border: 2px solid #303030;
-    border-radius: 10px;
-    text-align: center;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    box-shadow: -6px 0 5px -1px #242424;
-    transition: 1s ease;
-  }
-
-  .collapsed {
-    label {
-      overflow: visible;
-      display: inline-block;
-      transform: rotate(-90deg);
-    }
+    background: white;
+    border: 2px solid $color-dark;
+    box-shadow: -6px 0 5px -1px #aaaaaa;
   }
 
   .calendar-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex table;
-    justify-content: center;
-    box-shadow: inset -6px 0 5px -1px #242424;
-    transition: 1s ease;
+    box-shadow: inset -6px 0 5px -1px #aaaaaa;
 
     .titlebar {
-      display: block;
-      height: 75px;
-      background-color: #121212;
-      overflow: hidden;
-      box-shadow: inset -6px 0 5px -1px #101010;
-      transition: 1s ease;
+      background-color: $color-lighter;
+      box-shadow: inset -6px 0 5px -1px #aaaaaa;
 
       .icon {
-        float: right;
-        background-color: none;
-        padding-top: 10px;
-        font-size: 25px;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.7);
-        transition: 0.5s ease;
-        padding-right: 10px;
+        color: $color-darker;
+      }
 
-        label {
-          font-size: 15px;
-          font-style: italic;
+      .icon:hover {
+        color: black;
+      }
+
+      .features {
+        color: $color-darker;
+        padding-left: 10px;
+      }
+
+      .features:hover {
+        color: black;
+      }
+
+      img {
+        height: 72px;
+      }
+    }
+  }
+
+  .reset {
+    box-shadow: inset -6px 0 5px -1px #aaaaaa;
+  }
+
+  .capture-container {
+    background-color: white;
+  }
+
+  .sidebar {
+    background-color: $color-lighter;
+    border-left: 1px solid $color-dark;
+    box-shadow: -6px 0 5px -1px #aaaaaa;
+
+    .header {
+      background-color: $color-light;
+      border-bottom: 1px solid $color-dark;
+      transition: 1s ease;
+      box-shadow: -6px 0 5px -1px #aaaaaa;
+
+      .secondary {
+        color: $color-darker;
+      }
+    }
+
+    .footer {
+      > * {
+        border-top: 1px solid $color-dark;
+      }
+    }
+  }
+
+  .sidebar-courses {
+    .scroller {
+      > * {
+        border-bottom: 1px solid $color-dark;
+        transition: 1s ease;
+      }
+    }
+  }
+
+  .sidebar-combinations .scroller .combination {
+    border-bottom: 1px solid $color-dark;
+    .number {
+      background-color: $color-dark;
+      color: white;
+    }
+  }
+
+  &.mobile {
+    .tab-container {
+      .tab {
+        border-right: 1px solid $color-dark;
+        background-color: $color-lighter;
+        color: $color-darker;
+        border-bottom: 1px solid $color-dark;
+
+        &.active {
+          background-color: $color-light;
+          color: black;
+          border-top: 1px solid $color-dark;
         }
+      }
+    }
+  }
+}
+
+.App.dark {
+  background-color: #303030;
+
+  .avgGpa.sum {
+    background-color: #282828;
+
+    .labelAverage {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .gpa {
+      border: 2px solid #202020;
+    }
+  }
+
+  .customHandle {
+    background: $color-darker;
+    border: 2px solid #303030;
+    box-shadow: -6px 0 5px -1px #242424;
+  }
+
+  .calendar-container {
+    box-shadow: inset -6px 0 5px -1px #242424;
+
+    .titlebar {
+      background-color: #121212;
+      box-shadow: inset -6px 0 5px -1px #101010;
+
+      .icon {
+        color: rgba(255, 255, 255, 0.7);
       }
 
       .icon:hover {
         color: rgba(255, 255, 255, 1);
-        transition: 0.5s ease;
       }
 
       .features {
-        float: left;
-        display: block;
         color: rgba(255, 255, 255, 0.7);
-        font-size: 20px;
-        font-weight: bold;
-        padding-top: 28px;
         padding-left: 12px;
-        transition: 0.5s ease;
       }
 
       .features:hover {
         color: rgba(255, 255, 255, 1);
-        font-weight: bolder;
-        transition: 0.5s ease;
       }
 
       img {
-        float: left;
         height: 70px;
-        padding-left: 10px;
       }
     }
   }
@@ -482,89 +472,40 @@
   }
 
   .capture-container {
-    position: absolute;
-    top: 0;
-    left: 100vw;
     background-color: #212121;
-
-    .fake-calendar {
-      width: $calendar-width;
-    }
   }
 
   .sidebar {
     background-color: #303030;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    align-items: stretch;
-    max-width: 450px;
-    min-width: 200px;
     border-left: 1px solid #212121;
     box-shadow: -10px 0 8px -2px #242424;
-    transition: 1s ease;
 
     .header {
-      position: relative;
       background-color: #121212;
-      display: flex;
-      align-items: center;
       border-bottom: 1px solid #212121;
       transition: 1s ease;
+      box-shadow: -6px 0 5px -1px #242424;
 
       :hover {
         color: white;
       }
 
       .primary {
-        position: relative;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding: 0;
-        background: none;
-
         select {
-          align-self: stretch;
-          flex: 1;
-          padding: 8px 24px 8px 8px;
-          font-size: 1.2em;
           color: black;
         }
 
         .selected-option {
           color: rgba(255, 255, 255, 0.7);
         }
-
-        &:after {
-          position: absolute;
-          right: 8px;
-          content: '▼';
-          font-size: 1em;
-        }
       }
 
       .secondary {
-        position: absolute;
-        right: 24px;
-        font-size: 0.8em;
         color: rgba(255, 255, 255, 0.7);
       }
     }
 
-    .scroller {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
     .footer {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-
       > * {
         border-top: 1px solid #212121;
       }
@@ -573,131 +514,35 @@
 
   .sidebar-courses {
     .scroller {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      min-width: 256px;
-
       > * {
         border-bottom: 1px solid #212121;
-        transition: 1s ease;
-      }
-
-      .course-list {
-        display: flex;
-        flex-direction: column;
       }
     }
   }
 
-  .sidebar-combinations {
-    min-width: 230px;
-    .header {
-      .sorting-option {
-        position: relative;
-        display: flex;
-        align-items: center;
-        padding: 0;
+  .sidebar-combinations .scoller .combination {
+    border-bottom: 1px solid black;
 
-        select {
-          align-self: stretch;
-          flex: 1;
-          padding: 8px 32px 8px 8px;
-        }
-
-        &:after {
-          position: absolute;
-          right: 8px;
-          content: '▼';
-        }
-      }
+    .number {
+      background-color: #212121;
+      color: rgba(255, 255, 255, 0.7);
     }
-
-    .scroller {
-      margin-bottom: -1px;
-
-      .combination {
-        display: flex;
-        border-bottom: 1px solid black;
-        height: 100px;
-        align-items: stretch;
-        transition: 1s ease;
-
-        .number {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #212121;
-          width: 2.4em;
-          color: rgba(255, 255, 255, 0.7);
-          font-size: 0.8em;
-          font-weight: bold;
-          transition: 1s ease;
-        }
-
-        .calendar-preview {
-          flex: 1;
-          cursor: pointer;
-        }
-      }
-    }
-
-    .footer {
-      position: relative;
-    }
-  }
-
-  .github-fork-ribbon:before {
-    background-color: $color-darker;
   }
 
   &.mobile {
-    flex-direction: column-reverse;
-
     .tab-container {
-      flex-shrink: 0;
-      display: flex;
-      border-bottom: none;
-
       .tab {
-        flex: 1;
-        padding: 16px;
-        display: flex;
-        justify-content: center;
-        align-content: center;
         border-right: 1px solid #121212;
-        font-weight: bold;
         background-color: #303030;
         color: rgba(255, 255, 255, 0.7);
-        cursor: pointer;
         border-bottom: 1px solid #121212;
-        border-top: 1px solid #121212;
-        transition: 1s ease;
 
         &.active {
           background-color: #121212;
           color: rgba(255, 255, 255, 0.7);
           border-top: 1px solid #121212;
-          border-bottom: none;
-          transition: 1s ease;
-        }
-
-        &:last-child {
-          border-right: none;
         }
       }
-    }
-
-    .sidebar {
-      flex: 1;
-      width: auto;
-      max-width: none;
-      border-left: none;
-    }
-
-    .github-fork-ribbon {
-      display: none;
     }
   }
 }

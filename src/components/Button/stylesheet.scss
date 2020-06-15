@@ -1,21 +1,15 @@
 @import '../../variables';
 
-.App.light .Button {
+.Button {
   display: block;
   text-align: center;
   padding: 8px;
   font-size: 0.8em;
   font-weight: bold;
-  background-color: $color-light;
-  color: $color-darker;
   cursor: pointer;
   border: none;
   outline: none;
   transition: 1s ease;
-
-  &:hover {
-    color: black;
-  }
 
   &:disabled {
     cursor: default;
@@ -23,25 +17,20 @@
   }
 }
 
+.App.light .Button {
+  background-color: $color-light;
+  color: $color-darker;
+
+  &:hover {
+    color: black;
+  }
+}
+
 .App.dark .Button {
-  display: block;
-  text-align: center;
-  padding: 8px;
-  font-size: 0.8em;
-  font-weight: bold;
   background-color: #282828;
   color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: 1s ease;
 
   &:hover {
     color: white;
-  }
-
-  &:disabled {
-    cursor: default;
-    color: $color-dark;
   }
 }
