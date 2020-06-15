@@ -387,6 +387,7 @@ class Course extends SemiPureComponent {
                     icon: faInfoCircle,
                     onClick: () => this.handleInfoExpanded(),
                   },
+
                   {
                     icon: faPalette,
                     onClick: () => this.handleTogglePaletteShown(),
@@ -447,6 +448,7 @@ class Course extends SemiPureComponent {
             <span
               className="course_title"
               style={{ fontWeight: 700, fontStyle: 'italic' }}
+
               dangerouslySetInnerHTML={{ __html: course.title }}
             />
             <span className="section_crns">
@@ -484,6 +486,7 @@ class Course extends SemiPureComponent {
         ) : null}
 
         {critiqueData && expanded && (
+
           <div className="course-body">
             {Object.keys(instructorMap).map((name) => (
               <Instructor
@@ -493,6 +496,7 @@ class Course extends SemiPureComponent {
                 sections={instructorMap[name]}
                 onSetOverlayCrns={onSetOverlayCrns}
                 instructorData={this.state.critiqueData.instructors}
+
               />
             ))}
           </div>

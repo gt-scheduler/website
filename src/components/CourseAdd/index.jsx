@@ -70,6 +70,7 @@ class CourseAdd extends SemiPureComponent {
           onChange={this.handleChangeKeyword}
           className="keyword"
           placeholder="Add a Course - XX 0000"
+
           onKeyPress={this.handlePressEnter}
         />
         <div className="autocomplete">
@@ -83,6 +84,7 @@ class CourseAdd extends SemiPureComponent {
                 pinnedCrns={pinnedCrns}
                 onAddCourse={() => this.handleAddCourse(course)}
                 fromClass="autocomplete"
+
               />
             ))}
         </div>

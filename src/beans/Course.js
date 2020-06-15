@@ -12,8 +12,6 @@ class Course {
       (sectionId) => new Section(oscar, this, sectionId, sections[sectionId])
     );
 
-    //this.gpa = this.fetchGpa(courseId);
-
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)
     );
