@@ -1,4 +1,4 @@
-@import "../../variables";
+@import '../../variables';
 
 .App {
   position: fixed;
@@ -70,7 +70,7 @@
       .secondary {
         position: absolute;
         right: 24px;
-        font-size: .8em;
+        font-size: 0.8em;
         color: $color-darker;
       }
     }
@@ -150,7 +150,7 @@
           background-color: $color-dark;
           width: 2.4em;
           color: white;
-          font-size: .8em;
+          font-size: 0.8em;
           font-weight: bold;
         }
 

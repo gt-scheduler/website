@@ -4,9 +4,4 @@ const DAYS = ['M', 'T', 'W', 'R', 'F'];
 
 const PNG_SCALE_FACTOR = 2;
 
-export {
-  OPEN,
-  CLOSE,
-  DAYS,
-  PNG_SCALE_FACTOR,
-};
+export { OPEN, CLOSE, DAYS, PNG_SCALE_FACTOR };

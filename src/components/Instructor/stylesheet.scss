@@ -1,4 +1,4 @@
-@import "../../variables";
+@import '../../variables';
 
 .Instructor {
   display: flex;
@@ -49,12 +49,12 @@
           justify-content: flex-end;
 
           .days {
-            font-size: .8em;
+            font-size: 0.8em;
             margin-right: 8px;
           }
 
           .period {
-            font-size: .8em;
+            font-size: 0.8em;
             min-width: 8em;
           }
         }
