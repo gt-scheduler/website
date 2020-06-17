@@ -245,7 +245,6 @@ class App extends SemiPureComponent {
 
     const { terms, overlayCrns, tabIndex, selectedStyle } = this.state;
 
-
     if (!oscar) return null;
 
     const combinations = this.memoizedGetCombinations(
@@ -259,7 +258,6 @@ class App extends SemiPureComponent {
     );
 
     return (
-
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
         {(!mobile || tabIndex === 2) && (
           <div className="calendar-container">
@@ -273,12 +271,20 @@ class App extends SemiPureComponent {
                   className="features"
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="https://github.com/abhitirumala/gt-scheduler-v2#gt-scheduler-v20"
+                  href="https://github.com/64json/gt-scheduler#georgia-tech-scheduler"
+                >
+                  About
+                </a>
+                <a
+                  className="features"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://github.com/64json/gt-scheduler#georgia-tech-scheduler"
                 >
                   What's New
                 </a>
                 <span className="icon" onClick={this.handleThemeChange}>
-                  <FontAwesomeIcon fixedWidth icon={faAdjust} size="2.5x" />
+                  <FontAwesomeIcon fixedWidth icon={faAdjust} />
                   <br />
                   <label>
                     {selectedStyle === 'light' ? 'Dark' : 'Light'} Theme
@@ -506,9 +512,7 @@ class App extends SemiPureComponent {
         )}
         <a
           className="github-fork-ribbon left-bottom fixed"
-
           href="https://github.com/parkjs814/gt-scheduler"
-
           target="_blank"
           rel="noopener noreferrer"
           data-ribbon="Fork me on GitHub"
