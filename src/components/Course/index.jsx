@@ -12,7 +12,10 @@ import { classes, getContentClassName } from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
 import './stylesheet.scss';
-import { fetchCourseCritique } from '../../beans/fetchCourseCritique';
+import {
+  fetchCourseCritique,
+  removeCourse,
+} from '../../beans/fetchCourseCritique';
 import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
 import { getRandomColor } from '../../utils';
 
@@ -51,6 +54,7 @@ class Course extends SemiPureComponent {
       )
     );
     this.props.setColorMap({ ...colorMap, [course.id]: undefined });
+    removeCourse(this.props.courseId);
   }
 
   handleToggleExpanded(expanded = !this.state.expanded) {
@@ -446,7 +450,6 @@ class Course extends SemiPureComponent {
             <span
               className="course_title"
               style={{ fontWeight: 700, fontStyle: 'italic' }}
-
               dangerouslySetInnerHTML={{ __html: course.title }}
             />
             <span className="section_crns">
@@ -484,7 +487,6 @@ class Course extends SemiPureComponent {
         ) : null}
 
         {critiqueData && expanded && (
-
           <div className="course-body">
             {Object.keys(instructorMap).map((name) => (
               <Instructor
@@ -494,7 +496,6 @@ class Course extends SemiPureComponent {
                 sections={instructorMap[name]}
                 onSetOverlayCrns={onSetOverlayCrns}
                 instructorData={this.state.critiqueData.instructors}
-
               />
             ))}
           </div>

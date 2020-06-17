@@ -75,4 +75,4 @@ const handleParse = (res) => {
   return info;
 };
 
-export { fetchCourseCritique, storedCritiques };
+export { fetchCourseCritique, storedCritiques, removeCourse };
