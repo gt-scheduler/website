@@ -9,11 +9,14 @@
     "@fortawesome/react-fontawesome": "^0.1.10",
     "@vx/axis": "0.0.197",
     "@vx/group": "0.0.197",
+    "@vx/legend": "0.0.197",
     "@vx/mock-data": "0.0.197",
     "@vx/scale": "0.0.197",
     "@vx/shape": "0.0.197",
+    "@vx/tooltip": "0.0.197",
     "axios": "^0.18.1",
     "cheerio": "^1.0.0-rc.3",
+    "d3-time-format": "^2.2.3",
     "dom-to-image": "^2.6.0",
     "fast-html-parser": "^1.0.1",
     "file-saver": "^2.0.2",
@@ -31,8 +34,10 @@
     "react-resize-panel": "^0.3.5",
     "react-scripts": "^3.4.1",
     "react-virtualized": "^9.21.2",
+    "recharts": "^1.8.5",
     "redux": "^4.0.5",
-    "redux-actions": "^2.6.5"
+    "redux-actions": "^2.6.5",
+    "typescript": "^3.9.5"
   },
   "scripts": {
     "start": "react-scripts start",

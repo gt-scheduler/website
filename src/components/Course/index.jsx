@@ -18,6 +18,7 @@ import {
 } from '../../beans/fetchCourseCritique';
 import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
 import { getRandomColor } from '../../utils';
+import DistBarGraph from './DistBarGraph/index.tsx';
 
 class Course extends SemiPureComponent {
   constructor(props) {
@@ -110,39 +111,7 @@ class Course extends SemiPureComponent {
           return lastName === oscarProfName.toLowerCase();
         })[0];
         try {
-          return {
-            type: 'bar',
-            yValueFormatString: '##%',
-            showInLegend: true,
-            legendText: oscarProfName,
-            color: getRandomColor(),
-            dataPoints: [
-              {
-                y: profValues.a / 100,
-                label: 'A',
-              },
-              {
-                y: profValues.b / 100,
-                label: 'B',
-              },
-              {
-                y: profValues.c / 100,
-                label: 'C',
-              },
-              {
-                y: profValues.d / 100,
-                label: 'D',
-              },
-              {
-                y: profValues.f / 100,
-                label: 'F',
-              },
-              {
-                y: profValues.w / 100,
-                label: 'W',
-              },
-            ],
-          };
+          return profValues;
         } catch (err) {
           return null;
         }
@@ -474,13 +443,17 @@ class Course extends SemiPureComponent {
         infoExpanded ? (
           <div className="course-info">
             <div>
-              <CanvasJSReact.CanvasJSChart
-                containerProps={{ height: '300px' }}
-                options={options2}
-              />
-              <CanvasJSReact.CanvasJSChart
-                containerProps={{ height: '200px' }}
-                options={options}
+              <DistBarGraph
+                data={this.showGpaDistGraph()}
+                avg={{
+                  a: critiqueData.a,
+                  b: critiqueData.b,
+                  c: critiqueData.c,
+                  d: critiqueData.d,
+                  f: critiqueData.f,
+                  w: 0,
+                }}
+                avgColor={color}
               />
             </div>
           </div>
