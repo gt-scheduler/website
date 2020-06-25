@@ -68,9 +68,9 @@
   }
   .course-info {
     text-align: center;
-    background-color: rgb(50, 55, 58);
     border-radius: 3px;
-    border-color: rgb(50, 55, 58);
+    background-color: $color-dark-dark;
+    border-color: $color-dark-dark;
 
     .labelAverage {
       font-weight: bold;
