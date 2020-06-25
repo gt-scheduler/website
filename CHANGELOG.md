@@ -11,6 +11,13 @@ All notable changes to this project will be documented in this file.
 
 # Version History
 
+## Release 2.1.0
+
+#### New Chart Style
+
+- Replaced the CanvasJS chart module with recharts for open source graphs
+- Cummulative GPA is calculated using the corresponding instuctor GPA averages instead of course average
+
 ## Release 2.0.0
 
 #### UI Refresh and Improvements
