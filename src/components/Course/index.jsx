@@ -18,7 +18,7 @@ import {
 } from '../../beans/fetchCourseCritique';
 import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
 import { getRandomColor } from '../../utils';
-import DistBarGraph from './DistBarGraph/index.tsx';
+import DistBarGraph from './DistBarGraph/index.jsx';
 
 class Course extends SemiPureComponent {
   constructor(props) {
