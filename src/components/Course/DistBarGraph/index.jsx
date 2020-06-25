@@ -9,8 +9,10 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  Label,
 } from 'recharts';
 import { getRandomColor } from '../../../utils';
+import './stylesheet.scss';
 
 const preprocess = (data, avg) => {
   let grouped = [
@@ -64,29 +66,45 @@ export default ({ data, avg, avgColor }) => {
   console.log(colors);
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart
-        data={processed}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
+    <div>
+      <div
+        style={{
+          fontSize: '1.2em',
+          paddingTop: 10,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="grade" />
-        <YAxis />
-        <Tooltip formatter={(value) => `${value}%`} />
-        <Legend />
-        <Bar dataKey="Average" fill={avgColor} />
-        {Object.keys(processed[0]).map((element, index) => {
-          if (element === 'grade' || element === 'Average') {
-            return null;
-          }
-          return <Bar dataKey={element} fill={colors[index - 2]} />;
-        })}
-      </BarChart>
-    </ResponsiveContainer>
+        Letter Grade Distribution
+      </div>
+      <div
+        style={{
+          paddingRight: 30,
+        }}
+      >
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={processed}
+            margin={{
+              top: 15,
+              right: 10,
+              left: 10,
+              bottom: 15,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="grade" stroke="white" />
+            <YAxis stroke="white" tickFormatter={(value) => `${value}%`} />
+            <Tooltip formatter={(value) => `${value}%`} />
+            <Legend />
+            <Bar dataKey="Average" fill={avgColor} />
+            {Object.keys(processed[0]).map((element, index) => {
+              if (element === 'grade' || element === 'Average') {
+                return null;
+              }
+              return <Bar dataKey={element} fill={colors[index - 2]} />;
+            })}
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   );
 };

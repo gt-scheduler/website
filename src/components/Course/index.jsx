@@ -16,7 +16,6 @@ import {
   fetchCourseCritique,
   removeCourse,
 } from '../../beans/fetchCourseCritique';
-import CanvasJSReact from '../../beans/canvasjs-2.3.2/canvasjs.react';
 import { getRandomColor } from '../../utils';
 import DistBarGraph from './DistBarGraph/index.jsx';
 
@@ -158,7 +157,7 @@ class Course extends SemiPureComponent {
 
     matchProfCritiques = matchProfCritiques.map((item) => {
       return (
-        <div className="avgGpa">
+        <div className="avgGpa" key={item.instructor}>
           <div className="labelAverage course">{item.instructor}:</div>
           <div className="gpa course" style={this.value2color(item.gpa)}>
             {item.gpa}
@@ -210,119 +209,6 @@ class Course extends SemiPureComponent {
     const course = oscar.findCourse(courseId);
     const color = colorMap[course.id];
     const textClassName = getContentClassName(color);
-
-    const options = {
-      animationEnabled: true,
-      animationDuration: 500,
-      theme: 'dark2',
-      zoomEnabled: true,
-      title: {
-        text: 'Average Grade Distribution',
-        fontSize: 16,
-        fontFamily: 'arial',
-      },
-      axisX: {
-        title: 'Letter Grade',
-        reversed: true,
-      },
-      axisY: {
-        title: 'Percentage',
-      },
-      data: [
-        {
-          type: 'pie',
-          indexLabelPlacement: 'inside',
-          indexLabelFontSize: 16,
-          indexLabelFontStyle: 'bold',
-          yValueFormatString: '##%',
-          explodeOnClick: true,
-          dataPoints: [
-            {
-              y: this.state.critiqueData.a / 100,
-              indexLabel: 'A',
-              color: '#388E3C',
-            },
-            {
-              y: this.state.critiqueData.b / 100,
-              indexLabel: 'B',
-              color: '#CDDC39',
-            },
-            {
-              y: this.state.critiqueData.c / 100,
-              indexLabel: 'C',
-              color: '#FFA000',
-            },
-            {
-              y: this.state.critiqueData.d / 100,
-              indexLabel: 'D',
-              color: '#FF5722',
-            },
-            {
-              y: this.state.critiqueData.f / 100,
-              indexLabel: 'F',
-              color: '#D32F2F',
-            },
-          ],
-        },
-      ],
-    };
-
-    const options2 = {
-      animationEnabled: true,
-      theme: 'dark2',
-      zoomEnabled: true,
-      title: {
-        text: 'Grade Distributions by Professor',
-        fontSize: 16,
-        fontFamily: 'arial',
-      },
-      axisY: {
-        title: 'Percentage',
-        labelFormatter: function (e) {
-          return CanvasJSReact.CanvasJS.formatNumber(e.value, '##%');
-        },
-      },
-      axisX: {
-        title: 'Letter Grade',
-        reversed: true,
-      },
-      data: [
-        {
-          type: 'bar',
-          yValueFormatString: '##%',
-          showInLegend: true,
-          legendText: 'Course Average',
-          color: this.props.user.colorMap[this.props.courseId],
-          dataPoints: [
-            {
-              y: critiqueData.a / 100,
-              label: 'A',
-            },
-            {
-              y: critiqueData.b / 100,
-              label: 'B',
-            },
-            {
-              y: critiqueData.c / 100,
-              label: 'C',
-            },
-            {
-              y: critiqueData.d / 100,
-              label: 'D',
-            },
-            {
-              y: critiqueData.f / 100,
-              label: 'F',
-            },
-            {
-              y: 0,
-              label: 'W',
-            },
-          ],
-        },
-        ...this.showGpaDistGraph(),
-      ],
-    };
 
     const instructorMap = {};
     course.sections.forEach((section) => {
