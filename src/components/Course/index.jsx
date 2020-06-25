@@ -16,7 +16,6 @@ import {
   fetchCourseCritique,
   removeCourse,
 } from '../../beans/fetchCourseCritique';
-import { getRandomColor } from '../../utils';
 import DistBarGraph from './DistBarGraph/index.jsx';
 
 class Course extends SemiPureComponent {

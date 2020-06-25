@@ -2,11 +2,9 @@
 /* exported ics */
 
 const ics = function (uidDomain, prodId) {
-  'use strict';
-
   if (
     navigator.userAgent.indexOf('MSIE') > -1 &&
-    navigator.userAgent.indexOf('MSIE 10') == -1
+    navigator.userAgent.indexOf('MSIE 10') === -1
   ) {
     console.log('Unsupported Browser');
     return;
@@ -77,24 +75,28 @@ const ics = function (uidDomain, prodId) {
             rrule.freq !== 'WEEKLY' &&
             rrule.freq !== 'DAILY'
           ) {
-            throw "Recurrence rrule frequency must be provided and be one of the following: 'YEARLY', 'MONTHLY', 'WEEKLY', or 'DAILY'";
+            throw new Error(
+              "Recurrence rrule frequency must be provided and be one of the following: 'YEARLY', 'MONTHLY', 'WEEKLY', or 'DAILY'"
+            );
           }
 
           if (rrule.until) {
             if (isNaN(Date.parse(rrule.until))) {
-              throw "Recurrence rrule 'until' must be a valid date string";
+              throw new Error(
+                "Recurrence rrule 'until' must be a valid date string"
+              );
             }
           }
 
           if (rrule.interval) {
             if (isNaN(parseInt(rrule.interval))) {
-              throw "Recurrence rrule 'interval' must be an integer";
+              throw new Error("Recurrence rrule 'interval' must be an integer");
             }
           }
 
           if (rrule.count) {
             if (isNaN(parseInt(rrule.count))) {
-              throw "Recurrence rrule 'count' must be an integer";
+              throw new Error("Recurrence rrule 'count' must be an integer");
             }
           }
 
@@ -102,21 +104,25 @@ const ics = function (uidDomain, prodId) {
             if (
               Object.prototype.toString.call(rrule.byday) !== '[object Array]'
             ) {
-              throw "Recurrence rrule 'byday' must be an array";
+              throw new Error("Recurrence rrule 'byday' must be an array");
             }
 
             if (rrule.byday.length > 7) {
-              throw "Recurrence rrule 'byday' array must not be longer than the 7 days in a week";
+              throw new Error(
+                "Recurrence rrule 'byday' array must not be longer than the 7 days in a week"
+              );
             }
 
             // Filter any possible repeats
             rrule.byday = rrule.byday.filter(function (elem, pos) {
-              return rrule.byday.indexOf(elem) == pos;
+              return rrule.byday.indexOf(elem) === pos;
             });
 
             for (var d in rrule.byday) {
               if (BYDAY_VALUES.indexOf(rrule.byday[d]) < 0) {
-                throw "Recurrence rrule 'byday' values must include only the following: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'";
+                throw new Error(
+                  "Recurrence rrule 'byday' values must include only the following: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'"
+                );
               }
             }
           }
@@ -160,7 +166,7 @@ const ics = function (uidDomain, prodId) {
           start_seconds +
           end_hours +
           end_minutes +
-          end_seconds !=
+          end_seconds !==
         0
       ) {
         start_time = 'T' + start_hours + start_minutes + start_seconds;
@@ -202,7 +208,7 @@ const ics = function (uidDomain, prodId) {
         }
       }
 
-      var stamp = new Date().toISOString();
+      // var stamp = new Date().toISOString();
 
       var calendarEvent = [
         'BEGIN:VEVENT',

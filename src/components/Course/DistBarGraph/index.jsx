@@ -3,13 +3,11 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  Label,
 } from 'recharts';
 import { getRandomColor } from '../../../utils';
 import './stylesheet.scss';
@@ -53,11 +51,6 @@ const preprocess = (data, avg) => {
     return obj;
   });
   return gradeGroup;
-};
-
-const objectWithoutKey = (object, key) => {
-  const { [key]: deletedKey, ...otherKeys } = object;
-  return otherKeys;
 };
 
 export default ({ data, avg, avgColor }) => {

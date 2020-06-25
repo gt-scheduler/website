@@ -26,7 +26,9 @@ class ActionRow extends Component {
                 ...restProps,
               };
               return 'href' in props ? (
-                <a {...props} rel="noopener noreferrer" target="_blank" />
+                <a {...props} rel="noopener noreferrer" target="_blank">
+                  {''}
+                </a>
               ) : 'text' in props ? (
                 <CopyToClipboard {...props} />
               ) : (
