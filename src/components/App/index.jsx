@@ -97,14 +97,20 @@ class App extends SemiPureComponent {
 
       pinnedCrns.forEach((element) => {
         let id = oscar.findSection(element).course.id;
-
         const { storedCritiques } = require('../../beans/fetchCourseCritique');
         if (id in storedCritiques) {
+          let courseInstructors = storedCritiques[id].instructors;
+          let oscarProfName = oscar
+            .findSection(element)
+            .instructors[0].split(' ');
+          oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
+          let profValues = courseInstructors.filter((item) => {
+            let lastName = item.profName.split(',')[0].toLowerCase();
+            return lastName === oscarProfName;
+          })[0];
+
           let credits = oscar.findSection(element).credits;
-          let gpa =
-            storedCritiques[id].avgGpa === 0.0
-              ? 3.595
-              : storedCritiques[id].avgGpa;
+          let gpa = profValues.avgGpa === 0.0 ? 3.595 : profValues.avgGpa;
           weightedSum += gpa * credits;
           creditSum += credits;
         }
@@ -493,6 +499,24 @@ class App extends SemiPureComponent {
                 >
                   Export Calendar
                 </Button>
+                <label>
+                  Developed by{' '}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="http://jasonpark.me"
+                  >
+                    Jinseo Park
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="mailto:abhiram.tirumala@gatech.edu"
+                  >
+                    Abhiram Tirumala
+                  </a>
+                </label>
               </div>
             </div>
           </ConditionalWrapper>

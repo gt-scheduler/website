@@ -86,9 +86,10 @@ class Oscar {
       const isIncluded = (section) => !excludedCrns.includes(section.crn);
       const isPinned = (section) => pinnedCrns.includes(section.crn);
       const hasConflict = (section) =>
-        [...pinnedCrns, ...crns].some((crn) =>
-          hasConflictBetween(this.findSection(crn), section)
-        );
+        [...pinnedCrns, ...crns].some((crn) => {
+          console.log(crn);
+          hasConflictBetween(this.findSection(crn), section);
+        });
       if (course.hasLab) {
         const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
         const pinnedOnlyLab = course.onlyLabs.find(isPinned);

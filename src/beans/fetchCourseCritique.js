@@ -5,7 +5,6 @@ var storedCritiques = {};
 
 const addCourse = (courseId, critique) => {
   storedCritiques[courseId] = critique;
-  console.log(storedCritiques);
 };
 
 const removeCourse = (courseId) => {
