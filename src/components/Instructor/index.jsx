@@ -20,23 +20,25 @@ class Instructor extends SemiPureComponent {
 
     this.state = {
       expanded: true,
-      profGpa: '...',
+      profGpa: 'Loading...',
     };
   }
 
   componentDidMount() {
-    const instructorAverages = this.props.instructorData.filter((prof) => {
-      let lastName1 = prof.profName.split(',')[0].toLowerCase();
-      let profNameArr = this.props.name.split(' ');
-      let lastName2 = profNameArr[profNameArr.length - 1].toLowerCase();
-      return lastName1 === lastName2;
-    });
+    if (this.props.instructorData) {
+      const instructorAverages = this.props.instructorData.filter((prof) => {
+        let lastName1 = prof.profName.split(',')[0].toLowerCase();
+        let profNameArr = this.props.name.split(' ');
+        let lastName2 = profNameArr[profNameArr.length - 1].toLowerCase();
+        return lastName1 === lastName2;
+      });
 
-    const profGpa = instructorAverages[0]
-      ? instructorAverages[0].avgGpa
-      : 'N/A';
+      const profGpa = instructorAverages[0]
+        ? instructorAverages[0].avgGpa
+        : 'N/A';
 
-    this.setState({ profGpa });
+      this.setState({ profGpa });
+    }
   }
 
   handleTogglePinned(section) {
@@ -84,35 +86,15 @@ class Instructor extends SemiPureComponent {
     this.setState({ expanded });
   }
 
-  value2color = (value = this.state.profGpa, min = 2.5, max = 4.0) => {
-    let base = max - min;
-
-    if (base === 0) {
-      value = 100;
-    } else {
-      value = ((value - min) / base) * 100;
-    }
-    let r,
-      g,
-      b = 0;
-    let textColor;
-    if (value < 50) {
-      r = 255;
-      g = Math.round(5.1 * value);
-      textColor = g > 128 ? '$color-dark-darker' : 'white';
-    } else {
-      g = 255;
-      r = Math.round(510 - 5.1 * value);
-      textColor = '$color-dark-darker';
-    }
-    return {
-      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
-      color: textColor,
-    };
-  };
-
   render() {
-    const { className, color, name, sections, onSetOverlayCrns } = this.props;
+    const {
+      className,
+      color,
+      name,
+      sections,
+      onSetOverlayCrns,
+      colorFn,
+    } = this.props;
     const { term, pinnedCrns, excludedCrns } = this.props.user;
     const { expanded, profGpa } = this.state;
 
@@ -151,10 +133,14 @@ class Instructor extends SemiPureComponent {
         >
           {name || 'Not Assigned'}
           {name !== 'TBA' &&
-            (profGpa !== 'N/A' ? (
+            (profGpa === 'Loading...' ? (
+              <div className="avgGpa course">
+                <div className="labelAverage">{profGpa}</div>
+              </div>
+            ) : profGpa !== 'N/A' ? (
               <div className="avgGpa course">
                 <div className="labelAverage">Average GPA:</div>
-                <div className="gpa" style={this.value2color()}>
+                <div className="gpa" style={colorFn(this.state.profGpa)}>
                   {profGpa}
                 </div>
               </div>

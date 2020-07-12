@@ -133,21 +133,20 @@ class App extends SemiPureComponent {
     let r,
       g,
       b = 0;
-    let textColor;
+    let textColor = '#121212';
     if (value < 50) {
       r = 255;
       g = Math.round(5.1 * value);
-      textColor = g > 128 ? '$color-dark-darker' : 'white';
     } else {
       g = 255;
       r = Math.round(510 - 5.1 * value);
-      textColor = '$color-dark-darker';
     }
     return {
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
       color: textColor,
     };
   };
+
   handleResize = (e) => {
     const { mobile } = this.props.env;
     const nextMobile = isMobile();
@@ -463,6 +462,7 @@ class App extends SemiPureComponent {
                         key={courseId}
                         onSetOverlayCrns={this.handleSetOverlayCrns}
                         fromClass="course-list"
+                        colorFn={this.value2color}
                       />
                     );
                   })}

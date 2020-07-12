@@ -158,7 +158,7 @@ class Course extends SemiPureComponent {
       return (
         <div className="avgGpa" key={item.instructor}>
           <div className="labelAverage course">{item.instructor}:</div>
-          <div className="gpa course" style={this.value2color(item.gpa)}>
+          <div className="gpa course" style={this.props.colorFn(item.gpa)}>
             {item.gpa}
           </div>
         </div>
@@ -168,39 +168,14 @@ class Course extends SemiPureComponent {
     return matchProfCritiques;
   }
 
-  value2color = (
-    value = this.state.critiqueData.avgGpa,
-    min = 2.5,
-    max = 4.0
-  ) => {
-    let base = max - min;
-
-    if (base === 0) {
-      value = 100;
-    } else {
-      value = ((value - min) / base) * 100;
-    }
-    let r,
-      g,
-      b = 0;
-    let textColor;
-    if (value < 50) {
-      r = 255;
-      g = Math.round(5.1 * value);
-      textColor = g > 128 ? '$color-dark-darker' : 'white';
-    } else {
-      g = 255;
-      r = Math.round(510 - 5.1 * value);
-      textColor = '$color-dark-darker';
-    }
-    return {
-      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
-      color: textColor,
-    };
-  };
-
   render() {
-    const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
+    const {
+      className,
+      courseId,
+      onAddCourse,
+      onSetOverlayCrns,
+      colorFn,
+    } = this.props;
     const { oscar } = this.props.db;
     const { term, pinnedCrns, colorMap } = this.props.user;
     const { expanded, paletteShown, infoExpanded, critiqueData } = this.state;
@@ -271,7 +246,7 @@ class Course extends SemiPureComponent {
                         <div className="labelAverage course">Average GPA:</div>
                         <div
                           className="gpa course"
-                          style={this.value2color(critiqueData.avgGpa)}
+                          style={colorFn(critiqueData.avgGpa)}
                         >
                           {critiqueData.avgGpa}
                         </div>
@@ -354,6 +329,7 @@ class Course extends SemiPureComponent {
                 sections={instructorMap[name]}
                 onSetOverlayCrns={onSetOverlayCrns}
                 instructorData={this.state.critiqueData.instructors}
+                colorFn={colorFn}
               />
             ))}
           </div>
