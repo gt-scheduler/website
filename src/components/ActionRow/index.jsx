@@ -12,27 +12,29 @@ class ActionRow extends Component {
       <div className={classes('ActionRow', className)} {...restProps}>
         {children}
         <div className={classes('actions', 'default')}>
-          {
-            actions.filter(action => action).map(({ className, icon, ...restProps }, i) => {
+          {actions
+            .filter((action) => action)
+            .map(({ className, icon, ...restProps }, i) => {
               const props = {
                 key: i,
                 className: classes('action', className),
                 children: (
                   <div className="icon" style={{ backgroundColor: color }}>
-                    <FontAwesomeIcon fixedWidth icon={icon}/>
+                    <FontAwesomeIcon fixedWidth icon={icon} />
                   </div>
                 ),
                 ...restProps,
               };
               return 'href' in props ? (
-                <a {...props} rel="noopener noreferrer" target="_blank"/>
+                <a {...props} rel="noopener noreferrer" target="_blank">
+                  {''}
+                </a>
               ) : 'text' in props ? (
-                <CopyToClipboard {...props}/>
+                <CopyToClipboard {...props} />
               ) : (
-                <div {...props}/>
+                <div {...props} />
               );
-            })
-          }
+            })}
         </div>
       </div>
     );

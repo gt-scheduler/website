@@ -1,9 +1,39 @@
-@import "../../variables";
+@import '../../variables';
 
 .Instructor {
   display: flex;
   flex-direction: column;
   margin-left: 8px;
+  transition: 1s ease;
+
+  .avgGpa.course {
+    padding-top: 5px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+
+    .labelAverage {
+      font-weight: 500;
+      font-style: italic;
+      display: inline-block;
+      font-size: 0.813em;
+      height: 22px;
+      line-height: 18px;
+    }
+
+    .gpa {
+      width: 40px;
+      height: 22px;
+      margin-left: 8px;
+      line-height: 19px;
+      text-align: center;
+      color: white;
+      font-weight: 500;
+      border: 2px solid #202020;
+      display: inline-block;
+      font-size: 0.813em;
+      transition: 1s ease;
+    }
+  }
 
   .name {
     display: flex;
@@ -49,12 +79,12 @@
           justify-content: flex-end;
 
           .days {
-            font-size: .8em;
+            font-size: 0.8em;
             margin-right: 8px;
           }
 
           .period {
-            font-size: .8em;
+            font-size: 0.8em;
             min-width: 8em;
           }
         }

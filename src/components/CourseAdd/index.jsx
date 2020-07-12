@@ -39,8 +39,14 @@ class CourseAdd extends SemiPureComponent {
     const { desiredCourses, excludedCrns, colorMap } = this.props.user;
     if (desiredCourses.includes(course.id)) return;
     const tbaCrns = course.sections
-      .filter(section => !section.meetings.length || section.meetings.some(meeting => !meeting.days.length || !meeting.period))
-      .map(section => section.crn);
+      .filter(
+        (section) =>
+          !section.meetings.length ||
+          section.meetings.some(
+            (meeting) => !meeting.days.length || !meeting.period
+          )
+      )
+      .map((section) => section.crn);
     this.props.setDesiredCourses([...desiredCourses, course.id]);
     this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
     this.props.setColorMap({ ...colorMap, [course.id]: getRandomColor() });
@@ -57,16 +63,30 @@ class CourseAdd extends SemiPureComponent {
 
     return (
       <div className={classes('CourseAdd', className)}>
-        <input type="text" ref={this.inputRef} value={keyword} onChange={this.handleChangeKeyword}
-               className="keyword"
-               placeholder="XX 0000" onKeyPress={this.handlePressEnter}/>
+        <input
+          type="text"
+          ref={this.inputRef}
+          value={keyword}
+          onChange={this.handleChangeKeyword}
+          className="keyword"
+          placeholder="Add a Course - XX 0000"
+
+          onKeyPress={this.handlePressEnter}
+        />
         <div className="autocomplete">
-          {
-            oscar.searchCourses(keyword).filter(course => !desiredCourses.includes(course.id)).map(course => (
-              <Course key={course.id} courseId={course.id} pinnedCrns={pinnedCrns}
-                      onAddCourse={() => this.handleAddCourse(course)}/>
-            ))
-          }
+          {oscar
+            .searchCourses(keyword)
+            .filter((course) => !desiredCourses.includes(course.id))
+            .map((course) => (
+              <Course
+                key={course.id}
+                courseId={course.id}
+                pinnedCrns={pinnedCrns}
+                onAddCourse={() => this.handleAddCourse(course)}
+                fromClass="autocomplete"
+
+              />
+            ))}
         </div>
       </div>
     );
