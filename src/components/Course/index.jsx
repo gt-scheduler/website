@@ -8,7 +8,7 @@ import {
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { classes, getContentClassName } from '../../utils';
+import { classes, getContentClassName, value2color } from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
 import './stylesheet.scss';
@@ -158,7 +158,7 @@ class Course extends SemiPureComponent {
       return (
         <div className="avgGpa" key={item.instructor}>
           <div className="labelAverage course">{item.instructor}:</div>
-          <div className="gpa course" style={this.value2color(item.gpa)}>
+          <div className="gpa course" style={value2color(item.gpa)}>
             {item.gpa}
           </div>
         </div>
@@ -167,37 +167,6 @@ class Course extends SemiPureComponent {
 
     return matchProfCritiques;
   }
-
-  value2color = (
-    value = this.state.critiqueData.avgGpa,
-    min = 2.5,
-    max = 4.0
-  ) => {
-    let base = max - min;
-
-    if (base === 0) {
-      value = 100;
-    } else {
-      value = ((value - min) / base) * 100;
-    }
-    let r,
-      g,
-      b = 0;
-    let textColor;
-    if (value < 50) {
-      r = 255;
-      g = Math.round(5.1 * value);
-      textColor = g > 128 ? '$color-dark-darker' : 'white';
-    } else {
-      g = 255;
-      r = Math.round(510 - 5.1 * value);
-      textColor = '$color-dark-darker';
-    }
-    return {
-      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
-      color: textColor,
-    };
-  };
 
   render() {
     const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
@@ -271,7 +240,7 @@ class Course extends SemiPureComponent {
                         <div className="labelAverage course">Average GPA:</div>
                         <div
                           className="gpa course"
-                          style={this.value2color(critiqueData.avgGpa)}
+                          style={value2color(critiqueData.avgGpa)}
                         >
                           {critiqueData.avgGpa}
                         </div>

@@ -9,7 +9,7 @@ import { faAdjust } from '@fortawesome/free-solid-svg-icons';
 import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
 import ResizePanel from 'react-resize-panel';
 import ics from '../../libs/ics';
-import { classes, getSemesterName, isMobile } from '../../utils';
+import { classes, getSemesterName, isMobile, value2color } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
@@ -122,32 +122,6 @@ class App extends SemiPureComponent {
     return null;
   }
 
-  value2color = (value = this.getAverageGpa(), min = 2.5, max = 4.0) => {
-    let base = max - min;
-
-    if (base === 0) {
-      value = 100;
-    } else {
-      value = ((value - min) / base) * 100;
-    }
-    let r,
-      g,
-      b = 0;
-    let textColor;
-    if (value < 50) {
-      r = 255;
-      g = Math.round(5.1 * value);
-      textColor = g > 128 ? '$color-dark-darker' : 'white';
-    } else {
-      g = 255;
-      r = Math.round(510 - 5.1 * value);
-      textColor = '$color-dark-darker';
-    }
-    return {
-      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
-      color: textColor,
-    };
-  };
   handleResize = (e) => {
     const { mobile } = this.props.env;
     const nextMobile = isMobile();
@@ -262,6 +236,7 @@ class App extends SemiPureComponent {
       combinations,
       sortingOptionIndex
     );
+    const avgGpa = this.getAverageGpa();
 
     return (
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
@@ -475,8 +450,8 @@ class App extends SemiPureComponent {
                     <div className="labelAverage sum">
                       Cumulative Average GPA:
                     </div>
-                    <div className="gpa sum" style={this.value2color()}>
-                      {this.getAverageGpa()}
+                    <div className="gpa sum" style={value2color(avgGpa)}>
+                      {avgGpa}
                     </div>
                   </div>
                 ) : null}
