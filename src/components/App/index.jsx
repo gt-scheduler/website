@@ -236,7 +236,7 @@ class App extends SemiPureComponent {
       combinations,
       sortingOptionIndex
     );
-    const avgGpa = this.getAverageGpa;
+    const avgGpa = this.getAverageGpa();
 
     return (
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
