@@ -8,7 +8,7 @@ import {
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { classes, getContentClassName } from '../../utils';
+import { classes, getContentClassName, value2color } from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, Instructor, Palette, SemiPureComponent } from '../';
 import './stylesheet.scss';
@@ -158,7 +158,7 @@ class Course extends SemiPureComponent {
       return (
         <div className="avgGpa" key={item.instructor}>
           <div className="labelAverage course">{item.instructor}:</div>
-          <div className="gpa course" style={this.props.colorFn(item.gpa)}>
+          <div className="gpa course" style={value2color(item.gpa)}>
             {item.gpa}
           </div>
         </div>
@@ -169,13 +169,7 @@ class Course extends SemiPureComponent {
   }
 
   render() {
-    const {
-      className,
-      courseId,
-      onAddCourse,
-      onSetOverlayCrns,
-      colorFn,
-    } = this.props;
+    const { className, courseId, onAddCourse, onSetOverlayCrns } = this.props;
     const { oscar } = this.props.db;
     const { term, pinnedCrns, colorMap } = this.props.user;
     const { expanded, paletteShown, infoExpanded, critiqueData } = this.state;
@@ -246,7 +240,7 @@ class Course extends SemiPureComponent {
                         <div className="labelAverage course">Average GPA:</div>
                         <div
                           className="gpa course"
-                          style={colorFn(critiqueData.avgGpa)}
+                          style={value2color(critiqueData.avgGpa)}
                         >
                           {critiqueData.avgGpa}
                         </div>
@@ -329,7 +323,6 @@ class Course extends SemiPureComponent {
                 sections={instructorMap[name]}
                 onSetOverlayCrns={onSetOverlayCrns}
                 instructorData={this.state.critiqueData.instructors}
-                colorFn={colorFn}
               />
             ))}
           </div>

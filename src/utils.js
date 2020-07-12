@@ -106,6 +106,31 @@ const getSemesterName = (term) => {
   return `${semester} ${year}`;
 };
 
+const value2color = (value, min = 2.5, max = 4.0) => {
+  let base = max - min;
+
+  if (base === 0) {
+    value = 100;
+  } else {
+    value = ((value - min) / base) * 100;
+  }
+  let r,
+    g,
+    b = 0;
+  let textColor = '#121212';
+  if (value < 50) {
+    r = 255;
+    g = Math.round(5.1 * value);
+  } else {
+    g = 255;
+    r = Math.round(510 - 5.1 * value);
+  }
+  return {
+    backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
+    color: textColor,
+  };
+};
+
 export {
   stringToTime,
   timeToString,
@@ -122,4 +147,5 @@ export {
   isLab,
   isLecture,
   getSemesterName,
+  value2color,
 };

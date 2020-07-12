@@ -9,7 +9,13 @@ import {
   faThumbtack,
   faTimes,
 } from '@fortawesome/free-solid-svg-icons';
-import { classes, periodToString, simplifyName, unique } from '../../utils';
+import {
+  classes,
+  periodToString,
+  simplifyName,
+  unique,
+  value2color,
+} from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, SemiPureComponent } from '../';
 import './stylesheet.scss';
@@ -87,14 +93,7 @@ class Instructor extends SemiPureComponent {
   }
 
   render() {
-    const {
-      className,
-      color,
-      name,
-      sections,
-      onSetOverlayCrns,
-      colorFn,
-    } = this.props;
+    const { className, color, name, sections, onSetOverlayCrns } = this.props;
     const { term, pinnedCrns, excludedCrns } = this.props.user;
     const { expanded, profGpa } = this.state;
 
@@ -140,7 +139,7 @@ class Instructor extends SemiPureComponent {
             ) : profGpa !== 'N/A' ? (
               <div className="avgGpa course">
                 <div className="labelAverage">Average GPA:</div>
-                <div className="gpa" style={colorFn(this.state.profGpa)}>
+                <div className="gpa" style={value2color(profGpa)}>
                   {profGpa}
                 </div>
               </div>
