@@ -322,15 +322,12 @@
   .customHandle {
     background: white;
     border: 2px solid $color-light-dark;
-    box-shadow: -6px 0 5px -1px $shadow-light;
   }
 
   .calendar-container {
-    box-shadow: inset -6px 0 5px -1px $shadow-light;
 
     .titlebar {
       background-color: $color-light-lighter;
-      box-shadow: inset -6px 0 5px -1px $shadow-light;
 
       .icon {
         color: $color-light-darker;
@@ -356,7 +353,6 @@
   }
 
   .reset {
-    box-shadow: inset -6px 0 5px -1px $shadow-light;
   }
 
   .capture-container {
@@ -366,13 +362,11 @@
   .sidebar {
     background-color: $color-light-lighter;
     border-left: 1px solid $color-light-dark;
-    box-shadow: -6px 0 5px -1px $shadow-light;
 
     .header {
       background-color: $color-light-light;
       border-bottom: 1px solid $color-light-dark;
       transition: 1s ease;
-      box-shadow: -6px 0 5px -1px $shadow-light;
 
       .secondary {
         color: $color-light-darker;
@@ -453,15 +447,12 @@
   .customHandle {
     background: $color-light-darker;
     border: 2px solid $color-dark-light;
-    box-shadow: -6px 0 5px -1px $color-dark-dark;
   }
 
   .calendar-container {
-    box-shadow: inset -6px 0 5px -1px $color-dark-dark;
 
     .titlebar {
       background-color: $color-dark-darker;
-      box-shadow: inset -6px 0 5px -1px #101010;
 
       .icon {
         color: $text-dark;
@@ -487,7 +478,6 @@
   }
 
   .reset {
-    box-shadow: inset -10px 0 8px -2px $color-dark-dark;
   }
 
   .capture-container {
@@ -497,13 +487,11 @@
   .sidebar {
     background-color: $color-dark-light;
     border-left: 1px solid $color-dark-dark;
-    box-shadow: -10px 0 8px -2px $color-dark-dark;
 
     .header {
       background-color: $color-dark-darker;
       border-bottom: 1px solid $color-dark-dark;
       transition: 1s ease;
-      box-shadow: -6px 0 5px -1px $color-dark-dark;
 
       :hover {
         color: white;
