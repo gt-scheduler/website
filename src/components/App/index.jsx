@@ -96,8 +96,9 @@ class App extends SemiPureComponent {
       let creditSum = 1;
 
       pinnedCrns.forEach((element) => {
-        let id = oscar.findSection(element).course.id;
+        let { id } = oscar.findSection(element).course;
         const { storedCritiques } = require('../../beans/fetchCourseCritique');
+        // console.log(id);
         if (id in storedCritiques) {
           let courseInstructors = storedCritiques[id].instructors;
           let oscarProfName = oscar
@@ -110,7 +111,12 @@ class App extends SemiPureComponent {
           })[0];
 
           let credits = oscar.findSection(element).credits;
-          let gpa = profValues.avgGpa === 0.0 ? 3.595 : profValues.avgGpa;
+          let gpa;
+          if (profValues) {
+            gpa = profValues.avgGpa;
+          } else {
+            gpa = 3.595;
+          }
           weightedSum += gpa * credits;
           creditSum += credits;
         }
