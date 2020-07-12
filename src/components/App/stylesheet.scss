@@ -3,17 +3,16 @@
 .App {
   position: fixed;
   display: flex;
+  flex-direction: column;
   align-items: stretch;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  transition: 1s ease;
 
   .avgGpa.sum {
     text-align: center;
-    transition: 1s ease;
 
     .labelAverage {
       font-weight: 500;
@@ -22,7 +21,6 @@
       font-size: 1em;
       height: 22px;
       line-height: 18px;
-      transition: 1s ease;
     }
 
     .gpa {
@@ -36,7 +34,6 @@
       font-weight: 500;
       display: inline-block;
       font-size: 1em;
-      transition: 0.5s ease;
     }
   }
 
@@ -49,7 +46,6 @@
     overflow: hidden;
     display: flex;
     align-items: center;
-    transition: 1s ease;
   }
 
   .collapsed {
@@ -60,57 +56,49 @@
     }
   }
 
-  .calendar-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex table;
-    justify-content: center;
-    transition: 1s ease;
+  .navigation {
+    height: 80px;
+    padding: 0 16px;
+    display: flex;
+    align-items: stretch;
 
-    .titlebar {
-      display: block;
-      height: 75px;
-      overflow: hidden;
-      transition: 1s ease;
+    .logo {
+      font-size: 1.5em;
+      font-weight: bold;
+      white-space: pre;
+      padding: 0 16px;
 
-      .icon {
-        float: right;
-        background-color: none;
-        padding-top: 10px;
-        font-size: 1.5em;
-        text-align: center;
-        transition: 1s ease;
-        padding-right: 10px;
-
-        label {
-          font-size: 0.7em;
-          font-style: italic;
-        }
+      .gt {
       }
 
-      .icon:hover {
-        transition: 0.5s ease;
-      }
+      .scheduler {
 
-      .features {
-        float: left;
-        display: block;
-        font-size: 1.25em;
-        font-weight: bold;
-        padding-top: 28px;
-        transition: 0.5s ease;
-      }
-
-      .features:hover {
-        font-weight: bolder;
-        transition: 0.5s ease;
-      }
-
-      img {
-        float: left;
-        padding-left: 10px;
       }
     }
+
+    > * {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 1.2em;
+    }
+
+    .semester {
+      margin-right: auto;
+
+      &:after {
+        right: 8px;
+        content: '▼';
+        font-size: 1em;
+      }
+    }
+  }
+
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    align-items: stretch;
   }
 
   .capture-container {
@@ -130,7 +118,6 @@
     align-items: stretch;
     max-width: 450px;
     min-width: 200px;
-    transition: 1s ease;
 
     .header {
       position: relative;
@@ -204,6 +191,7 @@
 
   .sidebar-combinations {
     min-width: 230px;
+
     .header {
       .sorting-option {
         position: relative;
@@ -232,7 +220,6 @@
         display: flex;
         height: 100px;
         align-items: stretch;
-        transition: 1s ease;
 
         .number {
           display: flex;
@@ -242,7 +229,6 @@
 
           font-size: 0.8em;
           font-weight: bold;
-          transition: 1s ease;
           color: $text-dark;
         }
 
@@ -259,7 +245,7 @@
   }
 
   .github-fork-ribbon:before {
-    background-color: $color-light-darker;
+    background-color: $color-darker;
   }
 
   &.mobile {
@@ -278,11 +264,9 @@
         align-content: center;
         font-weight: bold;
         cursor: pointer;
-        transition: 1s ease;
 
         &.active {
           border-bottom: none;
-          transition: 1s ease;
         }
 
         &:last-child {
@@ -300,270 +284,6 @@
 
     .github-fork-ribbon {
       display: none;
-    }
-  }
-}
-
-.App.light {
-  background-color: white;
-
-  .avgGpa.sum {
-    background-color: $color-light-light;
-
-    .labelAverage {
-      color: $color-light-darker;
-    }
-
-    .gpa {
-      border: 2px solid $color-dark-lighter;
-    }
-  }
-
-  .customHandle {
-    background: white;
-    border: 2px solid $color-light-dark;
-  }
-
-  .calendar-container {
-
-    .titlebar {
-      background-color: $color-light-lighter;
-
-      .icon {
-        color: $color-light-darker;
-      }
-
-      .icon:hover {
-        color: black;
-      }
-
-      .features {
-        color: $color-light-darker;
-        padding-left: 10px;
-      }
-
-      .features:hover {
-        color: black;
-      }
-
-      img {
-        height: 72px;
-      }
-    }
-  }
-
-  .reset {
-  }
-
-  .capture-container {
-    background-color: white;
-  }
-
-  .sidebar {
-    background-color: $color-light-lighter;
-    border-left: 1px solid $color-light-dark;
-
-    .header {
-      background-color: $color-light-light;
-      border-bottom: 1px solid $color-light-dark;
-      transition: 1s ease;
-
-      .secondary {
-        color: $color-light-darker;
-      }
-    }
-
-    .footer {
-      label {
-        height: 24px;
-        line-height: 24px;
-        background-color: $color-light-light;
-        color: $color-light-darker;
-        font-size: 0.9em;
-        font-weight: bold;
-        transition: 1s ease;
-
-        a:hover {
-          color: black;
-        }
-      }
-
-      > * {
-        border-top: 1px solid $color-light-dark;
-      }
-    }
-  }
-
-  .sidebar-courses {
-    .scroller {
-      > * {
-        border-bottom: 1px solid $color-light-dark;
-        transition: 1s ease;
-      }
-    }
-  }
-
-  .sidebar-combinations .scroller .combination {
-    border-bottom: 1px solid $color-light-dark;
-    .number {
-      background-color: $color-light-dark;
-      color: white;
-    }
-  }
-
-  &.mobile {
-    .tab-container {
-      .tab {
-        border-right: 1px solid $color-light-dark;
-        background-color: $color-light-lighter;
-        color: $color-light-darker;
-        border-bottom: 1px solid $color-light-dark;
-
-        &.active {
-          background-color: $color-light-light;
-          color: black;
-          border-top: 1px solid $color-light-dark;
-        }
-      }
-    }
-  }
-}
-
-.App.dark {
-  background-color: $color-dark-light;
-
-  .avgGpa.sum {
-    background-color: $color-dark-dark;
-
-    .labelAverage {
-      color: $text-dark;
-    }
-
-    .gpa {
-      border: 2px solid #202020;
-    }
-  }
-
-  .customHandle {
-    background: $color-light-darker;
-    border: 2px solid $color-dark-light;
-  }
-
-  .calendar-container {
-
-    .titlebar {
-      background-color: $color-dark-darker;
-
-      .icon {
-        color: $text-dark;
-      }
-
-      .icon:hover {
-        color: rgba(255, 255, 255, 1);
-      }
-
-      .features {
-        color: $text-dark;
-        padding-left: 12px;
-      }
-
-      .features:hover {
-        color: rgba(255, 255, 255, 1);
-      }
-
-      img {
-        height: 70px;
-      }
-    }
-  }
-
-  .reset {
-  }
-
-  .capture-container {
-    background-color: $color-dark-dark;
-  }
-
-  .sidebar {
-    background-color: $color-dark-light;
-    border-left: 1px solid $color-dark-dark;
-
-    .header {
-      background-color: $color-dark-darker;
-      border-bottom: 1px solid $color-dark-dark;
-      transition: 1s ease;
-
-      :hover {
-        color: white;
-      }
-
-      .primary {
-        select {
-          color: black;
-        }
-
-        .selected-option {
-          color: $text-dark;
-        }
-      }
-
-      .secondary {
-        color: $text-dark;
-      }
-    }
-
-    .footer {
-      label {
-        height: 24px;
-        line-height: 24px;
-        background-color: $color-dark-dark;
-        color: $text-dark;
-        font-size: 0.9em;
-        font-weight: bold;
-        transition: 1s ease;
-
-        a:hover {
-          color: white;
-        }
-      }
-
-      > * {
-        border-top: 1px solid $color-dark-dark;
-      }
-    }
-  }
-
-  .sidebar-courses {
-    .scroller {
-      > * {
-        border-bottom: 1px solid $color-dark-dark;
-      }
-    }
-  }
-
-  .sidebar-combinations .scoller .combination {
-    border-bottom: 1px solid black;
-
-    .number {
-      background-color: $color-dark-dark;
-      color: $text-dark;
-    }
-  }
-
-  &.mobile {
-    .tab-container {
-      .tab {
-        border-right: 1px solid $color-dark-darker;
-        background-color: $color-dark-light;
-        color: $text-dark;
-        border-bottom: 1px solid $color-dark-darker;
-
-        &.active {
-          background-color: $color-dark-darker;
-          color: $text-dark;
-          border-top: 1px solid $color-dark-darker;
-        }
-      }
     }
   }
 }

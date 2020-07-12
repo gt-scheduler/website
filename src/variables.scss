@@ -3,19 +3,14 @@ $calendar-width: 720px;
 $time-width: 48px;
 $day-height: 40px;
 
-$color-light-lighter: #eeeeee;
-$color-light-light: #dddddd;
-$color-light-dark: #bbbbbb;
-$color-light-darker: #666666;
+$color-lighter: #eeeeee;
+$color-light: #dddddd;
+$color-dark: #bbbbbb;
+$color-darker: #666666;
 
 $shadow-light: #aaaaaa;
 
-$color-dark-lighter: #424242;
-$color-dark-light: #303030;
-$color-dark-dark: #242424;
-$color-dark-darker: #121212;
-
-$text-color-light: $color-light-lighter;
+$text-color-light: $color-lighter;
 $text-color-dark: #333333;
 
 $text-dark: rgba(255, 255, 255, 0.7);

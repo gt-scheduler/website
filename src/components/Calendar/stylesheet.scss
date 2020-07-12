@@ -2,12 +2,9 @@
 
 .Calendar {
   flex: 1;
-  max-width: 1024px;
   position: relative;
   height: $calendar-height;
   margin: $day-height 24px 24px $time-width;
-  background-color: $color-light-lighter;
-  transition: 1s ease;
 
   &.preview {
     margin: 0;
@@ -43,7 +40,6 @@
         font-size: 0.8em;
         font-weight: bold;
         text-align: right;
-        transition: 1s ease;
       }
 
       &:after {
@@ -53,7 +49,6 @@
         right: 0;
         top: 0.5em;
         height: 1px;
-        transition: 1s ease;
       }
     }
   }
@@ -80,7 +75,6 @@
         align-items: flex-end;
         justify-content: center;
         padding-bottom: 8px;
-        transition: 1s ease;
       }
 
       &:after {
@@ -89,72 +83,14 @@
         top: $day-height;
         bottom: 0;
         width: 1px;
-        transition: 1s ease;
       }
     }
   }
 
   .meeting {
-    transition: 1s ease;
   }
 
   &.mobile {
     margin-right: 0;
-  }
-}
-
-.App.light .Calendar {
-  border-bottom: 1px solid $color-light-light;
-  border-right: 1px solid $color-light-light;
-
-  &.preview {
-  }
-
-  .times .time {
-    &:after {
-      background-color: $color-light-light;
-    }
-  }
-
-  .days .day {
-    &:after {
-      background-color: $color-light-light;
-    }
-  }
-
-  .meeting {
-  }
-}
-
-.App.dark .Calendar {
-  background-color: $color-dark-light;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-
-  &.preview {
-    background-color: $color-dark-lighter;
-  }
-
-  .times .time {
-    .label {
-      color: $text-dark;
-    }
-
-    &:after {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-  }
-
-  .days .day {
-    .label {
-      color: $text-dark;
-    }
-
-    &:after {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-  }
-
-  .meeting {
   }
 }

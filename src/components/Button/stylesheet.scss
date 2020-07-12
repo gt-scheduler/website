@@ -9,28 +9,9 @@
   cursor: pointer;
   border: none;
   outline: none;
-  transition: 1s ease;
 
   &:disabled {
     cursor: default;
-    color: $color-light-dark;
-  }
-}
-
-.App.light .Button {
-  background-color: $color-light-light;
-  color: $color-light-darker;
-
-  &:hover {
-    color: black;
-  }
-}
-
-.App.dark .Button {
-  background-color: $color-dark-dark;
-  color: $text-dark;
-
-  &:hover {
-    color: white;
+    color: $color-dark;
   }
 }

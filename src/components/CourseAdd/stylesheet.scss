@@ -1,7 +1,6 @@
 .CourseAdd {
   display: flex;
   flex-direction: column;
-  transition: 1s ease;
 
   .keyword {
     padding: 8px;
@@ -12,12 +11,6 @@
   .autocomplete {
     display: flex;
     flex-direction: column;
-    color: rgba(255, 255, 255, 0.8);
-  }
-}
-
-.App.dark .CourseAdd {
-  input[type='text'] {
     color: rgba(255, 255, 255, 0.8);
   }
 }

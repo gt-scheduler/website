@@ -4,8 +4,6 @@ import axios from 'axios';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
 import memoizeOne from 'memoize-one';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdjust } from '@fortawesome/free-solid-svg-icons';
 import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
 import ResizePanel from 'react-resize-panel';
 import ics from '../../libs/ics';
@@ -17,8 +15,6 @@ import { Oscar } from '../../beans';
 import 'github-fork-ribbon-css/gh-fork-ribbon.css';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import logoLight from './logo-light.png';
-import logoDark from './logo-dark.png';
 
 class App extends SemiPureComponent {
   constructor(props) {
@@ -30,7 +26,7 @@ class App extends SemiPureComponent {
       tabIndex: 0,
       configCollapsed: false,
       courseListCollapsed: false,
-      selectedStyle: 'dark',
+      selectedStyle: 'light',
     };
 
     this.captureRef = React.createRef();
@@ -70,10 +66,10 @@ class App extends SemiPureComponent {
       .then((res) => {
         const oscar = new Oscar(res.data);
         this.memoizedGetCombinations = memoizeOne(
-          oscar.getCombinations.bind(oscar)
+          oscar.getCombinations.bind(oscar),
         );
         this.memoizedSortCombinations = memoizeOne(
-          oscar.sortCombinations.bind(oscar)
+          oscar.sortCombinations.bind(oscar),
         );
         this.props.setOscar(oscar);
       });
@@ -175,14 +171,14 @@ class App extends SemiPureComponent {
         const begin = new Date(from);
         while (
           !meeting.days.includes(
-            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()]
+            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()],
           )
-        ) {
+          ) {
           begin.setDate(begin.getDate() + 1);
         }
         begin.setHours(
           (meeting.period.start / 60) | 0,
-          meeting.period.start % 60
+          meeting.period.start % 60,
         );
         const end = new Date(begin);
         end.setHours((meeting.period.end / 60) | 0, meeting.period.end % 60);
@@ -190,7 +186,7 @@ class App extends SemiPureComponent {
           freq: 'WEEKLY',
           until: to,
           byday: meeting.days.map(
-            (day) => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])
+            (day) => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day]),
           ),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
@@ -256,203 +252,158 @@ class App extends SemiPureComponent {
     const combinations = this.memoizedGetCombinations(
       desiredCourses,
       pinnedCrns,
-      excludedCrns
+      excludedCrns,
     );
     const sortedCombinations = this.memoizedSortCombinations(
       combinations,
-      sortingOptionIndex
+      sortingOptionIndex,
     );
 
     return (
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
-        {(!mobile || tabIndex === 2) && (
-          <div className="calendar-container">
-            {!mobile && (
-              <div className="titlebar">
-                <img
-                  src={selectedStyle === 'light' ? logoLight : logoDark}
-                  alt="GT Scheduler Logo"
-                />
-                <a
-                  className="features"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://github.com/64json/gt-scheduler#georgia-tech-scheduler"
-                >
-                  About
-                </a>
-                <a
-                  className="features"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://github.com/64json/gt-scheduler#georgia-tech-scheduler"
-                >
-                  What's New
-                </a>
-                <span className="icon" onClick={this.handleThemeChange}>
-                  <FontAwesomeIcon fixedWidth icon={faAdjust} />
-                  <br />
-                  <label>
-                    {selectedStyle === 'light' ? 'Dark' : 'Light'} Theme
-                  </label>
-                </span>
-              </div>
-            )}
-
-            <Calendar overlayCrns={overlayCrns} />
+        <div className="navigation">
+          <div className="logo">
+            <span className="gt">GT </span>
+            <span className="scheduler">Scheduler</span>
           </div>
-        )}
-        <div className="capture-container" ref={this.captureRef}>
-          <Calendar className="fake-calendar" capture />
+          <label className="semester">
+            <select
+              onChange={(e) => this.handleChangeSemester(e.target.value)}
+              value={term}
+              className="selected-option">
+              {terms.map((term) => (
+                <option key={term} value={term}>
+                  {getSemesterName(term)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <a
+            className="link"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/64json/gt-scheduler#georgia-tech-scheduler">
+            What's New
+          </a>
+          <Button
+            onClick={this.handleDownload}
+            disabled={pinnedCrns.length === 0}>
+            Download as PNG
+          </Button>
+          <Button
+            onClick={this.handleExport}
+            disabled={pinnedCrns.length === 0}>
+            Export Calendar
+          </Button>
+          <span className="link" onClick={this.handleThemeChange}>
+            {selectedStyle === 'light' ? 'Dark' : 'Light'} Theme
+          </span>
+          <span className="secondary">
+            {this.getTotalCredits()} Credits
+          </span>
         </div>
-        {(!mobile || tabIndex === 1) &&
-          (this.state.configCollapsed ? (
-            <Button
-              className="reset collapsed"
-              onClick={() =>
-                this.setState({
-                  configCollapsed: !this.state.configCollapsed,
-                })
-              }
-            >
-              <label>Expand </label>
-            </Button>
-          ) : (
-            <ConditionalWrapper
-              condition={!mobile}
-              wrapper={(children) => (
-                <ResizePanel
-                  direction="w"
-                  style={{
-                    flexGrow: '1',
-                    width: 'auto',
-                    minWidth: '230px',
-                    maxWidth: '450px',
-                  }}
-                  handleClass="customHandle"
-                >
-                  {children}
-                </ResizePanel>
-              )}
-            >
-              <div className="sidebar sidebar-combinations">
-                <div className="header">
+        <div className="main">
+          <Calendar overlayCrns={overlayCrns}/>
+          <ResizePanel
+            direction="w"
+            style={{
+              flexGrow: '1',
+              width: 'auto',
+              minWidth: '230px',
+              maxWidth: '450px',
+            }}
+            handleClass="customHandle">
+            <div className="sidebar sidebar-combinations">
+              <div className="header">
                   <span className="secondary">
                     {combinations.length}{' '}
                     {combinations.length === 1 ? 'Combo' : 'Combos'}
                   </span>
-                  <Button className="primary">
-                    <select
-                      onChange={this.handleChangeSortingOptionIndex}
-                      value={sortingOptionIndex}
-                      className="selected-option"
-                    >
-                      {oscar.sortingOptions.map((sortingOption, i) => (
-                        <option key={i} value={i}>
-                          {sortingOption.label}
-                        </option>
-                      ))}
-                    </select>
-                  </Button>
-                </div>
-                <div className="scroller">
-                  <AutoSizer>
-                    {({ width, height }) => (
-                      <List
-                        width={width}
-                        height={height}
-                        rowCount={sortedCombinations.length}
-                        rowHeight={100}
-                        rowRenderer={({ index, key, style }) => {
-                          const { crns } = sortedCombinations[index];
-                          return (
-                            <div
-                              className="combination"
-                              key={key}
-                              style={style}
-                              onMouseEnter={() =>
-                                this.handleSetOverlayCrns(crns)
-                              }
-                              onMouseLeave={() => this.handleSetOverlayCrns([])}
-                              onClick={() =>
-                                this.handleSetPinnedCrns([
-                                  ...pinnedCrns,
-                                  ...crns,
-                                ])
-                              }
-                            >
-                              <div className="number">{index + 1}</div>
-                              <Calendar
-                                className="calendar-preview"
-                                overlayCrns={crns}
-                                preview
-                              />
-                            </div>
-                          );
-                        }}
-                      />
-                    )}
-                  </AutoSizer>
-                </div>
-                <div className="footer">
-                  <Button
-                    className="reset"
-                    onClick={this.handleResetPinnedCrns}
-                    disabled={pinnedCrns.length === 0}
-                  >
-                    Reset Sections
-                  </Button>
-                  <Button
-                    className="reset"
-                    onClick={() =>
-                      this.setState({
-                        configCollapsed: !this.state.configCollapsed,
-                      })
-                    }
-                  >
-                    Collapse Column
-                  </Button>
-                </div>
-              </div>
-            </ConditionalWrapper>
-          ))}
-        {(!mobile || tabIndex === 0) && (
-          <ConditionalWrapper
-            condition={!mobile}
-            wrapper={(children) => (
-              <ResizePanel
-                direction="w"
-                style={{
-                  flexGrow: '1',
-                  width: 'auto',
-                  minWidth: '275px',
-                  maxWidth: '450px',
-                }}
-                handleClass="customHandle"
-              >
-                {children}
-              </ResizePanel>
-            )}
-          >
-            <div className="sidebar sidebar-courses">
-              <div className="header">
-                <span className="secondary">
-                  {this.getTotalCredits()} Credits
-                </span>
                 <Button className="primary">
                   <select
-                    onChange={(e) => this.handleChangeSemester(e.target.value)}
-                    value={term}
+                    onChange={this.handleChangeSortingOptionIndex}
+                    value={sortingOptionIndex}
                     className="selected-option"
                   >
-                    {terms.map((term) => (
-                      <option key={term} value={term}>
-                        {getSemesterName(term)}
+                    {oscar.sortingOptions.map((sortingOption, i) => (
+                      <option key={i} value={i}>
+                        {sortingOption.label}
                       </option>
                     ))}
                   </select>
                 </Button>
               </div>
+              <div className="scroller">
+                <AutoSizer>
+                  {({ width, height }) => (
+                    <List
+                      width={width}
+                      height={height}
+                      rowCount={sortedCombinations.length}
+                      rowHeight={100}
+                      rowRenderer={({ index, key, style }) => {
+                        const { crns } = sortedCombinations[index];
+                        return (
+                          <div
+                            className="combination"
+                            key={key}
+                            style={style}
+                            onMouseEnter={() =>
+                              this.handleSetOverlayCrns(crns)
+                            }
+                            onMouseLeave={() => this.handleSetOverlayCrns([])}
+                            onClick={() =>
+                              this.handleSetPinnedCrns([
+                                ...pinnedCrns,
+                                ...crns,
+                              ])
+                            }
+                          >
+                            <div className="number">{index + 1}</div>
+                            <Calendar
+                              className="calendar-preview"
+                              overlayCrns={crns}
+                              preview
+                            />
+                          </div>
+                        );
+                      }}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
+              <div className="footer">
+                <Button
+                  className="reset"
+                  onClick={this.handleResetPinnedCrns}
+                  disabled={pinnedCrns.length === 0}
+                >
+                  Reset Sections
+                </Button>
+                <Button
+                  className="reset"
+                  onClick={() =>
+                    this.setState({
+                      configCollapsed: !this.state.configCollapsed,
+                    })
+                  }
+                >
+                  Collapse Column
+                </Button>
+              </div>
+            </div>
+          </ResizePanel>
+
+          <ResizePanel
+            direction="w"
+            style={{
+              flexGrow: '1',
+              width: 'auto',
+              minWidth: '275px',
+              maxWidth: '450px',
+            }}
+            handleClass="customHandle">
+            <div className="sidebar sidebar-courses">
               <div className="scroller">
                 <div className="course-list">
                   {desiredCourses.map((courseId) => {
@@ -467,7 +418,7 @@ class App extends SemiPureComponent {
                     );
                   })}
                 </div>
-                <CourseAdd />
+                <CourseAdd/>
               </div>
               <div className="footer">
                 {this.getAverageGpa() ? (
@@ -483,44 +434,32 @@ class App extends SemiPureComponent {
 
                 <Button
                   text={pinnedCrns.join(', ')}
-                  disabled={pinnedCrns.length === 0}
-                >
+                  disabled={pinnedCrns.length === 0}>
                   <span>Copy CRNs</span>
-                </Button>
-                <Button
-                  onClick={this.handleDownload}
-                  disabled={pinnedCrns.length === 0}
-                >
-                  Download as PNG
-                </Button>
-                <Button
-                  onClick={this.handleExport}
-                  disabled={pinnedCrns.length === 0}
-                >
-                  Export Calendar
                 </Button>
                 <label>
                   Developed by{' '}
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="http://jasonpark.me"
-                  >
+                    href="http://jasonpark.me">
                     Jinseo Park
                   </a>{' '}
                   and{' '}
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="mailto:abhiram.tirumala@gatech.edu"
-                  >
+                    href="mailto:abhiram.tirumala@gatech.edu">
                     Abhiram Tirumala
                   </a>
                 </label>
               </div>
             </div>
-          </ConditionalWrapper>
-        )}
+          </ResizePanel>
+        </div>
+        <div className="capture-container" ref={this.captureRef}>
+          <Calendar className="fake-calendar" capture/>
+        </div>
         {mobile && (
           <div className="tab-container">
             {['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
@@ -549,10 +488,7 @@ class App extends SemiPureComponent {
   }
 }
 
-const ConditionalWrapper = ({ condition, wrapper, children }) =>
-  condition ? wrapper(children) : children;
-
 export default connect(
   ({ env, db, user }) => ({ env, db, user }),
-  actions
+  actions,
 )(App);

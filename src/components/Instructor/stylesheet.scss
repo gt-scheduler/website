@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   margin-left: 8px;
-  transition: 1s ease;
 
   .avgGpa.course {
     padding-top: 5px;
@@ -31,7 +30,6 @@
       border: 2px solid #202020;
       display: inline-block;
       font-size: 0.813em;
-      transition: 1s ease;
     }
   }
 

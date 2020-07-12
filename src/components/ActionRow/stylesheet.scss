@@ -2,7 +2,6 @@
 
 .ActionRow {
   position: relative;
-  transition: 1s ease;
 
   .actions {
     position: absolute;
@@ -38,7 +37,7 @@
         justify-content: center;
         font-size: 0.8em;
         padding: 8px;
-        background-color: $color-light-dark;
+        background-color: $color-dark;
 
         svg {
           opacity: $opacity-inactive;
