@@ -93,7 +93,7 @@ class App extends SemiPureComponent {
       const { oscar } = this.props.db;
       const { pinnedCrns } = this.props.user;
       let weightedSum = 0;
-      let creditSum = 1;
+      let creditSum = 0;
 
       pinnedCrns.forEach((element) => {
         let { id } = oscar.findSection(element).course;
@@ -118,9 +118,9 @@ class App extends SemiPureComponent {
           }
         }
       });
-      return Number.isNaN(weightedSum / (creditSum - 1))
+      return Number.isNaN(weightedSum / creditSum)
         ? null
-        : Math.round((weightedSum / (creditSum - 1)) * 100) / 100;
+        : Math.round((weightedSum / creditSum) * 100) / 100;
     }
     return null;
   }
