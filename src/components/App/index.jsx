@@ -98,7 +98,6 @@ class App extends SemiPureComponent {
       pinnedCrns.forEach((element) => {
         let { id } = oscar.findSection(element).course;
         const { storedCritiques } = require('../../beans/fetchCourseCritique');
-        // console.log(id);
         if (id in storedCritiques) {
           let courseInstructors = storedCritiques[id].instructors;
           let oscarProfName = oscar
@@ -114,11 +113,9 @@ class App extends SemiPureComponent {
           let gpa;
           if (profValues) {
             gpa = profValues.avgGpa;
-          } else {
-            gpa = 3.595;
+            weightedSum += gpa * credits;
+            creditSum += credits;
           }
-          weightedSum += gpa * credits;
-          creditSum += credits;
         }
       });
       return Number.isNaN(weightedSum / (creditSum - 1))
