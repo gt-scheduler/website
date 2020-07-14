@@ -92,10 +92,10 @@ class App extends SemiPureComponent {
       const { oscar } = this.props.db;
       const { pinnedCrns } = this.props.user;
       let weightedSum = 0;
-      let creditSum = 1;
+      let creditSum = 0;
 
       pinnedCrns.forEach((element) => {
-        let id = oscar.findSection(element).course.id;
+        let { id } = oscar.findSection(element).course;
         const { storedCritiques } = require('../../beans/fetchCourseCritique');
         if (id in storedCritiques) {
           let courseInstructors = storedCritiques[id].instructors;
@@ -109,14 +109,17 @@ class App extends SemiPureComponent {
           })[0];
 
           let credits = oscar.findSection(element).credits;
-          let gpa = profValues.avgGpa === 0.0 ? 3.595 : profValues.avgGpa;
-          weightedSum += gpa * credits;
-          creditSum += credits;
+          let gpa;
+          if (profValues) {
+            gpa = profValues.avgGpa;
+            weightedSum += gpa * credits;
+            creditSum += credits;
+          }
         }
       });
-      return Number.isNaN(weightedSum / (creditSum - 1))
+      return Number.isNaN(weightedSum / creditSum)
         ? null
-        : Math.round((weightedSum / (creditSum - 1)) * 100) / 100;
+        : Math.round((weightedSum / creditSum) * 100) / 100;
     }
     return null;
   }
