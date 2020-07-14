@@ -1,9 +1,9 @@
 @import "../../variables";
 
 .Course {
+  @include card;
   display: flex;
   flex-direction: column;
-  background-color: $color-border;
 
   .course-header {
     position: relative;

@@ -5,9 +5,8 @@ import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
 import memoizeOne from 'memoize-one';
 import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
-import ResizePanel from 'react-resize-panel';
 import ics from '../../libs/ics';
-import { classes, getSemesterName, isMobile, value2color } from '../../utils';
+import { classes, getSemesterName, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
@@ -205,15 +204,14 @@ class App extends SemiPureComponent {
     return (
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
         <div className="navigation">
-          <div className="logo">
+          <Button className="logo">
             <span className="gt">GT </span>
             <span className="scheduler">Scheduler</span>
-          </div>
+          </Button>
           <label className="semester">
-            <select
-              onChange={(e) => this.handleChangeSemester(e.target.value)}
-              value={term}
-              className="selected-option">
+            <select onChange={(e) => this.handleChangeSemester(e.target.value)}
+                    value={term}
+                    className="selected-option">
               {terms.map((term) => (
                 <option key={term} value={term}>
                   {getSemesterName(term)}
@@ -256,105 +254,88 @@ class App extends SemiPureComponent {
           </div>
         </div>
         <div className="main">
-          <ResizePanel
-            direction="e"
-            style={{
-              minWidth: '280px',
-            }}
-            handleClass="resize-handle">
-            <div className="sidebar sidebar-courses">
-              <div className="scroller">
-                <div className="course-list">
-                  {desiredCourses.map((courseId) => {
+          <div className="sidebar sidebar-courses">
+            <div className="scroller">
+              <div className="course-list">
+                {
+                  desiredCourses.map((courseId) => {
                     return (
                       <Course
                         courseId={courseId}
                         expandable
                         key={courseId}
                         onSetOverlayCrns={this.handleSetOverlayCrns}
-                        fromClass="course-list"
                       />
                     );
-                  })}
-                </div>
-                <CourseAdd/>
+                  })
+                }
               </div>
+              <CourseAdd className="course-add"/>
             </div>
-          </ResizePanel>
+          </div>
 
-          <ResizePanel
-            direction="e"
-            style={{
-              minWidth: '280px',
-            }}
-            handleClass="resize-handle">
-            <div className="sidebar sidebar-combinations">
-              <div className="header">
-                  <span className="secondary">
-                    {combinations.length}{' '}
-                    {combinations.length === 1 ? 'Combo' : 'Combos'}
-                  </span>
-                <Button className="primary">
-                  <select
-                    onChange={this.handleChangeSortingOptionIndex}
-                    value={sortingOptionIndex}
-                    className="selected-option"
-                  >
-                    {oscar.sortingOptions.map((sortingOption, i) => (
-                      <option key={i} value={i}>
-                        {sortingOption.label}
-                      </option>
-                    ))}
-                  </select>
-                </Button>
-              </div>
-              <Button
-                className="reset"
-                onClick={this.handleResetPinnedCrns}
-                disabled={pinnedCrns.length === 0}>
-                Reset Sections
+          <div className="sidebar sidebar-combinations">
+            <div className="header">
+              <span className="secondary">
+                {combinations.length}{' '}
+                {combinations.length === 1 ? 'Combo' : 'Combos'}
+              </span>
+              <Button className="primary">
+                <select
+                  onChange={this.handleChangeSortingOptionIndex}
+                  value={sortingOptionIndex}
+                  className="selected-option">
+                  {oscar.sortingOptions.map((sortingOption, i) => (
+                    <option key={i} value={i}>
+                      {sortingOption.label}
+                    </option>
+                  ))}
+                </select>
               </Button>
-              <div className="scroller">
-                <AutoSizer>
-                  {({ width, height }) => (
-                    <List
-                      width={width}
-                      height={height}
-                      rowCount={sortedCombinations.length}
-                      rowHeight={100}
-                      rowRenderer={({ index, key, style }) => {
-                        const { crns } = sortedCombinations[index];
-                        return (
-                          <div
-                            className="combination"
-                            key={key}
-                            style={style}
-                            onMouseEnter={() =>
-                              this.handleSetOverlayCrns(crns)
-                            }
-                            onMouseLeave={() => this.handleSetOverlayCrns([])}
-                            onClick={() =>
-                              this.handleSetPinnedCrns([
-                                ...pinnedCrns,
-                                ...crns,
-                              ])
-                            }
-                          >
-                            <div className="number">{index + 1}</div>
-                            <Calendar
-                              className="calendar-preview"
-                              overlayCrns={crns}
-                              preview
-                            />
-                          </div>
-                        );
-                      }}
-                    />
-                  )}
-                </AutoSizer>
-              </div>
             </div>
-          </ResizePanel>
+            <Button
+              className="reset"
+              onClick={this.handleResetPinnedCrns}
+              disabled={pinnedCrns.length === 0}>
+              Reset Sections
+            </Button>
+            <div className="scroller">
+              <AutoSizer>
+                {({ width, height }) => (
+                  <List
+                    width={width}
+                    height={height}
+                    rowCount={sortedCombinations.length}
+                    rowHeight={108}
+                    rowRenderer={({ index, key, style }) => {
+                      const { crns } = sortedCombinations[index];
+                      return (
+                        <div className="list-item" style={style}>
+                          <div className="combination"
+                               key={key}
+                               onMouseEnter={() =>
+                                 this.handleSetOverlayCrns(crns)
+                               }
+                               onMouseLeave={() => this.handleSetOverlayCrns([])}
+                               onClick={() =>
+                                 this.handleSetPinnedCrns([
+                                   ...pinnedCrns,
+                                   ...crns,
+                                 ])
+                               }>
+                            <div className="number">{index + 1}</div>
+                            <Calendar className="calendar-preview"
+                                      overlayCrns={crns}
+                                      preview/>
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
+                )}
+              </AutoSizer>
+            </div>
+          </div>
 
           <Calendar overlayCrns={overlayCrns}/>
         </div>

@@ -43,8 +43,8 @@ class CourseAdd extends SemiPureComponent {
         (section) =>
           !section.meetings.length ||
           section.meetings.some(
-            (meeting) => !meeting.days.length || !meeting.period
-          )
+            (meeting) => !meeting.days.length || !meeting.period,
+          ),
       )
       .map((section) => section.crn);
     this.props.setDesiredCourses([...desiredCourses, course.id]);
@@ -83,8 +83,6 @@ class CourseAdd extends SemiPureComponent {
                 courseId={course.id}
                 pinnedCrns={pinnedCrns}
                 onAddCourse={() => this.handleAddCourse(course)}
-                fromClass="autocomplete"
-
               />
             ))}
         </div>

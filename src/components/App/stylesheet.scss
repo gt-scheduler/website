@@ -11,17 +11,6 @@
   height: 100%;
   overflow: hidden;
 
-  .resize-handle {
-  }
-
-  .collapsed {
-    label {
-      overflow: visible;
-      display: inline-block;
-      transform: rotate(-90deg);
-    }
-  }
-
   .navigation {
     height: 64px;
     padding: 0 16px;
@@ -51,7 +40,11 @@
     }
 
     .semester {
+      display: flex;
+      align-items: stretch;
+
       &:after {
+        align-self: center;
         margin-left: 8px;
         content: '▼';
       }
@@ -89,11 +82,12 @@
   }
 
   .sidebar {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     border-right: 1px solid $color-border;
+    width: 264px;
+    padding: 4px;
 
     .header {
       position: relative;
@@ -150,8 +144,6 @@
   }
 
   .sidebar-courses {
-    min-width: 256px;
-
     .scroller {
       flex-shrink: 0;
       display: flex;
@@ -162,12 +154,14 @@
         display: flex;
         flex-direction: column;
       }
+
+      .course-add {
+        margin: 4px;
+      }
     }
   }
 
   .sidebar-combinations {
-    min-width: 230px;
-
     .header {
       .sorting-option {
         position: relative;
@@ -192,24 +186,31 @@
     .scroller {
       margin-bottom: -1px;
 
-      .combination {
+      .list-item {
         display: flex;
-        height: 100px;
         align-items: stretch;
+        height: 108px;
 
-        .number {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 2.4em;
-
-          font-size: 0.8em;
-          font-weight: bold;
-        }
-
-        .calendar-preview {
+        .combination {
+          @include card;
           flex: 1;
-          cursor: pointer;
+          display: flex;
+          align-items: stretch;
+
+          .number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+
+            font-size: 0.8em;
+            font-weight: bold;
+          }
+
+          .calendar-preview {
+            flex: 1;
+            cursor: pointer;
+          }
         }
       }
     }
