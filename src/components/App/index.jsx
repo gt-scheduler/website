@@ -310,9 +310,8 @@ class App extends SemiPureComponent {
                     rowRenderer={({ index, key, style }) => {
                       const { crns } = sortedCombinations[index];
                       return (
-                        <div className="list-item" style={style}>
+                        <div className="list-item" style={style} key={key}>
                           <div className="combination"
-                               key={key}
                                onMouseEnter={() =>
                                  this.handleSetOverlayCrns(crns)
                                }
@@ -336,8 +335,9 @@ class App extends SemiPureComponent {
               </AutoSizer>
             </div>
           </div>
-
-          <Calendar overlayCrns={overlayCrns}/>
+          <div className="calendar-container">
+            <Calendar className="calendar" overlayCrns={overlayCrns}/>
+          </div>
         </div>
         <div className="capture-container" ref={this.captureRef}>
           <Calendar className="fake-calendar" capture/>

@@ -65,10 +65,147 @@
   }
 
   .main {
+    overflow: hidden;
     flex: 1;
-    overflow-y: auto;
     display: flex;
     align-items: stretch;
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      border-right: 1px solid $color-border;
+      width: 264px;
+      padding: 4px;
+
+      .header {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .primary {
+          position: relative;
+          flex: 1;
+          display: flex;
+          align-items: center;
+          padding: 0;
+          background: none;
+
+          select {
+            align-self: stretch;
+            flex: 1;
+            padding: 8px 24px 8px 8px;
+            font-size: 1.2em;
+          }
+
+          &:after {
+            position: absolute;
+            right: 8px;
+            content: '▼';
+            font-size: 1em;
+          }
+        }
+
+        .secondary {
+          position: absolute;
+          right: 24px;
+          font-size: 0.8em;
+        }
+      }
+
+      .scroller {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    .sidebar-courses {
+      .scroller {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        .course-list {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .course-add {
+          margin: 4px;
+        }
+      }
+    }
+
+    .sidebar-combinations {
+      .header {
+        .sorting-option {
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding: 0;
+
+          select {
+            align-self: stretch;
+            flex: 1;
+            padding: 8px 32px 8px 8px;
+          }
+
+          &:after {
+            position: absolute;
+            right: 8px;
+            content: '▼';
+          }
+        }
+      }
+
+      .scroller {
+        margin-bottom: -1px;
+
+        .list-item {
+          display: flex;
+          align-items: stretch;
+          height: 108px;
+
+          .combination {
+            @include card;
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+
+            .number {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 36px;
+
+              font-size: 0.8em;
+              font-weight: bold;
+            }
+
+            .calendar-preview {
+              flex: 1;
+              cursor: pointer;
+            }
+          }
+        }
+      }
+    }
+
+    .calendar-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow-y: auto;
+
+      .calendar {
+        min-height: $calendar-height;
+      }
+    }
   }
 
   .capture-container {
@@ -78,145 +215,6 @@
 
     .fake-calendar {
       width: $calendar-width;
-    }
-  }
-
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    border-right: 1px solid $color-border;
-    width: 264px;
-    padding: 4px;
-
-    .header {
-      position: relative;
-      display: flex;
-      align-items: center;
-
-      .primary {
-        position: relative;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding: 0;
-        background: none;
-
-        select {
-          align-self: stretch;
-          flex: 1;
-          padding: 8px 24px 8px 8px;
-          font-size: 1.2em;
-        }
-
-        &:after {
-          position: absolute;
-          right: 8px;
-          content: '▼';
-          font-size: 1em;
-        }
-      }
-
-      .secondary {
-        position: absolute;
-        right: 24px;
-        font-size: 0.8em;
-      }
-    }
-
-    .scroller {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .footer {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-
-      label {
-        text-align: center;
-      }
-    }
-  }
-
-  .sidebar-courses {
-    .scroller {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-
-      .course-list {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .course-add {
-        margin: 4px;
-      }
-    }
-  }
-
-  .sidebar-combinations {
-    .header {
-      .sorting-option {
-        position: relative;
-        display: flex;
-        align-items: center;
-        padding: 0;
-
-        select {
-          align-self: stretch;
-          flex: 1;
-          padding: 8px 32px 8px 8px;
-        }
-
-        &:after {
-          position: absolute;
-          right: 8px;
-          content: '▼';
-        }
-      }
-    }
-
-    .scroller {
-      margin-bottom: -1px;
-
-      .list-item {
-        display: flex;
-        align-items: stretch;
-        height: 108px;
-
-        .combination {
-          @include card;
-          flex: 1;
-          display: flex;
-          align-items: stretch;
-
-          .number {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-
-            font-size: 0.8em;
-            font-weight: bold;
-          }
-
-          .calendar-preview {
-            flex: 1;
-            cursor: pointer;
-          }
-        }
-      }
-    }
-
-    .footer {
-      position: relative;
     }
   }
 
