@@ -1,8 +1,9 @@
-@import '../../variables';
+@import "../../variables";
 
 .Course {
   display: flex;
   flex-direction: column;
+  background-color: $color-border;
 
   .course-header {
     position: relative;
@@ -37,7 +38,7 @@
     .row {
       .course_title {
         flex: 1;
-        font-size: 0.8em;
+        font-size: .8em;
         margin-right: 8px;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -45,7 +46,7 @@
       }
 
       .section_crns {
-        font-size: 0.8em;
+        font-size: .8em;
         white-space: nowrap;
       }
     }
@@ -63,55 +64,5 @@
   .course-body {
     display: flex;
     flex-direction: column;
-  }
-
-  .course-info {
-    text-align: center;
-    border-radius: 3px;
-    background-color: #202020;
-
-    .labelAverage {
-      font-weight: bold;
-      display: inline-block;
-      font-size: 1.25em;
-      height: 35px;
-      line-height: 28px;
-      color: white;
-    }
-
-    .gpa {
-      width: 50px;
-      height: 30px;
-      margin-left: 8px;
-      line-height: 28px;
-      text-align: center;
-      color: white;
-      font-weight: 500;
-      border: 2px solid #202020;
-      display: inline-block;
-      font-size: 1.125em;
-    }
-  }
-
-  .labelAverage {
-    font-weight: 500;
-    font-style: italic;
-    display: inline-block;
-    font-size: 0.813em;
-    height: 22px;
-    line-height: 0.813em;
-  }
-
-  .gpa {
-    width: 40px;
-    height: 22px;
-    margin-left: 8px;
-    line-height: 19px;
-    text-align: center;
-    color: white;
-    font-weight: 500;
-    border: 2px solid #202020;
-    display: inline-block;
-    font-size: 0.813em;
   }
 }

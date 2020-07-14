@@ -46,3 +46,59 @@ select {
   color: inherit;
   cursor: inherit;
 }
+
+@mixin content($content-color) {
+  &.default,
+  .default {
+    color: $content-color;
+  }
+
+  &.disabled,
+  .disabled {
+    color: rgba($content-color, $opacity-disabled);
+  }
+
+  &.inactive,
+  .inactive {
+    color: rgba($content-color, $opacity-inactive);
+  }
+
+  &.strikethrough,
+  .strikethrough {
+    &:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: rgba($content-color, $opacity-disabled);
+    }
+  }
+
+  &.divider-bottom,
+  .divider-bottom {
+    border-bottom: 1px solid rgba($content-color, $opacity-divider);
+  }
+
+  &.frame,
+  .frame {
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border: 2px solid $content-color;
+    }
+  }
+}
+
+.light-content {
+  @include content($text-color-light);
+}
+
+.dark-content {
+  @include content($text-color-dark);
+}
+

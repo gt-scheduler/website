@@ -87,43 +87,6 @@ class App extends SemiPureComponent {
     }, 0);
   }
 
-  getAverageGpa() {
-    if (this.props.user.pinnedCrns.length > 0) {
-      const { oscar } = this.props.db;
-      const { pinnedCrns } = this.props.user;
-      let weightedSum = 0;
-      let creditSum = 0;
-
-      pinnedCrns.forEach((element) => {
-        let { id } = oscar.findSection(element).course;
-        const { storedCritiques } = require('../../beans/fetchCourseCritique');
-        if (id in storedCritiques) {
-          let courseInstructors = storedCritiques[id].instructors;
-          let oscarProfName = oscar
-            .findSection(element)
-            .instructors[0].split(' ');
-          oscarProfName = oscarProfName[oscarProfName.length - 1].toLowerCase();
-          let profValues = courseInstructors.filter((item) => {
-            let lastName = item.profName.split(',')[0].toLowerCase();
-            return lastName === oscarProfName;
-          })[0];
-
-          let credits = oscar.findSection(element).credits;
-          let gpa;
-          if (profValues) {
-            gpa = profValues.avgGpa;
-            weightedSum += gpa * credits;
-            creditSum += credits;
-          }
-        }
-      });
-      return Number.isNaN(weightedSum / creditSum)
-        ? null
-        : Math.round((weightedSum / creditSum) * 100) / 100;
-    }
-    return null;
-  }
-
   handleResize = (e) => {
     const { mobile } = this.props.env;
     const nextMobile = isMobile();
@@ -238,7 +201,6 @@ class App extends SemiPureComponent {
       combinations,
       sortingOptionIndex,
     );
-    const avgGpa = this.getAverageGpa();
 
     return (
       <div className={classes('App', mobile && 'mobile', selectedStyle)}>
@@ -262,16 +224,6 @@ class App extends SemiPureComponent {
           <span className="credits">
             {this.getTotalCredits()} Credits
           </span>
-          {this.getAverageGpa() ? (
-            <div className="gpa-wrapper">
-              <div className="label">
-                Average GPA:&nbsp;
-              </div>
-              <div className="gpa" style={value2color(avgGpa)}>
-                {avgGpa}
-              </div>
-            </div>
-          ) : null}
           <div className="menu">
             <Button
               onClick={this.handleDownload}

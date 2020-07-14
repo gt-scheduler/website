@@ -1,24 +1,9 @@
-@import '../../variables';
+@import "../../variables";
 
 .Instructor {
   display: flex;
   flex-direction: column;
   margin-left: 8px;
-
-  .avgGpa.course {
-    padding-top: 5px;
-    padding-bottom: 3px;
-    padding-left: 5px;
-
-    .labelAverage {
-      font-weight: 500;
-      font-style: italic;
-      display: inline-block;
-      font-size: 0.813em;
-      height: 22px;
-      line-height: 18px;
-    }
-  }
 
   .name {
     display: flex;
@@ -64,12 +49,12 @@
           justify-content: flex-end;
 
           .days {
-            font-size: 0.8em;
+            font-size: .8em;
             margin-right: 8px;
           }
 
           .period {
-            font-size: 0.8em;
+            font-size: .8em;
             min-width: 8em;
           }
         }
