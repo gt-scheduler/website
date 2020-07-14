@@ -13,14 +13,12 @@ class Calendar extends SemiPureComponent {
     const { pinnedCrns } = this.props.user;
 
     return (
-      <div
-        className={classes(
-          'Calendar',
-          mobile && 'mobile',
-          preview && 'preview',
-          className
-        )}
-      >
+      <div className={classes(
+        'Calendar',
+        mobile && 'mobile',
+        preview && 'preview',
+        className,
+      )}>
         {!preview && (
           <div className="times">
             {new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
@@ -52,17 +50,17 @@ class Calendar extends SemiPureComponent {
             />
           ))}
           {overlayCrns &&
-            overlayCrns
-              .filter((crn) => !pinnedCrns.includes(crn))
-              .map((crn) => (
-                <TimeBlocks
-                  key={crn}
-                  crn={crn}
-                  overlay={!preview}
-                  preview={preview}
-                  capture={capture}
-                />
-              ))}
+          overlayCrns
+            .filter((crn) => !pinnedCrns.includes(crn))
+            .map((crn) => (
+              <TimeBlocks
+                key={crn}
+                crn={crn}
+                overlay={!preview}
+                preview={preview}
+                capture={capture}
+              />
+            ))}
         </div>
       </div>
     );

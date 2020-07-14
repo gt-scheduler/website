@@ -11,41 +11,7 @@
   height: 100%;
   overflow: hidden;
 
-  .avgGpa.sum {
-    text-align: center;
-
-    .labelAverage {
-      font-weight: 500;
-      font-style: italic;
-      display: inline-block;
-      font-size: 1em;
-      height: 22px;
-      line-height: 18px;
-    }
-
-    .gpa {
-      width: 50px;
-      height: 30px;
-      display: inline-block;
-      margin-left: 8px;
-      line-height: 27px;
-      text-align: center;
-      color: white;
-      font-weight: 500;
-      display: inline-block;
-      font-size: 1em;
-    }
-  }
-
-  .customHandle {
-    cursor: ew-resize;
-    width: 10px;
-    height: 100px;
-    border-radius: 10px;
-    text-align: center;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
+  .resize-handle {
   }
 
   .collapsed {
@@ -57,10 +23,11 @@
   }
 
   .navigation {
-    height: 80px;
+    height: 64px;
     padding: 0 16px;
     display: flex;
     align-items: stretch;
+    border-bottom: 1px solid $color-border;
 
     .logo {
       font-size: 1.5em;
@@ -84,12 +51,36 @@
     }
 
     .semester {
-      margin-right: auto;
-
       &:after {
-        right: 8px;
+        margin-left: 8px;
         content: '▼';
-        font-size: 1em;
+      }
+    }
+
+    .credits {
+    }
+
+    .gpa-wrapper {
+      display: flex;
+
+      .gpa {
+        width: 50px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+      }
+    }
+
+    .menu {
+      display: flex;
+      align-items: stretch;
+      margin-left: auto;
+
+      .icon {
+        margin-right: 4px;
       }
     }
   }
@@ -112,12 +103,11 @@
   }
 
   .sidebar {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
     align-items: stretch;
-    max-width: 450px;
-    min-width: 200px;
+    border-right: 1px solid $color-border;
 
     .header {
       position: relative;
@@ -229,7 +219,6 @@
 
           font-size: 0.8em;
           font-weight: bold;
-          color: $text-dark;
         }
 
         .calendar-preview {
@@ -242,10 +231,6 @@
     .footer {
       position: relative;
     }
-  }
-
-  .github-fork-ribbon:before {
-    background-color: $color-darker;
   }
 
   &.mobile {
@@ -280,10 +265,6 @@
       width: auto;
       max-width: none;
       border-left: none;
-    }
-
-    .github-fork-ribbon {
-      display: none;
     }
   }
 }

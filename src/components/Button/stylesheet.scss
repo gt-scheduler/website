@@ -1,17 +1,19 @@
 @import '../../variables';
 
 .Button {
-  display: block;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 8px;
-  font-size: 0.8em;
-  font-weight: bold;
   cursor: pointer;
-  border: none;
-  outline: none;
 
   &:disabled {
     cursor: default;
-    color: $color-dark;
+    color: inherit;
+    opacity: $opacity-disabled;
+  }
+
+  &:hover {
+    background-color: $color-border;
   }
 }

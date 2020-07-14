@@ -12,9 +12,14 @@ import { PNG_SCALE_FACTOR } from '../../constants';
 import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import { Oscar } from '../../beans';
-import 'github-fork-ribbon-css/gh-fork-ribbon.css';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons/faDownload';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons/faCalendarAlt';
+import { faPaste } from '@fortawesome/free-solid-svg-icons/faPaste';
+import { faAdjust } from '@fortawesome/free-solid-svg-icons/faAdjust';
+import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub';
 
 class App extends SemiPureComponent {
   constructor(props) {
@@ -24,8 +29,6 @@ class App extends SemiPureComponent {
       terms: [],
       overlayCrns: [],
       tabIndex: 0,
-      configCollapsed: false,
-      courseListCollapsed: false,
       selectedStyle: 'light',
     };
 
@@ -253,41 +256,83 @@ class App extends SemiPureComponent {
               ))}
             </select>
           </label>
-          <a
-            className="link"
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/64json/gt-scheduler#georgia-tech-scheduler">
-            What's New
-          </a>
-          <Button
-            onClick={this.handleDownload}
-            disabled={pinnedCrns.length === 0}>
-            Download as PNG
-          </Button>
-          <Button
-            onClick={this.handleExport}
-            disabled={pinnedCrns.length === 0}>
-            Export Calendar
-          </Button>
-          <span className="link" onClick={this.handleThemeChange}>
-            {selectedStyle === 'light' ? 'Dark' : 'Light'} Theme
-          </span>
-          <span className="secondary">
+          <span className="credits">
             {this.getTotalCredits()} Credits
           </span>
+          {this.getAverageGpa() ? (
+            <div className="gpa-wrapper">
+              <div className="label">
+                Average GPA:&nbsp;
+              </div>
+              <div className="gpa" style={value2color(avgGpa)}>
+                {avgGpa}
+              </div>
+            </div>
+          ) : null}
+          <div className="menu">
+            <Button
+              onClick={this.handleDownload}
+              disabled={pinnedCrns.length === 0}>
+              <FontAwesomeIcon className="icon" fixedWidth icon={faDownload}/>
+              Download
+            </Button>
+            <Button
+              onClick={this.handleExport}
+              disabled={pinnedCrns.length === 0}>
+              <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt}/>
+              Export
+            </Button>
+            <Button
+              text={pinnedCrns.join(', ')}
+              disabled={pinnedCrns.length === 0}>
+              <FontAwesomeIcon className="icon" fixedWidth icon={faPaste}/>
+              CRNs
+            </Button>
+            <Button
+              onClick={this.handleThemeChange}>
+              <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust}/>
+              Theme
+            </Button>
+            <Button
+              href="https://github.com/64json/gt-scheduler">
+              <FontAwesomeIcon className="icon" fixedWidth icon={faGithub}/>
+              GitHub
+            </Button>
+          </div>
         </div>
         <div className="main">
-          <Calendar overlayCrns={overlayCrns}/>
           <ResizePanel
-            direction="w"
+            direction="e"
             style={{
-              flexGrow: '1',
-              width: 'auto',
-              minWidth: '230px',
-              maxWidth: '450px',
+              minWidth: '280px',
             }}
-            handleClass="customHandle">
+            handleClass="resize-handle">
+            <div className="sidebar sidebar-courses">
+              <div className="scroller">
+                <div className="course-list">
+                  {desiredCourses.map((courseId) => {
+                    return (
+                      <Course
+                        courseId={courseId}
+                        expandable
+                        key={courseId}
+                        onSetOverlayCrns={this.handleSetOverlayCrns}
+                        fromClass="course-list"
+                      />
+                    );
+                  })}
+                </div>
+                <CourseAdd/>
+              </div>
+            </div>
+          </ResizePanel>
+
+          <ResizePanel
+            direction="e"
+            style={{
+              minWidth: '280px',
+            }}
+            handleClass="resize-handle">
             <div className="sidebar sidebar-combinations">
               <div className="header">
                   <span className="secondary">
@@ -308,6 +353,12 @@ class App extends SemiPureComponent {
                   </select>
                 </Button>
               </div>
+              <Button
+                className="reset"
+                onClick={this.handleResetPinnedCrns}
+                disabled={pinnedCrns.length === 0}>
+                Reset Sections
+              </Button>
               <div className="scroller">
                 <AutoSizer>
                   {({ width, height }) => (
@@ -347,90 +398,10 @@ class App extends SemiPureComponent {
                   )}
                 </AutoSizer>
               </div>
-              <div className="footer">
-                <Button
-                  className="reset"
-                  onClick={this.handleResetPinnedCrns}
-                  disabled={pinnedCrns.length === 0}
-                >
-                  Reset Sections
-                </Button>
-                <Button
-                  className="reset"
-                  onClick={() =>
-                    this.setState({
-                      configCollapsed: !this.state.configCollapsed,
-                    })
-                  }
-                >
-                  Collapse Column
-                </Button>
-              </div>
             </div>
           </ResizePanel>
 
-          <ResizePanel
-            direction="w"
-            style={{
-              flexGrow: '1',
-              width: 'auto',
-              minWidth: '275px',
-              maxWidth: '450px',
-            }}
-            handleClass="customHandle">
-            <div className="sidebar sidebar-courses">
-              <div className="scroller">
-                <div className="course-list">
-                  {desiredCourses.map((courseId) => {
-                    return (
-                      <Course
-                        courseId={courseId}
-                        expandable
-                        key={courseId}
-                        onSetOverlayCrns={this.handleSetOverlayCrns}
-                        fromClass="course-list"
-                      />
-                    );
-                  })}
-                </div>
-                <CourseAdd/>
-              </div>
-              <div className="footer">
-                {this.getAverageGpa() ? (
-                  <div className="avgGpa sum">
-                    <div className="labelAverage sum">
-                      Cumulative Average GPA:
-                    </div>
-                    <div className="gpa sum" style={value2color(avgGpa)}>
-                      {avgGpa}
-                    </div>
-                  </div>
-                ) : null}
-
-                <Button
-                  text={pinnedCrns.join(', ')}
-                  disabled={pinnedCrns.length === 0}>
-                  <span>Copy CRNs</span>
-                </Button>
-                <label>
-                  Developed by{' '}
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="http://jasonpark.me">
-                    Jinseo Park
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="mailto:abhiram.tirumala@gatech.edu">
-                    Abhiram Tirumala
-                  </a>
-                </label>
-              </div>
-            </div>
-          </ResizePanel>
+          <Calendar overlayCrns={overlayCrns}/>
         </div>
         <div className="capture-container" ref={this.captureRef}>
           <Calendar className="fake-calendar" capture/>
@@ -448,16 +419,6 @@ class App extends SemiPureComponent {
             ))}
           </div>
         )}
-        <a
-          className="github-fork-ribbon left-bottom fixed"
-          href="https://github.com/parkjs814/gt-scheduler"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-ribbon="Fork me on GitHub"
-          title="Fork me on GitHub"
-        >
-          Fork me on GitHub
-        </a>
       </div>
     );
   }
