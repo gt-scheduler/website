@@ -1,8 +1,8 @@
-import { stringToTime, unique } from '../utils';
+import { unique } from '../utils';
 
 class Section {
   constructor(oscar, course, sectionId, data) {
-    const [crn, meetings, credits, scheduleTypeIndex, campusIndex, instructionalMethodIndex] = data;
+    const [crn, meetings, credits, scheduleTypeIndex, campusIndex, attributeIndices, gradeBasisIndex] = data;
 
     this.course = course;
     this.id = sectionId;
@@ -10,16 +10,11 @@ class Section {
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex];
     this.campus = oscar.campuses[campusIndex];
-    this.instructionalMethod = oscar.instructionalMethods[instructionalMethodIndex];
+    this.attributes = attributeIndices.map(attributeIndex => oscar.attributes[attributeIndex]);
+    this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
     this.meetings = meetings.map(
-      ([period, days, where, instructors, dateRangeIndex]) => ({
-        period:
-          period === 'TBA'
-            ? undefined
-            : {
-              start: stringToTime(period.split(' - ')[0]),
-              end: stringToTime(period.split(' - ')[1]),
-            },
+      ([periodIndex, days, where, instructors, dateRangeIndex]) => ({
+        period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : [...days],
         where,
         instructors: instructors.map((instructor) =>

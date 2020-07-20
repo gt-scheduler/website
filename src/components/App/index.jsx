@@ -197,9 +197,11 @@ class App extends SemiPureComponent {
 
     const className = classes('App', mobile && 'mobile', theme);
 
-    if (!oscar) return (
-      <div className={className}/>
-    );
+    if (!oscar) {
+      return (
+        <div className={className}/>
+      );
+    }
 
     const combinations = this.memoizedGetCombinations(
       desiredCourses,

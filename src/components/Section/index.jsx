@@ -1,7 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { faBan, faInfoCircle, faThumbtack, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { classes, periodToString, simplifyInstructionalMethod } from '../../utils';
+import {
+  classes,
+  isInstructionalMethodAttribute,
+  periodToString,
+  refineInstructionalMethodAttribute,
+} from '../../utils';
 import { actions } from '../../reducers';
 import { ActionRow, SemiPureComponent } from '../';
 import './stylesheet.scss';
@@ -40,8 +45,10 @@ class Section extends SemiPureComponent {
         <div className="section-details">
           <div className="instructional-method">
             {
-              section.instructionalMethod &&
-              simplifyInstructionalMethod(section.instructionalMethod)
+              section.attributes
+                .filter(isInstructionalMethodAttribute)
+                .map(refineInstructionalMethodAttribute)
+                .join(', ')
             }
           </div>
           <div className="meeting-container">

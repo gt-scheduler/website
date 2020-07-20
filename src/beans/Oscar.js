@@ -1,19 +1,29 @@
 import { Course, SortingOption } from './';
-import { hasConflictBetween } from '../utils';
+import { hasConflictBetween, stringToTime } from '../utils';
 
 class Oscar {
   constructor(data) {
-    const { courses, dateRanges, scheduleTypes, campuses, instructionalMethods, updatedAt } = data;
+    const { courses, caches, updatedAt } = data;
 
-    this.dateRanges = dateRanges.map((dateRange) => {
+    this.periods = caches.periods.map(period => {
+      if (period === 'TBA') {
+        return undefined;
+      }
+      return {
+        start: stringToTime(period.split(' - ')[0]),
+        end: stringToTime(period.split(' - ')[1]),
+      };
+    });
+    this.dateRanges = caches.dateRanges.map((dateRange) => {
       const [from, to] = dateRange.split(' - ').map((v) => new Date(v));
       from.setHours(0);
       to.setHours(23, 59, 59, 999);
       return { from, to };
     });
-    this.scheduleTypes = scheduleTypes || [];
-    this.campuses = campuses || [];
-    this.instructionalMethods = instructionalMethods || [];
+    this.scheduleTypes = caches.scheduleTypes;
+    this.campuses = caches.campuses;
+    this.attributes = caches.attributes;
+    this.gradeBases = caches.gradeBases;
     this.updatedAt = new Date(updatedAt);
     this.courses = Object.keys(courses).map(
       (courseId) => new Course(this, courseId, courses[courseId]),

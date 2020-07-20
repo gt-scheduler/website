@@ -103,8 +103,18 @@ const getSemesterName = (term) => {
   return `${semester} ${year}`;
 };
 
-const simplifyInstructionalMethod = instructionalMethod => {
-  return instructionalMethod && instructionalMethod.replace(/ \(BOR\)$/, '');
+const isInstructionalMethodAttribute = attribute => {
+  return [
+    'Hybrid Course',
+    'Isolate Course in Canvas',
+    'Remote Synchronous Course',
+    'Remote Asynchronous Course',
+    'Residential Course',
+  ].includes(attribute);
+};
+
+const refineInstructionalMethodAttribute = attribute => {
+  return attribute.split(' ').filter(v => v !== 'Course').join(' ');
 };
 
 export {
@@ -123,5 +133,6 @@ export {
   isLab,
   isLecture,
   getSemesterName,
-  simplifyInstructionalMethod,
+  isInstructionalMethodAttribute,
+  refineInstructionalMethodAttribute,
 };
