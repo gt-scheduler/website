@@ -39,9 +39,14 @@ class App extends SemiPureComponent {
     const { term } = this.props.user;
     if (term) this.loadOscar(term);
     axios
-      .get('https://jasonpark.me/gt-schedule-crawler/terms.json')
+      .get('https://api.github.com/repos/64json/gt-schedule-crawler/contents?ref=gh-pages')
       .then((res) => {
-        const terms = res.data.reverse();
+        const terms = res.data
+          .map(content => content.name)
+          .filter(name => /\d{6}\.json/.test(name))
+          .map(name => name.replace(/\.json$/, ''))
+          .sort()
+          .reverse();
         if (!term) {
           const recentTerm = terms[0];
           this.handleChangeSemester(recentTerm);
