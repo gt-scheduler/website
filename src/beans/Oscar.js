@@ -96,7 +96,7 @@ class Oscar {
 
     return filteredCourses.filter(course => {
       return course.sections.some(section => {
-        return attributes.every(attribute => section.attributes.includes(attribute));
+        return attributes.some(attribute => section.attributes.includes(attribute));
       });
     });
   }
