@@ -1,15 +1,25 @@
 {
-  "main.css": "/gt-scheduler/static/css/main.df8aa3bc.chunk.css",
-  "main.js": "/gt-scheduler/static/js/main.6875ddae.chunk.js",
-  "main.js.map": "/gt-scheduler/static/js/main.6875ddae.chunk.js.map",
-  "static/css/1.2a8a0d29.chunk.css": "/gt-scheduler/static/css/1.2a8a0d29.chunk.css",
-  "static/js/1.968c054e.chunk.js": "/gt-scheduler/static/js/1.968c054e.chunk.js",
-  "static/js/1.968c054e.chunk.js.map": "/gt-scheduler/static/js/1.968c054e.chunk.js.map",
-  "runtime~main.js": "/gt-scheduler/static/js/runtime~main.3e8e58b9.js",
-  "runtime~main.js.map": "/gt-scheduler/static/js/runtime~main.3e8e58b9.js.map",
-  "static/css/main.df8aa3bc.chunk.css.map": "/gt-scheduler/static/css/main.df8aa3bc.chunk.css.map",
-  "static/css/1.2a8a0d29.chunk.css.map": "/gt-scheduler/static/css/1.2a8a0d29.chunk.css.map",
-  "index.html": "/gt-scheduler/index.html",
-  "precache-manifest.2a0e8e3896a8577032ed4654fc4b1e9e.js": "/gt-scheduler/precache-manifest.2a0e8e3896a8577032ed4654fc4b1e9e.js",
-  "service-worker.js": "/gt-scheduler/service-worker.js"
+  "files": {
+    "main.css": "/gt-scheduler/static/css/main.7cf7949f.chunk.css",
+    "main.js": "/gt-scheduler/static/js/main.150deb0b.chunk.js",
+    "main.js.map": "/gt-scheduler/static/js/main.150deb0b.chunk.js.map",
+    "runtime-main.js": "/gt-scheduler/static/js/runtime-main.705b6edb.js",
+    "runtime-main.js.map": "/gt-scheduler/static/js/runtime-main.705b6edb.js.map",
+    "static/css/2.771d4c7b.chunk.css": "/gt-scheduler/static/css/2.771d4c7b.chunk.css",
+    "static/js/2.913b6280.chunk.js": "/gt-scheduler/static/js/2.913b6280.chunk.js",
+    "static/js/2.913b6280.chunk.js.map": "/gt-scheduler/static/js/2.913b6280.chunk.js.map",
+    "index.html": "/gt-scheduler/index.html",
+    "precache-manifest.a1ca2c8e62253736e29d6368e28a48bc.js": "/gt-scheduler/precache-manifest.a1ca2c8e62253736e29d6368e28a48bc.js",
+    "service-worker.js": "/gt-scheduler/service-worker.js",
+    "static/css/2.771d4c7b.chunk.css.map": "/gt-scheduler/static/css/2.771d4c7b.chunk.css.map",
+    "static/css/main.7cf7949f.chunk.css.map": "/gt-scheduler/static/css/main.7cf7949f.chunk.css.map",
+    "static/js/2.913b6280.chunk.js.LICENSE.txt": "/gt-scheduler/static/js/2.913b6280.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.705b6edb.js",
+    "static/css/2.771d4c7b.chunk.css",
+    "static/js/2.913b6280.chunk.js",
+    "static/css/main.7cf7949f.chunk.css",
+    "static/js/main.150deb0b.chunk.js"
+  ]
 }
