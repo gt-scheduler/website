@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Course, SemiPureComponent } from '../';
-import { classes, getRandomColor } from '../../utils';
+import { classes, getRandomColor, refineInstructionalMethodAttribute } from '../../utils';
 import { actions } from '../../reducers';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
+import { INSTRUCTIONAL_METHOD_ATTRIBUTES } from '../../constants';
 
 class CourseAdd extends SemiPureComponent {
   constructor(props) {
@@ -13,6 +14,7 @@ class CourseAdd extends SemiPureComponent {
 
     this.state = {
       keyword: '',
+      attributes: [],
     };
 
     this.inputRef = React.createRef();
@@ -28,11 +30,11 @@ class CourseAdd extends SemiPureComponent {
 
   handlePressEnter(e) {
     const { oscar } = this.props.db;
-    const { keyword } = this.state;
+    const { keyword, attributes } = this.state;
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      const courses = oscar.searchCourses(keyword);
+      const courses = oscar.searchCourses(keyword, attributes);
       if (courses.length) this.handleAddCourse(courses[0]);
     }
   }
@@ -57,30 +59,55 @@ class CourseAdd extends SemiPureComponent {
     this.inputRef.current.focus();
   }
 
+  handleToggleAttribute(attribute) {
+    const { attributes } = this.state;
+    this.setState({
+      attributes: attributes.includes(attribute) ?
+        attributes.filter(v => v !== attribute) :
+        [...attributes, attribute],
+    });
+  }
+
   render() {
     const { className } = this.props;
     const { oscar } = this.props.db;
     const { desiredCourses, pinnedCrns } = this.props.user;
-    const { keyword } = this.state;
+    const { keyword, attributes } = this.state;
 
     const courses = oscar
-      .searchCourses(keyword)
+      .searchCourses(keyword, attributes)
       .filter((course) => !desiredCourses.includes(course.id));
 
     return (
       <div className={classes('CourseAdd', className)}>
         <div className="add">
-          <FontAwesomeIcon className={classes('icon', courses.length && 'active')} fixedWidth icon={faPlus}/>
-          <input type="text"
-                 ref={this.inputRef}
-                 value={keyword}
-                 onChange={this.handleChangeKeyword}
-                 className="keyword"
-                 placeholder="XX 0000"
-                 onKeyPress={this.handlePressEnter}/>
+          <div className="primary">
+            <FontAwesomeIcon className={classes('icon', courses.length && 'active')} fixedWidth icon={faPlus}/>
+            <input type="text"
+                   ref={this.inputRef}
+                   value={keyword}
+                   onChange={this.handleChangeKeyword}
+                   className="keyword"
+                   placeholder="XX 0000"
+                   onKeyPress={this.handlePressEnter}/>
+          </div>
+          <div className="secondary">
+            <div className={classes('attribute', attributes.length === 0 && 'active')}
+                 onClick={() => this.setState({ attributes: [] })}>
+              All
+            </div>
+            {
+              INSTRUCTIONAL_METHOD_ATTRIBUTES.map(attribute => (
+                <div className={classes('attribute', attributes.includes(attribute) && 'active')} key={attribute}
+                     onClick={() => this.handleToggleAttribute(attribute)}>
+                  {refineInstructionalMethodAttribute(attribute)}
+                </div>
+              ))
+            }
+          </div>
         </div>
         {
-          courses.slice(0, 10).map((course) => (
+          courses.map((course) => (
             <Course
               key={course.id}
               courseId={course.id}

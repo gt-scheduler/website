@@ -49,4 +49,12 @@ const PALETTE = [
   ],
 ];
 
-export { OPEN, CLOSE, DAYS, PNG_SCALE_FACTOR, PALETTE };
+const INSTRUCTIONAL_METHOD_ATTRIBUTES = [
+  'Hybrid Course',
+  'Isolate Course in Canvas',
+  'Remote Synchronous Course',
+  'Remote Asynchronous Course',
+  'Residential Course',
+];
+
+export { OPEN, CLOSE, DAYS, PNG_SCALE_FACTOR, PALETTE, INSTRUCTIONAL_METHOD_ATTRIBUTES };

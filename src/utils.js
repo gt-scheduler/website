@@ -1,4 +1,4 @@
-import { DAYS, PALETTE } from './constants';
+import { DAYS, INSTRUCTIONAL_METHOD_ATTRIBUTES, PALETTE } from './constants';
 
 const stringToTime = (string) => {
   const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -104,13 +104,7 @@ const getSemesterName = (term) => {
 };
 
 const isInstructionalMethodAttribute = attribute => {
-  return [
-    'Hybrid Course',
-    'Isolate Course in Canvas',
-    'Remote Synchronous Course',
-    'Remote Asynchronous Course',
-    'Residential Course',
-  ].includes(attribute);
+  return INSTRUCTIONAL_METHOD_ATTRIBUTES.includes(attribute);
 };
 
 const refineInstructionalMethodAttribute = attribute => {

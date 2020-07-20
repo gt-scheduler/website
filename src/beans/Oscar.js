@@ -70,21 +70,35 @@ class Oscar {
     return this.crnMap[crn];
   }
 
-  searchCourses(keyword) {
-    const [, subject, number] =
-    /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
-    if (subject && number) {
-      return this.courses.filter(
-        (course) =>
-          course.subject === subject && course.number.startsWith(number),
-      );
-    } else if (subject) {
-      return this.courses.filter((course) => course.subject === subject);
-    } else if (number) {
-      return this.courses.filter((course) => course.number.startsWith(number));
-    } else {
-      return [];
+  searchCourses(keyword, attributes) {
+    const filterCoursesByKeyword = () => {
+      const [, subject, number] =
+      /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
+      if (subject && number) {
+        return this.courses.filter(
+          (course) =>
+            course.subject === subject && course.number.startsWith(number),
+        );
+      } else if (subject) {
+        return this.courses.filter(course => course.subject === subject);
+      } else if (number) {
+        return this.courses.filter(course => course.number.startsWith(number));
+      } else {
+        return [];
+      }
+    };
+
+    const filteredCourses = filterCoursesByKeyword();
+
+    if (attributes.length === 0) {
+      return filteredCourses;
     }
+
+    return filteredCourses.filter(course => {
+      return course.sections.some(section => {
+        return attributes.every(attribute => section.attributes.includes(attribute));
+      });
+    });
   }
 
   getCombinations(desiredCourses, pinnedCrns, excludedCrns) {
