@@ -51,7 +51,7 @@ const PALETTE = [
 
 const INSTRUCTIONAL_METHOD_ATTRIBUTES = [
   'Hybrid Course',
-  'Isolate Course in Canvas',
+  // 'Isolate Course in Canvas',
   'Remote Synchronous Course',
   'Remote Asynchronous Course',
   'Residential Course',
