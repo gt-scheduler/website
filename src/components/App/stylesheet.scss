@@ -10,6 +10,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  transition: color .2s, background-color .2s;
 
   .navigation {
     height: 64px;
@@ -32,25 +33,13 @@
       }
     }
 
-    > * {
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-      font-size: 1.2em;
-    }
-
     .semester {
-      display: flex;
-      align-items: stretch;
-
-      &:after {
-        align-self: center;
-        margin-left: 8px;
-        content: '▼';
-      }
     }
 
     .credits {
+      padding: 12px;
+      display: flex;
+      align-items: center;
     }
 
     .menu {
@@ -58,8 +47,8 @@
       align-items: stretch;
       margin-left: auto;
 
-      .icon {
-        margin-right: 4px;
+      .text {
+        margin-left: 4px;
       }
     }
   }
@@ -75,43 +64,6 @@
       flex-direction: column;
       align-items: stretch;
       border-right: 1px solid $color-border;
-      width: 264px;
-      padding: 4px;
-
-      .header {
-        position: relative;
-        display: flex;
-        align-items: center;
-
-        .primary {
-          position: relative;
-          flex: 1;
-          display: flex;
-          align-items: center;
-          padding: 0;
-          background: none;
-
-          select {
-            align-self: stretch;
-            flex: 1;
-            padding: 8px 24px 8px 8px;
-            font-size: 1.2em;
-          }
-
-          &:after {
-            position: absolute;
-            right: 8px;
-            content: '▼';
-            font-size: 1em;
-          }
-        }
-
-        .secondary {
-          position: absolute;
-          right: 24px;
-          font-size: 0.8em;
-        }
-      }
 
       .scroller {
         flex: 1;
@@ -119,11 +71,13 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
+        padding: 4px;
       }
     }
 
     .sidebar-courses {
       .scroller {
+        width: 320px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
@@ -135,34 +89,23 @@
         }
 
         .course-add {
-          margin: 4px;
+          margin: -4px;
+        }
+      }
+
+      .updated-at {
+        color: $color-neutral;
+        font-size: .8em;
+
+        &:hover {
+          color: white;
         }
       }
     }
 
     .sidebar-combinations {
-      .header {
-        .sorting-option {
-          position: relative;
-          display: flex;
-          align-items: center;
-          padding: 0;
-
-          select {
-            align-self: stretch;
-            flex: 1;
-            padding: 8px 32px 8px 8px;
-          }
-
-          &:after {
-            position: absolute;
-            right: 8px;
-            content: '▼';
-          }
-        }
-      }
-
       .scroller {
+        width: 256px;
         margin-bottom: -1px;
 
         .list-item {
@@ -177,12 +120,13 @@
             align-items: stretch;
 
             .number {
+              background-color: $color-border;
               display: flex;
               align-items: center;
               justify-content: center;
               width: 36px;
 
-              font-size: 0.8em;
+              font-size: .8em;
               font-weight: bold;
             }
 
@@ -212,44 +156,66 @@
     position: absolute;
     top: 0;
     left: 100vw;
+    background-color: inherit;
 
     .fake-calendar {
       width: $calendar-width;
     }
   }
+}
 
-  &.mobile {
-    flex-direction: column-reverse;
+.App.dark {
+  background-color: $theme-dark-background;
+  color: $theme-dark-foreground;
+}
 
-    .tab-container {
-      flex-shrink: 0;
-      display: flex;
-      border-bottom: none;
+.App.light {
+  background-color: $theme-light-background;
+  color: $theme-light-foreground;
+}
 
-      .tab {
-        flex: 1;
-        padding: 16px;
-        display: flex;
-        justify-content: center;
-        align-content: center;
-        font-weight: bold;
-        cursor: pointer;
-
-        &.active {
-          border-bottom: none;
-        }
-
-        &:last-child {
-          border-right: none;
-        }
-      }
+.App.mobile {
+  .navigation {
+    .logo {
+      display: none;
     }
 
+    .credits {
+      display: none;
+    }
+
+    .menu {
+      .text {
+        display: none;
+      }
+    }
+  }
+
+  .tab-container {
+    display: flex;
+    height: 64px;
+    border-bottom: 1px solid $color-border;
+
+    .tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.active {
+        background-color: $color-border;
+      }
+    }
+  }
+
+  .main {
     .sidebar {
       flex: 1;
-      width: auto;
-      max-width: none;
-      border-left: none;
+      border-right: none;
+
+      .scroller {
+        width: auto;
+      }
     }
   }
 }

@@ -1,16 +1,45 @@
+@import "../../variables";
+
 .CourseAdd {
   display: flex;
   flex-direction: column;
+  padding: 4px;
 
-  .keyword {
-    padding: 8px;
-    border: none;
-    font-size: inherit;
+  .add {
+    @include card;
+    background-color: $color-border;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      margin-left: 8px;
+      color: $color-neutral;
+      transition: color .2s;
+
+      &.active {
+        color: inherit;
+      }
+    }
+
+    .keyword {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: inherit;
+      font-weight: bold;
+      padding: 12px 8px;
+      text-transform: uppercase;
+
+      &::placeholder {
+        font-weight: normal;
+        color: $color-neutral;
+      }
+    }
   }
 
   .autocomplete {
     display: flex;
     flex-direction: column;
-    color: rgba(255, 255, 255, 0.8);
   }
 }

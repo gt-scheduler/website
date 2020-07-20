@@ -3,17 +3,19 @@ $calendar-width: 720px;
 $time-width: 48px;
 $day-height: 40px;
 
-$color-border: rgba(#808080, .2);
-$text-color-light: #eeeeee;
-$text-color-dark: #404040;
+$color-neutral: #808080;
+$color-border: rgba($color-neutral, .2);
+$theme-light-background: #eeeeee;
+$theme-dark-background: #333333;
+$theme-light-foreground: $theme-dark-background;
+$theme-dark-foreground: $theme-light-background;
 $color-background-light: #f8f9fa;
 
 $opacity-inactive: 0.6;
 $opacity-disabled: 0.38;
-$opacity-divider: 0.2;
+$opacity-divider: 0.4;
 
 @mixin card {
-  background-color: $color-border;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 2px 1px -1px rgba(0, 0, 0, .12);
   margin: 4px;
   border-radius: 4px;

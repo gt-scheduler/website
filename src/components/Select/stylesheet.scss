@@ -1,0 +1,52 @@
+@import '../../variables';
+
+.Select {
+  position: relative;
+  justify-content: space-between;
+
+  .text {
+    margin-right: 8px;
+  }
+
+  .intercept {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .option-container {
+    @include card;
+    margin: 0;
+    z-index: 1;
+    position: absolute;
+    left: 0;
+    min-width: 100%;
+    top: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+
+    .option {
+      justify-content: flex-start;
+      white-space: nowrap;
+    }
+  }
+}
+
+.dark .Select {
+  .option-container {
+    background-color: $theme-dark-background;
+  }
+}
+
+.light .Select {
+  .option-container {
+    background-color: $theme-light-background;
+  }
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}

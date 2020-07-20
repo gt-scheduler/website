@@ -8,14 +8,14 @@ class Button extends Component {
     const { className, disabled, text, ...restProps } = this.props;
 
     const props = {
-      className: classes('Button', className),
+      className: classes('Button', disabled && 'disabled', className),
       ...restProps,
     };
 
     return disabled ? (
-      <button className={props.className} disabled>
+      <div className={props.className}>
         {props.children}
-      </button>
+      </div>
     ) : 'href' in props ? (
       <a {...props} rel="noopener noreferrer" target="_blank"/>
     ) : text ? (
@@ -23,7 +23,7 @@ class Button extends Component {
         <div {...props}/>
       </CopyToClipboard>
     ) : (
-      <button {...props} />
+      <div {...props} />
     );
   }
 }

@@ -1,12 +1,14 @@
 @import '../../variables';
 
-.Calendar {
-  $margin: 24px;
+@mixin calendar-margin($margin) {
+  margin: $day-height + $margin $margin $margin $time-width + $margin;
+}
 
+.Calendar {
+  @include calendar-margin(24px);
   flex: 1;
   position: relative;
   height: $calendar-height;
-  margin: $day-height + $margin $margin $margin $time-width + $margin;
   border-bottom: 1px solid $color-border;
   border-right: 1px solid $color-border;
 
@@ -41,7 +43,7 @@
         display: block;
         width: $time-width;
         padding-right: 8px;
-        font-size: 0.8em;
+        font-size: .8em;
         font-weight: bold;
         text-align: right;
       }
@@ -97,6 +99,6 @@
   }
 
   &.mobile {
-    margin-right: 0;
+    @include calendar-margin(0);
   }
 }

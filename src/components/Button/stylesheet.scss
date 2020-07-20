@@ -6,8 +6,9 @@
   align-items: center;
   padding: 12px;
   cursor: pointer;
+  transition: background-color .2s, color .2s;
 
-  &:disabled {
+  &.disabled {
     cursor: default;
     color: inherit;
     opacity: $opacity-disabled;

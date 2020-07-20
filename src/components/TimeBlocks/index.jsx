@@ -15,7 +15,7 @@ class TimeBlocks extends SemiPureComponent {
 
     const section = oscar.findSection(crn);
     const color = colorMap[section.course.id];
-    const textClassName = getContentClassName(color);
+    const contentClassName = getContentClassName(color);
 
     return (
       <div
@@ -31,7 +31,7 @@ class TimeBlocks extends SemiPureComponent {
             meeting.period &&
             meeting.days.map((day) => (
               <div
-                className={classes('meeting', textClassName, 'default', day)}
+                className={classes('meeting', contentClassName, 'default', day)}
                 key={[i, day].join('-')}
                 style={{
                   top:

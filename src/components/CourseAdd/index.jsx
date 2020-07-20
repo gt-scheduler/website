@@ -4,6 +4,8 @@ import { Course, SemiPureComponent } from '../';
 import { classes, getRandomColor } from '../../utils';
 import { actions } from '../../reducers';
 import './stylesheet.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 
 class CourseAdd extends SemiPureComponent {
   constructor(props) {
@@ -61,31 +63,32 @@ class CourseAdd extends SemiPureComponent {
     const { desiredCourses, pinnedCrns } = this.props.user;
     const { keyword } = this.state;
 
+    const courses = oscar
+      .searchCourses(keyword)
+      .filter((course) => !desiredCourses.includes(course.id));
+
     return (
       <div className={classes('CourseAdd', className)}>
-        <input
-          type="text"
-          ref={this.inputRef}
-          value={keyword}
-          onChange={this.handleChangeKeyword}
-          className="keyword"
-          placeholder="Add a Course - XX 0000"
-
-          onKeyPress={this.handlePressEnter}
-        />
-        <div className="autocomplete">
-          {oscar
-            .searchCourses(keyword)
-            .filter((course) => !desiredCourses.includes(course.id))
-            .map((course) => (
-              <Course
-                key={course.id}
-                courseId={course.id}
-                pinnedCrns={pinnedCrns}
-                onAddCourse={() => this.handleAddCourse(course)}
-              />
-            ))}
+        <div className="add">
+          <FontAwesomeIcon className={classes('icon', courses.length && 'active')} fixedWidth icon={faPlus}/>
+          <input type="text"
+                 ref={this.inputRef}
+                 value={keyword}
+                 onChange={this.handleChangeKeyword}
+                 className="keyword"
+                 placeholder="XX 0000"
+                 onKeyPress={this.handlePressEnter}/>
         </div>
+        {
+          courses.slice(0, 10).map((course) => (
+            <Course
+              key={course.id}
+              courseId={course.id}
+              pinnedCrns={pinnedCrns}
+              onAddCourse={() => this.handleAddCourse(course)}
+            />
+          ))
+        }
       </div>
     );
   }

@@ -25,6 +25,7 @@
     "react-virtualized": "^9.21.2",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
+    "s-ago": "^2.2.0",
     "typescript": "^3.9.5"
   },
   "scripts": {

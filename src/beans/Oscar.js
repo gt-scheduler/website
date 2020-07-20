@@ -3,7 +3,7 @@ import { hasConflictBetween } from '../utils';
 
 class Oscar {
   constructor(data) {
-    const { courses, dateRanges, scheduleTypes, campuses } = data;
+    const { courses, dateRanges, scheduleTypes, campuses, instructionalMethods, updatedAt } = data;
 
     this.dateRanges = dateRanges.map((dateRange) => {
       const [from, to] = dateRange.split(' - ').map((v) => new Date(v));
@@ -11,10 +11,12 @@ class Oscar {
       to.setHours(23, 59, 59, 999);
       return { from, to };
     });
-    this.scheduleTypes = scheduleTypes;
-    this.campuses = campuses;
+    this.scheduleTypes = scheduleTypes || [];
+    this.campuses = campuses || [];
+    this.instructionalMethods = instructionalMethods || [];
+    this.updatedAt = new Date(updatedAt);
     this.courses = Object.keys(courses).map(
-      (courseId) => new Course(this, courseId, courses[courseId])
+      (courseId) => new Course(this, courseId, courses[courseId]),
     );
     this.courseMap = {};
     this.crnMap = {};
@@ -28,7 +30,7 @@ class Oscar {
       new SortingOption('Most Compact', (combination) => {
         const { startMap, endMap } = combination;
         const diffs = Object.keys(startMap).map(
-          (day) => endMap[day] - startMap[day]
+          (day) => endMap[day] - startMap[day],
         );
         const sum = diffs.reduce((sum, min) => sum + min, 0);
         return +sum;
@@ -60,11 +62,11 @@ class Oscar {
 
   searchCourses(keyword) {
     const [, subject, number] =
-      /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
+    /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
     if (subject && number) {
       return this.courses.filter(
         (course) =>
-          course.subject === subject && course.number.startsWith(number)
+          course.subject === subject && course.number.startsWith(number),
       );
     } else if (subject) {
       return this.courses.filter((course) => course.subject === subject);
@@ -87,7 +89,7 @@ class Oscar {
       const isPinned = (section) => pinnedCrns.includes(section.crn);
       const hasConflict = (section) =>
         [...pinnedCrns, ...crns].some((crn) =>
-          hasConflictBetween(this.findSection(crn), section)
+          hasConflictBetween(this.findSection(crn), section),
         );
       if (course.hasLab) {
         const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
@@ -167,7 +169,7 @@ class Oscar {
           meeting.period &&
           meeting.days.forEach((day) => {
             callback(day, meeting.period);
-          })
+          }),
       );
     });
   }

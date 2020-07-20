@@ -1,0 +1,34 @@
+@import "../../variables";
+
+.Section {
+  .section-details {
+    padding: 4px;
+    display: flex;
+
+    .instructional-method {
+      flex: 1;
+      font-size: .8em;
+      margin-right: 8px;
+    }
+
+    .meeting-container {
+      display: flex;
+      flex-direction: column;
+
+      .meeting {
+        display: flex;
+        justify-content: flex-end;
+
+        .days {
+          font-size: .8em;
+          margin-right: 8px;
+        }
+
+        .period {
+          font-size: .8em;
+          min-width: 8em;
+        }
+      }
+    }
+  }
+}

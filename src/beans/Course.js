@@ -84,65 +84,29 @@ class Course {
     return groups;
   }
 
-  async fetchCourseCritique() {
-    let courseString = this.id.replace(' ', '%20');
+  async fetchGpa() {
+    const url = `https://critique.gatech.edu/course.php?id=${encodeURIComponent(this.id)}`;
     return await axios({
-      url: `https://cors-anywhere.herokuapp.com/http://critique.gatech.edu/course.php?id=${courseString}`,
+      url: `https://cors-anywhere.herokuapp.com/${url}`,
       method: 'get',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'text/html',
       },
-    })
-      .then((response) => response.data)
-      .then(this.handleParse)
-      .then(res => {
-        return res;
+    }).then(response => {
+      const $ = cheerio.load(response.data);
+      const averageGpa = Number($('div.center-table > table.table > tbody > tr :nth-child(2)').text());
+      const gpaMap = { averageGpa };
+
+      $('table#dataTable > tbody > tr').each((i, element) => {
+        const instructor = $(element).find('td:nth-child(1)').text();
+        const [lastName, firstName] = instructor.split(', ');
+        const fullName = `${firstName} ${lastName}`;
+        gpaMap[fullName] = Number($(element).find('td:nth-child(3)').text());
       });
-  };
 
-  handleParse(res) {
-    const $ = cheerio.load(res);
-    let info = {
-      avgGpa: Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(2)', res).text(),
-      ),
-      a: Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(3)', res).text(),
-      ),
-      b: Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(4)', res).text(),
-      ),
-      c: Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(5)', res).text(),
-      ),
-      d: Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(6)', res).text(),
-      ),
-      f: Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(7)', res).text(),
-      ),
-      instructors: [],
-    };
-
-    $('table#dataTable > tbody > tr', res).each((i, element) => {
-      let item = {
-        profName: $(element).find('td:nth-child(1)').text(),
-        classSize: $(element).find('td:nth-child(2)').text(),
-        avgGpa: $(element).find('td:nth-child(3)').text(),
-        a: $(element).find('td:nth-child(4)').text(),
-        b: $(element).find('td:nth-child(5)').text(),
-        c: $(element).find('td:nth-child(6)').text(),
-        d: $(element).find('td:nth-child(7)').text(),
-        f: $(element).find('td:nth-child(8)').text(),
-        w: $(element).find('td:nth-child(9)').text(),
-      };
-      let newArr = info.instructors;
-      newArr.push(item);
-      info.instructors = newArr;
+      return gpaMap;
     });
-
-    return info;
   };
 }
 

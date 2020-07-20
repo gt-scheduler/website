@@ -1,4 +1,4 @@
-import { DAYS } from './constants';
+import { DAYS, PALETTE } from './constants';
 
 const stringToTime = (string) => {
   const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -26,22 +26,19 @@ const periodToString = (period) =>
     ? `${timeToString(period.start, false)} - ${timeToString(period.end)}`
     : 'TBA';
 
-const getRandomColor = (from = 0, to = 256) => {
-  let hex = '#';
-  for (let i = 0; i < 3; i++) {
-    const component = ((Math.random() * (to - from) + from) | 0).toString(16);
-    hex += (component.length === 1 ? '0' : '') + component;
-  }
-  return hex;
+const getRandomColor = () => {
+  const colors = PALETTE.flat();
+  const index = Math.random() * colors.length | 0;
+  return colors[index];
 };
 
-const getContentClassName = (color = '#BBBBBB') => {
+const getContentClassName = color => {
   const r = parseInt(color.substring(1, 3), 16);
   const g = parseInt(color.substring(3, 5), 16);
   const b = parseInt(color.substring(5, 7), 16);
   return r * 0.299 + g * 0.587 + b * 0.114 > 128
-    ? 'dark-content'
-    : 'light-content';
+    ? 'light-content'
+    : 'dark-content';
 };
 
 const hasConflictBetween = (section1, section2) =>
@@ -51,11 +48,11 @@ const hasConflictBetween = (section1, section2) =>
         meeting1.period &&
         meeting2.period &&
         DAYS.some(
-          (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
+          (day) => meeting1.days.includes(day) && meeting2.days.includes(day),
         ) &&
         meeting1.period.start < meeting2.period.end &&
-        meeting2.period.start < meeting1.period.end
-    )
+        meeting2.period.start < meeting1.period.end,
+    ),
   );
 
 const classes = (...classList) => classList.filter((c) => c).join(' ');
@@ -106,29 +103,8 @@ const getSemesterName = (term) => {
   return `${semester} ${year}`;
 };
 
-const value2color = (value, min = 2.5, max = 4.0) => {
-  let base = max - min;
-
-  if (base === 0) {
-    value = 100;
-  } else {
-    value = ((value - min) / base) * 100;
-  }
-  let r,
-    g,
-    b = 0;
-  let textColor = '#121212';
-  if (value < 50) {
-    r = 255;
-    g = Math.round(5.1 * value);
-  } else {
-    g = 255;
-    r = Math.round(510 - 5.1 * value);
-  }
-  return {
-    backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
-    color: textColor,
-  };
+const simplifyInstructionalMethod = instructionalMethod => {
+  return instructionalMethod && instructionalMethod.replace(/ \(BOR\)$/, '');
 };
 
 export {
@@ -147,5 +123,5 @@ export {
   isLab,
   isLecture,
   getSemesterName,
-  value2color,
+  simplifyInstructionalMethod,
 };

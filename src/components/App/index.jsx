@@ -4,13 +4,15 @@ import axios from 'axios';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
 import memoizeOne from 'memoize-one';
+import Cookies from 'js-cookie';
 import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
 import ics from '../../libs/ics';
 import { classes, getSemesterName, isMobile } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import { Button, Calendar, Course, CourseAdd, SemiPureComponent } from '../';
+import { Button, Calendar, Course, CourseAdd, Select, SemiPureComponent } from '../';
 import { actions } from '../../reducers';
 import { Oscar } from '../../beans';
+import ago from 's-ago';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,9 +28,8 @@ class App extends SemiPureComponent {
 
     this.state = {
       terms: [],
-      overlayCrns: [],
       tabIndex: 0,
-      selectedStyle: 'light',
+      theme: Cookies.get('theme') === 'light' ? 'light' : 'dark',
     };
 
     this.captureRef = React.createRef();
@@ -52,8 +53,10 @@ class App extends SemiPureComponent {
   }
 
   handleThemeChange = () => {
+    const theme = this.state.theme === 'light' ? 'dark' : 'light';
+    Cookies.set('theme', theme);
     this.setState({
-      selectedStyle: this.state.selectedStyle === 'light' ? 'dark' : 'light',
+      theme,
     });
   };
 
@@ -92,10 +95,6 @@ class App extends SemiPureComponent {
     if (mobile !== nextMobile) {
       this.props.setMobile(nextMobile);
     }
-  };
-
-  handleSetOverlayCrns = (overlayCrns) => {
-    this.setState({ overlayCrns });
   };
 
   handleExport = () => {
@@ -171,13 +170,15 @@ class App extends SemiPureComponent {
     }
   };
 
-  handleChangeSortingOptionIndex = (e) => {
-    const sortingOptionIndex = e.target.value;
+  handleChangeSortingOptionIndex = sortingOptionIndex => {
     this.props.setSortingOptionIndex(sortingOptionIndex);
   };
 
   render() {
-    const { mobile } = this.props.env;
+    const {
+      mobile,
+      overlayCrns,
+    } = this.props.env;
     const { oscar } = this.props.db;
     const {
       term,
@@ -187,9 +188,13 @@ class App extends SemiPureComponent {
       sortingOptionIndex,
     } = this.props.user;
 
-    const { terms, overlayCrns, tabIndex, selectedStyle } = this.state;
+    const { terms, tabIndex, theme } = this.state;
 
-    if (!oscar) return null;
+    const className = classes('App', mobile && 'mobile', theme);
+
+    if (!oscar) return (
+      <div className={className}/>
+    );
 
     const combinations = this.memoizedGetCombinations(
       desiredCourses,
@@ -202,23 +207,16 @@ class App extends SemiPureComponent {
     );
 
     return (
-      <div className={classes('App', mobile && 'mobile', selectedStyle)}>
+      <div className={className}>
         <div className="navigation">
           <Button className="logo">
             <span className="gt">GT </span>
             <span className="scheduler">Scheduler</span>
           </Button>
-          <label className="semester">
-            <select onChange={(e) => this.handleChangeSemester(e.target.value)}
-                    value={term}
-                    className="selected-option">
-              {terms.map((term) => (
-                <option key={term} value={term}>
-                  {getSemesterName(term)}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select onChange={term => this.handleChangeSemester(term)}
+                  value={term}
+                  options={terms.map(term => ({ value: term, label: getSemesterName(term) }))}
+                  className="semester"/>
           <span className="credits">
             {this.getTotalCredits()} Credits
           </span>
@@ -227,134 +225,132 @@ class App extends SemiPureComponent {
               onClick={this.handleDownload}
               disabled={pinnedCrns.length === 0}>
               <FontAwesomeIcon className="icon" fixedWidth icon={faDownload}/>
-              Download
+              <div className="text">Download</div>
             </Button>
             <Button
               onClick={this.handleExport}
               disabled={pinnedCrns.length === 0}>
               <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt}/>
-              Export
+              <div className="text">Export</div>
             </Button>
             <Button
               text={pinnedCrns.join(', ')}
               disabled={pinnedCrns.length === 0}>
               <FontAwesomeIcon className="icon" fixedWidth icon={faPaste}/>
-              CRNs
+              <div className="text">CRNs</div>
             </Button>
             <Button
               onClick={this.handleThemeChange}>
               <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust}/>
-              Theme
+              <div className="text">Theme</div>
             </Button>
-            <Button
-              href="https://github.com/64json/gt-scheduler">
+            <Button href="https://github.com/64json/gt-scheduler">
               <FontAwesomeIcon className="icon" fixedWidth icon={faGithub}/>
-              GitHub
+              <div className="text">GitHub</div>
             </Button>
           </div>
         </div>
-        <div className="main">
-          <div className="sidebar sidebar-courses">
-            <div className="scroller">
-              <div className="course-list">
-                {
-                  desiredCourses.map((courseId) => {
-                    return (
-                      <Course
-                        courseId={courseId}
-                        expandable
-                        key={courseId}
-                        onSetOverlayCrns={this.handleSetOverlayCrns}
-                      />
-                    );
-                  })
-                }
-              </div>
-              <CourseAdd className="course-add"/>
+        {
+          mobile && (
+            <div className="tab-container">
+              {['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
+                <Button key={tabTitle}
+                        className={classes('tab', tabIndex === i && 'active')}
+                        onClick={() => this.handleChangeTab(i)}>
+                  {tabTitle}
+                </Button>
+              ))}
             </div>
-          </div>
+          )
+        }
+        <div className="main">
+          {
+            (!mobile || tabIndex === 0) && (
+              <div className="sidebar sidebar-courses">
+                <div className="scroller">
+                  <div className="course-list">
+                    {
+                      desiredCourses.map((courseId) => {
+                        return (
+                          <Course
+                            courseId={courseId}
+                            expandable
+                            key={courseId}
+                          />
+                        );
+                      })
+                    }
+                  </div>
+                  <CourseAdd className="course-add"/>
+                </div>
+                <Button className="updated-at" href="https://github.com/64json/gt-schedule-crawler">
+                  Course data fetched {ago(oscar.updatedAt)}
+                </Button>
+              </div>
+            )
+          }
 
-          <div className="sidebar sidebar-combinations">
-            <div className="header">
-              <span className="secondary">
-                {combinations.length}{' '}
-                {combinations.length === 1 ? 'Combo' : 'Combos'}
-              </span>
-              <Button className="primary">
-                <select
+          {
+            (!mobile || tabIndex === 1) && (
+              <div className="sidebar sidebar-combinations">
+                <Select
                   onChange={this.handleChangeSortingOptionIndex}
                   value={sortingOptionIndex}
-                  className="selected-option">
-                  {oscar.sortingOptions.map((sortingOption, i) => (
-                    <option key={i} value={i}>
-                      {sortingOption.label}
-                    </option>
-                  ))}
-                </select>
-              </Button>
-            </div>
-            <Button
-              className="reset"
-              onClick={this.handleResetPinnedCrns}
-              disabled={pinnedCrns.length === 0}>
-              Reset Sections
-            </Button>
-            <div className="scroller">
-              <AutoSizer>
-                {({ width, height }) => (
-                  <List
-                    width={width}
-                    height={height}
-                    rowCount={sortedCombinations.length}
-                    rowHeight={108}
-                    rowRenderer={({ index, key, style }) => {
-                      const { crns } = sortedCombinations[index];
-                      return (
-                        <div className="list-item" style={style} key={key}>
-                          <div className="combination"
-                               onMouseEnter={() =>
-                                 this.handleSetOverlayCrns(crns)
-                               }
-                               onMouseLeave={() => this.handleSetOverlayCrns([])}
-                               onClick={() =>
-                                 this.handleSetPinnedCrns([
-                                   ...pinnedCrns,
-                                   ...crns,
-                                 ])
-                               }>
-                            <div className="number">{index + 1}</div>
-                            <Calendar className="calendar-preview"
-                                      overlayCrns={crns}
-                                      preview/>
-                          </div>
-                        </div>
-                      );
-                    }}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-          <div className="calendar-container">
-            <Calendar className="calendar" overlayCrns={overlayCrns}/>
-          </div>
+                  options={oscar.sortingOptions.map((sortingOption, i) => ({ value: i, label: sortingOption.label }))}/>
+                <Button
+                  className="reset"
+                  onClick={this.handleResetPinnedCrns}
+                  disabled={pinnedCrns.length === 0}>
+                  Reset Sections
+                </Button>
+                <div className="scroller">
+                  <AutoSizer>
+                    {({ width, height }) => (
+                      <List
+                        width={width}
+                        height={height}
+                        rowCount={sortedCombinations.length}
+                        rowHeight={108}
+                        rowRenderer={({ index, key, style }) => {
+                          const { crns } = sortedCombinations[index];
+                          return (
+                            <div className="list-item" style={style} key={key}>
+                              <div className="combination"
+                                   onMouseEnter={() => this.props.setOverlayCrns(crns)}
+                                   onMouseLeave={() => this.props.setOverlayCrns([])}
+                                   onClick={() =>
+                                     this.handleSetPinnedCrns([
+                                       ...pinnedCrns,
+                                       ...crns,
+                                     ])
+                                   }>
+                                <div className="number">{index + 1}</div>
+                                <Calendar className="calendar-preview"
+                                          overlayCrns={crns}
+                                          preview/>
+                              </div>
+                            </div>
+                          );
+                        }}
+                      />
+                    )}
+                  </AutoSizer>
+                </div>
+              </div>
+            )
+          }
+
+          {
+            (!mobile || tabIndex === 2) && (
+              <div className="calendar-container">
+                <Calendar className="calendar" overlayCrns={overlayCrns}/>
+              </div>
+            )
+          }
         </div>
         <div className="capture-container" ref={this.captureRef}>
           <Calendar className="fake-calendar" capture/>
         </div>
-        {mobile && (
-          <div className="tab-container">
-            {['Courses', 'Combinations', 'Calendar'].map((tabTitle, i) => (
-              <div
-                className={classes('tab', tabIndex === i && 'active')}
-                onClick={() => this.handleChangeTab(i)}
-                key={i}
-              >
-                {tabTitle}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     );
   }

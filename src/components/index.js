@@ -7,4 +7,6 @@ export { default as Course } from './Course';
 export { default as CourseAdd } from './CourseAdd';
 export { default as Instructor } from './Instructor';
 export { default as Palette } from './Palette';
+export { default as Section } from './Section';
+export { default as Select } from './Select';
 export { default as TimeBlocks } from './TimeBlocks';
