@@ -96,6 +96,7 @@
       .updated-at {
         color: $color-neutral;
         font-size: .8em;
+        transition: color .2s;
 
         &:hover {
           color: white;
