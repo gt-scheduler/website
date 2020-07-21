@@ -26,19 +26,31 @@
         }
       }
 
-      .keyword {
-        flex: 1;
-        background: none;
-        border: none;
-        outline: none;
-        font-size: inherit;
-        font-weight: bold;
-        padding: 12px 8px;
-        text-transform: uppercase;
+      .keyword-wrapper {
+        display: flex;
+        align-items: center;
+        position: relative;
 
-        &::placeholder {
-          font-weight: normal;
-          color: $color-neutral;
+        .keyword {
+          position: relative;
+          flex: 1;
+          background: none;
+          border: none;
+          outline: none;
+          font-size: inherit;
+          font-weight: bold;
+          padding: 12px 8px;
+          text-transform: uppercase;
+
+          &::placeholder {
+            font-weight: normal;
+            color: $color-neutral;
+          }
+
+          &.autocomplete {
+            position: absolute;
+            opacity: .5;
+          }
         }
       }
     }
@@ -69,8 +81,14 @@
     }
   }
 
-  .autocomplete {
-    display: flex;
-    flex-direction: column;
+  .Course {
+    background-color: $color-border;
+    opacity: .6;
+    transition: opacity .2s;
+
+    &:hover,
+    &.active {
+      opacity: 1;
+    }
   }
 }

@@ -13,30 +13,62 @@ class CourseAdd extends SemiPureComponent {
     super(props);
 
     this.state = {
+      courses: [],
       keyword: '',
       attributes: [],
+      activeIndex: 0,
     };
 
     this.inputRef = React.createRef();
 
     this.handleChangeKeyword = this.handleChangeKeyword.bind(this);
-    this.handlePressEnter = this.handlePressEnter.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   handleChangeKeyword(e) {
-    const keyword = e.target.value;
-    this.setState({ keyword });
+    const { oscar } = this.props.db;
+    const { desiredCourses } = this.props.user;
+    const { attributes } = this.state;
+
+    let keyword = e.target.value.trim();
+    const results = keyword.match(/^([A-Z]+)(\d.*)$/i);
+    if (results) {
+      const [, subject, number] = results;
+      keyword = `${subject} ${number}`;
+    }
+    const courses = oscar.searchCourses(keyword, attributes)
+      .filter((course) => !desiredCourses.includes(course.id));
+    this.setState({
+      courses,
+      keyword,
+      activeIndex: 0,
+    });
   }
 
-  handlePressEnter(e) {
-    const { oscar } = this.props.db;
-    const { keyword, attributes } = this.state;
+  handleKeyDown(e) {
+    const { courses, activeIndex } = this.state;
 
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const courses = oscar.searchCourses(keyword, attributes);
-      if (courses.length) this.handleAddCourse(courses[0]);
+    switch (e.key) {
+      case 'Enter':
+        const activeCourse = courses[activeIndex];
+        if (activeCourse) {
+          this.handleAddCourse(activeCourse);
+        }
+        break;
+      case 'ArrowDown':
+        this.setState({
+          activeIndex: Math.min(activeIndex + 1, courses.length - 1),
+        });
+        break;
+      case 'ArrowUp':
+        this.setState({
+          activeIndex: Math.max(activeIndex - 1, 0),
+        });
+        break;
+      default:
+        return;
     }
+    e.preventDefault();
   }
 
   handleAddCourse(course) {
@@ -55,7 +87,10 @@ class CourseAdd extends SemiPureComponent {
     this.props.setExcludedCrns([...excludedCrns, ...tbaCrns]);
     this.props.setColorMap({ ...colorMap, [course.id]: getRandomColor() });
 
-    this.setState({ keyword: '' });
+    this.setState({
+      courses: [],
+      keyword: '',
+    });
     this.inputRef.current.focus();
   }
 
@@ -70,26 +105,31 @@ class CourseAdd extends SemiPureComponent {
 
   render() {
     const { className } = this.props;
-    const { oscar } = this.props.db;
-    const { desiredCourses, pinnedCrns } = this.props.user;
-    const { keyword, attributes } = this.state;
+    const { courses, keyword, attributes, activeIndex } = this.state;
 
-    const courses = oscar
-      .searchCourses(keyword, attributes)
-      .filter((course) => !desiredCourses.includes(course.id));
+    const activeCourse = courses[activeIndex];
 
     return (
       <div className={classes('CourseAdd', className)}>
         <div className="add">
           <div className="primary">
             <FontAwesomeIcon className={classes('icon', courses.length && 'active')} fixedWidth icon={faPlus}/>
-            <input type="text"
-                   ref={this.inputRef}
-                   value={keyword}
-                   onChange={this.handleChangeKeyword}
-                   className="keyword"
-                   placeholder="XX 0000"
-                   onKeyPress={this.handlePressEnter}/>
+            <div className="keyword-wrapper">
+              {
+                activeCourse && (
+                  <div className={classes('keyword', 'autocomplete')}>
+                    {activeCourse.id}
+                  </div>
+                )
+              }
+              <input type="text"
+                     ref={this.inputRef}
+                     value={keyword}
+                     onChange={this.handleChangeKeyword}
+                     className="keyword"
+                     placeholder="XX 0000"
+                     onKeyDown={this.handleKeyDown}/>
+            </div>
           </div>
           <div className="secondary">
             <div className={classes('attribute', attributes.length === 0 && 'active')}
@@ -107,11 +147,12 @@ class CourseAdd extends SemiPureComponent {
           </div>
         </div>
         {
-          courses.map((course) => (
+          courses.map(course => (
             <Course
               key={course.id}
+              className={course === activeCourse && 'active'}
               courseId={course.id}
-              pinnedCrns={pinnedCrns}
+              pinnedCrns={[]}
               onAddCourse={() => this.handleAddCourse(course)}
             />
           ))

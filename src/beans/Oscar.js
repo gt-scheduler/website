@@ -72,19 +72,15 @@ class Oscar {
 
   searchCourses(keyword, attributes) {
     const filterCoursesByKeyword = () => {
-      const [, subject, number] =
-      /^\s*([a-zA-Z]*)\s*(\d*)\s*$/.exec(keyword.toUpperCase()) || [];
-      if (subject && number) {
-        return this.courses.filter(
-          (course) =>
-            course.subject === subject && course.number.startsWith(number),
-        );
-      } else if (subject) {
-        return this.courses.filter(course => course.subject === subject);
-      } else if (number) {
-        return this.courses.filter(course => course.number.startsWith(number));
-      } else {
+      const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(keyword.toUpperCase());
+      if (!results) {
         return [];
+      }
+      const [, subject, number] = results;
+      if (number) {
+        return this.courses.filter(course => course.subject === subject && course.number.startsWith(number));
+      } else {
+        return this.courses.filter(course => course.subject === subject);
       }
     };
 

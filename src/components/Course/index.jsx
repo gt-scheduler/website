@@ -91,7 +91,7 @@ class Course extends SemiPureComponent {
     const totalCredits = pinnedSections.reduce((credits, section) => credits + section.credits, 0);
 
     return (
-      <div className={classes('Course', contentClassName, 'default', onAddCourse && 'temporary', className)}
+      <div className={classes('Course', contentClassName, 'default', className)}
            style={{ backgroundColor: color }}
            key={course.id}>
         <ActionRow label={[course.id, pinnedSections.map(section => section.id).join(', ')].join(' ')}

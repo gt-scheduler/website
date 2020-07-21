@@ -68,14 +68,4 @@
       }
     }
   }
-
-  &.temporary {
-    background-color: $color-border;
-    opacity: .6;
-    transition: opacity .2s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
 }
