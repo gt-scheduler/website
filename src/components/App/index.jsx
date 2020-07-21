@@ -316,6 +316,7 @@ class App extends SemiPureComponent {
                       <List
                         width={width}
                         height={height}
+                        style={{ outline: 'none' }}
                         rowCount={sortedCombinations.length}
                         rowHeight={108}
                         rowRenderer={({ index, key, style }) => {

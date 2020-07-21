@@ -172,6 +172,8 @@
 
 .App.mobile {
   .navigation {
+    padding: 0 8px;
+
     .logo {
       display: none;
     }
@@ -181,8 +183,16 @@
     }
 
     .menu {
-      .text {
-        display: none;
+      flex: 1;
+      margin-left: 0;
+
+      .Button {
+        flex: 1;
+        padding: 0;
+
+        .text {
+          display: none;
+        }
       }
     }
   }
