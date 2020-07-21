@@ -57,7 +57,7 @@ const hasConflictBetween = (section1, section2) =>
 
 const classes = (...classList) => classList.filter((c) => c).join(' ');
 
-const isMobile = () => window.innerWidth < 768;
+const isMobile = () => window.innerWidth < 1024;
 
 const shallowCompareEntries = (a, b) => {
   const aKeys = Object.keys(a);
