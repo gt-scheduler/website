@@ -1,0 +1,67 @@
+@import '../../variables';
+
+.Header {
+  height: 64px;
+  padding: 0 16px;
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid $color-border;
+
+  .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    white-space: pre;
+    padding: 0 16px;
+
+    .gt {
+    }
+
+    .scheduler {
+    }
+  }
+
+  .semester {
+  }
+
+  .credits {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .menu {
+    display: flex;
+    align-items: stretch;
+    margin-left: auto;
+
+    .text {
+      margin-left: 4px;
+    }
+  }
+}
+
+.mobile .Header {
+  padding: 0 8px;
+
+  .logo {
+    display: none;
+  }
+
+  .credits {
+    display: none;
+  }
+
+  .menu {
+    flex: 1;
+    margin-left: 0;
+
+    .Button {
+      flex: 1;
+      padding: 0;
+
+      .text {
+        display: none;
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+@import '../../variables';
+
+.CourseContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-right: 1px solid $color-border;
+
+  .scroller {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px;
+    width: 320px;
+    flex-shrink: 0;
+
+    .course-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-add {
+      margin: -4px;
+    }
+  }
+
+  .updated-at {
+    color: $color-neutral;
+    font-size: .8em;
+  }
+}
+
+.mobile .CourseContainer {
+  flex: 1;
+  border-right: none;
+
+  .scroller {
+    width: auto;
+  }
+}

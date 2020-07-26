@@ -1,29 +1,23 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { classes } from '../../utils';
 import { PALETTE } from '../../constants';
 import './stylesheet.scss';
 
-class Palette extends Component {
-  render() {
-    const { className, color, onSelectColor, ...restProps } = this.props;
-
-    return (
-      <div className={classes('Palette', className)} {...restProps}>
-        {PALETTE.map((colors, i) => (
-          <div className="palette-row" key={i}>
-            {colors.map((paletteColor) => (
-              <div
-                className={classes('color', paletteColor === color && 'frame')}
-                key={paletteColor}
-                style={{ backgroundColor: paletteColor }}
-                onClick={() => onSelectColor(paletteColor)}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    );
-  }
+export function Palette({ className, color, onSelectColor, ...restProps }) {
+  return (
+    <div className={classes('Palette', className)} {...restProps}>
+      {PALETTE.map((colors, i) => (
+        <div className="palette-row" key={i}>
+          {colors.map((paletteColor) => (
+            <div
+              className={classes('color', paletteColor === color && 'frame')}
+              key={paletteColor}
+              style={{ backgroundColor: paletteColor }}
+              onClick={() => onSelectColor(paletteColor)}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 }
-
-export default Palette;

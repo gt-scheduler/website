@@ -1,0 +1,57 @@
+@import '../../variables';
+
+.CombinationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-right: 1px solid $color-border;
+
+  .scroller {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px;
+    width: 256px;
+    margin-bottom: -1px;
+
+    .list-item {
+      display: flex;
+      align-items: stretch;
+      height: 108px;
+
+      .combination {
+        @include card;
+        flex: 1;
+        display: flex;
+        align-items: stretch;
+
+        .number {
+          background-color: $color-border;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+
+          font-size: .8em;
+          font-weight: bold;
+        }
+
+        .calendar-preview {
+          flex: 1;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+.mobile .CombinationContainer {
+  flex: 1;
+  border-right: none;
+
+  .scroller {
+    width: auto;
+  }
+}

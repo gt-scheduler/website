@@ -1,7 +1,6 @@
 @import '../../variables';
 
 .TimeBlocks {
-
   &.overlay {
     .meeting {
       opacity: $opacity-disabled;
@@ -32,7 +31,8 @@
         font-size: .72em;
       }
 
-      .course_id {
+      .ids {
+        display: flex;
         font-weight: bold;
         font-size: .8em;
       }
@@ -58,16 +58,30 @@
       left: 80%;
     }
   }
+}
 
-  &.mobile {
-    .meeting {
-      .meeting-wrapper {
-        padding: 2px;
+.mobile .TimeBlocks:not(.capture) {
+  .meeting {
+    .meeting-wrapper {
+      padding: 2px;
 
-        span {
-          white-space: normal;
-          overflow: visible;
+      span {
+        white-space: normal;
+      }
+
+      .ids {
+        .course-id {
+          flex: 1;
         }
+
+        .section-id {
+          display: none;
+        }
+      }
+
+      .where,
+      .instructors {
+        display: none;
       }
     }
   }

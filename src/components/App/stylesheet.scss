@@ -12,128 +12,11 @@
   overflow: hidden;
   transition: color .2s, background-color .2s;
 
-  .navigation {
-    height: 64px;
-    padding: 0 16px;
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid $color-border;
-
-    .logo {
-      font-size: 1.5em;
-      font-weight: bold;
-      white-space: pre;
-      padding: 0 16px;
-
-      .gt {
-      }
-
-      .scheduler {
-
-      }
-    }
-
-    .semester {
-    }
-
-    .credits {
-      padding: 12px;
-      display: flex;
-      align-items: center;
-    }
-
-    .menu {
-      display: flex;
-      align-items: stretch;
-      margin-left: auto;
-
-      .text {
-        margin-left: 4px;
-      }
-    }
-  }
-
   .main {
     overflow: hidden;
     flex: 1;
     display: flex;
     align-items: stretch;
-
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      border-right: 1px solid $color-border;
-
-      .scroller {
-        flex: 1;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        padding: 4px;
-      }
-    }
-
-    .sidebar-courses {
-      .scroller {
-        width: 320px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-
-        .course-list {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .course-add {
-          margin: -4px;
-        }
-      }
-
-      .updated-at {
-        color: $color-neutral;
-        font-size: .8em;
-      }
-    }
-
-    .sidebar-combinations {
-      .scroller {
-        width: 256px;
-        margin-bottom: -1px;
-
-        .list-item {
-          display: flex;
-          align-items: stretch;
-          height: 108px;
-
-          .combination {
-            @include card;
-            flex: 1;
-            display: flex;
-            align-items: stretch;
-
-            .number {
-              background-color: $color-border;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 36px;
-
-              font-size: .8em;
-              font-weight: bold;
-            }
-
-            .calendar-preview {
-              flex: 1;
-              cursor: pointer;
-            }
-          }
-        }
-      }
-    }
 
     .calendar-container {
       flex: 1;
@@ -171,32 +54,6 @@
 }
 
 .App.mobile {
-  .navigation {
-    padding: 0 8px;
-
-    .logo {
-      display: none;
-    }
-
-    .credits {
-      display: none;
-    }
-
-    .menu {
-      flex: 1;
-      margin-left: 0;
-
-      .Button {
-        flex: 1;
-        padding: 0;
-
-        .text {
-          display: none;
-        }
-      }
-    }
-  }
-
   .tab-container {
     display: flex;
     height: 64px;

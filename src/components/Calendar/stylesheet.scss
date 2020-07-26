@@ -97,8 +97,8 @@
 
   .meeting {
   }
+}
 
-  &.mobile {
-    @include calendar-margin(0);
-  }
+.mobile .Calendar:not(.capture) {
+  @include calendar-margin(0);
 }
