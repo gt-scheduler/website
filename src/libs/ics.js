@@ -76,27 +76,27 @@ const ics = function (uidDomain, prodId) {
             rrule.freq !== 'DAILY'
           ) {
             throw new Error(
-              "Recurrence rrule frequency must be provided and be one of the following: 'YEARLY', 'MONTHLY', 'WEEKLY', or 'DAILY'"
+              'Recurrence rrule frequency must be provided and be one of the following: \'YEARLY\', \'MONTHLY\', \'WEEKLY\', or \'DAILY\'',
             );
           }
 
           if (rrule.until) {
             if (isNaN(Date.parse(rrule.until))) {
               throw new Error(
-                "Recurrence rrule 'until' must be a valid date string"
+                'Recurrence rrule \'until\' must be a valid date string',
               );
             }
           }
 
           if (rrule.interval) {
             if (isNaN(parseInt(rrule.interval))) {
-              throw new Error("Recurrence rrule 'interval' must be an integer");
+              throw new Error('Recurrence rrule \'interval\' must be an integer');
             }
           }
 
           if (rrule.count) {
             if (isNaN(parseInt(rrule.count))) {
-              throw new Error("Recurrence rrule 'count' must be an integer");
+              throw new Error('Recurrence rrule \'count\' must be an integer');
             }
           }
 
@@ -104,12 +104,12 @@ const ics = function (uidDomain, prodId) {
             if (
               Object.prototype.toString.call(rrule.byday) !== '[object Array]'
             ) {
-              throw new Error("Recurrence rrule 'byday' must be an array");
+              throw new Error('Recurrence rrule \'byday\' must be an array');
             }
 
             if (rrule.byday.length > 7) {
               throw new Error(
-                "Recurrence rrule 'byday' array must not be longer than the 7 days in a week"
+                'Recurrence rrule \'byday\' array must not be longer than the 7 days in a week',
               );
             }
 
@@ -121,7 +121,7 @@ const ics = function (uidDomain, prodId) {
             for (var d in rrule.byday) {
               if (BYDAY_VALUES.indexOf(rrule.byday[d]) < 0) {
                 throw new Error(
-                  "Recurrence rrule 'byday' values must include only the following: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'"
+                  'Recurrence rrule \'byday\' values must include only the following: \'SU\', \'MO\', \'TU\', \'WE\', \'TH\', \'FR\', \'SA\'',
                 );
               }
             }
@@ -136,7 +136,7 @@ const ics = function (uidDomain, prodId) {
 
       var start_year = ('0000' + start_date.getFullYear().toString()).slice(-4);
       var start_month = ('00' + (start_date.getMonth() + 1).toString()).slice(
-        -2
+        -2,
       );
       var start_day = ('00' + start_date.getDate().toString()).slice(-2);
       var start_hours = ('00' + start_date.getHours().toString()).slice(-2);
@@ -162,11 +162,11 @@ const ics = function (uidDomain, prodId) {
       var end_time = '';
       if (
         start_hours +
-          start_minutes +
-          start_seconds +
-          end_hours +
-          end_minutes +
-          end_seconds !==
+        start_minutes +
+        start_seconds +
+        end_hours +
+        end_minutes +
+        end_seconds !==
         0
       ) {
         start_time = 'T' + start_hours + start_minutes + start_seconds;

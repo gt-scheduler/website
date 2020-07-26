@@ -3,7 +3,7 @@ import { Course } from '../';
 import { classes, getRandomColor, refineInstructionalMethodAttribute } from '../../utils';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { INSTRUCTIONAL_METHOD_ATTRIBUTES } from '../../constants';
 import { TermContext } from '../../contexts';
 

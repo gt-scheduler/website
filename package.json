@@ -13,20 +13,17 @@
     "dom-to-image": "^2.6.0",
     "file-saver": "^2.0.2",
     "js-cookie": "^2.2.1",
-    "memoize-one": "^4.0.3",
     "node-sass": "^4.14.1",
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.1",
-    "react-redux": "^5.1.2",
     "react-resize-panel": "^0.3.5",
     "react-scripts": "^3.4.1",
     "react-virtualized": "^9.21.2",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
-    "s-ago": "^2.2.0",
-    "typescript": "^3.9.5"
+    "s-ago": "^2.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

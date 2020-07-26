@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { classes } from '../../utils';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons/faCaretDown';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../';
 
 export function Select({ className, value, onChange, options }) {
