@@ -54,7 +54,7 @@ export function CourseAdd({ className }) {
     const toBeExcludedCrns = course.sections
       .filter(section => {
         const timeDecided = section.deliveryMode === ASYNC_DELIVERY_MODE
-          || section.meetings.length && section.meetings.every(meeting => meeting.days.length && meeting.period);
+          || (section.meetings.length && section.meetings.every(meeting => meeting.days.length && meeting.period));
         const filterMatch = Object.entries(filter)
           .every(([key, tags]) => tags.length === 0 || tags.includes(section[key]));
         return !timeDecided || !filterMatch;
@@ -143,15 +143,22 @@ export function CourseAdd({ className }) {
         }
       </div>
       {
-        courses.map(course => (
-          <Course
-            key={course.id}
-            className={course === activeCourse && 'active'}
-            courseId={course.id}
-            pinnedCrns={[]}
-            onAddCourse={() => handleAddCourse(course)}
-          />
-        ))
+        courses.length > 0 ? (
+          courses.map(course => (
+            <Course
+              key={course.id}
+              className={course === activeCourse && 'active'}
+              courseId={course.id}
+              pinnedCrns={[]}
+              onAddCourse={() => handleAddCourse(course)}
+            />
+          ))
+        ) : (
+          <div className="disclaimer">
+            Disclaimer: GT Scheduler should be used as general reference only, and users are solely responsible for
+            ensuring any information including registration restrictions.
+          </div>
+        )
       }
     </div>
   );

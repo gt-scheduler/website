@@ -66,7 +66,7 @@ const simplifyName = (name) => {
 
 const unique = (array) => [...new Set(array)];
 
-const isLab = (section) => section.scheduleType.includes('Lab');
+const isLab = (section) => ['Lab', 'Studio'].some(type => section.scheduleType.includes(type));
 
 const isLecture = (section) => section.scheduleType.includes('Lecture');
 

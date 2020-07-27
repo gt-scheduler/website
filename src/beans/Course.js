@@ -14,49 +14,27 @@ class Course {
       (sectionId) => new Section(oscar, this, sectionId, sections[sectionId]),
     );
 
-    const onlyLectures = this.sections.filter(
-      (section) => isLecture(section) && !isLab(section),
-    );
-    const onlyLabs = this.sections.filter(
-      (section) => isLab(section) && !isLecture(section),
-    );
+    const onlyLectures = this.sections.filter(section => isLecture(section) && !isLab(section));
+    const onlyLabs = this.sections.filter(section => isLab(section) && !isLecture(section));
     this.hasLab = onlyLectures.length && onlyLabs.length;
     if (this.hasLab) {
-      onlyLectures.forEach(
-        (lecture) =>
-          (lecture.associatedLabs = onlyLabs.filter((lab) =>
-            lab.id.startsWith(lecture.id),
-          )),
-      );
-      onlyLabs.forEach(
-        (lab) =>
-          (lab.associatedLectures = onlyLectures.filter((lecture) =>
-            lab.id.startsWith(lecture.id),
-          )),
-      );
-      const lonelyLectures = onlyLectures.filter(
-        (lecture) => !lecture.associatedLabs.length,
-      );
-      const lonelyLabs = onlyLabs.filter(
-        (lab) => !lab.associatedLectures.length,
-      );
-      lonelyLectures.forEach(
-        (lecture) =>
-          (lecture.associatedLabs = lonelyLabs.filter(
-            (lab) => !hasConflictBetween(lecture, lab),
-          )),
-      );
-      lonelyLabs.forEach(
-        (lab) =>
-          (lab.associatedLectures = lonelyLectures.filter(
-            (lecture) => !hasConflictBetween(lecture, lab),
-          )),
-      );
+      for (const lecture of onlyLectures) {
+        lecture.associatedLabs = onlyLabs.filter(lab => lab.id.startsWith(lecture.id));
+      }
+      for (const lab of onlyLabs) {
+        lab.associatedLectures = onlyLectures.filter(lecture => lab.id.startsWith(lecture.id));
+      }
+      const lonelyLectures = onlyLectures.filter(lecture => !lecture.associatedLabs.length);
+      const lonelyLabs = onlyLabs.filter(lab => !lab.associatedLectures.length);
+      for (const lecture of lonelyLectures) {
+        lecture.associatedLabs = lonelyLabs.filter(lab => !hasConflictBetween(lecture, lab));
+      }
+      for (const lab of lonelyLabs) {
+        lab.associatedLectures = lonelyLectures.filter(lecture => !hasConflictBetween(lecture, lab));
+      }
       this.onlyLectures = onlyLectures;
       this.onlyLabs = onlyLabs;
-      this.allInOnes = this.sections.filter(
-        (section) => isLecture(section) && isLab(section),
-      );
+      this.allInOnes = this.sections.filter(section => isLecture(section) && isLab(section));
     } else {
       this.sectionGroups = this.distinct(this.sections);
     }
