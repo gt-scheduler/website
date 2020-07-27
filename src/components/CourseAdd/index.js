@@ -1,10 +1,10 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Course } from '../';
-import { classes, getRandomColor, refineInstructionalMethodAttribute } from '../../utils';
+import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { Course, CourseFilter } from '../';
+import { classes, getRandomColor } from '../../utils';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { INSTRUCTIONAL_METHOD_ATTRIBUTES } from '../../constants';
+import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { TermContext } from '../../contexts';
 
 export function CourseAdd({ className }) {
@@ -12,9 +12,11 @@ export function CourseAdd({ className }) {
     { oscar, desiredCourses, excludedCrns, colorMap },
     { patchTermData },
   ] = useContext(TermContext);
-  const [courses, setCourses] = useState([]);
   const [keyword, setKeyword] = useState('');
-  const [attributes, setAttributes] = useState([]);
+  const [filter, setFilter] = useState({
+    deliveryMode: [],
+    campus: [],
+  });
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
 
@@ -28,30 +30,44 @@ export function CourseAdd({ className }) {
     setKeyword(keyword);
   }, []);
 
-  useEffect(() => {
-    const courses = oscar.searchCourses(keyword, attributes)
-      .filter((course) => !desiredCourses.includes(course.id));
-    setCourses(courses);
+  const courses = useMemo(() => {
+    const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(keyword.toUpperCase());
+    if (!results) {
+      return [];
+    }
+    const [, subject, number] = results;
+
     setActiveIndex(0);
-  }, [oscar, keyword, attributes, desiredCourses]);
+
+    return oscar.courses
+      .filter(course => {
+        const keywordMatch = course.subject === subject && course.number.startsWith(number);
+        const filterMatch = Object.entries(filter)
+          .every(([key, tags]) => tags.length === 0 || course.sections.some(section => tags.includes(section[key])));
+        return keywordMatch && filterMatch;
+      })
+      .filter(course => !desiredCourses.includes(course.id));
+  }, [oscar, keyword, filter, desiredCourses]);
 
   const handleAddCourse = useCallback(course => {
     if (desiredCourses.includes(course.id)) return;
-    const tbaCrns = course.sections
-      .filter(section =>
-        !section.meetings.length ||
-        section.meetings.some(meeting => !meeting.days.length || !meeting.period),
-      )
-      .map((section) => section.crn);
+    const toBeExcludedCrns = course.sections
+      .filter(section => {
+        const timeDecided = section.deliveryMode === ASYNC_DELIVERY_MODE
+          || section.meetings.length && section.meetings.every(meeting => meeting.days.length && meeting.period);
+        const filterMatch = Object.entries(filter)
+          .every(([key, tags]) => tags.length === 0 || tags.includes(section[key]));
+        return !timeDecided || !filterMatch;
+      })
+      .map(section => section.crn);
     patchTermData({
       desiredCourses: [...desiredCourses, course.id],
-      excludedCrns: [...excludedCrns, ...tbaCrns],
+      excludedCrns: [...excludedCrns, ...toBeExcludedCrns],
       colorMap: { ...colorMap, [course.id]: getRandomColor() },
     });
-    setCourses([]);
     setKeyword('');
     inputRef.current.focus();
-  }, [desiredCourses, excludedCrns, colorMap, inputRef, patchTermData]);
+  }, [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchTermData]);
 
   const handleKeyDown = useCallback(e => {
     switch (e.key) {
@@ -73,13 +89,22 @@ export function CourseAdd({ className }) {
     e.preventDefault();
   }, [courses, handleAddCourse, activeIndex]);
 
-  const handleToggleAttribute = useCallback(attribute => {
-    setAttributes(
-      attributes.includes(attribute) ?
-        attributes.filter(v => v !== attribute) :
-        [...attributes, attribute],
-    );
-  }, [attributes]);
+  const handleToggleFilter = useCallback((key, tag) => {
+    const tags = filter[key];
+    setFilter({
+      ...filter,
+      [key]: tags.includes(tag)
+        ? tags.filter(v => v !== tag)
+        : [...tags, tag],
+    });
+  }, [filter]);
+
+  const handleResetFilter = useCallback(key => {
+    setFilter({
+      ...filter,
+      [key]: [],
+    });
+  }, [filter]);
 
   const activeCourse = courses[activeIndex];
 
@@ -105,20 +130,17 @@ export function CourseAdd({ className }) {
                    onKeyDown={handleKeyDown}/>
           </div>
         </div>
-        <div className="secondary">
-          <div className={classes('attribute', attributes.length === 0 && 'active')}
-               onClick={() => setAttributes([])}>
-            All
-          </div>
-          {
-            INSTRUCTIONAL_METHOD_ATTRIBUTES.map(attribute => (
-              <div className={classes('attribute', attributes.includes(attribute) && 'active')} key={attribute}
-                   onClick={() => handleToggleAttribute(attribute)}>
-                {refineInstructionalMethodAttribute(attribute)}
-              </div>
-            ))
-          }
-        </div>
+        {
+          [
+            ['Delivery Mode', 'deliveryMode', DELIVERY_MODES],
+            ['Campus', 'campus', CAMPUSES],
+          ].map(([name, property, labels]) => (
+            <CourseFilter key={property} name={name} labels={labels}
+                          selectedTags={filter[property]}
+                          onReset={() => handleResetFilter(property)}
+                          onToggle={tag => handleToggleFilter(property, tag)}/>
+          ))
+        }
       </div>
       {
         courses.map(course => (

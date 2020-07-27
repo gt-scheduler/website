@@ -34,7 +34,10 @@
       .ids {
         display: flex;
         font-weight: bold;
-        font-size: .8em;
+
+        span {
+          font-size: .8em;
+        }
       }
     }
 

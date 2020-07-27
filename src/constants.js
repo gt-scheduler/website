@@ -49,12 +49,23 @@ const PALETTE = [
   ],
 ];
 
-const INSTRUCTIONAL_METHOD_ATTRIBUTES = [
-  'Hybrid Course',
-  // 'Isolate Course in Canvas',
-  'Remote Synchronous Course',
-  'Remote Asynchronous Course',
-  'Residential Course',
-];
+const ASYNC_DELIVERY_MODE = 'Remote Asynchronous Course';
 
-export { OPEN, CLOSE, DAYS, PNG_SCALE_FACTOR, PALETTE, INSTRUCTIONAL_METHOD_ATTRIBUTES };
+const DELIVERY_MODES = {
+  'Hybrid Course': 'Hybrid',
+  'Remote Synchronous Course': 'Remote Synchronous',
+  'Remote Asynchronous Course': 'Remote Asynchronous',
+  'Residential Course': 'Residential',
+};
+
+const CAMPUSES = {
+  'Georgia Tech-Atlanta *': 'Atlanta',
+  'GT Lorraine-Undergrad Programs': 'Lorraine Undergrad',
+  'GT Lorraine-Graduate Programs': 'Lorraine Graduate',
+  'Georgia Tech - Shenzhen': 'Shenzhen',
+  'Video': 'Video',
+  'Online': 'Online',
+  'MBA Evening Program': 'MBA Evening',
+};
+
+export { OPEN, CLOSE, DAYS, PNG_SCALE_FACTOR, PALETTE, ASYNC_DELIVERY_MODE, DELIVERY_MODES, CAMPUSES };

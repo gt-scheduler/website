@@ -6,6 +6,7 @@ export * from './CombinationContainer';
 export * from './Course';
 export * from './CourseAdd';
 export * from './CourseContainer';
+export * from './CourseFilter';
 export * from './Header';
 export * from './Instructor';
 export * from './Palette';

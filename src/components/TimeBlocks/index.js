@@ -24,32 +24,30 @@ export function TimeBlocks({ className, crn, overlay, preview, capture }) {
         (meeting, i) =>
           meeting.period &&
           meeting.days.map((day) => (
-            <div
-              className={classes('meeting', contentClassName, 'default', day)}
-              key={[i, day].join('-')}
-              style={{
-                top:
-                  ((meeting.period.start - OPEN) / (CLOSE - OPEN)) * 100 +
-                  '%',
-                height:
-                  ((meeting.period.end - meeting.period.start) /
-                    (CLOSE - OPEN)) *
-                  100 +
-                  '%',
-                backgroundColor: color,
-              }}
-            >
+            <div className={classes('meeting', contentClassName, 'default', day)}
+                 key={[i, day].join('-')}
+                 style={{
+                   top:
+                     ((meeting.period.start - OPEN) / (CLOSE - OPEN)) * 100 +
+                     '%',
+                   height:
+                     ((meeting.period.end - meeting.period.start) /
+                       (CLOSE - OPEN)) *
+                     100 +
+                     '%',
+                   backgroundColor: color,
+                 }}>
               {
                 !preview && (
                   <div className="meeting-wrapper">
-                    <span className="ids">
+                    <div className="ids">
                       <span className="course-id">
                         {section.course.id}
                       </span>
                       <span className="section-id">
                         &nbsp;{section.id}
                       </span>
-                    </span>
+                    </div>
                     <span className="period">
                       {periodToString(meeting.period)}
                     </span>

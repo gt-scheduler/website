@@ -1,19 +1,17 @@
-import { DAYS, INSTRUCTIONAL_METHOD_ATTRIBUTES, PALETTE } from './constants';
+import { DAYS, PALETTE } from './constants';
 
 const stringToTime = (string) => {
   const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
-  return (
-    ((ampm === 'p' ? 12 : 0) + Number.parseInt(hour % 12)) * 60 +
-    Number.parseInt(minute)
-  );
+  return ((ampm === 'p' ? 12 : 0) + +hour % 12) * 60 + +minute;
 };
 
 const timeToString = (time, ampm = true) => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
-  return `${hour > 12 ? hour - 12 : hour}:${
-    minute < 10 ? '0' + minute : minute
-  }${ampm ? ` ${hour < 12 ? 'a' : 'p'}m` : ''}`;
+  const hh = hour > 12 ? hour - 12 : hour;
+  const mm = `${minute}`.padStart(2, '0');
+  const A = `${hour < 12 ? 'a' : 'p'}m`;
+  return ampm ? `${hh}:${mm} ${A}` : `${hh}:${mm}`;
 };
 
 const timeToShortString = (time) => {
@@ -59,15 +57,6 @@ const classes = (...classList) => classList.filter((c) => c).join(' ');
 
 const isMobile = () => window.innerWidth < 1024;
 
-const shallowCompareEntries = (a, b) => {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-  return (
-    aKeys.length === bKeys.length &&
-    aKeys.every((key) => key in b && a[key] === b[key])
-  );
-};
-
 const simplifyName = (name) => {
   const tokens = name.split(' ');
   const firstName = tokens.shift();
@@ -81,7 +70,7 @@ const isLab = (section) => section.scheduleType.includes('Lab');
 
 const isLecture = (section) => section.scheduleType.includes('Lecture');
 
-const getSemesterName = (term) => {
+const getSemesterName = term => {
   const year = term.substring(0, 4);
   const semester = (() => {
     switch (Number.parseInt(term.substring(4))) {
@@ -103,12 +92,13 @@ const getSemesterName = (term) => {
   return `${semester} ${year}`;
 };
 
-const isInstructionalMethodAttribute = attribute => {
-  return INSTRUCTIONAL_METHOD_ATTRIBUTES.includes(attribute);
-};
-
-const refineInstructionalMethodAttribute = attribute => {
-  return attribute.split(' ').filter(v => v !== 'Course').join(' ');
+const humanizeArray = (array, conjunction = 'and') => {
+  if (array.length <= 2) {
+    return array.join(` ${conjunction} `);
+  }
+  const init = [...array];
+  const last = init.pop();
+  return `${init.join(', ')}, ${conjunction} ${last}`;
 };
 
 export {
@@ -121,12 +111,10 @@ export {
   hasConflictBetween,
   classes,
   isMobile,
-  shallowCompareEntries,
   simplifyName,
   unique,
   isLab,
   isLecture,
   getSemesterName,
-  isInstructionalMethodAttribute,
-  refineInstructionalMethodAttribute,
+  humanizeArray,
 };

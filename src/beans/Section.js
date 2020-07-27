@@ -1,4 +1,5 @@
 import { unique } from '../utils';
+import { DELIVERY_MODES } from '../constants';
 
 class Section {
   constructor(oscar, course, sectionId, data) {
@@ -10,7 +11,10 @@ class Section {
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex];
     this.campus = oscar.campuses[campusIndex];
-    this.attributes = attributeIndices.map(attributeIndex => oscar.attributes[attributeIndex]);
+
+    const attributes = attributeIndices.map(attributeIndex => oscar.attributes[attributeIndex]);
+    this.deliveryMode = attributes.find(attribute => attribute in DELIVERY_MODES);
+
     this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
     this.meetings = meetings.map(
       ([periodIndex, days, where, instructors, dateRangeIndex]) => ({

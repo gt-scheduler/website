@@ -55,31 +55,6 @@
         }
       }
     }
-
-    .secondary {
-      padding: 0 8px 8px;
-      display: flex;
-      flex-wrap: wrap;
-
-      .attribute {
-        @include card;
-        background-color: rgba($color-neutral, .5);
-        padding: 4px 8px;
-        opacity: .5;
-        transition: opacity .2s;
-        font-size: .8em;
-        cursor: pointer;
-
-        &.active {
-          opacity: 1;
-          font-weight: bold;
-        }
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-    }
   }
 
   .Course {

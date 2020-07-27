@@ -70,33 +70,6 @@ class Oscar {
     return this.crnMap[crn];
   }
 
-  searchCourses(keyword, attributes) {
-    const filterCoursesByKeyword = () => {
-      const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(keyword.toUpperCase());
-      if (!results) {
-        return [];
-      }
-      const [, subject, number] = results;
-      if (number) {
-        return this.courses.filter(course => course.subject === subject && course.number.startsWith(number));
-      } else {
-        return this.courses.filter(course => course.subject === subject);
-      }
-    };
-
-    const filteredCourses = filterCoursesByKeyword();
-
-    if (attributes.length === 0) {
-      return filteredCourses;
-    }
-
-    return filteredCourses.filter(course => {
-      return course.sections.some(section => {
-        return attributes.some(attribute => section.attributes.includes(attribute));
-      });
-    });
-  }
-
   getCombinations(desiredCourses, pinnedCrns, excludedCrns) {
     const crnsList = [];
     const dfs = (courseIndex = 0, crns = []) => {

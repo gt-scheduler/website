@@ -1,14 +1,10 @@
 import React, { useCallback, useContext } from 'react';
 import { faBan, faInfoCircle, faThumbtack, faTimes } from '@fortawesome/free-solid-svg-icons';
-import {
-  classes,
-  isInstructionalMethodAttribute,
-  periodToString,
-  refineInstructionalMethodAttribute,
-} from '../../utils';
+import { classes, periodToString } from '../../utils';
 import { ActionRow } from '../';
 import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
+import { DELIVERY_MODES } from '../../constants';
 
 export function Section({ className, section, pinned, color }) {
   const [
@@ -49,13 +45,8 @@ export function Section({ className, section, pinned, color }) {
       { icon: faBan, onClick: () => excludeSection(section) },
     ]} style={pinned ? { backgroundColor: color } : undefined}>
       <div className="section-details">
-        <div className="instructional-method">
-          {
-            section.attributes
-              .filter(isInstructionalMethodAttribute)
-              .map(refineInstructionalMethodAttribute)
-              .join(', ')
-          }
+        <div className="delivery-mode">
+          {DELIVERY_MODES[section.deliveryMode]}
         </div>
         <div className="meeting-container">
           {
