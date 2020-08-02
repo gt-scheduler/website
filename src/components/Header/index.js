@@ -24,7 +24,7 @@ export function Header(props) {
 
   const handleThemeChange = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    Cookies.set('theme', newTheme);
+    Cookies.set('theme', newTheme, { expires: 1460 });
     setTheme(newTheme);
   }, [theme, setTheme]);
 
