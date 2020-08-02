@@ -6,7 +6,7 @@ export function useCookie(key, defaultValue) {
 
   const setCookieValue = useCallback(value => {
     setValue(value);
-    Cookies.set(key, value);
+    Cookies.set(key, value, { expires: 1460 });
   }, [key, setValue]);
 
   useEffect(() => {
