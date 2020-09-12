@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useMemo } from 'react';
 import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
-import { Button, Calendar, Select } from '../';
+import { Button, Calendar, Select } from '..';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
@@ -8,38 +8,42 @@ import { OverlayCrnsContext, TermContext } from '../../contexts';
 export function CombinationContainer(props) {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
-    { patchTermData },
+    { patchTermData }
   ] = useContext(TermContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
 
   const handleResetPinnedCrns = useCallback(() => {
     if (window.confirm('Are you sure to reset sections you selected?')) {
       patchTermData({
-        pinnedCrns: [],
+        pinnedCrns: []
       });
     }
   }, [patchTermData]);
 
-  const combinations = useMemo(() => oscar.getCombinations(
-    desiredCourses,
-    pinnedCrns,
-    excludedCrns,
-  ), [oscar, desiredCourses, pinnedCrns, excludedCrns]);
-  const sortedCombinations = useMemo(() => oscar.sortCombinations(
-    combinations,
-    sortingOptionIndex,
-  ), [oscar, combinations, sortingOptionIndex]);
+  const combinations = useMemo(
+    () => oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns),
+    [oscar, desiredCourses, pinnedCrns, excludedCrns]
+  );
+  const sortedCombinations = useMemo(
+    () => oscar.sortCombinations(combinations, sortingOptionIndex),
+    [oscar, combinations, sortingOptionIndex]
+  );
 
   return (
     <div className="CombinationContainer">
       <Select
-        onChange={sortingOptionIndex => patchTermData({ sortingOptionIndex })}
+        onChange={(sortingOptionIndex) => patchTermData({ sortingOptionIndex })}
         value={sortingOptionIndex}
-        options={oscar.sortingOptions.map((sortingOption, i) => ({ value: i, label: sortingOption.label }))}/>
+        options={oscar.sortingOptions.map((sortingOption, i) => ({
+          value: i,
+          label: sortingOption.label
+        }))}
+      />
       <Button
         className="reset"
         onClick={handleResetPinnedCrns}
-        disabled={pinnedCrns.length === 0}>
+        disabled={pinnedCrns.length === 0}
+      >
         Reset Sections
       </Button>
       <div className="scroller">
@@ -55,21 +59,22 @@ export function CombinationContainer(props) {
                 const { crns } = sortedCombinations[index];
                 return (
                   <div className="list-item" style={style} key={key}>
-                    <div className="combination"
-                         onMouseEnter={() => setOverlayCrns(crns)}
-                         onMouseLeave={() => setOverlayCrns([])}
-                         onClick={() =>
-                           patchTermData({
-                             pinnedCrns: [
-                               ...pinnedCrns,
-                               ...crns,
-                             ],
-                           })
-                         }>
+                    <div
+                      className="combination"
+                      onMouseEnter={() => setOverlayCrns(crns)}
+                      onMouseLeave={() => setOverlayCrns([])}
+                      onClick={() =>
+                        patchTermData({
+                          pinnedCrns: [...pinnedCrns, ...crns]
+                        })
+                      }
+                    >
                       <div className="number">{index + 1}</div>
-                      <Calendar className="calendar-preview"
-                                overlayCrns={crns}
-                                preview/>
+                      <Calendar
+                        className="calendar-preview"
+                        overlayCrns={crns}
+                        preview
+                      />
                     </div>
                   </div>
                 );

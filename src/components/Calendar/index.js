@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils';
-import { TimeBlocks } from '../';
+import { TimeBlocks } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
@@ -9,12 +9,14 @@ export function Calendar({ className, overlayCrns, preview, capture }) {
   const [{ pinnedCrns }] = useContext(TermContext);
 
   return (
-    <div className={classes(
-      'Calendar',
-      capture && 'capture',
-      preview && 'preview',
-      className,
-    )}>
+    <div
+      className={classes(
+        'Calendar',
+        capture && 'capture',
+        preview && 'preview',
+        className
+      )}
+    >
       {!preview && (
         <div className="times">
           {new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
@@ -38,25 +40,20 @@ export function Calendar({ className, overlayCrns, preview, capture }) {
       )}
       <div className="meetings">
         {pinnedCrns.map((crn) => (
-          <TimeBlocks
-            key={crn}
-            crn={crn}
-            preview={preview}
-            capture={capture}
-          />
+          <TimeBlocks key={crn} crn={crn} preview={preview} capture={capture} />
         ))}
         {overlayCrns &&
-        overlayCrns
-          .filter((crn) => !pinnedCrns.includes(crn))
-          .map((crn) => (
-            <TimeBlocks
-              key={crn}
-              crn={crn}
-              overlay={!preview}
-              preview={preview}
-              capture={capture}
-            />
-          ))}
+          overlayCrns
+            .filter((crn) => !pinnedCrns.includes(crn))
+            .map((crn) => (
+              <TimeBlocks
+                key={crn}
+                crn={crn}
+                overlay={!preview}
+                preview={preview}
+                capture={capture}
+              />
+            ))}
       </div>
     </div>
   );

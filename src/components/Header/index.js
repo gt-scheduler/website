@@ -1,23 +1,25 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import { getSemesterName } from '../../utils';
-import { Button, Calendar, Select } from '../';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdjust, faCalendarAlt, faDownload, faPaste } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAdjust,
+  faCalendarAlt,
+  faDownload,
+  faPaste
+} from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
-import ics from '../../libs/ics';
 import domtoimage from 'dom-to-image';
-import { PNG_SCALE_FACTOR } from '../../constants';
 import saveAs from 'file-saver';
+import { PNG_SCALE_FACTOR } from '../../constants';
+import ics from '../../libs/ics';
+import { Button, Calendar, Select } from '..';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 
 export function Header(props) {
-  const [
-    { term, oscar, pinnedCrns },
-    { setTerm },
-  ] = useContext(TermContext);
+  const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
   const [terms] = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
   const captureRef = useRef(null);
@@ -47,14 +49,14 @@ export function Header(props) {
         const begin = new Date(from.getTime());
         while (
           !meeting.days.includes(
-            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()],
+            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()]
           )
-          ) {
+        ) {
           begin.setDate(begin.getDate() + 1);
         }
         begin.setHours(
           (meeting.period.start / 60) | 0,
-          meeting.period.start % 60,
+          meeting.period.start % 60
         );
         const end = new Date(begin.getTime());
         end.setHours((meeting.period.end / 60) | 0, meeting.period.end % 60);
@@ -62,8 +64,8 @@ export function Header(props) {
           freq: 'WEEKLY',
           until: to,
           byday: meeting.days.map(
-            (day) => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day]),
-          ),
+            (day) => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])
+          )
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
       });
@@ -80,8 +82,8 @@ export function Header(props) {
         style: {
           left: 0,
           transform: `scale(${PNG_SCALE_FACTOR})`,
-          'transform-origin': 'top left',
-        },
+          'transform-origin': 'top left'
+        }
       })
       .then((blob) => saveAs(blob, 'schedule.png'));
   }, [captureRef]);
@@ -92,44 +94,40 @@ export function Header(props) {
         <span className="gt">GT </span>
         <span className="scheduler">Scheduler</span>
       </Button>
-      <Select onChange={setTerm}
-              value={term}
-              options={terms.map(term => ({ value: term, label: getSemesterName(term) }))}
-              className="semester"/>
-      <span className="credits">
-            {totalCredits} Credits
-          </span>
+      <Select
+        onChange={setTerm}
+        value={term}
+        options={terms.map((term) => ({
+          value: term,
+          label: getSemesterName(term)
+        }))}
+        className="semester"
+      />
+      <span className="credits">{totalCredits} Credits</span>
       <div className="menu">
-        <Button
-          onClick={handleDownload}
-          disabled={pinnedCrns.length === 0}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faDownload}/>
+        <Button onClick={handleDownload} disabled={pinnedCrns.length === 0}>
+          <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
           <div className="text">Download</div>
         </Button>
-        <Button
-          onClick={handleExport}
-          disabled={pinnedCrns.length === 0}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt}/>
+        <Button onClick={handleExport} disabled={pinnedCrns.length === 0}>
+          <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
           <div className="text">Export</div>
         </Button>
-        <Button
-          text={pinnedCrns.join(', ')}
-          disabled={pinnedCrns.length === 0}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faPaste}/>
+        <Button text={pinnedCrns.join(', ')} disabled={pinnedCrns.length === 0}>
+          <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
           <div className="text">CRNs</div>
         </Button>
-        <Button
-          onClick={handleThemeChange}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust}/>
+        <Button onClick={handleThemeChange}>
+          <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
         </Button>
         <Button href="https://github.com/64json/gt-scheduler">
-          <FontAwesomeIcon className="icon" fixedWidth icon={faGithub}/>
+          <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
           <div className="text">GitHub</div>
         </Button>
       </div>
       <div className="capture-container" ref={captureRef}>
-        <Calendar className="fake-calendar" capture/>
+        <Calendar className="fake-calendar" capture />
       </div>
     </div>
   );

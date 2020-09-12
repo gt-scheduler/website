@@ -4,10 +4,13 @@ import Cookies from 'js-cookie';
 export function useCookie(key, defaultValue) {
   const [value, setValue] = useState(defaultValue);
 
-  const setCookieValue = useCallback(value => {
-    setValue(value);
-    Cookies.set(key, value, { expires: 1460 });
-  }, [key, setValue]);
+  const setCookieValue = useCallback(
+    (value) => {
+      setValue(value);
+      Cookies.set(key, value, { expires: 1460 });
+    },
+    [key, setValue]
+  );
 
   useEffect(() => {
     let value;

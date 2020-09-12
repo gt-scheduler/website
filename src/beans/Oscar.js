@@ -1,17 +1,17 @@
-import { Course, SortingOption } from './';
+import { Course, SortingOption } from '.';
 import { hasConflictBetween, stringToTime } from '../utils';
 
 class Oscar {
   constructor(data) {
     const { courses, caches, updatedAt } = data;
 
-    this.periods = caches.periods.map(period => {
+    this.periods = caches.periods.map((period) => {
       if (period === 'TBA') {
         return undefined;
       }
       return {
         start: stringToTime(period.split(' - ')[0]),
-        end: stringToTime(period.split(' - ')[1]),
+        end: stringToTime(period.split(' - ')[1])
       };
     });
     this.dateRanges = caches.dateRanges.map((dateRange) => {
@@ -26,7 +26,7 @@ class Oscar {
     this.gradeBases = caches.gradeBases;
     this.updatedAt = new Date(updatedAt);
     this.courses = Object.keys(courses).map(
-      (courseId) => new Course(this, courseId, courses[courseId]),
+      (courseId) => new Course(this, courseId, courses[courseId])
     );
     this.courseMap = {};
     this.crnMap = {};
@@ -40,7 +40,7 @@ class Oscar {
       new SortingOption('Most Compact', (combination) => {
         const { startMap, endMap } = combination;
         const diffs = Object.keys(startMap).map(
-          (day) => endMap[day] - startMap[day],
+          (day) => endMap[day] - startMap[day]
         );
         const sum = diffs.reduce((sum, min) => sum + min, 0);
         return +sum;
@@ -58,7 +58,7 @@ class Oscar {
         const sum = starts.reduce((sum, min) => sum + min, 0);
         const avg = sum / starts.length;
         return -avg;
-      }),
+      })
     ];
   }
 
@@ -82,7 +82,7 @@ class Oscar {
       const isPinned = (section) => pinnedCrns.includes(section.crn);
       const hasConflict = (section) =>
         [...pinnedCrns, ...crns].some((crn) =>
-          hasConflictBetween(this.findSection(crn), section),
+          hasConflictBetween(this.findSection(crn), section)
         );
       if (course.hasLab) {
         const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
@@ -115,16 +115,14 @@ class Oscar {
             dfs(courseIndex + 1, [...crns, section.crn]);
           });
         }
+      } else if (course.sections.some(isPinned)) {
+        dfs(courseIndex + 1, crns);
       } else {
-        if (course.sections.some(isPinned)) {
-          dfs(courseIndex + 1, crns);
-        } else {
-          Object.values(course.sectionGroups).forEach((sectionGroup) => {
-            const section = sectionGroup.sections.find(isIncluded);
-            if (!section || hasConflict(section)) return;
-            dfs(courseIndex + 1, [...crns, section.crn]);
-          });
-        }
+        Object.values(course.sectionGroups).forEach((sectionGroup) => {
+          const section = sectionGroup.sections.find(isIncluded);
+          if (!section || hasConflict(section)) return;
+          dfs(courseIndex + 1, [...crns, section.crn]);
+        });
       }
     };
     dfs();
@@ -140,7 +138,7 @@ class Oscar {
       return {
         crns,
         startMap,
-        endMap,
+        endMap
       };
     });
   }
@@ -150,7 +148,7 @@ class Oscar {
     return combinations
       .map((combination) => ({
         ...combination,
-        factor: sortingOption.calculateFactor(combination),
+        factor: sortingOption.calculateFactor(combination)
       }))
       .sort((a, b) => a.factor - b.factor);
   }
@@ -162,7 +160,7 @@ class Oscar {
           meeting.period &&
           meeting.days.forEach((day) => {
             callback(day, meeting.period);
-          }),
+          })
       );
     });
   }

@@ -2,7 +2,7 @@ import { DAYS, PALETTE } from './constants';
 
 const stringToTime = (string) => {
   const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
-  return ((ampm === 'p' ? 12 : 0) + +hour % 12) * 60 + +minute;
+  return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
 const timeToString = (time, ampm = true) => {
@@ -26,11 +26,11 @@ const periodToString = (period) =>
 
 const getRandomColor = () => {
   const colors = PALETTE.flat();
-  const index = Math.random() * colors.length | 0;
+  const index = (Math.random() * colors.length) | 0;
   return colors[index];
 };
 
-const getContentClassName = color => {
+const getContentClassName = (color) => {
   const r = parseInt(color.substring(1, 3), 16);
   const g = parseInt(color.substring(3, 5), 16);
   const b = parseInt(color.substring(5, 7), 16);
@@ -46,11 +46,11 @@ const hasConflictBetween = (section1, section2) =>
         meeting1.period &&
         meeting2.period &&
         DAYS.some(
-          (day) => meeting1.days.includes(day) && meeting2.days.includes(day),
+          (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
         ) &&
         meeting1.period.start < meeting2.period.end &&
-        meeting2.period.start < meeting1.period.end,
-    ),
+        meeting2.period.start < meeting1.period.end
+    )
   );
 
 const classes = (...classList) => classList.filter((c) => c).join(' ');
@@ -66,11 +66,12 @@ const simplifyName = (name) => {
 
 const unique = (array) => [...new Set(array)];
 
-const isLab = (section) => ['Lab', 'Studio'].some(type => section.scheduleType.includes(type));
+const isLab = (section) =>
+  ['Lab', 'Studio'].some((type) => section.scheduleType.includes(type));
 
 const isLecture = (section) => section.scheduleType.includes('Lecture');
 
-const getSemesterName = term => {
+const getSemesterName = (term) => {
   const year = term.substring(0, 4);
   const semester = (() => {
     switch (Number.parseInt(term.substring(4))) {
@@ -116,5 +117,5 @@ export {
   isLab,
   isLecture,
   getSemesterName,
-  humanizeArray,
+  humanizeArray
 };

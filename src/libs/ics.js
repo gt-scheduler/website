@@ -17,22 +17,22 @@ const ics = function (uidDomain, prodId) {
     prodId = 'Calendar';
   }
 
-  var SEPARATOR = navigator.appVersion.indexOf('Win') !== -1 ? '\r\n' : '\n';
-  var calendarEvents = [];
-  var calendarStart = [
+  const SEPARATOR = navigator.appVersion.indexOf('Win') !== -1 ? '\r\n' : '\n';
+  const calendarEvents = [];
+  const calendarStart = [
     'BEGIN:VCALENDAR',
-    'PRODID:' + prodId,
-    'VERSION:2.0',
+    `PRODID:${prodId}`,
+    'VERSION:2.0'
   ].join(SEPARATOR);
-  var calendarEnd = SEPARATOR + 'END:VCALENDAR';
-  var BYDAY_VALUES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+  const calendarEnd = `${SEPARATOR}END:VCALENDAR`;
+  const BYDAY_VALUES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
   return {
     /**
      * Returns events array
      * @return {array} Events
      */
-    events: function () {
+    events() {
       return calendarEvents;
     },
 
@@ -40,7 +40,7 @@ const ics = function (uidDomain, prodId) {
      * Returns calendar
      * @return {string} Calendar in iCalendar format
      */
-    calendar: function () {
+    calendar() {
       return (
         calendarStart + SEPARATOR + calendarEvents.join(SEPARATOR) + calendarEnd
       );
@@ -54,7 +54,7 @@ const ics = function (uidDomain, prodId) {
      * @param  {string} begin       Beginning date of event
      * @param  {string} stop        Ending date of event
      */
-    addEvent: function (subject, description, location, begin, stop, rrule) {
+    addEvent(subject, description, location, begin, stop, rrule) {
       // I'm not in the mood to make these optional... So they are all required
       if (
         typeof subject === 'undefined' ||
@@ -76,27 +76,27 @@ const ics = function (uidDomain, prodId) {
             rrule.freq !== 'DAILY'
           ) {
             throw new Error(
-              'Recurrence rrule frequency must be provided and be one of the following: \'YEARLY\', \'MONTHLY\', \'WEEKLY\', or \'DAILY\'',
+              "Recurrence rrule frequency must be provided and be one of the following: 'YEARLY', 'MONTHLY', 'WEEKLY', or 'DAILY'"
             );
           }
 
           if (rrule.until) {
             if (isNaN(Date.parse(rrule.until))) {
               throw new Error(
-                'Recurrence rrule \'until\' must be a valid date string',
+                "Recurrence rrule 'until' must be a valid date string"
               );
             }
           }
 
           if (rrule.interval) {
             if (isNaN(parseInt(rrule.interval))) {
-              throw new Error('Recurrence rrule \'interval\' must be an integer');
+              throw new Error("Recurrence rrule 'interval' must be an integer");
             }
           }
 
           if (rrule.count) {
             if (isNaN(parseInt(rrule.count))) {
-              throw new Error('Recurrence rrule \'count\' must be an integer');
+              throw new Error("Recurrence rrule 'count' must be an integer");
             }
           }
 
@@ -104,12 +104,12 @@ const ics = function (uidDomain, prodId) {
             if (
               Object.prototype.toString.call(rrule.byday) !== '[object Array]'
             ) {
-              throw new Error('Recurrence rrule \'byday\' must be an array');
+              throw new Error("Recurrence rrule 'byday' must be an array");
             }
 
             if (rrule.byday.length > 7) {
               throw new Error(
-                'Recurrence rrule \'byday\' array must not be longer than the 7 days in a week',
+                "Recurrence rrule 'byday' array must not be longer than the 7 days in a week"
               );
             }
 
@@ -118,10 +118,10 @@ const ics = function (uidDomain, prodId) {
               return rrule.byday.indexOf(elem) === pos;
             });
 
-            for (var d in rrule.byday) {
+            for (const d in rrule.byday) {
               if (BYDAY_VALUES.indexOf(rrule.byday[d]) < 0) {
                 throw new Error(
-                  'Recurrence rrule \'byday\' values must include only the following: \'SU\', \'MO\', \'TU\', \'WE\', \'TH\', \'FR\', \'SA\'',
+                  "Recurrence rrule 'byday' values must include only the following: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'"
                 );
               }
             }
@@ -129,99 +129,98 @@ const ics = function (uidDomain, prodId) {
         }
       }
 
-      //TODO add time and time zone? use moment to format?
-      var start_date = new Date(begin);
-      var end_date = new Date(stop);
-      var now_date = new Date();
+      // TODO add time and time zone? use moment to format?
+      const start_date = new Date(begin);
+      const end_date = new Date(stop);
+      const now_date = new Date();
 
-      var start_year = ('0000' + start_date.getFullYear().toString()).slice(-4);
-      var start_month = ('00' + (start_date.getMonth() + 1).toString()).slice(
-        -2,
+      const start_year = `0000${start_date.getFullYear().toString()}`.slice(-4);
+      const start_month = `00${(start_date.getMonth() + 1).toString()}`.slice(
+        -2
       );
-      var start_day = ('00' + start_date.getDate().toString()).slice(-2);
-      var start_hours = ('00' + start_date.getHours().toString()).slice(-2);
-      var start_minutes = ('00' + start_date.getMinutes().toString()).slice(-2);
-      var start_seconds = ('00' + start_date.getSeconds().toString()).slice(-2);
+      const start_day = `00${start_date.getDate().toString()}`.slice(-2);
+      const start_hours = `00${start_date.getHours().toString()}`.slice(-2);
+      const start_minutes = `00${start_date.getMinutes().toString()}`.slice(-2);
+      const start_seconds = `00${start_date.getSeconds().toString()}`.slice(-2);
 
-      var end_year = ('0000' + end_date.getFullYear().toString()).slice(-4);
-      var end_month = ('00' + (end_date.getMonth() + 1).toString()).slice(-2);
-      var end_day = ('00' + end_date.getDate().toString()).slice(-2);
-      var end_hours = ('00' + end_date.getHours().toString()).slice(-2);
-      var end_minutes = ('00' + end_date.getMinutes().toString()).slice(-2);
-      var end_seconds = ('00' + end_date.getSeconds().toString()).slice(-2);
+      const end_year = `0000${end_date.getFullYear().toString()}`.slice(-4);
+      const end_month = `00${(end_date.getMonth() + 1).toString()}`.slice(-2);
+      const end_day = `00${end_date.getDate().toString()}`.slice(-2);
+      const end_hours = `00${end_date.getHours().toString()}`.slice(-2);
+      const end_minutes = `00${end_date.getMinutes().toString()}`.slice(-2);
+      const end_seconds = `00${end_date.getSeconds().toString()}`.slice(-2);
 
-      var now_year = ('0000' + now_date.getFullYear().toString()).slice(-4);
-      var now_month = ('00' + (now_date.getMonth() + 1).toString()).slice(-2);
-      var now_day = ('00' + now_date.getDate().toString()).slice(-2);
-      var now_hours = ('00' + now_date.getHours().toString()).slice(-2);
-      var now_minutes = ('00' + now_date.getMinutes().toString()).slice(-2);
-      var now_seconds = ('00' + now_date.getSeconds().toString()).slice(-2);
+      const now_year = `0000${now_date.getFullYear().toString()}`.slice(-4);
+      const now_month = `00${(now_date.getMonth() + 1).toString()}`.slice(-2);
+      const now_day = `00${now_date.getDate().toString()}`.slice(-2);
+      const now_hours = `00${now_date.getHours().toString()}`.slice(-2);
+      const now_minutes = `00${now_date.getMinutes().toString()}`.slice(-2);
+      const now_seconds = `00${now_date.getSeconds().toString()}`.slice(-2);
 
       // Since some calendars don't add 0 second events, we need to remove time if there is none...
-      var start_time = '';
-      var end_time = '';
+      let start_time = '';
+      let end_time = '';
       if (
         start_hours +
-        start_minutes +
-        start_seconds +
-        end_hours +
-        end_minutes +
-        end_seconds !==
+          start_minutes +
+          start_seconds +
+          end_hours +
+          end_minutes +
+          end_seconds !==
         0
       ) {
-        start_time = 'T' + start_hours + start_minutes + start_seconds;
-        end_time = 'T' + end_hours + end_minutes + end_seconds;
+        start_time = `T${start_hours}${start_minutes}${start_seconds}`;
+        end_time = `T${end_hours}${end_minutes}${end_seconds}`;
       }
-      var now_time = 'T' + now_hours + now_minutes + now_seconds;
+      const now_time = `T${now_hours}${now_minutes}${now_seconds}`;
 
-      var start = start_year + start_month + start_day + start_time;
-      var end = end_year + end_month + end_day + end_time;
-      var now = now_year + now_month + now_day + now_time;
+      const start = start_year + start_month + start_day + start_time;
+      const end = end_year + end_month + end_day + end_time;
+      const now = now_year + now_month + now_day + now_time;
 
       // recurrence rrule vars
-      var rruleString;
+      let rruleString;
       if (rrule) {
         if (rrule.rrule) {
           rruleString = rrule.rrule;
         } else {
-          rruleString = 'RRULE:FREQ=' + rrule.freq;
+          rruleString = `RRULE:FREQ=${rrule.freq}`;
 
           if (rrule.until) {
-            var uDate = new Date(Date.parse(rrule.until)).toISOString();
-            rruleString +=
-              ';UNTIL=' +
-              uDate.substring(0, uDate.length - 13).replace(/[-]/g, '') +
-              '000000Z';
+            const uDate = new Date(Date.parse(rrule.until)).toISOString();
+            rruleString += `;UNTIL=${uDate
+              .substring(0, uDate.length - 13)
+              .replace(/[-]/g, '')}000000Z`;
           }
 
           if (rrule.interval) {
-            rruleString += ';INTERVAL=' + rrule.interval;
+            rruleString += `;INTERVAL=${rrule.interval}`;
           }
 
           if (rrule.count) {
-            rruleString += ';COUNT=' + rrule.count;
+            rruleString += `;COUNT=${rrule.count}`;
           }
 
           if (rrule.byday && rrule.byday.length > 0) {
-            rruleString += ';BYDAY=' + rrule.byday.join(',');
+            rruleString += `;BYDAY=${rrule.byday.join(',')}`;
           }
         }
       }
 
       // var stamp = new Date().toISOString();
 
-      var calendarEvent = [
+      let calendarEvent = [
         'BEGIN:VEVENT',
-        'UID:' + calendarEvents.length + '@' + uidDomain,
+        `UID:${calendarEvents.length}@${uidDomain}`,
         'CLASS:PUBLIC',
-        'DESCRIPTION:' + description,
-        'DTSTAMP;VALUE=DATE-TIME:' + now,
-        'DTSTART;VALUE=DATE-TIME:' + start,
-        'DTEND;VALUE=DATE-TIME:' + end,
-        'LOCATION:' + location,
-        'SUMMARY;LANGUAGE=en-us:' + subject,
+        `DESCRIPTION:${description}`,
+        `DTSTAMP;VALUE=DATE-TIME:${now}`,
+        `DTSTART;VALUE=DATE-TIME:${start}`,
+        `DTEND;VALUE=DATE-TIME:${end}`,
+        `LOCATION:${location}`,
+        `SUMMARY;LANGUAGE=en-us:${subject}`,
         'TRANSP:TRANSPARENT',
-        'END:VEVENT',
+        'END:VEVENT'
       ];
 
       if (rruleString) {
@@ -239,28 +238,28 @@ const ics = function (uidDomain, prodId) {
      * @param  {string} filename Filename
      * @param  {string} ext      Extention
      */
-    download: function (filename, ext) {
+    download(filename, ext) {
       if (calendarEvents.length < 1) {
         return false;
       }
 
       ext = typeof ext !== 'undefined' ? ext : '.ics';
       filename = typeof filename !== 'undefined' ? filename : 'calendar';
-      var calendar =
+      const calendar =
         calendarStart +
         SEPARATOR +
         calendarEvents.join(SEPARATOR) +
         calendarEnd;
 
-      var blob;
+      let blob;
       if (navigator.userAgent.indexOf('MSIE 10') === -1) {
         // chrome or firefox
         blob = new Blob([calendar]);
       } else {
         // ie
-        var bb = new BlobBuilder();
+        const bb = new BlobBuilder();
         bb.append(calendar);
-        blob = bb.getBlob('text/x-vCalendar;charset=' + document.characterSet);
+        blob = bb.getBlob(`text/x-vCalendar;charset=${document.characterSet}`);
       }
       saveAs(blob, filename + ext);
       return calendar;
@@ -269,19 +268,19 @@ const ics = function (uidDomain, prodId) {
     /**
      * Build and return the ical contents
      */
-    build: function () {
+    build() {
       if (calendarEvents.length < 1) {
         return false;
       }
 
-      var calendar =
+      const calendar =
         calendarStart +
         SEPARATOR +
         calendarEvents.join(SEPARATOR) +
         calendarEnd;
 
       return calendar;
-    },
+    }
   };
 };
 

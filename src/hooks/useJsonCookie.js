@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useCookie } from './';
+import { useCookie } from '.';
 
 export function useJsonCookie(key, defaultValue) {
   const [rawValue, setRawValue] = useCookie(key);
@@ -9,19 +9,22 @@ export function useJsonCookie(key, defaultValue) {
       const parsedValue = JSON.parse(rawValue);
       return {
         ...defaultValue,
-        ...parsedValue,
+        ...parsedValue
       };
     }
     return defaultValue;
   }, [rawValue, defaultValue]);
 
-  const patchValue = useCallback(patch => {
-    const rawValue = JSON.stringify({
-      ...value,
-      ...patch,
-    });
-    setRawValue(rawValue);
-  }, [value, setRawValue]);
+  const patchValue = useCallback(
+    (patch) => {
+      const rawValue = JSON.stringify({
+        ...value,
+        ...patch
+      });
+      setRawValue(rawValue);
+    },
+    [value, setRawValue]
+  );
 
   return [value, patchValue];
 }
