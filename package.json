@@ -2,7 +2,7 @@
   "name": "gt-scheduler",
   "version": "0.2.0",
   "private": true,
-  "homepage": "https://jasonpark.me/gt-scheduler",
+  "homepage": "https://gtbitsofgood.github.io/gt-scheduler/",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
@@ -25,13 +25,32 @@
     "redux-actions": "^2.6.5",
     "s-ago": "^2.2.0"
   },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.9.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.6",
+    "eslint-plugin-react-hooks": "^4.1.2",
+    "gh-pages": "^2.2.0",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.3.0",
+    "prettier": "^2.1.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "lint": "eslint \"**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "format": "prettier \"**/*.{js,jsx}\" --write",
+    "format:check": "prettier \"**/*.{js,jsx}\" -l"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -42,7 +61,13 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "devDependencies": {
-    "gh-pages": "^2.2.0"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": ["eslint"],
+    "*.{js,jsx,css}": ["prettier --write"]
   }
 }
