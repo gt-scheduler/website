@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/scraper/node_modules
+/scraper/classInfo.json
 
 # testing
 /coverage
