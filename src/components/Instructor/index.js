@@ -3,7 +3,7 @@ import {
   faAngleDown,
   faAngleUp,
   faBan,
-  faInfoCircle
+  faGraduationCap
 } from '@fortawesome/free-solid-svg-icons';
 import { classes, simplifyName, unique } from '../../utils';
 import { ActionRow, Section } from '..';
@@ -63,7 +63,7 @@ export function Instructor({ className, color, name, sections, gpa }) {
             onClick: () => setExpanded(!expanded)
           },
           !['TBA', 'Not Assigned'].includes(name) && {
-            icon: faInfoCircle,
+            icon: faGraduationCap,
             href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
               simplifyName(name)
             )}`
