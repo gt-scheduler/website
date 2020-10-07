@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from 'react';
 import {
   faBan,
-  faInfoCircle,
+  faChair,
   faThumbtack,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
@@ -55,7 +55,7 @@ export function Section({ className, section, pinned, color }) {
           onClick: () => pinSection(section)
         },
         {
-          icon: faInfoCircle,
+          icon: faChair,
           href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`
         },
         { icon: faBan, onClick: () => excludeSection(section) }
