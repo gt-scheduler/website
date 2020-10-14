@@ -5,7 +5,7 @@ import { TimeBlocks } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export function Calendar({ className, overlayCrns, preview, capture }) {
+export function Calendar({ className, overlayCrns, preview, capture, isAutosized }) {
   const [{ pinnedCrns }] = useContext(TermContext);
 
   return (
@@ -40,19 +40,15 @@ export function Calendar({ className, overlayCrns, preview, capture }) {
       )}
       <div className="meetings">
         {pinnedCrns.map((crn) => (
-          <TimeBlocks key={crn} crn={crn} preview={preview} capture={capture} />
+          <TimeBlocks key={crn} crn={crn} preview={preview}
+            capture={capture} isAutosized={isAutosized} />
         ))}
         {overlayCrns &&
           overlayCrns
             .filter((crn) => !pinnedCrns.includes(crn))
             .map((crn) => (
-              <TimeBlocks
-                key={crn}
-                crn={crn}
-                overlay={!preview}
-                preview={preview}
-                capture={capture}
-              />
+              <TimeBlocks key={crn} crn={crn} overlay={!preview}
+                preview={preview} capture={capture} />
             ))}
       </div>
     </div>

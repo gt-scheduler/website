@@ -132,7 +132,8 @@ export function Course({ className, courseId, onAddCourse }) {
         {!isSearching && (
           <div className="course-row">
             <span className="gpa">
-              Course GPA: {Object.keys(gpaMap).length === 0 ? 'Loading...' : (gpaMap.averageGpa || 'N/A')}
+              Course GPA: {Object.keys(gpaMap).length === 0 ? "Loading..."
+                : (gpaMap.averageGpa ? gpaMap.averageGpa.toFixed(2) : "N/A")}
             </span>
             {totalCredits > 0 && (
               <span className="credits">{totalCredits} Credits</span>
@@ -158,7 +159,8 @@ export function Course({ className, courseId, onAddCourse }) {
               color={color}
               name={name}
               sections={instructorMap[name]}
-              gpa={Object.keys(gpaMap).length === 0 ? 'Loading...' : gpaMap[name]}
+              gpa={Object.keys(gpaMap).length === 0 ? "Loading..."
+                : (gpaMap[name] ? gpaMap[name].toFixed(2) : "N/A")}
             />
           ))}
           {excludedInstructors.length > 0 && (

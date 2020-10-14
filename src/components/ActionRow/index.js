@@ -18,9 +18,16 @@ export function ActionRow({
         <div className={classes('actions', 'default')}>
           {actions
             .filter((action) => action)
-            .map(({ icon, ...restProps }, i) => (
+            .map(({ icon, dataTip, dataFor, onMouseEnter, onMouseLeave, ...restProps }, i) => (
               <Button className="action" {...restProps} key={i}>
-                <FontAwesomeIcon fixedWidth icon={icon} />
+                <FontAwesomeIcon
+                  fixedWidth
+                  icon={icon}
+                  data-tip={dataTip}
+                  data-for={dataFor}
+                  onMouseEnter={onMouseEnter}
+                  onMouseLeave={onMouseLeave}
+                />
               </Button>
             ))}
         </div>

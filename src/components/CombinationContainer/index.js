@@ -73,6 +73,7 @@ export function CombinationContainer(props) {
                       <Calendar
                         className="calendar-preview"
                         overlayCrns={crns}
+                        isAutosized
                         preview
                       />
                     </div>
