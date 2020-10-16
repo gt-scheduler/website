@@ -59,7 +59,7 @@ export function App(props) {
     setOscar(null);
     if (term) {
       axios
-        .get(`https://jasonpark.me/gt-schedule-crawler/${term}.json`)
+        .get(`https://gtbitsofgood.github.io/gt-schedule-crawler/${term}.json`)
         .then((res) => {
           const oscar = new Oscar(res.data);
           setOscar(oscar);

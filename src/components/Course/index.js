@@ -3,6 +3,7 @@ import {
   faAngleDown,
   faAngleUp,
   faInfoCircle,
+  faShareAlt,
   faPalette,
   faPlus,
   faTrash
@@ -14,6 +15,7 @@ import { TermContext } from '../../contexts';
 
 export function Course({ className, courseId, onAddCourse }) {
   const [expanded, setExpanded] = useState(false);
+  const [prereqs, setPrereqs] = useState(false);
   const [paletteShown, setPaletteShown] = useState(false);
   const [gpaMap, setGpaMap] = useState({});
   const isSearching = Boolean(onAddCourse);
@@ -79,10 +81,12 @@ export function Course({ className, courseId, onAddCourse }) {
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const infoAction = {
-    icon: faInfoCircle,
-    href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`
-  };
+  const prereqControl = (pre, exp) => { setPrereqs(pre); setExpanded(exp); }
+  const prereqAction = {
+    icon: faShareAlt,
+    styling: { transform: "rotate(90deg)" },
+    onClick: () => { prereqControl(true, !prereqs ? true : !expanded) }
+  }
 
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
@@ -105,13 +109,22 @@ export function Course({ className, courseId, onAddCourse }) {
         ].join(' ')}
         actions={
           isSearching
-            ? [{ icon: faPlus, onClick: onAddCourse }, infoAction]
+            ? [
+                { icon: faPlus, onClick: onAddCourse },
+                {
+                  icon: faInfoCircle,
+                  href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?`
+                    + `cat_term_in=${term}&subj_code_in=${course.subject}`
+                    + `&crse_numb_in=${course.number}`
+                },
+                prereqAction
+              ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: () => setExpanded(!expanded)
+                  onClick: () => { prereqControl(false, !expanded); }
                 },
-                infoAction,
+                prereqAction,
                 {
                   icon: faPalette,
                   onClick: () => setPaletteShown(!paletteShown)
@@ -151,7 +164,7 @@ export function Course({ className, courseId, onAddCourse }) {
           />
         )}
       </ActionRow>
-      {expanded && (
+      {expanded && !prereqs && (
         <div className={classes('instructor-container', 'nested')}>
           {includedInstructors.map((name) => (
             <Instructor
@@ -178,6 +191,11 @@ export function Course({ className, courseId, onAddCourse }) {
           )}
         </div>
       )}
+      {
+        expanded && prereqs && (
+          <div></div> // TODO: <Prerequisites> component
+        )
+      }
     </div>
   );
 }
