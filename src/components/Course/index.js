@@ -2,25 +2,24 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   faAngleDown,
   faAngleUp,
-  faInfoCircle,
   faShareAlt,
   faPalette,
   faPlus,
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { classes, getContentClassName } from '../../utils';
-import { ActionRow, Instructor, Palette } from '..';
+import { ActionRow, Instructor, Palette, PrereqHeader } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
 export function Course({ className, courseId, onAddCourse }) {
   const [expanded, setExpanded] = useState(false);
-  const [prereqs, setPrereqs] = useState(false);
+  const [prereqOpen, setPrereqOpen] = useState(false);
   const [paletteShown, setPaletteShown] = useState(false);
   const [gpaMap, setGpaMap] = useState({});
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchTermData }
   ] = useContext(TermContext);
 
@@ -62,6 +61,7 @@ export function Course({ className, courseId, onAddCourse }) {
   const course = oscar.findCourse(courseId);
   const color = colorMap[course.id];
   const contentClassName = color && getContentClassName(color);
+  const prereqs = course.prereqs.slice(1, course.prereqs.length);
 
   const instructorMap = {};
   course.sections.forEach((section) => {
@@ -81,11 +81,11 @@ export function Course({ className, courseId, onAddCourse }) {
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const prereqControl = (pre, exp) => { setPrereqs(pre); setExpanded(exp); }
+  const prereqControl = (pre, exp) => { setPrereqOpen(pre); setExpanded(exp); }
   const prereqAction = {
     icon: faShareAlt,
     styling: { transform: "rotate(90deg)" },
-    onClick: () => { prereqControl(true, !prereqs ? true : !expanded) }
+    onClick: () => { prereqControl(true, !prereqOpen ? true : !expanded) }
   }
 
   const pinnedSections = course.sections.filter((section) =>
@@ -111,12 +111,6 @@ export function Course({ className, courseId, onAddCourse }) {
           isSearching
             ? [
                 { icon: faPlus, onClick: onAddCourse },
-                {
-                  icon: faInfoCircle,
-                  href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?`
-                    + `cat_term_in=${term}&subj_code_in=${course.subject}`
-                    + `&crse_numb_in=${course.number}`
-                },
                 prereqAction
               ]
             : [
@@ -164,8 +158,8 @@ export function Course({ className, courseId, onAddCourse }) {
           />
         )}
       </ActionRow>
-      {expanded && !prereqs && (
-        <div className={classes('instructor-container', 'nested')}>
+      {expanded && !prereqOpen && (
+        <div className={classes('hover-container', 'nested')}>
           {includedInstructors.map((name) => (
             <Instructor
               key={name}
@@ -191,11 +185,25 @@ export function Course({ className, courseId, onAddCourse }) {
           )}
         </div>
       )}
-      {
-        expanded && prereqs && (
-          <div></div> // TODO: <Prerequisites> component
-        )
-      }
+      {expanded && prereqOpen && (
+        <div className={classes('hover-container')}>
+          <PrereqHeader course={course} />
+          {prereqs.length > 1 &&
+            prereqs.map((req, i) => (
+              <div key={i} className={classes(
+                !desiredCourses.includes(course.id) && 'dark-content',
+                'hover-container',
+                'nested'
+              )}>
+                <PrereqHeader
+                  course={course}
+                  requirement={req}
+                  option={i+1}
+                />
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }
