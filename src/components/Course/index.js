@@ -8,7 +8,7 @@ import {
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { classes, getContentClassName } from '../../utils';
-import { ActionRow, Instructor, Palette, PrereqHeader } from '..';
+import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
@@ -61,7 +61,10 @@ export function Course({ className, courseId, onAddCourse }) {
   const course = oscar.findCourse(courseId);
   const color = colorMap[course.id];
   const contentClassName = color && getContentClassName(color);
-  const prereqs = course.prereqs.slice(1, course.prereqs.length);
+
+  let prereqs = course.prereqs.slice(1, course.prereqs.length);
+  if (prereqs.length && prereqs.every(prereq => !prereq[0]))
+    prereqs = [prereqs];
 
   const instructorMap = {};
   course.sections.forEach((section) => {
@@ -187,21 +190,22 @@ export function Course({ className, courseId, onAddCourse }) {
       )}
       {expanded && prereqOpen && (
         <div className={classes('hover-container')}>
-          <PrereqHeader course={course} />
-          {prereqs.length > 1 &&
-            prereqs.map((req, i) => (
-              <div key={i} className={classes(
-                !desiredCourses.includes(course.id) && 'dark-content',
-                'hover-container',
-                'nested'
-              )}>
-                <PrereqHeader
-                  course={course}
-                  requirement={req}
-                  option={i+1}
-                />
-              </div>
-            ))}
+          <div className={classes(
+            !desiredCourses.includes(course.id) && 'dark-content',
+            'nested'
+          )}>
+            <Prerequisite course={course} isHeader />
+            <div className={classes('nested')}>
+              {!!prereqs.length > 0 && 
+                prereqs.map((req, i) =>
+                  <Prerequisite key={i} course={course}
+                    req={req} option={i+1} isHeader />
+              )}
+              {!prereqs.length &&
+                <Prerequisite course={course} isEmpty />
+              }
+            </div>
+          </div>
         </div>
       )}
     </div>

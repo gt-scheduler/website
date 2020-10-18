@@ -13,4 +13,4 @@ export * from './Palette';
 export * from './Section';
 export * from './Select';
 export * from './TimeBlocks';
-export * from './PrereqHeader';
+export * from './Prerequisite';
