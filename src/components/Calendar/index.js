@@ -48,7 +48,7 @@ export function Calendar({ className, overlayCrns, preview, capture, isAutosized
             .filter((crn) => !pinnedCrns.includes(crn))
             .map((crn) => (
               <TimeBlocks key={crn} crn={crn} overlay={!preview}
-                preview={preview} capture={capture} />
+                preview={preview} capture={capture} isAutosized />
             ))}
       </div>
     </div>
