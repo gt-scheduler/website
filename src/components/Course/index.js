@@ -2,23 +2,24 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   faAngleDown,
   faAngleUp,
-  faInfoCircle,
+  faShareAlt,
   faPalette,
   faPlus,
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { classes, getContentClassName } from '../../utils';
-import { ActionRow, Instructor, Palette } from '..';
+import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
 export function Course({ className, courseId, onAddCourse }) {
   const [expanded, setExpanded] = useState(false);
+  const [prereqOpen, setPrereqOpen] = useState(false);
   const [paletteShown, setPaletteShown] = useState(false);
   const [gpaMap, setGpaMap] = useState({});
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchTermData }
   ] = useContext(TermContext);
 
@@ -61,6 +62,10 @@ export function Course({ className, courseId, onAddCourse }) {
   const color = colorMap[course.id];
   const contentClassName = color && getContentClassName(color);
 
+  let prereqs = course.prereqs.slice(1, course.prereqs.length);
+  if (prereqs.length && prereqs.every(prereq => !prereq[0]))
+    prereqs = [prereqs];
+
   const instructorMap = {};
   course.sections.forEach((section) => {
     const [primaryInstructor = 'Not Assigned'] = section.instructors;
@@ -79,10 +84,12 @@ export function Course({ className, courseId, onAddCourse }) {
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const infoAction = {
-    icon: faInfoCircle,
-    href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`
-  };
+  const prereqControl = (pre, exp) => { setPrereqOpen(pre); setExpanded(exp); }
+  const prereqAction = {
+    icon: faShareAlt,
+    styling: { transform: "rotate(90deg)" },
+    onClick: () => { prereqControl(true, !prereqOpen ? true : !expanded) }
+  }
 
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
@@ -105,13 +112,16 @@ export function Course({ className, courseId, onAddCourse }) {
         ].join(' ')}
         actions={
           isSearching
-            ? [{ icon: faPlus, onClick: onAddCourse }, infoAction]
+            ? [
+                { icon: faPlus, onClick: onAddCourse },
+                prereqAction
+              ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: () => setExpanded(!expanded)
+                  onClick: () => { prereqControl(false, !expanded); }
                 },
-                infoAction,
+                prereqAction,
                 {
                   icon: faPalette,
                   onClick: () => setPaletteShown(!paletteShown)
@@ -151,8 +161,8 @@ export function Course({ className, courseId, onAddCourse }) {
           />
         )}
       </ActionRow>
-      {expanded && (
-        <div className={classes('instructor-container', 'nested')}>
+      {expanded && !prereqOpen && (
+        <div className={classes('hover-container', 'nested')}>
           {includedInstructors.map((name) => (
             <Instructor
               key={name}
@@ -176,6 +186,26 @@ export function Course({ className, courseId, onAddCourse }) {
               ))}
             </div>
           )}
+        </div>
+      )}
+      {expanded && prereqOpen && (
+        <div className={classes('hover-container')}>
+          <div className={classes(
+            !desiredCourses.includes(course.id) && 'dark-content',
+            'nested'
+          )}>
+            <Prerequisite course={course} isHeader />
+            <div className={classes('nested')}>
+              {!!prereqs.length > 0 && 
+                prereqs.map((req, i) =>
+                  <Prerequisite key={i} course={course}
+                    req={req} option={i+1} isHeader />
+              )}
+              {!prereqs.length &&
+                <Prerequisite course={course} isEmpty />
+              }
+            </div>
+          </div>
         </div>
       )}
     </div>

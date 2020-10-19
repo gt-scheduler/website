@@ -5,7 +5,7 @@ import { hasConflictBetween, isLab, isLecture } from '../utils';
 
 class Course {
   constructor(oscar, courseId, data) {
-    const [title, sections] = data;
+    const [title, sections, prereqs] = data;
 
     this.id = courseId;
     [this.subject, this.number] = this.id.split(' ');
@@ -13,6 +13,7 @@ class Course {
     this.sections = Object.keys(sections).map(
       (sectionId) => new Section(oscar, this, sectionId, sections[sectionId])
     );
+    this.prereqs = prereqs;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)
