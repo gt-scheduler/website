@@ -65,7 +65,7 @@ const App = () => {
           .reverse();
         setTerms(newTerms);
       });
-  });
+  }, [setTerms]);
 
   // Set the term to be the first one if it is unset
   // (once the terms load)
