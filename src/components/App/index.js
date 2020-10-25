@@ -51,11 +51,10 @@ const App = () => {
   }, [term]);
 
   // Fetch all terms via the GitHub API
-  // TODO change to Bits of Good repo to fetch up-to-date terms
   useEffect(() => {
     axios
       .get(
-        'https://api.github.com/repos/64json/gt-schedule-crawler/contents?ref=gh-pages'
+        'https://api.github.com/repos/GTBitsOfGood/gt-schedule-crawler/contents?ref=gh-pages'
       )
       .then((res) => {
         const newTerms = res.data
