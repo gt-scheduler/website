@@ -121,7 +121,7 @@ export function Header(props) {
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
         </Button>
-        <Button href="https://github.com/64json/gt-scheduler">
+        <Button href="https://github.com/gtbitsofgood/gt-scheduler">
           <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
           <div className="text">GitHub</div>
         </Button>

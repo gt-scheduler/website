@@ -63,7 +63,7 @@ export function Course({ className, courseId, onAddCourse }) {
   const color = colorMap[course.id];
   const contentClassName = color && getContentClassName(color);
 
-  const hasPrereqs = oscar.version === "2";
+  const hasPrereqs = oscar.version > 1;
   let prereqs = null;
 
   if (hasPrereqs) {
