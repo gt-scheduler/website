@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import { getSemesterName } from '../../utils';
+import PropTypes from 'prop-types';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,12 +13,17 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
 import domtoimage from 'dom-to-image';
 import saveAs from 'file-saver';
+import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import ics from '../../libs/ics';
-import { Button, Calendar, Select } from '..';
+import { Button, Calendar, Select, Tab } from '..';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 
-export function Header(props) {
+/**
+ * Renders the top header component,
+ * and includes controls for top-level tab-based navigation
+ */
+const Header = ({ currentTab, onChangeTab, tabs }) => {
   const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
   const [terms] = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
@@ -54,12 +59,9 @@ export function Header(props) {
         ) {
           begin.setDate(begin.getDate() + 1);
         }
-        begin.setHours(
-          (meeting.period.start / 60) | 0,
-          meeting.period.start % 60
-        );
+        begin.setHours(meeting.period.start / 60, meeting.period.start % 60);
         const end = new Date(begin.getTime());
-        end.setHours((meeting.period.end / 60) | 0, meeting.period.end % 60);
+        end.setHours(meeting.period.end / 60, meeting.period.end % 60);
         const rrule = {
           freq: 'WEEKLY',
           until: to,
@@ -97,13 +99,26 @@ export function Header(props) {
       <Select
         onChange={setTerm}
         value={term}
-        options={terms.map((term) => ({
-          value: term,
-          label: getSemesterName(term)
+        options={terms.map((currentTerm) => ({
+          value: currentTerm,
+          label: getSemesterName(currentTerm)
         }))}
         className="semester"
       />
       <span className="credits">{totalCredits} Credits</span>
+
+      {/* Include middle-aligned tabs on desktop
+      TODO change display on mobile screens */}
+      <div className="tabs">
+        {tabs.map((tabLabel, tabIdx) => (
+          <Tab
+            active={tabIdx === currentTab}
+            onClick={() => onChangeTab(tabIdx)}
+            label={tabLabel}
+          />
+        ))}
+      </div>
+
       <div className="menu">
         <Button onClick={handleDownload} disabled={pinnedCrns.length === 0}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
@@ -121,7 +136,7 @@ export function Header(props) {
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
         </Button>
-        <Button href="https://github.com/64json/gt-scheduler">
+        <Button href="https://github.com/gtbitsofgood/gt-scheduler">
           <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
           <div className="text">GitHub</div>
         </Button>
@@ -131,4 +146,12 @@ export function Header(props) {
       </div>
     </div>
   );
-}
+};
+
+Header.propTypes = {
+  currentTab: PropTypes.number.isRequired,
+  onChangeTab: PropTypes.func.isRequired,
+  tabs: PropTypes.arrayOf(PropTypes.string).isRequired
+};
+
+export default Header;
