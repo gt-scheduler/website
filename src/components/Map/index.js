@@ -1,4 +1,16 @@
-// import React from 'react';
-// import GoogleMapReact from 'google-map-react';
-// import './stylesheet.scss';
-// api key??: AIzaSyBPX7M5n6pDWJnkFMWZxGtt3OfsuW4tnA4
+import React from 'react';
+import MapView from '../MapView';
+
+// TODO get the actual location/locations (if multiple)
+
+const location = {
+  address: 'Georgian Tech',
+  lat: 33.7722,
+  lng: -84.3902
+};
+
+const Map = () => {
+  return <MapView location={location} />;
+};
+
+export default Map;

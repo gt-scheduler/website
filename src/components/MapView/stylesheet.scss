@@ -14,16 +14,17 @@
   .pin {
     display: flex;
     align-items: center;
-    width: 180px;
+    width: 200px;
     color: var(--main-blue);
   }
   
   .pin-icon {
-    font-size: 4rem;
+    font-size: 2.7rem;
   }
   
   .pin-text {
-    font-size: 1.3em;
+    margin-left: 15px;
+    font-size: 3.0em;
   }
   
   @media screen and (min-width: 799px) {
@@ -41,6 +42,6 @@
     }
   
     .pin-icon {
-      font-size: 10vw;
+      font-size: 2.7vw;
     }
 }
