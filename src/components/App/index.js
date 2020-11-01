@@ -1,23 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import { classes, isMobile } from '../../utils';
-import {
-  Button,
-  Calendar,
-  CombinationContainer,
-  CourseContainer,
-  Header
-} from '..';
+import { classes } from '../../utils';
+import { Header, Scheduler, Map, Comparison } from '..';
 import { Oscar } from '../../beans';
+import { useCookie, useJsonCookie, useMobile } from '../../hooks';
+import { TermContext, TermsContext, ThemeContext } from '../../contexts';
+
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import { useCookie, useJsonCookie } from '../../hooks';
-import {
-  OverlayCrnsContext,
-  TermContext,
-  TermsContext,
-  ThemeContext
-} from '../../contexts';
 
 const defaultTermData = {
   desiredCourses: [],
@@ -27,21 +17,18 @@ const defaultTermData = {
   sortingOptionIndex: 0
 };
 
-export function App(props) {
-  const [theme, setTheme] = useCookie('theme', 'dark');
-  const [term, setTerm] = useCookie('term');
-  const [termData, patchTermData] = useJsonCookie(term, defaultTermData);
+const App = () => {
   const [terms, setTerms] = useState([]);
   const [oscar, setOscar] = useState(null);
 
-  const [tabIndex, setTabIndex] = useState(0);
-  const [mobile, setMobile] = useState(isMobile());
-  const [overlayCrns, setOverlayCrns] = useState([]);
+  // Persist the theme, term, and some term data as cookies
+  const [theme, setTheme] = useCookie('theme', 'dark');
+  const [term, setTerm] = useCookie('term');
+  const [termData, patchTermData] = useJsonCookie(term, defaultTermData);
 
+  // Memoize context values so that their references are stable
   const themeContextValue = useMemo(() => [theme, setTheme], [theme, setTheme]);
-
   const termsContextValue = useMemo(() => [terms, setTerms], [terms, setTerms]);
-
   const termContextValue = useMemo(
     () => [
       { term, oscar, ...termData },
@@ -50,39 +37,38 @@ export function App(props) {
     [term, oscar, termData, setTerm, setOscar, patchTermData]
   );
 
-  const overlayContextValue = useMemo(() => [overlayCrns, setOverlayCrns], [
-    overlayCrns,
-    setOverlayCrns
-  ]);
-
+  // Fetch the current term's scraper information
   useEffect(() => {
     setOscar(null);
     if (term) {
       axios
-        .get(`https://jasonpark.me/gt-schedule-crawler/${term}.json`)
+        .get(`https://gtbitsofgood.github.io/gt-schedule-crawler/${term}.json`)
         .then((res) => {
-          const oscar = new Oscar(res.data);
-          setOscar(oscar);
+          const newOscar = new Oscar(res.data);
+          setOscar(newOscar);
         });
     }
   }, [term]);
 
+  // Fetch all terms via the GitHub API
   useEffect(() => {
     axios
       .get(
-        'https://api.github.com/repos/64json/gt-schedule-crawler/contents?ref=gh-pages'
+        'https://api.github.com/repos/GTBitsOfGood/gt-schedule-crawler/contents?ref=gh-pages'
       )
       .then((res) => {
-        const terms = res.data
+        const newTerms = res.data
           .map((content) => content.name)
           .filter((name) => /\d{6}\.json/.test(name))
           .map((name) => name.replace(/\.json$/, ''))
           .sort()
           .reverse();
-        setTerms(terms);
+        setTerms(newTerms);
       });
   }, [setTerms]);
 
+  // Set the term to be the first one if it is unset
+  // (once the terms load)
   useEffect(() => {
     if (!term) {
       const [recentTerm] = terms;
@@ -90,21 +76,16 @@ export function App(props) {
     }
   }, [terms, term, setTerm]);
 
-  useEffect(() => {
-    const handleResize = (e) => {
-      const newMobile = isMobile();
-      if (mobile !== newMobile) {
-        setMobile(newMobile);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [mobile]);
-
+  // Re-render when the page is re-sized to become mobile/desktop
+  // (desktop is >= 1024 px wide)
+  const mobile = useMobile();
   const className = classes('App', mobile && 'mobile', theme);
 
+  // Allow top-level tab-based navigation
+  const [currentTabIndex, setTabIndex] = useState(0);
+
+  // If the scraped JSON hasn't been loaded,
+  // then show an empty div as a loading intermediate
   if (!oscar) {
     return <div className={className} />;
   }
@@ -113,37 +94,22 @@ export function App(props) {
     <ThemeContext.Provider value={themeContextValue}>
       <TermsContext.Provider value={termsContextValue}>
         <TermContext.Provider value={termContextValue}>
-          <OverlayCrnsContext.Provider value={overlayContextValue}>
-            <div className={className}>
-              <Header />
-              {mobile && (
-                <div className="tab-container">
-                  {['Courses', 'Combinations', 'Calendar'].map(
-                    (tabTitle, i) => (
-                      <Button
-                        key={tabTitle}
-                        className={classes('tab', tabIndex === i && 'active')}
-                        onClick={() => setTabIndex(i)}
-                      >
-                        {tabTitle}
-                      </Button>
-                    )
-                  )}
-                </div>
-              )}
-              <div className="main">
-                {(!mobile || tabIndex === 0) && <CourseContainer />}
-                {(!mobile || tabIndex === 1) && <CombinationContainer />}
-                {(!mobile || tabIndex === 2) && (
-                  <div className="calendar-container">
-                    <Calendar className="calendar" overlayCrns={overlayCrns} />
-                  </div>
-                )}
-              </div>
-            </div>
-          </OverlayCrnsContext.Provider>
+          <div className={className}>
+            {/* The header controls top-level navigation
+            and is always present */}
+            <Header
+              currentTab={currentTabIndex}
+              onChangeTab={setTabIndex}
+              tabs={['Scheduler', 'Map', 'Comparison']}
+            />
+            {currentTabIndex === 0 && <Scheduler />}
+            {currentTabIndex === 1 && <Map />}
+            {currentTabIndex === 2 && <Comparison />}
+          </div>
         </TermContext.Provider>
       </TermsContext.Provider>
     </ThemeContext.Provider>
   );
-}
+};
+
+export default App;

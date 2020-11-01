@@ -1,4 +1,5 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
+import ReactTooltip from "react-tooltip";
 import {
   faBan,
   faChair,
@@ -16,6 +17,16 @@ export function Section({ className, section, pinned, color }) {
     TermContext
   );
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
+  const [seating, setSeating] = useState([[], []]);
+
+  let hovering = false;
+  const handleHover = () => {
+    hovering = true;
+    setTimeout(async () => {
+      if (hovering)
+        setSeating(await section.fetchSeating(term));
+    }, 333);
+  };
 
   const excludeSection = useCallback(
     (section) => {
@@ -56,6 +67,8 @@ export function Section({ className, section, pinned, color }) {
         },
         {
           icon: faChair,
+          dataTip: true,
+          dataFor: section.id,
           href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`
         },
         { icon: faBan, onClick: () => excludeSection(section) }
@@ -76,6 +89,31 @@ export function Section({ className, section, pinned, color }) {
             );
           })}
         </div>
+
+        <ReactTooltip id={section.id} className="tooltip"
+          type="dark" place="right" effect="solid"
+          afterShow={ () => handleHover() }
+          afterHide={ () => hovering = false }
+        >
+          <table>
+            <tbody>
+              <tr>
+                <td><b>Seats Filled</b></td>
+                <td>{seating[0].length === 0 ? `Loading...` :
+                  typeof seating[0][1] === "number" ?
+                    `${seating[0][1]} of ${seating[0][0]}` : `N/A`
+                }</td>
+              </tr>
+              <tr>
+                <td><b>Waitlist Filled</b></td>
+                <td>{seating[0].length === 0 ? `Loading...` :
+                  typeof seating[0][1] === "number" ?
+                    `${seating[0][3]} of ${seating[0][2]}` : `N/A`
+                }</td>
+              </tr>
+            </tbody>
+          </table>
+        </ReactTooltip>
       </div>
     </ActionRow>
   );

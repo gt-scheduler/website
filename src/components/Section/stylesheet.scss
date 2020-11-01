@@ -30,5 +30,23 @@
         }
       }
     }
+
+    .tooltip {
+      opacity: 0.95;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    tr {
+      :nth-child(1) {
+        text-align: right;
+        padding-right: 3px;
+      }
+
+      :nth-child(2) {
+        text-align: left;
+        padding-left: 3px;
+      }
+    }
   }
 }

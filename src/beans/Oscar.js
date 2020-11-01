@@ -3,7 +3,7 @@ import { hasConflictBetween, stringToTime } from '../utils';
 
 class Oscar {
   constructor(data) {
-    const { courses, caches, updatedAt } = data;
+    const { courses, caches, updatedAt, version } = data;
 
     this.periods = caches.periods.map((period) => {
       if (period === 'TBA') {
@@ -25,6 +25,7 @@ class Oscar {
     this.attributes = caches.attributes;
     this.gradeBases = caches.gradeBases;
     this.updatedAt = new Date(updatedAt);
+    this.version = version;
     this.courses = Object.keys(courses).map(
       (courseId) => new Course(this, courseId, courses[courseId])
     );

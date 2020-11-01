@@ -3,17 +3,19 @@ import {
   faAngleDown,
   faAngleUp,
   faInfoCircle,
+  faShareAlt,
   faPalette,
   faPlus,
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { classes, getContentClassName } from '../../utils';
-import { ActionRow, Instructor, Palette } from '..';
+import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
 export function Course({ className, courseId, onAddCourse }) {
   const [expanded, setExpanded] = useState(false);
+  const [prereqOpen, setPrereqOpen] = useState(false);
   const [paletteShown, setPaletteShown] = useState(false);
   const [gpaMap, setGpaMap] = useState({});
   const isSearching = Boolean(onAddCourse);
@@ -61,6 +63,15 @@ export function Course({ className, courseId, onAddCourse }) {
   const color = colorMap[course.id];
   const contentClassName = color && getContentClassName(color);
 
+  const hasPrereqs = oscar.version > 1;
+  let prereqs = null;
+
+  if (hasPrereqs) {
+    prereqs = course.prereqs.slice(1, course.prereqs.length);
+    if (prereqs.length && prereqs.every(prereq => !prereq[0]))
+      prereqs = [prereqs];
+  }
+
   const instructorMap = {};
   course.sections.forEach((section) => {
     const [primaryInstructor = 'Not Assigned'] = section.instructors;
@@ -79,10 +90,19 @@ export function Course({ className, courseId, onAddCourse }) {
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
+  const prereqControl = (pre, exp) => { setPrereqOpen(pre); setExpanded(exp); }
+  const prereqAction = {
+    icon: faShareAlt,
+    styling: { transform: "rotate(90deg)" },
+    onClick: () => { prereqControl(true, !prereqOpen ? true : !expanded) }
+  }
+
   const infoAction = {
     icon: faInfoCircle,
-    href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${course.subject}&crse_numb_in=${course.number}`
-  };
+    href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_`
+      + `course_detail?cat_term_in=${term}&subj_code_in=`
+      + `${course.subject}&crse_numb_in=${course.number}`
+  }
 
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
@@ -105,13 +125,16 @@ export function Course({ className, courseId, onAddCourse }) {
         ].join(' ')}
         actions={
           isSearching
-            ? [{ icon: faPlus, onClick: onAddCourse }, infoAction]
+            ? [
+                { icon: faPlus, onClick: onAddCourse },
+                hasPrereqs ? prereqAction : infoAction
+              ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: () => setExpanded(!expanded)
+                  onClick: () => { prereqControl(false, !expanded); }
                 },
-                infoAction,
+                hasPrereqs ? prereqAction : infoAction,
                 {
                   icon: faPalette,
                   onClick: () => setPaletteShown(!paletteShown)
@@ -132,7 +155,8 @@ export function Course({ className, courseId, onAddCourse }) {
         {!isSearching && (
           <div className="course-row">
             <span className="gpa">
-              Course GPA: {gpaMap.averageGpa || 'N/A'}
+              Course GPA: {Object.keys(gpaMap).length === 0 ? "Loading..."
+                : (gpaMap.averageGpa ? gpaMap.averageGpa.toFixed(2) : "N/A")}
             </span>
             {totalCredits > 0 && (
               <span className="credits">{totalCredits} Credits</span>
@@ -150,15 +174,16 @@ export function Course({ className, courseId, onAddCourse }) {
           />
         )}
       </ActionRow>
-      {expanded && (
-        <div className={classes('instructor-container', 'nested')}>
+      {expanded && !prereqOpen && (
+        <div className={classes('hover-container', 'nested')}>
           {includedInstructors.map((name) => (
             <Instructor
               key={name}
               color={color}
               name={name}
               sections={instructorMap[name]}
-              gpa={gpaMap[name]}
+              gpa={Object.keys(gpaMap).length === 0 ? "Loading..."
+                : (gpaMap[name] ? gpaMap[name].toFixed(2) : "N/A")}
             />
           ))}
           {excludedInstructors.length > 0 && (
@@ -174,6 +199,26 @@ export function Course({ className, courseId, onAddCourse }) {
               ))}
             </div>
           )}
+        </div>
+      )}
+      {expanded && prereqOpen && (
+        <div className={classes('hover-container')}>
+          <div className={classes(
+            !desiredCourses.includes(course.id) && 'dark-content',
+            'nested'
+          )}>
+            <Prerequisite course={course} isHeader />
+            <div className={classes('nested')}>
+              {!!prereqs.length > 0 && 
+                prereqs.map((req, i) =>
+                  <Prerequisite key={i} course={course}
+                    req={req} option={i+1} isHeader />
+              )}
+              {!prereqs.length &&
+                <Prerequisite course={course} isEmpty />
+              }
+            </div>
+          </div>
         </div>
       )}
     </div>

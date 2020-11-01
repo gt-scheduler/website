@@ -20,6 +20,15 @@
     }
   }
 
+  .tabs {
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    justify-content: center;
+  }
+
   .semester {
   }
 
@@ -32,7 +41,6 @@
   .menu {
     display: flex;
     align-items: stretch;
-    margin-left: auto;
 
     .text {
       margin-left: 4px;
