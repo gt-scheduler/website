@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import GoogleMapReact from 'google-map-react';
-import './stylesheet.scss';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './stylesheet.scss';
 
 const LocationPin = ({ text }) => (
   <div className="pin">
@@ -12,44 +11,23 @@ const LocationPin = ({ text }) => (
   </div>
 );
 
-const MapView = ({ location, APIkey }) => (
-  <div className="map">
-    <h2 className="map-h2">Your class(es) is/are located here!</h2>
-
-    <div className="google-map">
-      <GoogleMapReact
-        bootstrapURLKeys={{ key: APIkey }}
-        defaultCenter={location}
-        defaultZoom={16}
-      >
+const MapView = ({ locations, APIkey }) => (
+  <div className="google-map">
+    <GoogleMapReact
+      bootstrapURLKeys={{ key: APIkey }}
+      defaultCenter={{ lat: 33.7756, lng: -84.3963 }}
+      defaultZoom={16}
+    >
+      {locations.map((location, i) => (
         <LocationPin
+          key={i}
           lat={location.lat}
           lng={location.lng}
-          text={location.address}
+          text={location.id}
         />
-      </GoogleMapReact>
-    </div>
+      ))}
+    </GoogleMapReact>
   </div>
 );
-
-LocationPin.propTypes = {
-  text: PropTypes.string
-  // eslint-disable-next-line react/forbid-prop-types
-};
-
-LocationPin.defaultProps = {
-  text: ''
-};
-
-MapView.propTypes = {
-  location: PropTypes,
-  APIkey: PropTypes.string
-  // eslint-disable-next-line react/forbid-prop-types
-};
-
-MapView.defaultProps = {
-  location: {},
-  APIkey: ''
-};
 
 export default MapView;
