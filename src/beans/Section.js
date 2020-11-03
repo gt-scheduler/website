@@ -1,3 +1,5 @@
+import axios from 'axios';
+import cheerio from 'cheerio';
 import { unique } from '../utils';
 import { DELIVERY_MODES } from '../constants';
 
@@ -16,6 +18,7 @@ class Section {
     this.course = course;
     this.id = sectionId;
     this.crn = crn;
+    this.seating = [[], 0];
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex];
     this.campus = oscar.campuses[campusIndex];
@@ -45,6 +48,43 @@ class Section {
         []
       )
     );
+  }
+
+  async fetchSeating(term) {
+    const prevDate = this.seating[1];
+    const currDate = Date.now();
+
+    if (currDate - prevDate > 300000) {
+      const url = `https://oscar.gatech.edu/pls/bprod/`
+        + `bwckschd.p_disp_detail_sched?term_in=${term}`
+        + `&crn_in=${this.crn}`;
+
+      return await axios({
+        url: `https://cors-anywhere.herokuapp.com/${url}`,
+        method: 'get',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'text/html'
+        }
+      })
+        .then(response => {
+          const $ = cheerio.load(response.data);
+          const availabilityTable = $('.datadisplaytable .datadisplaytable');
+          const tableRow = availabilityTable.find("tr");
+
+          this.seating = [[
+            parseInt(tableRow.eq(1).children("td").first().text(), 10),
+            parseInt(tableRow.eq(1).children("td").eq(1).text(), 10),
+            parseInt(tableRow.eq(2).children("td").first().text(), 10),
+            parseInt(tableRow.eq(2).children("td").eq(1).text(), 10)
+          ], currDate]
+
+          return this.seating;
+        })
+        .catch(() => [new Array(4).fill("N/A"), currDate]);
+    } else {
+      return this.seating;
+    }
   }
 }
 

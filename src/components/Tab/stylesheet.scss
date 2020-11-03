@@ -1,0 +1,29 @@
+@import '../../variables';
+
+.Tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: transparent;
+  outline: none;
+  border: none;
+
+  border-bottom: 2px solid transparent;
+
+  &.active {
+    // TODO make these actual accent colors
+    color: currentColor;
+    border-bottom-color: currentColor;
+  }
+
+  &:not(.active) {
+    color: $color-neutral;
+  }
+
+  &:hover {
+    background-color: $color-border;
+  }
+}

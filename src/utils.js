@@ -102,6 +102,28 @@ const humanizeArray = (array, conjunction = 'and') => {
   return `${init.join(', ')}, ${conjunction} ${last}`;
 };
 
+const decryptReqs = (reqs, openPar = false, closePar = false) => {
+  const last = (i) => i === reqs.length - 2;
+  let string = "";
+
+  if (!reqs[0])
+    string += (openPar ? "(" : "") + reqs.id + (closePar ? ")" : "");
+  else if (reqs[0] === 'and')
+    reqs.slice(1, reqs.length).forEach((req, i) => {
+      string += decryptReqs(req, i === 0, last(i)) + (last(i) ? "" : " and ");
+    });
+  else if (reqs[0] === 'or')
+    reqs.slice(1, reqs.length).forEach((req, i) => {
+      string += decryptReqs(req) + (last(i) ? "" : " or ");
+    });
+  else
+    reqs.forEach((req, i) => {
+      string += req.id + (i === reqs.length - 1 ? "" : " or ");
+    });
+
+  return string;
+}
+
 export {
   stringToTime,
   timeToString,
@@ -117,5 +139,6 @@ export {
   isLab,
   isLecture,
   getSemesterName,
-  humanizeArray
+  humanizeArray,
+  decryptReqs
 };
