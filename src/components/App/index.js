@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { classes } from '../../utils';
-import { Header, Scheduler, Map, Comparison } from '..';
+import { Header, Scheduler, Map, Comparison, NavDrawer, NavMenu } from '..';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
@@ -9,6 +9,8 @@ import { defaultTermData } from '../../types';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+
+const NAV_TABS = ['Scheduler', 'Map', 'Comparison'];
 
 const App = () => {
   const [terms, setTerms] = useState([]);
@@ -77,6 +79,17 @@ const App = () => {
   // Allow top-level tab-based navigation
   const [currentTabIndex, setTabIndex] = useState(0);
 
+  // Handle the status of the drawer being open on mobile
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
+  useEffect(() => {
+    // Close the drawer if switching to desktop
+    if (isDrawerOpen && !mobile) {
+      setIsDrawerOpen(false);
+    }
+  }, [isDrawerOpen, mobile]);
+
   // If the scraped JSON hasn't been loaded,
   // then show an empty div as a loading intermediate
   if (!oscar) {
@@ -87,13 +100,24 @@ const App = () => {
     <ThemeContext.Provider value={themeContextValue}>
       <TermsContext.Provider value={termsContextValue}>
         <TermContext.Provider value={termContextValue}>
-          <div className={className}>
+          <div className={classes('App', className)}>
+            {/* On mobile, show the nav drawer + overlay */}
+            {mobile && (
+              <NavDrawer open={isDrawerOpen} onClose={closeDrawer}>
+                <NavMenu
+                  items={NAV_TABS}
+                  currentItem={currentTabIndex}
+                  onChangeItem={setTabIndex}
+                />
+              </NavDrawer>
+            )}
             {/* The header controls top-level navigation
             and is always present */}
             <Header
               currentTab={currentTabIndex}
               onChangeTab={setTabIndex}
-              tabs={['Scheduler', 'Map', 'Comparison']}
+              onToggleMenu={openDrawer}
+              tabs={NAV_TABS}
             />
             {currentTabIndex === 0 && <Scheduler />}
             {currentTabIndex === 1 && <Map />}

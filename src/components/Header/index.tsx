@@ -122,7 +122,7 @@ const Header = ({
     <div className="Header">
       {/* Menu button, only displayed on mobile */}
       {mobile && (
-        <Button className="nav-menu" onClick={onToggleMenu}>
+        <Button className="nav-menu-button" onClick={onToggleMenu}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faBars} />
         </Button>
       )}
@@ -132,6 +132,8 @@ const Header = ({
         <span className="gt">GT </span>
         <span className="scheduler">Scheduler</span>
       </Button>
+
+      {/* Term selector */}
       <Select
         onChange={setTerm}
         value={term}
@@ -141,6 +143,7 @@ const Header = ({
         }))}
         className="semester"
       />
+
       <span className="credits">{totalCredits} Credits</span>
 
       {/* Include middle-aligned tabs on desktop */}
@@ -156,6 +159,7 @@ const Header = ({
         </div>
       )}
 
+      {/* Action bar */}
       <div className="menu">
         <Button onClick={handleDownload} disabled={pinnedCrns.length === 0}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
@@ -178,6 +182,8 @@ const Header = ({
           <div className="text">GitHub</div>
         </Button>
       </div>
+
+      {/* Fake calendar used to capture screenshots */}
       <div className="capture-container" ref={captureRef}>
         {/* TODO remove once Calendar gets typing */}
         {/*

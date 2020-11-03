@@ -12,6 +12,8 @@ export * from './CourseFilter';
 export { default as Header } from './Header';
 export * from './Instructor';
 export { default as Map } from './Map';
+export { default as NavDrawer } from './NavDrawer';
+export { default as NavMenu } from './NavMenu';
 export * from './Palette';
 export { default as Scheduler } from './Scheduler';
 export * from './Section';
