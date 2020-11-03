@@ -1,51 +1,31 @@
-import React, { useContext, useEffect } from 'react';
-import { TermContext } from '../../contexts';
+import React, { useState } from 'react';
 
-export function DaySelection() {
-  const [{ oscar, pinnedCrns }] = useContext(TermContext);
-  let courseDateMap = {
-    M: [],
-    T: [],
-    W: [],
-    R: [],
-    F: []
+export function DaySelection({ courseDateMap }) {
+  const [activeDay, setActiveDay] = useState('');
+
+  const formatTime = (time) => {
+    return (Math.floor(time / 60) % 12) + ':' + (time % 60);
   };
 
-  useEffect(() => {
-    pinnedCrns.forEach((crn) => {
-      const section = oscar.findSection(crn);
-      console.log(section);
-      return section.meetings.forEach(
-        (meeting) =>
-          meeting.period &&
-          meeting.days.map((day) => {
-            courseDateMap[day].push({
-              id: section.course.id,
-              title: section.course.title,
-              times: meeting.period
-            });
-          })
-      );
-    });
-  }, []);
-
-  console.log(courseDateMap);
-
+  // active course?
+  // add a new div for each day of the week
   return (
     <div>
       {Object.keys(courseDateMap).map((date) => (
-        <div>
-          <p>{date}</p>
-          {courseDateMap[date].map((course) => (
-            <div>
-              <div className="meeting-wrapper">
-                <div className="ids">
-                  <span className="course-id">{course.id}</span>
-                  <span className="section-id">&nbsp;{course.title}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className={`${date}-block`}>
+          <div onClick={() => setActiveDay(date)}>{date}</div>
+          <ul hidden={date !== activeDay ? true : false}>
+            {courseDateMap[date].map((course) => (
+              <li>
+                <p className="course-id">{course.id}</p>
+                <p className="course-title">{course.title}</p>
+                <p className="course-times">
+                  {formatTime(course.times.start)} -
+                  {formatTime(course.times.end)}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       ))}
     </div>
