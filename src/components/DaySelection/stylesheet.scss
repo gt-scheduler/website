@@ -1,0 +1,30 @@
+@import '../../variables';
+
+.date-container {
+  width: 320px;
+
+  .date {
+    @include card;
+
+    .day-select {
+      box-shadow: 1px 1px 1px gray;
+    }
+
+    .dropdown-content {
+      .course-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 4px;
+        .course-id {
+          font-weight: bold;
+        }
+        .course-row {
+          padding: 4px;
+          display: flex;
+        }
+      }
+    }
+  }
+}
