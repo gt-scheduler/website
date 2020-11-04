@@ -46,11 +46,15 @@
 .App.dark {
   background-color: $theme-dark-background;
   color: $theme-dark-foreground;
+  --theme-bg: #{$theme-dark-background};
+  --dark-overlay: rgba(0, 0, 0, 0.2);
 }
 
 .App.light {
   background-color: $theme-light-background;
   color: $theme-light-foreground;
+  --theme-bg: #{$theme-light-background};
+  --dark-overlay: rgba(0, 0, 0, 0.1);
 }
 
 .App.mobile {

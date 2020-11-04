@@ -1,7 +1,7 @@
 @import '../../variables';
 
 .Header {
-  height: 64px;
+  height: $header-height;
   padding: 0 16px;
   display: flex;
   align-items: stretch;
@@ -44,6 +44,12 @@
 
     .text {
       margin-left: 4px;
+
+      // Make the text hidden on all buttons
+      // at sufficiently-small screen sizes
+      @media screen and (max-width: 1200px) {
+        display: none;
+      }
     }
   }
 }
@@ -66,10 +72,15 @@
     .Button {
       flex: 1;
       padding: 0;
-
-      .text {
-        display: none;
-      }
     }
   }
+}
+
+.nav-menu-button {
+  // Increase the tap target size
+  margin-left: -8px;
+  padding: 0 16px;
+
+  // Increase the icon size
+  font-size: 1.7rem;
 }
