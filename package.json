@@ -8,6 +8,13 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.10",
+    "@types/dom-to-image": "^2.6.2",
+    "@types/file-saver": "^2.0.1",
+    "@types/js-cookie": "^2.2.6",
+    "@types/node": "^14.14.6",
+    "@types/react": "^16.9.55",
+    "@types/react-copy-to-clipboard": "^4.3.0",
+    "@types/react-dom": "^16.9.9",
     "axios": "^0.18.1",
     "cheerio": "^1.0.0-rc.3",
     "dom-to-image": "^2.6.0",
@@ -26,10 +33,13 @@
     "react-virtualized": "^9.21.2",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
-    "s-ago": "^2.2.0"
+    "s-ago": "^2.2.0",
+    "typescript": "^3.9.7"
   },
   "devDependencies": {
     "@bitwarden/cli": "^1.11.0",
+    "@typescript-eslint/eslint-plugin": "4.0.1",
+    "@typescript-eslint/parser": "4.0.1",
     "babel-eslint": "^10.1.0",
     "cross-env": "^7.0.2",
     "eslint-config-airbnb": "^18.2.0",
@@ -52,10 +62,10 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "lint": "eslint \"**/*.{js,jsx}\"",
-    "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
-    "format": "prettier \"**/*.{js,jsx}\" --write",
-    "format:check": "prettier \"**/*.{js,jsx}\" -l",
+    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
+    "format": "prettier \"**/*.{js,jsx,ts,tsx}\" --write",
+    "format:check": "prettier \"**/*.{js,jsx,ts,tsx}\" -l",
     "secrets:logout": "(bw logout || exit 0)",
     "secrets:login": "bw login product@bitsofgood.org",
     "secrets:sync": "bw sync && bw get item \"gt-scheduler\" | fx .notes > \".env.local\"",
@@ -76,10 +86,10 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx}": [
+    "*.{js,jsx,ts,tsx}": [
       "eslint"
     ],
-    "*.{js,jsx,css}": [
+    "*.{js,jsx,ts,tsx,css}": [
       "prettier --write"
     ]
   }

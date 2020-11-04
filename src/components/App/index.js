@@ -5,17 +5,10 @@ import { Header, Scheduler, Map, Comparison } from '..';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
+import { defaultTermData } from '../../types';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-
-const defaultTermData = {
-  desiredCourses: [],
-  pinnedCrns: [],
-  excludedCrns: [],
-  colorMap: {},
-  sortingOptionIndex: 0
-};
 
 const App = () => {
   const [terms, setTerms] = useState([]);

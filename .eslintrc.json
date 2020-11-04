@@ -4,6 +4,7 @@
     "plugin:prettier/recommended",
     "prettier/react"
   ],
+  "plugins": ["@typescript-eslint"],
   "env": {
     "browser": true,
     "commonjs": true,
@@ -11,9 +12,37 @@
     "jest": true,
     "node": true
   },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
   "rules": {
     "jsx-a11y/href-no-hash": ["off"],
-    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".tsx"] }],
+    "import/extensions": [
+       "error",
+       "ignorePackages",
+       {
+         "js": "never",
+         "jsx": "never",
+         "ts": "never",
+         "tsx": "never"
+       }
+    ],
     "max-len": [
       "warn",
       {
