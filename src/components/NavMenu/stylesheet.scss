@@ -1,0 +1,45 @@
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+
+  .nav-button {
+    position: relative;
+    overflow: hidden;
+    justify-content: flex-start;
+
+    // Left-align the buttons with the close button
+    padding-left: 24px;
+
+    // Increase the size of the tap target
+    padding-top: 16px;
+    padding-bottom: 16px;
+  
+    // Add an active background color
+    background-color: transparent;
+    transition: background-color 0.2s linear;
+
+    // Add in an "active indicator" but hide it by default
+    &::after {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      transform: translateX(5px);
+      content: " ";
+      background-color: currentColor;
+      transition: transform 0.2s ease;
+    }
+
+    &.active {
+      background-color: var(--dark-overlay);
+
+      // Show the active indicator
+      &::after {
+        transform: none;
+      }
+    }
+  }
+}

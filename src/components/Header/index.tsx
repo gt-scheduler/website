@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import PropTypes from 'prop-types';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faAdjust,
+  faBars,
   faCalendarAlt,
   faDownload,
   faPaste
@@ -12,22 +12,36 @@ import {
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
 import domtoimage from 'dom-to-image';
-import saveAs from 'file-saver';
+import { saveAs } from 'file-saver';
 import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import ics from '../../libs/ics';
 import { Button, Calendar, Select, Tab } from '..';
+import { useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
+import { ICS } from '../../types';
+
+export type HeaderProps = {
+  currentTab: number;
+  onChangeTab: (newTab: number) => void;
+  onToggleMenu: () => void;
+  tabs: string[];
+};
 
 /**
  * Renders the top header component,
  * and includes controls for top-level tab-based navigation
  */
-const Header = ({ currentTab, onChangeTab, tabs }) => {
+const Header = ({
+  currentTab,
+  onChangeTab,
+  onToggleMenu,
+  tabs
+}: HeaderProps) => {
   const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
   const [terms] = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
-  const captureRef = useRef(null);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   const handleThemeChange = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -42,10 +56,17 @@ const Header = ({ currentTab, onChangeTab, tabs }) => {
   }, [pinnedCrns, oscar]);
 
   const handleExport = useCallback(() => {
-    const cal = ics();
+    const cal = ics() as ICS | undefined;
+    if (cal == null) {
+      // eslint-disable-next-line no-alert
+      window.alert('This browser does not support calendar export');
+      return;
+    }
+
     pinnedCrns.forEach((crn) => {
       const section = oscar.findSection(crn);
-      section.meetings.forEach((meeting) => {
+      // TODO supply better types
+      section.meetings.forEach((meeting: any) => {
         if (!meeting.period || !meeting.days.length) return;
         const { from, to } = meeting.dateRange;
         const subject = section.course.id;
@@ -66,7 +87,8 @@ const Header = ({ currentTab, onChangeTab, tabs }) => {
           freq: 'WEEKLY',
           until: to,
           byday: meeting.days.map(
-            (day) => ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])
+            (day: 'M' | 'T' | 'W' | 'R' | 'F') =>
+              ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])
           )
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
@@ -77,6 +99,8 @@ const Header = ({ currentTab, onChangeTab, tabs }) => {
 
   const handleDownload = useCallback(() => {
     const captureElement = captureRef.current;
+    if (captureElement == null) return;
+
     domtoimage
       .toPng(captureElement, {
         width: captureElement.offsetWidth * PNG_SCALE_FACTOR,
@@ -90,12 +114,26 @@ const Header = ({ currentTab, onChangeTab, tabs }) => {
       .then((blob) => saveAs(blob, 'schedule.png'));
   }, [captureRef]);
 
+  // Re-render when the page is re-sized to become mobile/desktop
+  // (desktop is >= 1024 px wide)
+  const mobile = useMobile();
+
   return (
     <div className="Header">
+      {/* Menu button, only displayed on mobile */}
+      {mobile && (
+        <Button className="nav-menu-button" onClick={onToggleMenu}>
+          <FontAwesomeIcon className="icon" fixedWidth icon={faBars} />
+        </Button>
+      )}
+
+      {/* Left-aligned logo */}
       <Button className="logo">
         <span className="gt">GT </span>
         <span className="scheduler">Scheduler</span>
       </Button>
+
+      {/* Term selector */}
       <Select
         onChange={setTerm}
         value={term}
@@ -105,20 +143,23 @@ const Header = ({ currentTab, onChangeTab, tabs }) => {
         }))}
         className="semester"
       />
+
       <span className="credits">{totalCredits} Credits</span>
 
-      {/* Include middle-aligned tabs on desktop
-      TODO change display on mobile screens */}
-      <div className="tabs">
-        {tabs.map((tabLabel, tabIdx) => (
-          <Tab
-            active={tabIdx === currentTab}
-            onClick={() => onChangeTab(tabIdx)}
-            label={tabLabel}
-          />
-        ))}
-      </div>
+      {/* Include middle-aligned tabs on desktop */}
+      {!mobile && (
+        <div className="tabs">
+          {tabs.map((tabLabel, tabIdx) => (
+            <Tab
+              active={tabIdx === currentTab}
+              onClick={() => onChangeTab(tabIdx)}
+              label={tabLabel}
+            />
+          ))}
+        </div>
+      )}
 
+      {/* Action bar */}
       <div className="menu">
         <Button onClick={handleDownload} disabled={pinnedCrns.length === 0}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
@@ -141,17 +182,16 @@ const Header = ({ currentTab, onChangeTab, tabs }) => {
           <div className="text">GitHub</div>
         </Button>
       </div>
+
+      {/* Fake calendar used to capture screenshots */}
       <div className="capture-container" ref={captureRef}>
+        {/* TODO remove once Calendar gets typing */}
+        {/*
+          // @ts-ignore */}
         <Calendar className="fake-calendar" capture />
       </div>
     </div>
   );
-};
-
-Header.propTypes = {
-  currentTab: PropTypes.number.isRequired,
-  onChangeTab: PropTypes.func.isRequired,
-  tabs: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
 export default Header;
