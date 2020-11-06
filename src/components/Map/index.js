@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import MapView from '../MapView';
 import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
@@ -6,6 +6,8 @@ import { DaySelection } from '../DaySelection/index';
 
 const Map = () => {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
+  const [activeDay, setActiveDay] = useState('');
+  const [activeLocations, setActiveLocations] = useState([]);
   const locations = [];
   const courseDateMap = {
     M: [],
@@ -15,8 +17,19 @@ const Map = () => {
     F: []
   };
 
+  useEffect(() => {
+    if (activeDay !== '') {
+      setActiveLocations(
+        locations.filter((loc) =>
+          courseDateMap[activeDay].some((course) => course.id === loc.id)
+        )
+      );
+    } else {
+      setActiveLocations([]);
+    }
+  }, [activeDay]);
+
   pinnedCrns.forEach((crn) => {
-    // parse through dates here?
     const info = oscar.crnMap[crn.toString()];
     const meetings = info.meetings[0];
 
@@ -24,7 +37,8 @@ const Map = () => {
       courseDateMap[day].push({
         id: info.course.id,
         title: info.course.title,
-        times: meetings.period
+        times: meetings.period,
+        daysOfWeek: meetings.days
       });
     });
 
@@ -51,9 +65,13 @@ const Map = () => {
   });
 
   return (
-    <div>
-      <DaySelection courseDateMap={courseDateMap} />
-      <MapView locations={locations} />
+    <div className="map-content" style={{ display: 'flex', height: '100vh' }}>
+      <DaySelection
+        courseDateMap={courseDateMap}
+        activeDay={activeDay}
+        setActiveDay={setActiveDay}
+      />
+      <MapView locations={activeLocations} />
     </div>
   );
 };
