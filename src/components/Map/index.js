@@ -12,6 +12,7 @@ const Map = () => {
     const meetings = info.meetings[0];
 
     locations.push({
+      section: info.id,
       id: info.course.id,
       title: info.course.title,
       days: meetings.days,

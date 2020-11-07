@@ -4,14 +4,21 @@
   width: 100%;
 
   .pin-text {
-    // right: 2 * svg width
+    // right: svg width
     // up: 3/2 * svg height + 0.5 * text height
-    transform: translate(18px, -61px);
-    text-shadow: 0px 0px 5px #000;
-    font-size: 1.25rem;
+    transform: translate(18px, -65px);
     font-weight: bold;
     cursor: pointer;
+    padding: 8px;
     margin: 0;
+
+    box-shadow: 0px 0px 3px #00000080;
+    border-color: #00000080;
+    background: #ffffffcc;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    color: #000000;
   }
 
   .pin {
@@ -26,11 +33,32 @@
   }
 
   .pin-icon {
-    // svg icon is 18px x 33px
-    transform: translate(-9px, -33px);
+    // svg icon is 18px x 32px
+    transform: translate(-9px, -32px);
     cursor: pointer;
     font-size: 2rem;
     color: #C54848;
+  }
+
+  .unknown-container {
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    text-align: center;
+    width: max-content;
+    position: relative;
+    font-size: 14px;
+    z-index: 1;
+
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: #00000080;
+    background: white; color: black;
+    box-shadow: 0px 0px 3px #00000080;
+
+    .class:first-of-type { margin-top: 8px; }
+    .class:not(:first-of-type) { margin-top: 3px; }
   }
 
   .navigation {

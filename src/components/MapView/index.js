@@ -12,6 +12,7 @@ const MapView = ({ locations }) => {
     width: '100%',
     zoom: 15
   });
+  let unknown = [];
 
   return (
     <div className="mapbox">
@@ -22,16 +23,28 @@ const MapView = ({ locations }) => {
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         onViewportChange={viewport => setViewport(viewport)}
       >
-        {locations.map((location, i) => (
-          location.coords && <Marker
-            key={i}
-            latitude={location.coords.lat}
-            longitude={location.coords.long}
-          >
-            <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
-            <p className="pin-text">{location.id}</p>
-          </Marker>
-        ))}
+        {locations.map((location, i) => {
+          if (!location.coords)
+            unknown.push(location);
+          return !location.coords ? <></> : (
+            <Marker
+              key={i}
+              latitude={location.coords.lat}
+              longitude={location.coords.long}
+            >
+              <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
+              <p className="pin-text">{location.id} {location.section}</p>
+            </Marker>
+          )
+        })}
+        {unknown.length > 0 && 
+          <div className="unknown-container">
+            <b>Undetermined</b>
+            {unknown.map((location, i) => (
+              <div className="class" key={i}>{location.id} {location.section}</div>
+            ))}
+          </div>
+        }
         <div className="navigation">
           <NavigationControl />
         </div>
