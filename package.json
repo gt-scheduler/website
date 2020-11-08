@@ -8,6 +8,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.10",
+    "@sweetalert/with-react": "^0.1.1",
     "@types/dom-to-image": "^2.6.2",
     "@types/file-saver": "^2.0.1",
     "@types/js-cookie": "^2.2.6",
@@ -35,6 +36,7 @@
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
     "s-ago": "^2.2.0",
+    "sweetalert": "^2.1.2",
     "typescript": "^3.9.7"
   },
   "devDependencies": {
