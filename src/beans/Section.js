@@ -32,10 +32,11 @@ class Section {
 
     this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
     this.meetings = meetings.map(
-      ([periodIndex, days, where, instructors, dateRangeIndex]) => ({
+      ([periodIndex, days, where, locationIndex, instructors, dateRangeIndex]) => ({
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : [...days],
         where,
+        location: oscar.locations[locationIndex],
         instructors: instructors.map((instructor) =>
           instructor.replace(/ \(P\)$/, '')
         ),

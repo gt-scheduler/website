@@ -1,33 +1,63 @@
-import React from 'react';
-import GoogleMapReact from 'google-map-react';
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from 'react';
+import ReactMapGL, { Marker, NavigationControl } from 'react-map-gl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapPin } from '@fortawesome/free-solid-svg-icons';
 import './stylesheet.scss';
 
-const LocationPin = ({ text }) => (
-  <div className="pin">
-    <FontAwesomeIcon icon={faMapMarkerAlt} className="pin-icon" />
-    <p className="pin-text">{text}</p>
-  </div>
-);
+const MapView = ({ locations }) => {
+  const [viewport, setViewport] = useState({
+    latitude: 33.7765,
+    longitude: -84.3963,
+    height: '100%',
+    width: '100%',
+    zoom: 15
+  });
+  let unknown = [];
 
-const MapView = ({ locations, APIkey }) => (
-  <div className="google-map">
-    <GoogleMapReact
-      bootstrapURLKeys={{ key: APIkey }}
-      defaultCenter={{ lat: 33.7756, lng: -84.3963 }}
-      defaultZoom={16}
-    >
-      {locations.map((location, i) => (
-        <LocationPin
-          key={i}
-          lat={location.lat}
-          lng={location.lng}
-          text={location.id}
-        />
-      ))}
-    </GoogleMapReact>
-  </div>
-);
+  return (
+    <div className="mapbox">
+      {console.log(process.env)}
+      <ReactMapGL
+        {...viewport}
+        showZoom
+        showCompass
+        mapStyle="mapbox://styles/mapbox/outdoors-v9"
+        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+        onViewportChange={(viewport) => setViewport(viewport)}
+      >
+        {locations.map((location, i) => {
+          if (!location.coords) unknown.push(location);
+          return !location.coords ? (
+            <></>
+          ) : (
+            <Marker
+              key={i}
+              latitude={location.coords.lat}
+              longitude={location.coords.long}
+            >
+              <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
+              <p className="pin-text">
+                {location.id} {location.section}
+              </p>
+            </Marker>
+          );
+        })}
+        {unknown.length > 0 && (
+          <div className="unknown-container">
+            <b>Undetermined</b>
+            {unknown.map((location, i) => (
+              <div className="class" key={i}>
+                {location.id} {location.section}
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="navigation">
+          <NavigationControl />
+        </div>
+      </ReactMapGL>
+    </div>
+  );
+};
 
 export default MapView;
