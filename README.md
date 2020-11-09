@@ -11,5 +11,5 @@ Copyright (c) 2020 Jinseo Park (parkjs814@gmail.com)
 
 ### Modifications
 
-Copyright (c) 2020 all members of the "GT Scheduler" team for Bits of Good
+Copyright (c) 2020 the Bits of Good "GT Scheduler" team
 
