@@ -2,6 +2,7 @@
   // subtract header height
   height: calc(100% - 64px);
   width: 100%;
+  z-index: -3;
 
   .pin-text {
     // right: svg width
@@ -10,6 +11,7 @@
     font-weight: bold;
     cursor: pointer;
     padding: 8px;
+    z-index: -2;
     margin: 0;
 
     box-shadow: 0px 0px 3px #00000080;
@@ -23,6 +25,7 @@
     align-items: center;
 
     svg {
+      z-index: -1;
       filter: drop-shadow(
         0px 0px 3px #00000080
       );
