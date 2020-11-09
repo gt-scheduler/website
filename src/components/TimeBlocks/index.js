@@ -6,10 +6,10 @@ import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
 export function TimeBlocks({ className, crn, overlay, preview, capture, isAutosized }) {
-  const [{ oscar, colorMap }] = useContext(TermContext);
+  const [{ oscar, desiredColorMap }] = useContext(TermContext);
 
   const section = oscar.findSection(crn);
-  const color = colorMap[section.course.id];
+  const color = desiredColorMap[section.course.id];
   const contentClassName = getContentClassName(color);
 
   return (

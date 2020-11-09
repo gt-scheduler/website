@@ -39,7 +39,7 @@ const Scheduler = () => {
       )}
       <OverlayCrnsContext.Provider value={overlayContextValue}>
         <div className="main">
-          {(!mobile || tabIndex === 0) && <CourseContainer />}
+          {(!mobile || tabIndex === 0) && <CourseContainer isExpandable={true} isCatalog={false}/>}
           {(!mobile || tabIndex === 1) && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">

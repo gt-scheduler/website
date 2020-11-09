@@ -13,14 +13,14 @@ import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export function Course({ className, courseId, onAddCourse }) {
+export function Course({ className, courseId, onAddCourse, isExpandable = true}) {
   const [expanded, setExpanded] = useState(false);
   const [prereqOpen, setPrereqOpen] = useState(false);
   const [paletteShown, setPaletteShown] = useState(false);
   const [gpaMap, setGpaMap] = useState({});
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, term, desiredCourses, catalogCourses, pinnedCrns, excludedCrns, desiredColorMap, catalogColorMap },
     { patchTermData }
   ] = useContext(TermContext);
 
@@ -31,9 +31,9 @@ export function Course({ className, courseId, onAddCourse }) {
     }
   }, [isSearching, oscar, courseId]);
 
-  const handleRemoveCourse = useCallback(
+  const handleRemoveDesiredCourse = useCallback(
     (course) => {
-      patchTermData({
+      patchTermData({     
         desiredCourses: desiredCourses.filter(
           (courseId) => courseId !== course.id
         ),
@@ -43,10 +43,28 @@ export function Course({ className, courseId, onAddCourse }) {
         excludedCrns: excludedCrns.filter(
           (crn) => !course.sections.some((section) => section.crn === crn)
         ),
-        colorMap: { ...colorMap, [course.id]: undefined }
+        desiredColorMap: { ...desiredColorMap, [course.id]: undefined }
       });
     },
-    [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchTermData]
+    [desiredCourses, pinnedCrns, excludedCrns, desiredColorMap, patchTermData]
+  );
+
+  const handleRemoveCatalogCourse = useCallback(
+    (course) => {
+      patchTermData({
+        catalogCourses: catalogCourses.filter(
+          (courseId) => courseId !== course.id
+        ),
+        pinnedCrns: pinnedCrns.filter(
+          (crn) => !course.sections.some((section) => section.crn === crn)
+        ),
+        excludedCrns: excludedCrns.filter(
+          (crn) => !course.sections.some((section) => section.crn === crn)
+        ),
+        catalogColorMap: { ...catalogColorMap, [course.id]: undefined }
+      });
+    },
+    [catalogCourses, pinnedCrns, excludedCrns, catalogColorMap, patchTermData]
   );
 
   const handleIncludeSections = useCallback(
@@ -60,7 +78,7 @@ export function Course({ className, courseId, onAddCourse }) {
   );
 
   const course = oscar.findCourse(courseId);
-  const color = colorMap[course.id];
+  const color = isSearching ? null : (isExpandable ? desiredColorMap[course.id] : catalogColorMap[course.id])
   const contentClassName = color && getContentClassName(color);
 
   const hasPrereqs = oscar.version > 1;
@@ -129,18 +147,27 @@ export function Course({ className, courseId, onAddCourse }) {
                 { icon: faPlus, onClick: onAddCourse },
                 hasPrereqs ? prereqAction : infoAction
               ]
-            : [
-                {
-                  icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: () => { prereqControl(false, !expanded); }
-                },
-                hasPrereqs ? prereqAction : infoAction,
-                {
-                  icon: faPalette,
-                  onClick: () => setPaletteShown(!paletteShown)
-                },
-                { icon: faTrash, onClick: () => handleRemoveCourse(course) }
-              ]
+            : isExpandable
+                ? [
+                    {
+                      icon: expanded ? faAngleUp : faAngleDown,
+                      onClick: () => { prereqControl(false, !expanded); }
+                    },
+                    hasPrereqs ? prereqAction : infoAction,
+                    {
+                      icon: faPalette,
+                      onClick: () => setPaletteShown(!paletteShown)
+                    },
+                    { icon: faTrash, onClick: () => handleRemoveDesiredCourse(course) }
+                  ]
+                : [
+                    hasPrereqs ? prereqAction : infoAction,
+                    {
+                      icon: faPalette,
+                      onClick: () => setPaletteShown(!paletteShown)
+                    },
+                    { icon: faTrash, onClick: () => handleRemoveCatalogCourse(course)  }
+                  ]
         }
       >
         <div className="course-row">
@@ -167,7 +194,11 @@ export function Course({ className, courseId, onAddCourse }) {
           <Palette
             className="palette"
             onSelectColor={(color) =>
-              patchTermData({ colorMap: { ...colorMap, [courseId]: color } })
+              isExpandable 
+              ?
+              patchTermData({desiredColorMap: { ...desiredColorMap, [courseId]: color}}) 
+              :
+              patchTermData({catalogColorMap: { ...catalogColorMap, [courseId]: color}})
             }
             color={color}
             onMouseLeave={() => setPaletteShown(false)}
@@ -204,7 +235,7 @@ export function Course({ className, courseId, onAddCourse }) {
       {expanded && prereqOpen && (
         <div className={classes('hover-container')}>
           <div className={classes(
-            !desiredCourses.includes(course.id) && 'dark-content',
+            !catalogCourses.includes(course.id) && 'dark-content',
             'nested'
           )}>
             <Prerequisite course={course} isHeader />

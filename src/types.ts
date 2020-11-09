@@ -3,17 +3,21 @@ export type Theme = 'light' | 'dark';
 // TODO ensure types are correct
 export type TermData = {
   desiredCourses: string[];
+  catalogCourses: string[];
   pinnedCrns: string[];
   excludedCrns: string[];
-  colorMap: Record<string, string | undefined>;
+  desiredColorMap: Record<string, string | undefined>;
+  catalogColorMap: Record<string, string | undefined>;
   sortingOptionIndex: number;
 };
 
 export const defaultTermData: TermData = {
   desiredCourses: [],
+  catalogCourses: [],
   pinnedCrns: [],
   excludedCrns: [],
-  colorMap: {},
+  desiredColorMap: {},
+  catalogColorMap: {},
   sortingOptionIndex: 0
 };
 

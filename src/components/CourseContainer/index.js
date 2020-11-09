@@ -1,22 +1,36 @@
 import React, { useContext } from 'react';
 import ago from 's-ago';
-import { Button, Course, CourseAdd } from '..';
+import { Button, Course, CatalogCourseAdd, CourseAdd } from '..';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
 export function CourseContainer(props) {
-  const [{ oscar, desiredCourses }] = useContext(TermContext);
+  const [{ oscar, desiredCourses, catalogCourses }] = useContext(TermContext);
 
   return (
     <div className="CourseContainer">
       <div className="scroller">
         <div className="course-list">
-          {desiredCourses.map((courseId) => {
-            return <Course courseId={courseId} expandable key={courseId} />;
-          })}
+          { props.isCatalog
+            ?
+            catalogCourses.map((courseId) => {
+            return <Course courseId={courseId} expandable key={courseId} isExpandable={props.isExpandable}/>;
+            })
+            :
+            desiredCourses.map((courseId) => {
+            return <Course courseId={courseId} expandable key={courseId} isExpandable={props.isExpandable}/>;
+            })
+          }
         </div>
-        <CourseAdd className="course-add" />
+        
+        { props.isCatalog
+          ?
+          <CatalogCourseAdd className="catalog-course-add" />
+          :
+          <CourseAdd className="course-add" />
+        }
+        
       </div>
       <Button
         className="updated-at"

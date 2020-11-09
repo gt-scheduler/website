@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { classes } from '../../utils';
-import { Header, Scheduler, Map, NavDrawer, NavMenu } from '..';
+import { Header, Scheduler, Map, Comparison, NavDrawer, NavMenu } from '..';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
@@ -12,7 +12,7 @@ import Cookies from 'js-cookie';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
-const NAV_TABS = ['Scheduler', 'Map'];
+const NAV_TABS = ['Scheduler', 'Map', 'Comparison'];
 
 const App = () => {
   const [terms, setTerms] = useState([]);
@@ -158,6 +158,7 @@ const App = () => {
             />
             {currentTabIndex === 0 && <Scheduler />}
             {currentTabIndex === 1 && <Map />}
+            {currentTabIndex === 2 && <Comparison />}
           </div>
         </TermContext.Provider>
       </TermsContext.Provider>

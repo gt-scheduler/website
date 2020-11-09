@@ -7,6 +7,7 @@ export * from './CombinationContainer';
 export { default as Comparison } from './Comparison';
 export * from './Course';
 export * from './CourseAdd';
+export * from './CatalogCourseAdd'
 export * from './CourseContainer';
 export * from './CourseFilter';
 export { default as Header } from './Header';

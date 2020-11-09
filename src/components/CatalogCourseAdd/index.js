@@ -12,10 +12,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { TermContext } from '../../contexts';
-
-export function CourseAdd({ className }) {
+ 
+export function CatalogCourseAdd({ className }) {
   const [
-    { oscar, desiredCourses, excludedCrns, desiredColorMap },
+    { oscar, catalogCourses, excludedCrns, catalogColorMap },
     { patchTermData }
   ] = useContext(TermContext);
   const [keyword, setKeyword] = useState('');
@@ -44,7 +44,7 @@ export function CourseAdd({ className }) {
     const [, subject, number] = results;
 
     setActiveIndex(0);
-
+  
     return oscar.courses
       .filter((course) => {
         const keywordMatch =
@@ -56,12 +56,12 @@ export function CourseAdd({ className }) {
         );
         return keywordMatch && filterMatch;
       })
-      .filter((course) => !desiredCourses.includes(course.id));
-  }, [oscar, keyword, filter, desiredCourses]);
+      .filter((course) => !catalogCourses.includes(course.id));
+  }, [oscar, keyword, filter, catalogCourses]);
 
   const handleAddCourse = useCallback(
     (course) => {
-      if (desiredCourses.includes(course.id)) return;
+      if (catalogCourses.includes(course.id)) return;
       const toBeExcludedCrns = course.sections
         .filter((section) => {
           const timeDecided =
@@ -77,14 +77,14 @@ export function CourseAdd({ className }) {
         })
         .map((section) => section.crn);
       patchTermData({
-        desiredCourses: [...desiredCourses, course.id],
+        catalogCourses: [...catalogCourses, course.id],
         excludedCrns: [...excludedCrns, ...toBeExcludedCrns],
-        desiredColorMap: { ...desiredColorMap, [course.id]: getRandomColor() }
+        catalogColorMap: { ...catalogColorMap, [course.id]: getRandomColor() }
       });
       setKeyword('');
       inputRef.current.focus();
     },
-    [filter, desiredCourses, excludedCrns, desiredColorMap, inputRef, patchTermData]
+    [filter, catalogCourses, excludedCrns, catalogColorMap, inputRef, patchTermData]
   );
 
   const handleKeyDown = useCallback(
@@ -109,7 +109,7 @@ export function CourseAdd({ className }) {
     },
     [courses, handleAddCourse, activeIndex]
   );
-
+  
   const handleToggleFilter = useCallback(
     (key, tag) => {
       const tags = filter[key];
@@ -122,7 +122,7 @@ export function CourseAdd({ className }) {
     },
     [filter]
   );
-
+  
   const handleResetFilter = useCallback(
     (key) => {
       setFilter({
@@ -132,11 +132,11 @@ export function CourseAdd({ className }) {
     },
     [filter]
   );
-
+  
   const activeCourse = courses[activeIndex];
-
+  
   return (
-    <div className={classes('CourseAdd', className)}>
+    <div className={classes('CatalogCourseAdd', className)}>
       <div className="add">
         <div className="primary">
           <FontAwesomeIcon
@@ -195,3 +195,4 @@ export function CourseAdd({ className }) {
     </div>
   );
 }
+  
