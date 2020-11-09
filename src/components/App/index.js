@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { classes } from '../../utils';
-import { Header, Scheduler, Map, Comparison, NavDrawer, NavMenu } from '..';
+import { Header, Scheduler, Map, NavDrawer, NavMenu } from '..';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 import { defaultTermData } from '../../types';
+import swal from '@sweetalert/with-react'
+import Cookies from 'js-cookie';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
-const NAV_TABS = ['Scheduler', 'Map', 'Comparison'];
+const NAV_TABS = ['Scheduler', 'Map'];
 
 const App = () => {
   const [terms, setTerms] = useState([]);
@@ -31,6 +33,41 @@ const App = () => {
     ],
     [term, oscar, termData, setTerm, setOscar, patchTermData]
   );
+
+  // display popup when first visiting the site
+  useEffect(() => {
+    if (!Cookies.get("visited")) {
+      swal({
+        button: "Got It!",
+        content: (
+          <div>
+            <img
+              style={{ width: "100px" }}
+              alt="Bits of Good Logo"
+              src="https://bit.ly/3n0uaSI">
+            </img>
+            <h1>GT Scheduler</h1>
+            <p>
+              Hey there, yellow jackets! Thoughout the course of the semester, we at <a
+              rel="noopener noreferrer" href="https://bitsofgood.org" target="_blank">Bits
+              of Good</a> have been working toward integrating additional features into <a
+              rel="noopener noreferrer" href="https://github.com/64json" target="_blank">Jason
+              Park's</a> original scheduler. So far, we've been able to provide prerequisite
+              information, real-time seating/waitlist data, as well as a map through which you
+              can view your class locations.
+            </p>
+            <p>
+              If you enjoy our work and would like to contribute, <a href="https://bitsofgood.org/join"
+              rel="noopener noreferrer" target="_blank">apply</a> to be part of the team or open a pull
+              request with your improvements. Thank you and enjoy!
+            </p>
+          </div>
+        )
+      });
+
+      Cookies.set('visited', true);
+    }
+  }, []);
 
   // Fetch the current term's scraper information
   useEffect(() => {
@@ -121,7 +158,6 @@ const App = () => {
             />
             {currentTabIndex === 0 && <Scheduler />}
             {currentTabIndex === 1 && <Map />}
-            {currentTabIndex === 2 && <Comparison />}
           </div>
         </TermContext.Provider>
       </TermsContext.Provider>

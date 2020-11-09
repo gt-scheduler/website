@@ -18,6 +18,8 @@ jobs:
 
       - name: Build
         run: CI=false yarn build
+        env:
+          REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3

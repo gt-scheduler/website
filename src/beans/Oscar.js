@@ -24,6 +24,7 @@ class Oscar {
     this.campuses = caches.campuses;
     this.attributes = caches.attributes;
     this.gradeBases = caches.gradeBases;
+    this.locations = caches.locations;
     this.updatedAt = new Date(updatedAt);
     this.version = version;
     this.courses = Object.keys(courses).map(

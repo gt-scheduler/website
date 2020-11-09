@@ -8,6 +8,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.10",
+    "@sweetalert/with-react": "^0.1.1",
     "@types/dom-to-image": "^2.6.2",
     "@types/file-saver": "^2.0.1",
     "@types/js-cookie": "^2.2.6",
@@ -18,8 +19,8 @@
     "axios": "^0.18.1",
     "cheerio": "^1.0.0-rc.3",
     "dom-to-image": "^2.6.0",
+    "dotenv": "^8.2.0",
     "file-saver": "^2.0.2",
-    "google-map-react": "^2.1.8",
     "js-cookie": "^2.2.1",
     "node-sass": "^4.14.1",
     "normalize.css": "^8.0.1",
@@ -27,6 +28,7 @@
     "react": "^16.13.1",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.1",
+    "react-map-gl": "^5.2.10",
     "react-resize-panel": "^0.3.5",
     "react-scripts": "^3.4.1",
     "react-tooltip": "^4.2.10",
@@ -34,6 +36,7 @@
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
     "s-ago": "^2.2.0",
+    "sweetalert": "^2.1.2",
     "typescript": "^3.9.7"
   },
   "devDependencies": {

@@ -11,23 +11,13 @@ const Map = () => {
     const info = oscar.crnMap[crn.toString()];
     const meetings = info.meetings[0];
 
-    // todo: pull lat-long from oscar data
-    const location = {
-      lat: Math.random() < 0.5 
-        ? 33.7756 + Math.random() / 250 
-        : 33.7756 - Math.random() / 250,
-      lng: Math.random() < 0.5 
-        ? -84.396 + Math.random() / 250
-        : -84.396 - Math.random() / 250
-    }
-
     locations.push({
+      section: info.id,
       id: info.course.id,
       title: info.course.title,
       days: meetings.days,
       time: periodToString(meetings.period),
-      lat: location.lat,
-      lng: location.lng
+      coords: meetings.location
     });
   });
 
