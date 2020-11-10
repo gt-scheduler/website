@@ -68,7 +68,7 @@ export function Instructor({ className, color, name, sections, gpa }) {
               simplifyName(name)
             )}`
           },
-          { icon: faBan, onClick: () => excludeSections(sections) }
+          { icon: faBan, title: "Exclude from combinations", onClick: () => excludeSections(sections) }
         ]}
         style={instructorPinned ? { backgroundColor: color } : undefined}
       >
