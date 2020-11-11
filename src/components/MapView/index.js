@@ -12,39 +12,45 @@ const MapView = ({ locations }) => {
     width: '100%',
     zoom: 15
   });
-  let unknown = [];
+  const unknown = [];
 
   return (
     <div className="mapbox">
       <ReactMapGL
         {...viewport}
-        showZoom showCompass
+        showZoom
+        showCompass
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-        onViewportChange={viewport => setViewport(viewport)}
+        onViewportChange={(display) => setViewport(display)}
       >
         {locations.map((location, i) => {
-          if (!location.coords)
-            unknown.push(location);
-          return !location.coords ? <></> : (
+          if (!location.coords) unknown.push(location);
+          return !location.coords ? (
+            <></>
+          ) : (
             <Marker
               key={i}
               latitude={location.coords.lat}
               longitude={location.coords.long}
             >
               <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
-              <p className="pin-text">{location.id} {location.section}</p>
+              <p className="pin-text">
+                {location.id} {location.section}
+              </p>
             </Marker>
-          )
+          );
         })}
-        {unknown.length > 0 && 
+        {unknown.length > 0 && (
           <div className="unknown-container">
             <b>Undetermined</b>
             {unknown.map((location, i) => (
-              <div className="class" key={i}>{location.id} {location.section}</div>
+              <div className="class" key={i}>
+                {location.id} {location.section}
+              </div>
             ))}
           </div>
-        }
+        )}
         <div className="navigation">
           <NavigationControl />
         </div>

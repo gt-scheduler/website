@@ -44,20 +44,20 @@ class Oscar {
         const diffs = Object.keys(startMap).map(
           (day) => endMap[day] - startMap[day]
         );
-        const sum = diffs.reduce((sum, min) => sum + min, 0);
+        const sum = diffs.reduce((tot, min) => tot + min, 0);
         return +sum;
       }),
       new SortingOption('Earliest Ending', (combination) => {
         const { endMap } = combination;
         const ends = Object.values(endMap);
-        const sum = ends.reduce((sum, end) => sum + end, 0);
+        const sum = ends.reduce((tot, end) => tot + end, 0);
         const avg = sum / ends.length;
         return +avg;
       }),
       new SortingOption('Latest Beginning', (combination) => {
         const { startMap } = combination;
         const starts = Object.values(startMap);
-        const sum = starts.reduce((sum, min) => sum + min, 0);
+        const sum = starts.reduce((tot, min) => tot + min, 0);
         const avg = sum / starts.length;
         return -avg;
       })

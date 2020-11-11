@@ -3,7 +3,12 @@ import { classes } from '../../utils';
 import { PALETTE } from '../../constants';
 import './stylesheet.scss';
 
-export function Palette({ className, color, onSelectColor, ...restProps }) {
+export default function Palette({
+  className,
+  color,
+  onSelectColor,
+  ...restProps
+}) {
   return (
     <div className={classes('Palette', className)} {...restProps}>
       {PALETTE.map((colors, i) => (

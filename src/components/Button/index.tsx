@@ -12,7 +12,7 @@ export type ButtonProps = {
   children?: React.ReactNode;
 };
 
-export function Button({
+export default function Button({
   className,
   disabled = false,
   text,

@@ -10,7 +10,7 @@ import { ActionRow, Section } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export function Instructor({ className, color, name, sections, gpa }) {
+export default function Instructor({ className, color, name, sections, gpa }) {
   const [{ pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
   );
@@ -26,8 +26,8 @@ export function Instructor({ className, color, name, sections, gpa }) {
   );
 
   const excludeSections = useCallback(
-    (sections) => {
-      const crns = sections.map((section) => section.crn);
+    (sectionList) => {
+      const crns = sectionList.map((section) => section.crn);
       patchTermData({
         excludedCrns: unique([...excludedCrns, ...crns]),
         pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn))
@@ -68,7 +68,11 @@ export function Instructor({ className, color, name, sections, gpa }) {
               simplifyName(name)
             )}`
           },
-          { icon: faBan, title: "Exclude from combinations", onClick: () => excludeSections(sections) }
+          {
+            icon: faBan,
+            title: 'Exclude from Combinations',
+            onClick: () => excludeSections(sections)
+          }
         ]}
         style={instructorPinned ? { backgroundColor: color } : undefined}
       >

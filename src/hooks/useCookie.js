@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
-export function useCookie(key, defaultValue) {
+export default function useCookie(key, defaultValue) {
   const [value, setValue] = useState(defaultValue);
 
   const setCookieValue = useCallback(
-    (value) => {
-      setValue(value);
-      Cookies.set(key, value, { expires: 1460 });
+    (val) => {
+      setValue(val);
+      Cookies.set(key, val, { expires: 1460 });
     },
     [key, setValue]
   );
 
   useEffect(() => {
-    let value;
+    let val;
     if (key !== undefined) {
-      value = Cookies.get(key);
+      val = Cookies.get(key);
     }
-    setValue(value === undefined ? defaultValue : value);
+    setValue(val === undefined ? defaultValue : val);
   }, [key, defaultValue]);
 
   return [value, setCookieValue];

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { classes, humanizeArray } from '../../utils';
-import './stylesheet.scss';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { classes, humanizeArray } from '../../utils';
+import './stylesheet.scss';
 
-export function CourseFilter({
+export default function CourseFilter({
   name,
   labels,
   selectedTags,
@@ -22,6 +22,7 @@ export function CourseFilter({
         {!expanded && selectedTags.length > 0 ? (
           <div
             className="name"
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: humanizeArray(
                 selectedTags.map((tag) => labels[tag]),

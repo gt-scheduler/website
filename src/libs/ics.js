@@ -1,11 +1,12 @@
-/* global saveAs, Blob, BlobBuilder, console */
+/* global saveAs, BlobBuilder */
 /* exported ics */
 
-const ics = function (uidDomain, prodId) {
+const ics = (uidDomain, prodId) => {
   if (
     navigator.userAgent.indexOf('MSIE') > -1 &&
     navigator.userAgent.indexOf('MSIE 10') === -1
   ) {
+    // eslint-disable-next-line no-console
     console.log('Unsupported Browser');
     return;
   }
@@ -81,7 +82,7 @@ const ics = function (uidDomain, prodId) {
           }
 
           if (rrule.until) {
-            if (isNaN(Date.parse(rrule.until))) {
+            if (Number.isNaN(Date.parse(rrule.until))) {
               throw new Error(
                 "Recurrence rrule 'until' must be a valid date string"
               );
@@ -89,13 +90,13 @@ const ics = function (uidDomain, prodId) {
           }
 
           if (rrule.interval) {
-            if (isNaN(parseInt(rrule.interval))) {
+            if (Number.isNaN(parseInt(rrule.interval, 10))) {
               throw new Error("Recurrence rrule 'interval' must be an integer");
             }
           }
 
           if (rrule.count) {
-            if (isNaN(parseInt(rrule.count))) {
+            if (Number.isNaN(parseInt(rrule.count, 10))) {
               throw new Error("Recurrence rrule 'count' must be an integer");
             }
           }
@@ -114,7 +115,7 @@ const ics = function (uidDomain, prodId) {
             }
 
             // Filter any possible repeats
-            rrule.byday = rrule.byday.filter(function (elem, pos) {
+            rrule.byday = rrule.byday.filter((elem, pos) => {
               return rrule.byday.indexOf(elem) === pos;
             });
 
@@ -157,7 +158,6 @@ const ics = function (uidDomain, prodId) {
       const now_minutes = `00${now_date.getMinutes().toString()}`.slice(-2);
       const now_seconds = `00${now_date.getSeconds().toString()}`.slice(-2);
 
-      // Since some calendars don't add 0 second events, we need to remove time if there is none...
       let start_time = '';
       let end_time = '';
       if (

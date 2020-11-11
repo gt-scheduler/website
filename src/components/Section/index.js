@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
-import ReactTooltip from "react-tooltip";
+import ReactTooltip from 'react-tooltip';
 import {
   faBan,
   faChair,
@@ -12,7 +12,7 @@ import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
 
-export function Section({ className, section, pinned, color }) {
+export default function Section({ className, section, pinned, color }) {
   const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
   );
@@ -23,31 +23,30 @@ export function Section({ className, section, pinned, color }) {
   const handleHover = () => {
     hovering = true;
     setTimeout(async () => {
-      if (hovering)
-        setSeating(await section.fetchSeating(term));
+      if (hovering) setSeating(await section.fetchSeating(term));
     }, 333);
   };
 
   const excludeSection = useCallback(
-    (section) => {
+    (sect) => {
       patchTermData({
-        excludedCrns: [...excludedCrns, section.crn],
-        pinnedCrns: pinnedCrns.filter((crn) => crn !== section.crn)
+        excludedCrns: [...excludedCrns, sect.crn],
+        pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
       });
     },
     [pinnedCrns, excludedCrns, patchTermData]
   );
 
   const pinSection = useCallback(
-    (section) => {
-      if (pinnedCrns.includes(section.crn)) {
+    (sect) => {
+      if (pinnedCrns.includes(sect.crn)) {
         patchTermData({
-          pinnedCrns: pinnedCrns.filter((crn) => crn !== section.crn)
+          pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
         });
       } else {
         patchTermData({
-          pinnedCrns: [...pinnedCrns, section.crn],
-          excludedCrns: excludedCrns.filter((crn) => crn !== section.crn)
+          pinnedCrns: [...pinnedCrns, sect.crn],
+          excludedCrns: excludedCrns.filter((crn) => crn !== sect.crn)
         });
       }
     },
@@ -71,7 +70,11 @@ export function Section({ className, section, pinned, color }) {
           dataFor: section.id,
           href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`
         },
-        { icon: faBan, title: "Exclude from combinations", onClick: () => excludeSection(section) }
+        {
+          icon: faBan,
+          title: 'Exclude from Combinations',
+          onClick: () => excludeSection(section)
+        }
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
@@ -90,26 +93,42 @@ export function Section({ className, section, pinned, color }) {
           })}
         </div>
 
-        <ReactTooltip id={section.id} className="tooltip"
-          type="dark" place="right" effect="solid"
+        <ReactTooltip
+          id={section.id}
+          className="tooltip"
+          type="dark"
+          place="right"
+          effect="solid"
           afterShow={() => handleHover()}
-          afterHide={() => hovering = false}
+          afterHide={() => {
+            hovering = false;
+          }}
         >
           <table>
             <tbody>
               <tr>
-                <td><b>Seats Filled</b></td>
-                <td>{seating[0].length === 0 ? `Loading...` :
-                  typeof seating[0][1] === "number" ?
-                    `${seating[0][1]} of ${seating[0][0]}` : `N/A`
-                }</td>
+                <td>
+                  <b>Seats Filled</b>
+                </td>
+                <td>
+                  {seating[0].length === 0
+                    ? `Loading...`
+                    : typeof seating[0][1] === 'number'
+                    ? `${seating[0][1]} of ${seating[0][0]}`
+                    : `N/A`}
+                </td>
               </tr>
               <tr>
-                <td><b>Waitlist Filled</b></td>
-                <td>{seating[0].length === 0 ? `Loading...` :
-                  typeof seating[0][1] === "number" ?
-                    `${seating[0][3]} of ${seating[0][2]}` : `N/A`
-                }</td>
+                <td>
+                  <b>Waitlist Filled</b>
+                </td>
+                <td>
+                  {seating[0].length === 0
+                    ? `Loading...`
+                    : typeof seating[0][1] === 'number'
+                    ? `${seating[0][3]} of ${seating[0][2]}`
+                    : `N/A`}
+                </td>
               </tr>
             </tbody>
           </table>
