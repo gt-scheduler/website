@@ -7,7 +7,7 @@ const Map = () => {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
   const locations = [];
 
-  pinnedCrns.forEach(crn => {
+  pinnedCrns.forEach((crn) => {
     const info = oscar.crnMap[crn.toString()];
     const meetings = info.meetings[0];
 

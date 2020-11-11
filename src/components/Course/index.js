@@ -13,7 +13,7 @@ import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export function Course({ className, courseId, onAddCourse }) {
+export default function Course({ className, courseId, onAddCourse }) {
   const [expanded, setExpanded] = useState(false);
   const [prereqOpen, setPrereqOpen] = useState(false);
   const [paletteShown, setPaletteShown] = useState(false);
@@ -34,9 +34,7 @@ export function Course({ className, courseId, onAddCourse }) {
   const handleRemoveCourse = useCallback(
     (course) => {
       patchTermData({
-        desiredCourses: desiredCourses.filter(
-          (courseId) => courseId !== course.id
-        ),
+        desiredCourses: desiredCourses.filter((id) => id !== course.id),
         pinnedCrns: pinnedCrns.filter(
           (crn) => !course.sections.some((section) => section.crn === crn)
         ),
@@ -68,7 +66,7 @@ export function Course({ className, courseId, onAddCourse }) {
 
   if (hasPrereqs) {
     prereqs = course.prereqs.slice(1, course.prereqs.length);
-    if (prereqs.length && prereqs.every(prereq => !prereq[0]))
+    if (prereqs.length && prereqs.every((prereq) => !prereq[0]))
       prereqs = [prereqs];
   }
 
@@ -90,19 +88,25 @@ export function Course({ className, courseId, onAddCourse }) {
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const prereqControl = (pre, exp) => { setPrereqOpen(pre); setExpanded(exp); }
+  const prereqControl = (pre, exp) => {
+    setPrereqOpen(pre);
+    setExpanded(exp);
+  };
   const prereqAction = {
     icon: faShareAlt,
-    styling: { transform: "rotate(90deg)" },
-    onClick: () => { prereqControl(true, !prereqOpen ? true : !expanded) }
-  }
+    styling: { transform: 'rotate(90deg)' },
+    onClick: () => {
+      prereqControl(true, !prereqOpen ? true : !expanded);
+    }
+  };
 
   const infoAction = {
     icon: faInfoCircle,
-    href: `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_`
-      + `course_detail?cat_term_in=${term}&subj_code_in=`
-      + `${course.subject}&crse_numb_in=${course.number}`
-  }
+    href:
+      `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
+      `course_detail?cat_term_in=${term}&subj_code_in=` +
+      `${course.subject}&crse_numb_in=${course.number}`
+  };
 
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
@@ -132,7 +136,7 @@ export function Course({ className, courseId, onAddCourse }) {
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: () => { prereqControl(false, !expanded); }
+                  onClick: () => prereqControl(false, !expanded)
                 },
                 hasPrereqs ? prereqAction : infoAction,
                 {
@@ -146,6 +150,7 @@ export function Course({ className, courseId, onAddCourse }) {
         <div className="course-row">
           <span
             className="course-title"
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: course.title }}
           />
           <span className="section-crns">
@@ -155,8 +160,12 @@ export function Course({ className, courseId, onAddCourse }) {
         {!isSearching && (
           <div className="course-row">
             <span className="gpa">
-              Course GPA: {Object.keys(gpaMap).length === 0 ? "Loading..."
-                : (gpaMap.averageGpa ? gpaMap.averageGpa.toFixed(2) : "N/A")}
+              Course GPA:{' '}
+              {Object.keys(gpaMap).length === 0
+                ? 'Loading...'
+                : gpaMap.averageGpa
+                ? gpaMap.averageGpa.toFixed(2)
+                : 'N/A'}
             </span>
             {totalCredits > 0 && (
               <span className="credits">{totalCredits} Credits</span>
@@ -166,8 +175,8 @@ export function Course({ className, courseId, onAddCourse }) {
         {paletteShown && (
           <Palette
             className="palette"
-            onSelectColor={(color) =>
-              patchTermData({ colorMap: { ...colorMap, [courseId]: color } })
+            onSelectColor={(col) =>
+              patchTermData({ colorMap: { ...colorMap, [courseId]: col } })
             }
             color={color}
             onMouseLeave={() => setPaletteShown(false)}
@@ -182,8 +191,13 @@ export function Course({ className, courseId, onAddCourse }) {
               color={color}
               name={name}
               sections={instructorMap[name]}
-              gpa={Object.keys(gpaMap).length === 0 ? "Loading..."
-                : (gpaMap[name] ? gpaMap[name].toFixed(2) : "N/A")}
+              gpa={
+                Object.keys(gpaMap).length === 0
+                  ? 'Loading...'
+                  : gpaMap[name]
+                  ? gpaMap[name].toFixed(2)
+                  : 'N/A'
+              }
             />
           ))}
           {excludedInstructors.length > 0 && (
@@ -203,20 +217,25 @@ export function Course({ className, courseId, onAddCourse }) {
       )}
       {expanded && prereqOpen && (
         <div className={classes('hover-container')}>
-          <div className={classes(
-            !desiredCourses.includes(course.id) && 'dark-content',
-            'nested'
-          )}>
+          <div
+            className={classes(
+              !desiredCourses.includes(course.id) && 'dark-content',
+              'nested'
+            )}
+          >
             <Prerequisite course={course} isHeader />
             <div className={classes('nested')}>
-              {!!prereqs.length > 0 && 
-                prereqs.map((req, i) =>
-                  <Prerequisite key={i} course={course}
-                    req={req} option={i+1} isHeader />
-              )}
-              {!prereqs.length &&
-                <Prerequisite course={course} isEmpty />
-              }
+              {!!prereqs.length > 0 &&
+                prereqs.map((req, i) => (
+                  <Prerequisite
+                    key={i}
+                    option={i + 1}
+                    course={course}
+                    req={req}
+                    isHeader
+                  />
+                ))}
+              {!prereqs.length && <Prerequisite course={course} isEmpty />}
             </div>
           </div>
         </div>

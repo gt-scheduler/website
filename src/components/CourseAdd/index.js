@@ -5,15 +5,15 @@ import React, {
   useRef,
   useState
 } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Course, CourseFilter } from '..';
 import { classes, getRandomColor } from '../../utils';
 import './stylesheet.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { TermContext } from '../../contexts';
 
-export function CourseAdd({ className }) {
+export default function CourseAdd({ className }) {
   const [
     { oscar, desiredCourses, excludedCrns, colorMap },
     { patchTermData }
@@ -27,13 +27,13 @@ export function CourseAdd({ className }) {
   const inputRef = useRef(null);
 
   const handleChangeKeyword = useCallback((e) => {
-    let keyword = e.target.value.trim();
-    const results = keyword.match(/^([A-Z]+)(\d.*)$/i);
+    let input = e.target.value.trim();
+    const results = input.match(/^([A-Z]+)(\d.*)$/i);
     if (results) {
       const [, subject, number] = results;
-      keyword = `${subject} ${number}`;
+      input = `${subject} ${number}`;
     }
-    setKeyword(keyword);
+    setKeyword(input);
   }, []);
 
   const courses = useMemo(() => {
@@ -91,9 +91,8 @@ export function CourseAdd({ className }) {
     (e) => {
       switch (e.key) {
         case 'Enter':
-          const activeCourse = courses[activeIndex];
-          if (activeCourse) {
-            handleAddCourse(activeCourse);
+          if (courses[activeIndex]) {
+            handleAddCourse(courses[activeIndex]);
           }
           break;
         case 'ArrowDown':

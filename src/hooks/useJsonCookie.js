@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useCookie } from '.';
 
-export function useJsonCookie(key, defaultValue) {
+export default function useJsonCookie(key, defaultValue) {
   const [rawValue, setRawValue] = useCookie(key);
 
   const value = useMemo(() => {
@@ -17,11 +17,11 @@ export function useJsonCookie(key, defaultValue) {
 
   const patchValue = useCallback(
     (patch) => {
-      const rawValue = JSON.stringify({
+      const rawVal = JSON.stringify({
         ...value,
         ...patch
       });
-      setRawValue(rawValue);
+      setRawValue(rawVal);
     },
     [value, setRawValue]
   );

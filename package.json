@@ -2,7 +2,7 @@
   "name": "gt-scheduler",
   "version": "0.2.0",
   "private": true,
-  "homepage": "https://gtbitsofgood.github.io/gt-scheduler/",
+  "homepage": "https://gtscheduler.tech",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
@@ -68,11 +68,7 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
     "format": "prettier \"**/*.{js,jsx,ts,tsx}\" --write",
-    "format:check": "prettier \"**/*.{js,jsx,ts,tsx}\" -l",
-    "secrets:logout": "(bw logout || exit 0)",
-    "secrets:login": "bw login product@bitsofgood.org",
-    "secrets:sync": "bw sync && bw get item \"gt-scheduler\" | fx .notes > \".env.local\"",
-    "secrets": "npm run secrets:logout && cross-env-shell BW_SESSION=`bw login product@bitsofgood.org --raw` \"npm run secrets:sync\""
+    "format:check": "prettier \"**/*.{js,jsx,ts,tsx}\" -l"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -89,11 +85,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint"
-    ],
-    "*.{js,jsx,ts,tsx,css}": [
-      "prettier --write"
-    ]
+    "*.{js,jsx,ts,tsx}": ["eslint"],
+    "*.{js,jsx,ts,tsx,css}": ["prettier --write"]
   }
 }

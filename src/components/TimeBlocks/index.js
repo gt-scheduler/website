@@ -1,11 +1,18 @@
 import React, { useContext } from 'react';
-import ReactTooltip from "react-tooltip";
+import ReactTooltip from 'react-tooltip';
 import { classes, getContentClassName, periodToString } from '../../utils';
 import { CLOSE, OPEN } from '../../constants';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export function TimeBlocks({ className, crn, overlay, preview, capture, isAutosized }) {
+export default function TimeBlocks({
+  className,
+  crn,
+  overlay,
+  preview,
+  capture,
+  isAutosized
+}) {
   const [{ oscar, colorMap }] = useContext(TermContext);
 
   const section = oscar.findSection(crn);
@@ -61,32 +68,44 @@ export function TimeBlocks({ className, crn, overlay, preview, capture, isAutosi
           ))
       )}
 
-      {!isAutosized &&
-        <ReactTooltip id={crn} className="tooltip"
-          type="dark" place="top" effect="solid"
+      {!isAutosized && (
+        <ReactTooltip
+          id={crn}
+          className="tooltip"
+          type="dark"
+          place="top"
+          effect="solid"
         >
           <table>
             <tbody>
               <tr>
-                <td><b>Course Name</b></td>
+                <td>
+                  <b>Course Name</b>
+                </td>
                 <td>{section.course.title}</td>
               </tr>
               <tr>
-                <td><b>Delivery Type</b></td>
+                <td>
+                  <b>Delivery Type</b>
+                </td>
                 <td>{section.deliveryMode}</td>
               </tr>
               <tr>
-                <td><b>Course Number</b></td>
+                <td>
+                  <b>Course Number</b>
+                </td>
                 <td>{section.crn}</td>
               </tr>
               <tr>
-                <td><b>Credit Hours</b></td>
+                <td>
+                  <b>Credit Hours</b>
+                </td>
                 <td>{section.credits}</td>
               </tr>
             </tbody>
           </table>
         </ReactTooltip>
-      }
+      )}
     </div>
   );
 }

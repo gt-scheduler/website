@@ -58,7 +58,6 @@ const Header = ({
   const handleExport = useCallback(() => {
     const cal = ics() as ICS | undefined;
     if (cal == null) {
-      // eslint-disable-next-line no-alert
       window.alert('This browser does not support calendar export');
       return;
     }

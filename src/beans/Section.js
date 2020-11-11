@@ -32,7 +32,14 @@ class Section {
 
     this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
     this.meetings = meetings.map(
-      ([periodIndex, days, where, locationIndex, instructors, dateRangeIndex]) => ({
+      ([
+        periodIndex,
+        days,
+        where,
+        locationIndex,
+        instructors,
+        dateRangeIndex
+      ]) => ({
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : [...days],
         where,
@@ -56,11 +63,12 @@ class Section {
     const currDate = Date.now();
 
     if (currDate - prevDate > 300000) {
-      const url = `https://oscar.gatech.edu/pls/bprod/`
-        + `bwckschd.p_disp_detail_sched?term_in=${term}`
-        + `&crn_in=${this.crn}`;
+      const url =
+        `https://oscar.gatech.edu/pls/bprod/` +
+        `bwckschd.p_disp_detail_sched?term_in=${term}` +
+        `&crn_in=${this.crn}`;
 
-      return await axios({
+      return axios({
         url: `https://cors-anywhere.herokuapp.com/${url}`,
         method: 'get',
         headers: {
@@ -68,24 +76,26 @@ class Section {
           'Content-Type': 'text/html'
         }
       })
-        .then(response => {
+        .then((response) => {
           const $ = cheerio.load(response.data);
           const availabilityTable = $('.datadisplaytable .datadisplaytable');
-          const tableRow = availabilityTable.find("tr");
+          const tableRow = availabilityTable.find('tr');
 
-          this.seating = [[
-            parseInt(tableRow.eq(1).children("td").first().text(), 10),
-            parseInt(tableRow.eq(1).children("td").eq(1).text(), 10),
-            parseInt(tableRow.eq(2).children("td").first().text(), 10),
-            parseInt(tableRow.eq(2).children("td").eq(1).text(), 10)
-          ], currDate]
+          this.seating = [
+            [
+              parseInt(tableRow.eq(1).children('td').first().text(), 10),
+              parseInt(tableRow.eq(1).children('td').eq(1).text(), 10),
+              parseInt(tableRow.eq(2).children('td').first().text(), 10),
+              parseInt(tableRow.eq(2).children('td').eq(1).text(), 10)
+            ],
+            currDate
+          ];
 
           return this.seating;
         })
-        .catch(() => [new Array(4).fill("N/A"), currDate]);
-    } else {
-      return this.seating;
+        .catch(() => [new Array(4).fill('N/A'), currDate]);
     }
+    return this.seating;
   }
 }
 

@@ -5,7 +5,7 @@ import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 
-export function CombinationContainer(props) {
+export default function CombinationContainer() {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
     { patchTermData }
@@ -32,6 +32,7 @@ export function CombinationContainer(props) {
   return (
     <div className="CombinationContainer">
       <Select
+        // eslint-disable-next-line no-shadow
         onChange={(sortingOptionIndex) => patchTermData({ sortingOptionIndex })}
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({

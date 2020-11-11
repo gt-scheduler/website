@@ -85,7 +85,7 @@ class Course {
     const url = `https://critique.gatech.edu/course.php?id=${encodeURIComponent(
       this.id
     )}`;
-    return await axios({
+    return axios({
       url: `https://cors-anywhere.herokuapp.com/${url}`,
       method: 'get',
       headers: {
