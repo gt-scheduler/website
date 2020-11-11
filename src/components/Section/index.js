@@ -71,7 +71,7 @@ export function Section({ className, section, pinned, color }) {
           dataFor: section.id,
           href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`
         },
-        { icon: faBan, onClick: () => excludeSection(section) }
+        { icon: faBan, title: "Exclude from combinations", onClick: () => excludeSection(section) }
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
@@ -92,8 +92,8 @@ export function Section({ className, section, pinned, color }) {
 
         <ReactTooltip id={section.id} className="tooltip"
           type="dark" place="right" effect="solid"
-          afterShow={ () => handleHover() }
-          afterHide={ () => hovering = false }
+          afterShow={() => handleHover()}
+          afterHide={() => hovering = false}
         >
           <table>
             <tbody>
