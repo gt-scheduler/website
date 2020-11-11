@@ -42,50 +42,35 @@ const App = () => {
         content: (
           <div>
             <img
-              style={{ width: '100px' }}
+              style={{ width: '175px' }}
               alt="Bits of Good Logo"
-              src="https://bit.ly/3n0uaSI"
+              src="/mascot.png"
             />
             <h1>GT Scheduler</h1>
             <p>
-              Hey there, yellow jackets! Thoughout the course of the semester,
-              we at{' '}
-              <a
-                rel="noopener noreferrer"
-                href="https://bitsofgood.org"
-                target="_blank"
-              >
-                Bits of Good
-              </a>{' '}
-              have been working toward integrating additional features into{' '}
-              <a
-                rel="noopener noreferrer"
-                href="https://github.com/64json"
-                target="_blank"
-              >
-                Jason Park&apos;s
-              </a>{' '}
-              original scheduler. So far, we&apos;ve been able to provide
-              prerequisite information, real-time seating/waitlist data, as well
-              as a map through which you can view your class locations.
+              Hey there, yellow jackets! We understand the registration process
+              can be stressful for many students, so we&apos;ve developed a
+              scheduling application to help. Now, you can access course
+              prerequisites, instructor GPAs, and live seating information all
+              in one location!
             </p>
             <p>
-              If you enjoy our work and would like to contribute,{' '}
+              If you enjoy our work and are interested in contributing, feel
+              free to open a{' '}
               <a
-                href="https://bitsofgood.org/join"
+                href="https://github.com/gt-scheduler/gt-scheduler/pulls"
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                apply
+                pull request
               </a>{' '}
-              to be part of the team or open a pull request with your
-              improvements. Thank you and enjoy!
+              with your improvements. Thank you and enjoy!
             </p>
           </div>
         )
       });
 
-      Cookies.set('visited', true);
+      Cookies.set('visited', true, { expires: 365 });
     }
   }, []);
 

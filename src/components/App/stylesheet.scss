@@ -98,18 +98,18 @@
   h1 { color: #444444; font-weight: 800; }
   p  { color: #555555; text-align: left; }
   a {
-    &:hover { color: #FFC55A; }
+    &:hover { color: #ffaa5a; }
     transition: all 0.33s ease;
-    color: #F38D6A;
+    color: #f37f6a;
     font-weight: 700;
   }
 }
 
 .swal-button {
-  &:hover { background-color: #FFC55A !important; }
+  &:hover { background-color: #ffaa5a !important; }
   box-shadow: 0px 0px 20px #00000033;
   transition: all 0.33s ease;
-  background-color: #F38D6A;
+  background-color: #f37f6a;
   border-radius: 15px;
   margin-top: 0.67em;
   padding: 10px 60px;
