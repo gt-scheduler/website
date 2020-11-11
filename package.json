@@ -2,7 +2,7 @@
   "name": "gt-scheduler",
   "version": "0.2.0",
   "private": true,
-  "homepage": "https://gtscheduler.tech",
+  "homepage": "https://gtbitsofgood.github.io/gt-scheduler/",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-brands-svg-icons": "^5.13.1",

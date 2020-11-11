@@ -43,8 +43,8 @@ const App = () => {
           <div>
             <img
               style={{ width: '175px' }}
-              alt="Bits of Good Logo"
-              src="/mascot.png"
+              alt="GT Scheduler Logo"
+              src="/gt-scheduler/mascot.png"
             />
             <h1>GT Scheduler</h1>
             <p>
