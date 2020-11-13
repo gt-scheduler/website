@@ -82,7 +82,7 @@ class Course {
   }
 
   async fetchGpa() {
-    const url = `https://critique.gatech.edu/course?id=${encodeURIComponent(
+    const url = `https://critique.gatech.edu/course?courseID=${encodeURIComponent(
       this.id
     )}`;
     return axios({
