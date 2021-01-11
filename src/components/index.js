@@ -20,3 +20,4 @@ export { default as Section } from './Section';
 export { default as Select } from './Select';
 export { default as Tab } from './Tab';
 export { default as TimeBlocks } from './TimeBlocks';
+export { default as Attribution } from './Attribution';

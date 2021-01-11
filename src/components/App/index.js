@@ -3,7 +3,7 @@ import axios from 'axios';
 import swal from '@sweetalert/with-react';
 import Cookies from 'js-cookie';
 import { classes } from '../../utils';
-import { Header, Scheduler, Map, NavDrawer, NavMenu } from '..';
+import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
@@ -163,6 +163,7 @@ const App = () => {
             />
             {currentTabIndex === 0 && <Scheduler />}
             {currentTabIndex === 1 && <Map />}
+            <Attribution />
           </div>
         </TermContext.Provider>
       </TermsContext.Provider>
