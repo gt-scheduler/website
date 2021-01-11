@@ -49,10 +49,11 @@ const App = () => {
             <h1>GT Scheduler</h1>
             <p>
               Hey there, yellow jackets! We understand the registration process
-              can be stressful for many students, so we&apos;ve developed a
-              scheduling application to help. Now, you can access course
-              prerequisites, instructor GPAs, and live seating information all
-              in one location!
+              can be stressful for many students. That&apos;s why we took{' '}
+              <a href="https://jasonpark.me">Jason Park&apos;s</a>
+              spectacular scheduling app and added our own touch. Now, you can
+              access course prerequisites, instructor GPAs, and live seating
+              information all in one location!
             </p>
             <p>
               If you enjoy our work and are interested in contributing, feel
