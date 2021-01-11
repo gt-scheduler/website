@@ -50,8 +50,7 @@ const App = () => {
             <p>
               Hey there, yellow jackets! We understand the registration process
               can be stressful for many students. That&apos;s why we took{' '}
-              <a href="https://jasonpark.me">Jason Park&apos;s</a>
-              spectacular{' '}
+              <a href="https://jasonpark.me">Jason Park&apos;s</a> spectacular{' '}
               <a href="github.com/64json/gt-scheduler">scheduling app</a> and
               added our own touch. Now, you can access course prerequisites,
               instructor GPAs, and live seating information all in one location!
