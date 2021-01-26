@@ -28,12 +28,12 @@ The project requires a small handful of tools that are used to develop both the 
 
 The list of software that you'll need to have installed is:
 
-- [`git`](https://git-scm.com/) - `git` is the tool we use to track changes made by lots of people to the codebase. If you've taken a CS class like CS 2340 you or something similar you likely already have it installed and are familiar with it, but in case you aren't, you can [download it from their website](https://git-scm.com/downloads) and learn more about using it using some of the brief starter guides available online (Personally, I really like [this one](https://rogerdudler.github.io/git-guide/) and I often come back to it as a reference).
+- [`git`](https://git-scm.com/) - `git` is the tool we use to track changes made by multiple people to the codebase. If you've taken a CS class like CS 2340 or something similar you likely already have it installed and are familiar with it, but in case you aren't, you can [download it from their website](https://git-scm.com/downloads) and learn more about using it using some of the brief starter guides available online (personally, I really like [this one](https://rogerdudler.github.io/git-guide/) I often come back to it as a reference).
   - Even if you already have Git installed, it might be worth reviewing the [GT Bits of Good branching conventions](https://www.notion.so/Branch-Conventions-fa4d056e31bd4242a2d0ffee959de92d), specifically that:
     > 4. All feature branches must use the following naming convention:
     >  - `[NAME]/[ISSUE-NUMBER]-[SHORT_DESCRIPTION]` (Issue number is optional)
     >  - i.e `daniel/48-setup-ci`
-- [Node.js](https://nodejs.org/en/) - Node.js is a JavaScript runner that exists on your computer as a standalone tool (as opposed to being embedded in a browser) and is used to run various JavaScripts to build the frontend code and manage dependencies before it ever hits your browser.
+- [Node.js](https://nodejs.org/en/) - Node.js is a JavaScript runtime that exists on your computer as a standalone tool (as opposed to being embedded in a browser) and is used to run various JavaScript scripts to build the frontend code and manage dependencies before it ever hits your browser.
   - If you already have a version of Node.js installed (you can check by opening a terminal and running `node --version`), and it ends up causing strange errors when building the app (especially if it's older), you may want to either uninstall the old version or look into a tool like [`nvm`](https://github.com/nvm-sh/nvm) that lets you have multiple versions of Node.js installed (you only need this if you encounter issues or want multiple versions installed for some other purpose).
 - [`yarn`](https://classic.yarnpkg.com/en/docs/install/) - We use Yarn to manage dependencies and download packages that are used in the frontend. To install it, you can use the `npm` utility that was installed alongside with Node:
 
@@ -55,7 +55,7 @@ This will create a new folder called `gt-scheduler` that will have the downloade
 
 ### Installing Dependencies
 
-To install the dependencies needed to run the project locally, you'll use Yarn. With the same terminal that you cloned the repository with, run:
+To install the dependencies needed to run the project locally, you'll use Yarn. In the same terminal that you cloned the repository with, run:
 
 ```
 yarn install
