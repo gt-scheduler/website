@@ -47,7 +47,7 @@ The list of software that you'll need to have installed is:
 To download the code, you'll need to clone the Git repository to your local computer. With a new terminal open and inside of whatever folder you'd like to have your repository folder in, run:
 
 ```
-git clone https://github.com/GTBitsOfGood/gt-scheduler.git
+git clone https://github.com/gt-scheduler/website.git gt-scheduler
 cd gt-scheduler
 ```
 

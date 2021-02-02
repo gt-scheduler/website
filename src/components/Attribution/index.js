@@ -14,7 +14,7 @@ export default function Attribution() {
         </span>{' '}
         by <a href="https://jasonpark.me">Jinseo Park</a>,{' '}
         <a href="https://bitsofgood.org">Bits of Good</a>, and{' '}
-        <a href="https://github.com/GTBitsOfGood/gt-scheduler/graphs/contributors">
+        <a href="https://github.com/gt-scheduler/website/graphs/contributors">
           {mobile ? 'others' : 'the GT Scheduler contributors'}
         </a>
         .

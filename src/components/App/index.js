@@ -59,7 +59,7 @@ const App = () => {
               If you enjoy our work and are interested in contributing, feel
               free to open a{' '}
               <a
-                href="https://github.com/gt-scheduler/gt-scheduler/pulls"
+                href="https://github.com/gt-scheduler/website/pulls"
                 rel="noopener noreferrer"
                 target="_blank"
               >

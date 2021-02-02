@@ -177,7 +177,7 @@ const Header = ({
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
         </Button>
-        <Button href="https://github.com/gtbitsofgood/gt-scheduler">
+        <Button href="https://github.com/gt-scheduler/website">
           <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
           <div className="text">GitHub</div>
         </Button>
