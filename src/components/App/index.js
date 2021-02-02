@@ -44,7 +44,7 @@ const App = () => {
             <img
               style={{ width: '175px' }}
               alt="GT Scheduler Logo"
-              src="/gt-scheduler/mascot.png"
+              src="/mascot.png"
             />
             <h1>GT Scheduler</h1>
             <p>
