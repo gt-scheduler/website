@@ -2,7 +2,7 @@
 
 > Georgia Tech Scheduler lets you find the schedule that fits you best among all the possible combinations of courses.
 
-## License & Copyright Notice
+## 📃 License & Copyright Notice
 
 This work is a derivative of the original and spectacular [GT Scheduler](https://github.com/64json/gt-scheduler) project created by Jinseo Park. The original work and all modifications are licensed under the [AGPL v3.0](https://github.com/64json/gt-scheduler/blob/master/LICENSE) license.
 
@@ -30,11 +30,6 @@ The project requires a small handful of tools that are used to develop both the 
 The list of software that you'll need to have installed is:
 
 - [`git`](https://git-scm.com/) - `git` is the tool we use to track changes made by multiple people to the codebase. If you've taken a CS class like CS 2340 or something similar you likely already have it installed and are familiar with it, but in case you aren't, you can [download it from their website](https://git-scm.com/downloads) and learn more about using it using some of the brief starter guides available online (personally, I really like [this one](https://rogerdudler.github.io/git-guide/) I often come back to it as a reference).
-  - Even if you already have Git installed, it might be worth reviewing the [GT Bits of Good branching conventions](https://www.notion.so/Branch-Conventions-fa4d056e31bd4242a2d0ffee959de92d), specifically that:
-    > 4. All feature branches must use the following naming convention:
-    >
-    > - `[NAME]/[ISSUE-NUMBER]-[SHORT_DESCRIPTION]` (Issue number is optional)
-    > - i.e `daniel/48-setup-ci`
 - [Node.js](https://nodejs.org/en/) - Node.js is a JavaScript runtime that exists on your computer as a standalone tool (as opposed to being embedded in a browser) and is used to run various JavaScript scripts to build the frontend code and manage dependencies before it ever hits your browser.
   - If you already have a version of Node.js installed (you can check by opening a terminal and running `node --version`), and it ends up causing strange errors when building the app (especially if it's older), you may want to either uninstall the old version or look into a tool like [`nvm`](https://github.com/nvm-sh/nvm) that lets you have multiple versions of Node.js installed (you only need this if you encounter issues or want multiple versions installed for some other purpose).
 - [`yarn`](https://classic.yarnpkg.com/en/docs/install/) - We use Yarn to manage dependencies and download packages that are used in the frontend. To install it, you can use the `npm` utility that was installed alongside with Node:
@@ -54,7 +49,7 @@ git clone https://github.com/gt-scheduler/website.git gt-scheduler
 cd gt-scheduler
 ```
 
-This will create a new folder called `gt-scheduler` that will have the downloaded code in, and switches the current directory to that folder.
+This will create a new folder called `gt-scheduler` that will have the downloaded code, and switches the current directory to that folder.
 
 ### Installing Dependencies
 
@@ -74,6 +69,6 @@ Once all of the above steps have been taken, you can start a local development v
 yarn start
 ```
 
-The app should then be viewable at [http://localhost:3000/gt-scheduler](http://localhost:3000/gt-scheduler), which you can open a new browser tab to view.
+The app should then be viewable at [http://localhost:3000](http://localhost:3000), which you can open a new browser tab to view.
 
 With that, you're able to make changes to the code and have them be re-built and viewable after a short delay in the same tab. This is the main workflow for adding new features or fixing bugs and testing them in the actual app.
