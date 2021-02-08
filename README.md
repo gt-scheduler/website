@@ -1,4 +1,5 @@
 # GT Scheduler
+
 > Georgia Tech Scheduler lets you find the schedule that fits you best among all the possible combinations of courses.
 
 ## License & Copyright Notice
@@ -24,22 +25,24 @@ To run the GT scheduler app locally and start contributing new features/bugfixes
 
 ### Getting Started - Development Tools
 
-The project requires a small handful of tools that are used to develop both the frontend (this repository) and the scraper/crawler scripts that are used to fetch course data (at [GTBitsOfGood/gt-schedule-crawler](https://github.com/GTBitsOfGood/gt-schedule-crawler)).
+The project requires a small handful of tools that are used to develop both the frontend (this repository) and the scraper/crawler scripts that are used to fetch course data (at [gt-scheduler/crawler](https://gt-scheduler.github.io/crawler)).
 
 The list of software that you'll need to have installed is:
 
 - [`git`](https://git-scm.com/) - `git` is the tool we use to track changes made by multiple people to the codebase. If you've taken a CS class like CS 2340 or something similar you likely already have it installed and are familiar with it, but in case you aren't, you can [download it from their website](https://git-scm.com/downloads) and learn more about using it using some of the brief starter guides available online (personally, I really like [this one](https://rogerdudler.github.io/git-guide/) I often come back to it as a reference).
   - Even if you already have Git installed, it might be worth reviewing the [GT Bits of Good branching conventions](https://www.notion.so/Branch-Conventions-fa4d056e31bd4242a2d0ffee959de92d), specifically that:
     > 4. All feature branches must use the following naming convention:
-    >  - `[NAME]/[ISSUE-NUMBER]-[SHORT_DESCRIPTION]` (Issue number is optional)
-    >  - i.e `daniel/48-setup-ci`
+    >
+    > - `[NAME]/[ISSUE-NUMBER]-[SHORT_DESCRIPTION]` (Issue number is optional)
+    > - i.e `daniel/48-setup-ci`
 - [Node.js](https://nodejs.org/en/) - Node.js is a JavaScript runtime that exists on your computer as a standalone tool (as opposed to being embedded in a browser) and is used to run various JavaScript scripts to build the frontend code and manage dependencies before it ever hits your browser.
   - If you already have a version of Node.js installed (you can check by opening a terminal and running `node --version`), and it ends up causing strange errors when building the app (especially if it's older), you may want to either uninstall the old version or look into a tool like [`nvm`](https://github.com/nvm-sh/nvm) that lets you have multiple versions of Node.js installed (you only need this if you encounter issues or want multiple versions installed for some other purpose).
 - [`yarn`](https://classic.yarnpkg.com/en/docs/install/) - We use Yarn to manage dependencies and download packages that are used in the frontend. To install it, you can use the `npm` utility that was installed alongside with Node:
 
-  ~~~
+  ```
   npm install --global yarn
-  ~~~
+  ```
+
 - A text editor/IDE. You most likely already have one installed, but in case you don't, we recommend using [Visual Studio Code](https://code.visualstudio.com/) since it's easy to use and has a wide set of powerful plugins. It can be downloaded from their [downloads page](https://code.visualstudio.com/Download).
 
 ### Downloading the Code - Cloning

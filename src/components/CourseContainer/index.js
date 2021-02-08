@@ -20,7 +20,7 @@ export default function CourseContainer() {
       </div>
       <Button
         className="updated-at"
-        href="https://github.com/gtbitsofgood/gt-schedule-crawler"
+        href="https://github.com/gt-scheduler/crawler"
       >
         Course data fetched {ago(oscar.updatedAt)}
       </Button>

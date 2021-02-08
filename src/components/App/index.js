@@ -80,7 +80,7 @@ const App = () => {
     setOscar(null);
     if (term) {
       axios
-        .get(`https://gtbitsofgood.github.io/gt-schedule-crawler/${term}.json`)
+        .get(`https://gt-scheduler.github.io/crawler/${term}.json`)
         .then((res) => {
           const newOscar = new Oscar(res.data);
           setOscar(newOscar);
@@ -92,7 +92,7 @@ const App = () => {
   useEffect(() => {
     axios
       .get(
-        'https://api.github.com/repos/GTBitsOfGood/gt-schedule-crawler/contents?ref=gh-pages'
+        'https://api.github.com/repos/gt-scheduler/crawler/contents?ref=gh-pages'
       )
       .then((res) => {
         const newTerms = res.data
