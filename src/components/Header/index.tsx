@@ -13,6 +13,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
+import ReactTooltip from 'react-tooltip';
 import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import ics from '../../libs/ics';
@@ -116,7 +117,7 @@ const Header = ({
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
   const mobile = useMobile();
-
+  const [removeToolTip, updateRemoveToolTip] = React.useState(false);
   return (
     <div className="Header">
       {/* Menu button, only displayed on mobile */}
@@ -169,10 +170,33 @@ const Header = ({
           <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
           <div className="text">Export</div>
         </Button>
-        <Button text={pinnedCrns.join(', ')} disabled={pinnedCrns.length === 0}>
+
+        <Button
+          text={pinnedCrns.join(', ')}
+          disabled={pinnedCrns.length === 0}
+          className="text"
+          onClick={() => {
+            setTimeout(() => updateRemoveToolTip(true), 3000);
+          }}
+        >
           <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-          <div className="text">CRNs</div>
+          <div
+            data-tip="Copied CRN!"
+            data-for="CopyCRN"
+            data-event={!removeToolTip && 'click focus'}
+          >
+            CRNs
+          </div>
         </Button>
+
+        <ReactTooltip
+          id="CopyCRN"
+          type="dark"
+          place="bottom"
+          effect="solid"
+          delayHide={500}
+          globalEventOff="click"
+        />
         <Button onClick={handleThemeChange}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
