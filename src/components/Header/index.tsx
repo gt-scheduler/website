@@ -100,14 +100,18 @@ const Header = ({
     const captureElement = captureRef.current;
     if (captureElement == null) return;
 
+    const computed = window
+      .getComputedStyle(captureElement)
+      .getPropertyValue('left');
+
     domtoimage
-      .toPng(captureElement, {
+      .toBlob(captureElement, {
         width: captureElement.offsetWidth * PNG_SCALE_FACTOR,
         height: captureElement.offsetHeight * PNG_SCALE_FACTOR,
         style: {
-          left: 0,
           transform: `scale(${PNG_SCALE_FACTOR})`,
-          'transform-origin': 'top left'
+          'transform-origin': `${computed} 0px`,
+          'background-color': '#333333'
         }
       })
       .then((blob) => saveAs(blob, 'schedule.png'));
