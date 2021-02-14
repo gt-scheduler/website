@@ -111,11 +111,11 @@ const Header = ({
         style: {
           transform: `scale(${PNG_SCALE_FACTOR})`,
           'transform-origin': `${computed} 0px`,
-          'background-color': '#333333'
+          'background-color': theme === 'light' ? '#FFFFFF' : '#333333'
         }
       })
       .then((blob) => saveAs(blob, 'schedule.png'));
-  }, [captureRef]);
+  }, [captureRef, theme]);
 
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
