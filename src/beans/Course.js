@@ -1,5 +1,4 @@
 import axios from 'axios';
-import cheerio from 'cheerio';
 import { Section } from '.';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
 
@@ -82,28 +81,24 @@ class Course {
   }
 
   async fetchGpa() {
-    const url = `https://critique.gatech.edu/course?courseID=${encodeURIComponent(
-      this.id
-    )}`;
+    const base =
+      'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
+    const encodedCourse = encodeURIComponent(this.id);
     return axios({
-      url: `https://cors-anywhere.herokuapp.com/${url}`,
-      method: 'get',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': 'text/html'
-      }
+      url: `${base}/course?courseID=${encodedCourse}`,
+      method: 'get'
     }).then((response) => {
-      const $ = cheerio.load(response.data);
-      const averageGpa = Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(2)').text()
-      );
+      const { data } = response;
+      const averageGpa = data.header[0].avg_gpa;
       const gpaMap = { averageGpa };
 
-      $('table#dataTable > tbody > tr').each((i, element) => {
-        const instructor = $(element).find('td:nth-child(1)').text();
+      data.raw.forEach((datum) => {
+        const instructor = datum.instructor_name;
+        const gpa = datum.GPA;
+
         const [lastName, firstName] = instructor.split(', ');
         const fullName = `${firstName} ${lastName}`;
-        gpaMap[fullName] = Number($(element).find('td:nth-child(3)').text());
+        gpaMap[fullName] = gpa;
       });
 
       return gpaMap;
