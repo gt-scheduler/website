@@ -4,9 +4,11 @@ import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
 import DaySelection from '../DaySelection';
 
+import './stylesheet.scss';
+
 const Map = () => {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
-  const [activeDay, setActiveDay] = useState('');
+  const [activeDay, setActiveDay] = useState('M');
   const locations = [];
   const courseDateMap = {
     M: [],
@@ -48,7 +50,7 @@ const Map = () => {
   }
 
   return (
-    <div className="map-content" style={{ display: 'flex', height: '100vh' }}>
+    <div className="map-content">
       <DaySelection
         courseDateMap={courseDateMap}
         activeDay={activeDay}

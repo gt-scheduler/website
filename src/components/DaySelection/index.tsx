@@ -63,7 +63,9 @@ export default function DaySelection({
           {activeDay === date && (
             <div className="dropdown-content">
               {courseDateMap[date as Day].length === 0 ? (
-                <div className="course-content">No classes this day!</div>
+                <div className="course-content" style={{ padding: 8 }}>
+                  No classes this day!
+                </div>
               ) : (
                 courseDateMap[date as Day].map((course: any) => (
                   <div className="course-content">
