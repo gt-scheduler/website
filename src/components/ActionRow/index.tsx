@@ -1,18 +1,38 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { classes } from '../../utils';
+import Button, { ButtonProps } from '../Button';
+
 import './stylesheet.scss';
-import { Button } from '..';
+
+type FontAwesomeProps = React.ComponentProps<typeof FontAwesomeIcon>;
+export type Action = {
+  icon: FontAwesomeProps['icon'];
+  styling?: React.CSSProperties;
+  dataTip?: string;
+  dataFor?: string;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+} & Omit<ButtonProps, 'children'>;
+
+type BaseActionRowProps = {
+  label: string;
+  actions: Action[];
+  className?: string;
+  children?: React.ReactNode;
+};
+export type ActionRowProps = BaseActionRowProps &
+  Omit<React.HTMLAttributes<HTMLDivElement>, keyof BaseActionRowProps>;
 
 export default function ActionRow({
   className,
   label,
   children,
   actions,
-  ...props
-}) {
+  ...restProps
+}: ActionRowProps) {
   return (
-    <div className={classes('ActionRow', className)} {...props}>
+    <div className={classes('ActionRow', className)} {...restProps}>
       <div className="action-row-header">
         <div className="label">{label}</div>
         <div className={classes('actions', 'default')}>
@@ -22,22 +42,20 @@ export default function ActionRow({
               (
                 {
                   icon,
-                  title,
                   styling,
                   dataTip,
                   dataFor,
                   onMouseEnter,
                   onMouseLeave,
-                  ...restProps
+                  ...rest
                 },
                 i
               ) => (
-                <Button className="action" {...restProps} key={i}>
+                <Button className="action" {...rest} key={i}>
                   <FontAwesomeIcon
                     fixedWidth
                     style={styling}
                     icon={icon}
-                    title={title}
                     data-tip={dataTip}
                     data-for={dataFor}
                     onMouseEnter={onMouseEnter}
