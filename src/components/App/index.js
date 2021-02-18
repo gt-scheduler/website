@@ -36,7 +36,8 @@ const App = () => {
 
   // display popup when first visiting the site
   useEffect(() => {
-    if (!Cookies.get('visited')) {
+    const cookieKey = 'visited-merge-notice';
+    if (!Cookies.get(cookieKey)) {
       swal({
         button: 'Got It!',
         content: (
@@ -48,24 +49,20 @@ const App = () => {
             />
             <h1>GT Scheduler</h1>
             <p>
-              Hey there, yellow jackets! We understand the registration process
-              can be stressful for many students. That&apos;s why we took{' '}
-              <a href="https://jasonpark.me">Jason Park&apos;s</a> spectacular{' '}
-              <a href="https://github.com/64json/gt-scheduler">
-                scheduling app
-              </a>{' '}
-              added our own touch. Now, you can access course prerequisites,
-              instructor GPAs, and live seating information all in one location!
+              Hey there, yellow jackets!{' '}
+              <a href="https://github.com/gt-scheduler">GT Scheduler</a> is a
+              new collaboration between{' '}
+              <a href="https://bitsofgood.org/">Bits of Good</a> and{' '}
+              <a href="https://jasonpark.me/">Jason (Jinseo) Park</a> aimed at
+              making class registration easier for everybody! Now, you can
+              access course prerequisites, instructor GPAs, live seating
+              information, and more all in one location.
             </p>
             <p>
               If you enjoy our work and are interested in contributing, feel
-              free to open a{' '}
-              <a
-                href="https://github.com/gt-scheduler/website/pulls"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                pull request
+              free to{' '}
+              <a href="https://github.com/gt-scheduler/website/pulls">
+                open a pull request
               </a>{' '}
               with your improvements. Thank you and enjoy!
             </p>
@@ -73,7 +70,7 @@ const App = () => {
         )
       });
 
-      Cookies.set('visited', true, { expires: 365 });
+      Cookies.set(cookieKey, true, { expires: 365 });
     }
   }, []);
 
