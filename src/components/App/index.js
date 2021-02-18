@@ -3,7 +3,15 @@ import axios from 'axios';
 import swal from '@sweetalert/with-react';
 import Cookies from 'js-cookie';
 import { classes } from '../../utils';
-import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
+import {
+  Header,
+  Scheduler,
+  Map,
+  NavDrawer,
+  NavMenu,
+  Attribution,
+  CourseGuide
+} from '..';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
@@ -12,7 +20,7 @@ import { defaultTermData } from '../../types';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
-const NAV_TABS = ['Scheduler', 'Map'];
+const NAV_TABS = ['Scheduler', 'Map', 'Course Guide'];
 
 const App = () => {
   const [terms, setTerms] = useState([]);
@@ -163,6 +171,7 @@ const App = () => {
             />
             {currentTabIndex === 0 && <Scheduler />}
             {currentTabIndex === 1 && <Map />}
+            {currentTabIndex === 2 && <CourseGuide />}
             <Attribution />
           </div>
         </TermContext.Provider>
