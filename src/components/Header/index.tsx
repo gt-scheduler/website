@@ -100,18 +100,22 @@ const Header = ({
     const captureElement = captureRef.current;
     if (captureElement == null) return;
 
+    const computed = window
+      .getComputedStyle(captureElement)
+      .getPropertyValue('left');
+
     domtoimage
-      .toPng(captureElement, {
+      .toBlob(captureElement, {
         width: captureElement.offsetWidth * PNG_SCALE_FACTOR,
         height: captureElement.offsetHeight * PNG_SCALE_FACTOR,
         style: {
-          left: 0,
           transform: `scale(${PNG_SCALE_FACTOR})`,
-          'transform-origin': 'top left'
+          'transform-origin': `${computed} 0px`,
+          'background-color': theme === 'light' ? '#FFFFFF' : '#333333'
         }
       })
       .then((blob) => saveAs(blob, 'schedule.png'));
-  }, [captureRef]);
+  }, [captureRef, theme]);
 
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
