@@ -117,7 +117,6 @@ const Header = ({
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
   const mobile = useMobile();
-  const [removeToolTip, updateRemoveToolTip] = React.useState(false);
   return (
     <div className="Header">
       {/* Menu button, only displayed on mobile */}
@@ -171,32 +170,28 @@ const Header = ({
           <div className="text">Export</div>
         </Button>
 
-        <Button
-          text={pinnedCrns.join(', ')}
-          disabled={pinnedCrns.length === 0}
-          className="text"
-          onClick={() => {
-            setTimeout(() => updateRemoveToolTip(true), 3000);
-          }}
-        >
-          <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-          <div
-            data-tip="Copied CRN!"
-            data-for="CopyCRN"
-            data-event={!removeToolTip && 'click focus'}
+        <div className="menu" data-tip data-for="CopyCRN" data-event="click">
+          <Button
+            text={pinnedCrns.join(', ')}
+            disabled={pinnedCrns.length === 0}
+            className="text"
           >
-            CRNs
-          </div>
-        </Button>
+            <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
+            <div> CRNs </div>
+          </Button>
+        </div>
 
         <ReactTooltip
           id="CopyCRN"
           type="dark"
           place="bottom"
           effect="solid"
-          delayHide={500}
-          globalEventOff="click"
-        />
+          event="click"
+          afterShow={() => setTimeout(() => ReactTooltip.hide(), 3000)}
+        >
+          Copied to clipboard!
+        </ReactTooltip>
+
         <Button onClick={handleThemeChange}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
