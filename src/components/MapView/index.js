@@ -12,7 +12,11 @@ const MapView = ({ locations }) => {
     width: '100%',
     zoom: 15
   });
+
   const unknown = [];
+  locations.forEach((location) => {
+    if (!location.coords) unknown.push(location);
+  });
 
   return (
     <div className="mapbox">
@@ -24,10 +28,9 @@ const MapView = ({ locations }) => {
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         onViewportChange={(display) => setViewport(display)}
       >
-        {locations.map((location, i) => {
-          if (!location.coords) unknown.push(location);
-          return !location.coords ? (
-            <></>
+        {locations.map((location, i) =>
+          !location.coords ? (
+            <React.Fragment key={i} />
           ) : (
             <Marker
               key={i}
@@ -39,8 +42,8 @@ const MapView = ({ locations }) => {
                 {location.id} {location.section}
               </p>
             </Marker>
-          );
-        })}
+          )
+        )}
         {unknown.length > 0 && (
           <div className="unknown-container">
             <b>Undetermined</b>
