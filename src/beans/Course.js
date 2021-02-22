@@ -1,5 +1,4 @@
 import axios from 'axios';
-import cheerio from 'cheerio';
 import { Section } from '.';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
 
@@ -82,32 +81,43 @@ class Course {
   }
 
   async fetchGpa() {
-    const url = `https://critique.gatech.edu/course?courseID=${encodeURIComponent(
-      this.id
-    )}`;
+    const base =
+      'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
+    // We have to clean up the course ID before sending it to the API,
+    // since courses like CHEM 1212K should become CHEM 1212
+    let { id } = this;
+    try {
+      const [subject, number] = id.split(' ');
+      id = `${subject} ${number.replace(/\D/g, '')}`;
+    } catch (_) {
+      // Ignore errors during cleaning
+    }
+    const encodedCourse = encodeURIComponent(id);
     return axios({
-      url: `https://cors-anywhere.herokuapp.com/${url}`,
-      method: 'get',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': 'text/html'
-      }
-    }).then((response) => {
-      const $ = cheerio.load(response.data);
-      const averageGpa = Number(
-        $('div.center-table > table.table > tbody > tr :nth-child(2)').text()
-      );
-      const gpaMap = { averageGpa };
+      url: `${base}/course?courseID=${encodedCourse}`,
+      method: 'get'
+    })
+      .then((response) => {
+        const { data } = response;
+        const averageGpa = data.header[0].avg_gpa;
+        const gpaMap = { averageGpa };
 
-      $('table#dataTable > tbody > tr').each((i, element) => {
-        const instructor = $(element).find('td:nth-child(1)').text();
-        const [lastName, firstName] = instructor.split(', ');
-        const fullName = `${firstName} ${lastName}`;
-        gpaMap[fullName] = Number($(element).find('td:nth-child(3)').text());
+        data.raw.forEach((datum) => {
+          const instructor = datum.instructor_name;
+          const gpa = datum.GPA;
+
+          const [lastName, firstName] = instructor.split(', ');
+          const fullName = `${firstName} ${lastName}`;
+          gpaMap[fullName] = gpa;
+        });
+
+        return gpaMap;
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(err);
+        return {};
       });
-
-      return gpaMap;
-    });
   }
 }
 
