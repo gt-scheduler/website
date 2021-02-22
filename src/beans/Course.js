@@ -83,7 +83,16 @@ class Course {
   async fetchGpa() {
     const base =
       'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
-    const encodedCourse = encodeURIComponent(this.id);
+    // We have to clean up the course ID before sending it to the API,
+    // since courses like CHEM 1212K should become CHEM 1212
+    let { id } = this;
+    try {
+      const [subject, number] = id.split(' ');
+      id = `${subject} ${number.replace(/\D/g, '')}`;
+    } catch (_) {
+      // Ignore errors during cleaning
+    }
+    const encodedCourse = encodeURIComponent(id);
     return axios({
       url: `${base}/course?courseID=${encodedCourse}`,
       method: 'get'
