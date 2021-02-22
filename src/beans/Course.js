@@ -87,22 +87,28 @@ class Course {
     return axios({
       url: `${base}/course?courseID=${encodedCourse}`,
       method: 'get'
-    }).then((response) => {
-      const { data } = response;
-      const averageGpa = data.header[0].avg_gpa;
-      const gpaMap = { averageGpa };
+    })
+      .then((response) => {
+        const { data } = response;
+        const averageGpa = data.header[0].avg_gpa;
+        const gpaMap = { averageGpa };
 
-      data.raw.forEach((datum) => {
-        const instructor = datum.instructor_name;
-        const gpa = datum.GPA;
+        data.raw.forEach((datum) => {
+          const instructor = datum.instructor_name;
+          const gpa = datum.GPA;
 
-        const [lastName, firstName] = instructor.split(', ');
-        const fullName = `${firstName} ${lastName}`;
-        gpaMap[fullName] = gpa;
+          const [lastName, firstName] = instructor.split(', ');
+          const fullName = `${firstName} ${lastName}`;
+          gpaMap[fullName] = gpa;
+        });
+
+        return gpaMap;
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(err);
+        return {};
       });
-
-      return gpaMap;
-    });
   }
 }
 
