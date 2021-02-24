@@ -43,12 +43,6 @@ const Header = ({
   const [terms] = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
   const captureRef = useRef<HTMLDivElement>(null);
-  const [showToolTip, setShowToolTip] = React.useState(false);
-
-  const handleToolTip = () => {
-    setShowToolTip(true);
-    setTimeout(() => setShowToolTip(false), 3000);
-  };
 
   const handleThemeChange = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -176,12 +170,7 @@ const Header = ({
           <div className="text">Export</div>
         </Button>
 
-        <div
-          className="menu"
-          data-tip
-          data-for={showToolTip ? 'CopyCRN' : null}
-          onClick={handleToolTip}
-        >
+        <div className="menu" data-tip data-for="CopyCRN" delay-hide="1000">
           <Button
             text={pinnedCrns.join(', ')}
             disabled={pinnedCrns.length === 0}
@@ -197,8 +186,9 @@ const Header = ({
           type="dark"
           place="bottom"
           effect="solid"
-          // event="click"
-          // afterShow={() => setTimeout(() => ReactTooltip.hide(), 3000)}
+          event="click"
+          delayHide={1000}
+          afterShow={() => setTimeout(() => ReactTooltip.hide(), 1000)}
         >
           Copied to clipboard!
         </ReactTooltip>
