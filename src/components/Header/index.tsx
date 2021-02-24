@@ -114,6 +114,9 @@ const Header = ({
       .then((blob) => saveAs(blob, 'schedule.png'));
   }, [captureRef]);
 
+  // Obtain a ref to the copy button to only close its tooltip
+  const crnButton = useRef<HTMLDivElement>(null);
+
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
   const mobile = useMobile();
@@ -170,25 +173,36 @@ const Header = ({
           <div className="text">Export</div>
         </Button>
 
-        <div className="menu" data-tip data-for="CopyCRN" delay-hide="1000">
+        {/* Include separate button and tooltip component
+            with manually controlled closing logic */}
+        <div
+          className="menu"
+          data-tip
+          data-for="copy-crn"
+          delay-hide="1000"
+          ref={crnButton}
+        >
           <Button
             text={pinnedCrns.join(', ')}
             disabled={pinnedCrns.length === 0}
-            className="text"
           >
             <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-            <div> CRNs </div>
+            <div className="text">CRNs</div>
           </Button>
         </div>
-
         <ReactTooltip
-          id="CopyCRN"
+          id="copy-crn"
           type="dark"
           place="bottom"
           effect="solid"
           event="click"
           delayHide={1000}
-          afterShow={() => setTimeout(() => ReactTooltip.hide(), 1000)}
+          afterShow={() =>
+            setTimeout(
+              () => ReactTooltip.hide(crnButton.current ?? undefined),
+              1000
+            )
+          }
         >
           Copied to clipboard!
         </ReactTooltip>
