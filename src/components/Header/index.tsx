@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import ReactTooltip from 'react-tooltip';
+import copy from 'copy-to-clipboard';
 import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import ics from '../../libs/ics';
@@ -182,30 +183,31 @@ const Header = ({
           delay-hide="1000"
           ref={crnButton}
         >
-          <Button
-            text={pinnedCrns.join(', ')}
-            disabled={pinnedCrns.length === 0}
-          >
+          <Button disabled={pinnedCrns.length === 0}>
             <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
             <div className="text">CRNs</div>
           </Button>
         </div>
-        <ReactTooltip
-          id="copy-crn"
-          type="dark"
-          place="bottom"
-          effect="solid"
-          event="click"
-          delayHide={1000}
-          afterShow={() =>
-            setTimeout(
-              () => ReactTooltip.hide(crnButton.current ?? undefined),
-              1000
-            )
-          }
-        >
-          Copied to clipboard!
-        </ReactTooltip>
+        {/* Only enable the tooltip logic if there are CRNS to copy */}
+        {pinnedCrns.length > 0 && (
+          <ReactTooltip
+            id="copy-crn"
+            type="dark"
+            place="bottom"
+            effect="solid"
+            event="click"
+            delayHide={1000}
+            afterShow={() => {
+              copy(pinnedCrns.join(', '));
+              setTimeout(
+                () => ReactTooltip.hide(crnButton.current ?? undefined),
+                1000
+              );
+            }}
+          >
+            Copied to clipboard!
+          </ReactTooltip>
+        )}
 
         <Button onClick={handleThemeChange}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />

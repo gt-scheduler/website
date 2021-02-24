@@ -1,12 +1,10 @@
 import React from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { classes } from '../../utils';
 import './stylesheet.scss';
 
 export type ButtonProps = {
   className?: string;
   disabled?: boolean;
-  text?: string;
   href?: string;
   onClick?: () => void;
   children?: React.ReactNode;
@@ -15,7 +13,6 @@ export type ButtonProps = {
 export default function Button({
   className,
   disabled = false,
-  text,
   href,
   onClick,
   children
@@ -33,13 +30,6 @@ export default function Button({
       >
         {children}
       </a>
-    );
-
-  if (text != null)
-    return (
-      <CopyToClipboard text={text}>
-        <div className={classes('Button', className)}>{children}</div>
-      </CopyToClipboard>
     );
 
   return (
