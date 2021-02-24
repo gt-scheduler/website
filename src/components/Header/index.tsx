@@ -13,6 +13,8 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
+import ReactTooltip from 'react-tooltip';
+import copy from 'copy-to-clipboard';
 import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
 import ics from '../../libs/ics';
@@ -117,10 +119,12 @@ const Header = ({
       .then((blob) => saveAs(blob, 'schedule.png'));
   }, [captureRef, theme]);
 
+  // Obtain a ref to the copy button to only close its tooltip
+  const crnButton = useRef<HTMLDivElement>(null);
+
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
   const mobile = useMobile();
-
   return (
     <div className="Header">
       {/* Menu button, only displayed on mobile */}
@@ -173,10 +177,42 @@ const Header = ({
           <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
           <div className="text">Export</div>
         </Button>
-        <Button text={pinnedCrns.join(', ')} disabled={pinnedCrns.length === 0}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-          <div className="text">CRNs</div>
-        </Button>
+
+        {/* Include separate button and tooltip component
+            with manually controlled closing logic */}
+        <div
+          className="menu"
+          data-tip
+          data-for="copy-crn"
+          delay-hide="1000"
+          ref={crnButton}
+        >
+          <Button disabled={pinnedCrns.length === 0}>
+            <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
+            <div className="text">CRNs</div>
+          </Button>
+        </div>
+        {/* Only enable the tooltip logic if there are CRNS to copy */}
+        {pinnedCrns.length > 0 && (
+          <ReactTooltip
+            id="copy-crn"
+            type="dark"
+            place="bottom"
+            effect="solid"
+            event="click"
+            delayHide={1000}
+            afterShow={() => {
+              copy(pinnedCrns.join(', '));
+              setTimeout(
+                () => ReactTooltip.hide(crnButton.current ?? undefined),
+                1000
+              );
+            }}
+          >
+            Copied to clipboard!
+          </ReactTooltip>
+        )}
+
         <Button onClick={handleThemeChange}>
           <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
           <div className="text">Theme</div>
