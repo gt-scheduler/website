@@ -4,6 +4,7 @@ import swal from '@sweetalert/with-react';
 import Cookies from 'js-cookie';
 import { classes } from '../../utils';
 import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
+import Feedback from '../Feedback';
 import { Oscar } from '../../beans';
 import { useCookie, useJsonCookie, useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
@@ -163,6 +164,7 @@ const App = () => {
             />
             {currentTabIndex === 0 && <Scheduler />}
             {currentTabIndex === 1 && <Map />}
+            <Feedback />
             <Attribution />
           </div>
         </TermContext.Provider>
