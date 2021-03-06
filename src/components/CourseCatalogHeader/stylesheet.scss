@@ -1,0 +1,56 @@
+@import "../../variables";
+$grid__cols: 12;
+
+.container {
+  padding: 16px; 
+  text-align: left;
+  &--fluid {
+    margin: 0;
+    max-width: 100%;
+  }
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 1em;
+  }
+  &__attr {
+    margin-bottom: 1em;
+  }
+  @for $i from 1 through $grid__cols {
+    &__col-#{$i} {
+      flex-basis: (100 / ($grid__cols / $i) ) * 1%;
+      width: (100 / ($grid__cols / $i) ) * 1%;
+    }
+  }
+}
+
+.container {
+  .courseName {
+    font-size: 1.5em;
+    font-weight: bold;
+    white-space: pre;
+    padding: 0 16px;
+  }
+
+  .courseDescription {
+    font-size: 0.9em;
+    padding: 0 16px;
+    overflow-x: auto;
+  }
+
+  .courseAttr {
+    font-size: 0.9em;
+    font-weight: bold;
+    white-space: pre;
+    padding: 0 16px;
+  }
+
+  .letter {
+    color: #6698FF;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+}
