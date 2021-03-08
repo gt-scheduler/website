@@ -12,32 +12,32 @@ export default function CourseGuide() {
     'CS 3510 or CS 3511 and MATH 3012 OR MATH 3022 and MATH2399';
   const courseGPA = [
     {
-      Letter: 'Avg',
-      Percentage: 3.06
+      letter: 'Avg',
+      percentage: 3.06
     },
     {
-      Letter: 'A',
-      Percentage: 3.06
+      letter: 'A',
+      percentage: 3.06
     },
     {
-      Letter: 'B',
-      Percentage: 3.06
+      letter: 'B',
+      percentage: 3.06
     },
     {
-      Letter: 'C',
-      Percentage: 3.06
+      letter: 'C',
+      percentage: 3.06
     },
     {
-      Letter: 'D',
-      Percentage: 3.06
+      letter: 'D',
+      percentage: 3.06
     },
     {
-      Letter: 'F',
-      Percentage: 3.06
+      letter: 'F',
+      percentage: 3.06
     },
     {
-      Letter: 'W',
-      Percentage: 3.06
+      letter: 'W',
+      percentage: 3.06
     }
   ];
 

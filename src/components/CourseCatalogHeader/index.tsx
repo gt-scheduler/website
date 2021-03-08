@@ -3,8 +3,8 @@ import React from 'react';
 import './stylesheet.scss';
 
 interface GradeObj {
-  Letter: string;
-  Percentage: number;
+  letter: string;
+  percentage: number;
 }
 
 type CourseCatalogHeaderProps = {
@@ -88,9 +88,9 @@ const CourseCatalogHeader = ({
           <div className="container__col-1 courseAttr">Course GPA</div>
           {courseGPA.map((gradeObj) => (
             <LetterGradeComp
-              key={gradeObj.Letter.toString()}
-              name={gradeObj.Letter}
-              percentage={gradeObj.Percentage}
+              key={gradeObj.letter.toString()}
+              name={gradeObj.letter}
+              percentage={gradeObj.percentage}
             />
           ))}
         </div>
