@@ -2,13 +2,10 @@ import React from 'react';
 
 import CourseCatalogHeader from '../CourseCatalogHeader';
 
-/**
- * Renders a nav drawer and the overlay when it is open
- */
 export default function CourseGuide() {
-  const currentCourse = 'CS 2340: Object System Design';
+  const currentCourse = 'CS 2340: Objects and Design';
   const description =
-    'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.';
+    'Object-oriented programming methods for dealing with large programs. Focus on quality processes, effective debugging techniques, and testing to assure a quality product.';
 
   const creditHours = 3;
   const prerequisite =

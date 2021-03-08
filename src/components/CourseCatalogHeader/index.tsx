@@ -3,20 +3,20 @@ import React from 'react';
 import './stylesheet.scss';
 
 interface GradeObj {
-  Letter: String;
+  Letter: string;
   Percentage: number;
 }
 
 type CourseCatalogHeaderProps = {
-  currentCourse: String;
-  description: String;
+  currentCourse: string;
+  description: string;
   creditHours: number;
-  prerequisite: String;
+  prerequisite: string;
   courseGPA: Array<GradeObj>;
 };
 
 type LetterGradeProps = {
-  name: String;
+  name: string;
   percentage: number;
 };
 
