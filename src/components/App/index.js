@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import swal from '@sweetalert/with-react';
+import * as Sentry from '@sentry/react';
 import Cookies from 'js-cookie';
 import { classes } from '../../utils';
 import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
@@ -143,26 +144,28 @@ const App = () => {
       <TermsContext.Provider value={termsContextValue}>
         <TermContext.Provider value={termContextValue}>
           <div className={classes('App', className)}>
-            {/* On mobile, show the nav drawer + overlay */}
-            {mobile && (
-              <NavDrawer open={isDrawerOpen} onClose={closeDrawer}>
-                <NavMenu
-                  items={NAV_TABS}
-                  currentItem={currentTabIndex}
-                  onChangeItem={setTabIndex}
-                />
-              </NavDrawer>
-            )}
-            {/* The header controls top-level navigation
-            and is always present */}
-            <Header
-              currentTab={currentTabIndex}
-              onChangeTab={setTabIndex}
-              onToggleMenu={openDrawer}
-              tabs={NAV_TABS}
-            />
-            {currentTabIndex === 0 && <Scheduler />}
-            {currentTabIndex === 1 && <Map />}
+            <Sentry.ErrorBoundary fallback="An error has occurred">
+              {/* On mobile, show the nav drawer + overlay */}
+              {mobile && (
+                <NavDrawer open={isDrawerOpen} onClose={closeDrawer}>
+                  <NavMenu
+                    items={NAV_TABS}
+                    currentItem={currentTabIndex}
+                    onChangeItem={setTabIndex}
+                  />
+                </NavDrawer>
+              )}
+              {/* The header controls top-level navigation
+              and is always present */}
+              <Header
+                currentTab={currentTabIndex}
+                onChangeTab={setTabIndex}
+                onToggleMenu={openDrawer}
+                tabs={NAV_TABS}
+              />
+              {currentTabIndex === 0 && <Scheduler />}
+              {currentTabIndex === 1 && <Map />}
+            </Sentry.ErrorBoundary>
             <Attribution />
           </div>
         </TermContext.Provider>
