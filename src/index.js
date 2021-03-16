@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'production') {
   console.log('Initializing Sentry');
   Sentry.init({
     dsn:
-      'https://cfb29f8e240b468f971c168e3369807d@o415387.ingest.sentry.io/5672156',
+      'https://8955ef982197469e97c7644a8c090db1@o552970.ingest.sentry.io/5679614',
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 0.8
   });
