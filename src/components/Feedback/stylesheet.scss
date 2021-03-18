@@ -1,20 +1,20 @@
 .FeedbackButton {
   position: absolute;
-  top: 88%;
+  top: 84%;
   right: 2%;
   background-color: #434343;
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
 }
 
 .FeedbackForm {
   position: absolute;
-  top: 59%;
+  top: 50%;
   right: 2%;
   background-color: #434343;
-  width: 200px;
-  height: 240px;
+  width: 300px;
+  height: 340px;
   border-radius: 5px;
 }
 
@@ -25,49 +25,62 @@
 
 .text {
   margin-top: 10px;
-  font-size: 12px;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.FeedbackTitle  {
+  font-size: 24px;
 }
 
 .FormButtons div {
   display: inline-block;
+  justify-content: space-around;
   background-color: #333333;
   color: #c4c4c4;
-  width: 20px;
-  height: 20px;
-  padding-top: 0px;
-  padding-left: 4px;
-  margin-right: 10px;
+  text-align: center;
+  margin-right: 6px;
+  margin-left: 6px;
+}
+
+.FormButton {
+  vertical-align: middle;
+  height:40px;
+  width: 40px;
 }
 
 .score {
-  margin-top: 4px;
-  color: #808080;
-  font-size: 9px;
+  font-size: 14px;
 }
 
-.TextArea {
-  margin-top: 10px;
+.FeedbackTextArea {
+  margin-top: 20px;
   background-color: #333333;
-  height: 50px;
-  width: 160px;
-  font-size: 9px;
+  height: 85px;
+  width: 260px;
+  font-size: 16px;
+  resize: none;
+  border-radius: 5px;
 }
 
 .SubmitButton {
-  width: 58px;
-  height: 20px;
+  position: relative;
+  left: 12%;
+  width: 100px;
+  height: 30px;
   background-color: #429bda;
-  font-size: 10px;
+  font-size: 16px;
   margin-top: 13px;
   text-align: center;
   margin-left: 51px;
+  border-radius: 5px;
 }
 
 .CloseIcon {
-  margin-left: 150px;
+  margin-left: 250px;
   position: absolute;
   opacity: 0.5;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }

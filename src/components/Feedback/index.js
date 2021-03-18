@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamation, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '..';
 
 export default function Feedback() {
   const [expanded, setExpanded] = useState(false);
   const [submit, setSubmit] = useState(false);
-  const buttonValues = [1, 2, 3, 4, 5];
 
   return (
     <div>
       {!expanded && (
-        <Button className="FeedbackButton" onClick={() => setExpanded(true)}>
-          <FontAwesomeIcon icon={faExclamation} />
+        <Button
+          className="FeedbackButton"
+          onClick={() => setExpanded(true)}
+          onMouse
+        >
+          <FontAwesomeIcon icon={faCommentAlt} size="2x" />
         </Button>
       )}
       {expanded && (
@@ -25,24 +28,28 @@ export default function Feedback() {
                 className="CloseIcon"
                 onClick={() => setExpanded(false)}
               />
-              <h3>Feedback</h3>
+              <h3 className="FeedbackTitle">Feedback</h3>
               {!submit && (
                 <div>
                   <p className="text">How would you rate your experience?</p>
                   <div className="FormButtons">
-                    {buttonValues.map((number) => (
-                      <div>
-                        <Button className="FormButton">{number}</Button>
-                      </div>
-                    ))}
+                    <Button className="FormButton">1</Button>
+                    <Button className="FormButton">2</Button>
+                    <Button className="FormButton">3</Button>
+                    <Button className="FormButton">4</Button>
+                    <Button className="FormButton">5</Button>
                   </div>
-                  <span className="score">Poor</span>
-                  <span className="score" style={{ marginLeft: '100px' }}>
-                    Great
-                  </span>
+                  <div className="ScoreLabels">
+                    <span className="score" style={{ marginLeft: '10px' }}>
+                      Poor
+                    </span>
+                    <span className="score" style={{ marginLeft: '179px' }}>
+                      Great
+                    </span>
+                  </div>
                   <textarea
-                    className="TextArea"
-                    placeholder="Please let us know if you have anything more feedback!"
+                    className="FeedbackTextArea"
+                    placeholder="Please let us know if you have any more feedback!"
                   />
                   <Button
                     className="SubmitButton"
