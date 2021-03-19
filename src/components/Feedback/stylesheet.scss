@@ -2,20 +2,22 @@
   position: absolute;
   top: 84%;
   right: 2%;
-  background-color: #434343;
+  background-color: var(--theme-card-bg);
   width: 60px;
   height: 60px;
   border-radius: 5px;
+  box-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .FeedbackForm {
   position: absolute;
   top: 50%;
   right: 2%;
-  background-color: #434343;
+  background-color: var(--theme-card-bg);
   width: 300px;
   height: 340px;
   border-radius: 5px;
+  box-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .container {
@@ -36,8 +38,7 @@
 .FormButtons div {
   display: inline-block;
   justify-content: space-around;
-  background-color: #333333;
-  color: #c4c4c4;
+  background-color: var(--theme-bg);
   text-align: center;
   margin-right: 6px;
   margin-left: 6px;
@@ -47,20 +48,29 @@
   vertical-align: middle;
   height:40px;
   width: 40px;
+  border-radius: 5px;
+  &.active {
+    background-color: #429bda;
+  }
 }
 
 .score {
   font-size: 14px;
+  color: #808080;
 }
 
 .FeedbackTextArea {
   margin-top: 20px;
-  background-color: #333333;
+  border: none;
+  overflow: auto;
+  outline: none;
   height: 85px;
   width: 260px;
   font-size: 16px;
   resize: none;
   border-radius: 5px;
+  background-color: var(--theme-bg);
+  color: #808080
 }
 
 .SubmitButton {
