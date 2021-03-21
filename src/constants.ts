@@ -68,6 +68,8 @@ const CAMPUSES = {
   'MBA Evening Program': 'MBA Evening'
 };
 
+const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
+
 export {
   OPEN,
   CLOSE,
@@ -76,5 +78,6 @@ export {
   PALETTE,
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
-  CAMPUSES
+  CAMPUSES,
+  BACKEND_BASE_URL
 };

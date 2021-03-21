@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import { unique } from '../utils';
-import { DELIVERY_MODES } from '../constants';
+import { DELIVERY_MODES, BACKEND_BASE_URL } from '../constants';
 
 class Section {
   constructor(oscar, course, sectionId, data) {
@@ -63,13 +63,9 @@ class Section {
     const currDate = Date.now();
 
     if (currDate - prevDate > 300000) {
-      const url =
-        `https://oscar.gatech.edu/pls/bprod/` +
-        `bwckschd.p_disp_detail_sched?term_in=${term}` +
-        `&crn_in=${this.crn}`;
-
+      const url = `${BACKEND_BASE_URL}/proxy/class_section?term=${term}&crn=${this.crn}`;
       return axios({
-        url: `https://cors-anywhere.herokuapp.com/${url}`,
+        url,
         method: 'get',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',

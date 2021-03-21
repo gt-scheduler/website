@@ -8,6 +8,8 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.10",
+    "@sentry/react": "^6.2.2",
+    "@sentry/tracing": "^6.2.2",
     "@sweetalert/with-react": "^0.1.1",
     "@types/dom-to-image": "^2.6.2",
     "@types/file-saver": "^2.0.1",
