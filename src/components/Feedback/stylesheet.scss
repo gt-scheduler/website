@@ -1,0 +1,136 @@
+.FeedbackButton {
+  position: absolute;
+  bottom: 40px;
+  right: 24px;
+  background-color: var(--theme-card-bg);
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  box-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.FeedbackForm {
+  position: absolute;
+  bottom: 40px;
+  right: 24px;
+  background-color: var(--theme-card-bg);
+  width: 300px;
+  min-height: 350px;
+  border-radius: 5px;
+  box-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+
+  .container {
+    margin: 20px;
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .text {
+    margin-top: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .FeedbackTitle  {
+    font-size: 24px;
+    margin-bottom: 16px;
+    margin-top: 0;
+  }
+  
+  .FormButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    
+    & div {
+      display: inline-block;
+      justify-content: space-around;
+      background-color: var(--theme-bg);
+      text-align: center;
+    }
+  }
+  
+  .FormButton {
+    vertical-align: middle;
+    height:40px;
+    width: 40px;
+    border-radius: 5px;
+    &.active {
+      background-color: #429bda;
+    }
+  }
+
+  .ScoreLabels {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  
+  .score {
+    font-size: 14px;
+    color: #808080;
+  }
+  
+  .FeedbackTextArea {
+    margin-top: 20px;
+    border: none;
+    overflow: auto;
+    outline: none;
+    height: 85px;
+    width: 260px;
+    font-size: 16px;
+    resize: none;
+    border-radius: 5px;
+    background-color: var(--theme-bg);
+    color: currentColor;
+    padding: 8px;
+
+    &::placeholder {
+      color: #808080;
+    }
+  }
+  
+  .SubmitButton {
+    position: relative;
+    width: 100px;
+    height: 32px;
+    background-color: #429bda;
+    font-size: 16px;
+    margin-top: 13px;
+    text-align: center;
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .CloseIcon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.5;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .submitted {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    & .submitted-thanks {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
