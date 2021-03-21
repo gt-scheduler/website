@@ -27,12 +27,16 @@ export default function DaySelection({
   ];
 
   const formatTime = (time: number): string => {
-    if (Math.floor(time / 60) > 12) {
-      return `${Math.floor(time / 60) % 12}:${
-        time % 60 === 0 ? '00' : time % 60
-      }pm`;
+    if (Math.floor(time / 60) >= 12) {
+      const adjustedHour = Math.floor(time / 60) % 12;
+      const hour = adjustedHour === 0 ? '12' : adjustedHour;
+      const minute = String(time % 60).padStart(2, '0');
+      return `${hour}:${minute}pm`;
     }
-    return `${Math.floor(time / 60)}:${time % 60 === 0 ? '00' : time % 60}am`;
+
+    const hour = Math.floor(time / 60);
+    const minute = String(time % 60).padStart(2, '0');
+    return `${hour}:${minute}am`;
   };
 
   return (
