@@ -27,10 +27,10 @@ export default function DaySelection({
   ];
 
   const formatTime = (time: number): string => {
-    if (Math.floor(time / 60) > 12) {
-      return `${Math.floor(time / 60) % 12}:${
-        time % 60 === 0 ? '00' : time % 60
-      }pm`;
+    if (Math.floor(time / 60) >= 12) {
+      return `${
+        Math.floor(time / 60) % 12 === 0 ? '12' : Math.floor(time / 60) % 12
+      }:${time % 60 === 0 ? '00' : time % 60}pm`;
     }
     return `${Math.floor(time / 60)}:${time % 60 === 0 ? '00' : time % 60}am`;
   };
