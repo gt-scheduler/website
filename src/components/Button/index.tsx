@@ -18,7 +18,9 @@ export default function Button({
   children
 }: ButtonProps) {
   if (disabled)
-    return <div className={classes('Button', 'disabled')}>{children}</div>;
+    return (
+      <div className={classes('Button', 'disabled', className)}>{children}</div>
+    );
 
   if (href != null)
     return (

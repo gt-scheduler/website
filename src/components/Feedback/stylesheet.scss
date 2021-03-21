@@ -1,7 +1,7 @@
 .FeedbackButton {
   position: absolute;
-  top: 84%;
-  right: 2%;
+  bottom: 40px;
+  right: 24px;
   background-color: var(--theme-card-bg);
   width: 60px;
   height: 60px;
@@ -11,17 +11,22 @@
 
 .FeedbackForm {
   position: absolute;
-  top: 50%;
-  right: 2%;
+  bottom: 40px;
+  right: 24px;
   background-color: var(--theme-card-bg);
   width: 300px;
-  height: 340px;
+  min-height: 350px;
   border-radius: 5px;
   box-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
 
   .container {
-    margin-left: 20px;
-    margin-top: 20px;
+    margin: 20px;
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
   }
   
   .text {
@@ -32,15 +37,22 @@
   
   .FeedbackTitle  {
     font-size: 24px;
+    margin-bottom: 16px;
+    margin-top: 0;
   }
   
-  .FormButtons div {
-    display: inline-block;
-    justify-content: space-around;
-    background-color: var(--theme-bg);
-    text-align: center;
-    margin-right: 6px;
-    margin-left: 6px;
+  .FormButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    
+    & div {
+      display: inline-block;
+      justify-content: space-around;
+      background-color: var(--theme-bg);
+      text-align: center;
+    }
   }
   
   .FormButton {
@@ -51,6 +63,14 @@
     &.active {
       background-color: #429bda;
     }
+  }
+
+  .ScoreLabels {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
   }
   
   .score {
@@ -69,28 +89,48 @@
     resize: none;
     border-radius: 5px;
     background-color: var(--theme-bg);
-    color: #808080
+    color: currentColor;
+    padding: 8px;
+
+    &::placeholder {
+      color: #808080;
+    }
   }
   
   .SubmitButton {
     position: relative;
-    left: 12%;
     width: 100px;
-    height: 30px;
+    height: 32px;
     background-color: #429bda;
     font-size: 16px;
     margin-top: 13px;
     text-align: center;
-    margin-left: 51px;
     border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .CloseIcon {
-    margin-left: 250px;
     position: absolute;
+    top: 0;
+    right: 0;
     opacity: 0.5;
     width: 20px;
     height: 20px;
     cursor: pointer;
+  }
+
+  .submitted {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    & .submitted-thanks {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
   }
 }

@@ -10,6 +10,11 @@ export default function Feedback() {
   const [submit, setSubmit] = useState(false);
   const [rating, setRating] = useState(null);
 
+  const onSubmit = () => {
+    // TODO implement API request
+    setSubmit(true);
+  };
+
   return (
     <div>
       {!expanded && (
@@ -82,10 +87,10 @@ export default function Feedback() {
                     </Button>
                   </div>
                   <div className="ScoreLabels">
-                    <span className="score" style={{ marginLeft: '10px' }}>
+                    <span className="score" style={{ marginLeft: '4px' }}>
                       Poor
                     </span>
-                    <span className="score" style={{ marginLeft: '179px' }}>
+                    <span className="score" style={{ marginRight: '4px' }}>
                       Great
                     </span>
                   </div>
@@ -95,18 +100,19 @@ export default function Feedback() {
                   />
                   <Button
                     className="SubmitButton"
-                    onClick={() => setSubmit(true)}
+                    onClick={onSubmit}
+                    disabled={rating == null}
                   >
                     Submit
                   </Button>
                 </div>
               )}
               {submit && (
-                <div>
-                  <p className="text" style={{ marginTop: '59px' }}>
-                    Thank you for your feedback!
+                <div className="submitted">
+                  <p className="submitted-thanks text">
+                    <span>Thank you for your feedback!</span>
                   </p>
-                  <div style={{ marginTop: '77px' }}>
+                  <div>
                     <Button
                       className="SubmitButton"
                       onClick={() => setExpanded(false)}
