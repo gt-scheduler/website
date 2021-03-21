@@ -18,79 +18,79 @@
   height: 340px;
   border-radius: 5px;
   box-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.4);
-}
 
-.container {
-  margin-left: 20px;
-  margin-top: 20px;
-}
-
-.text {
-  margin-top: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-.FeedbackTitle  {
-  font-size: 24px;
-}
-
-.FormButtons div {
-  display: inline-block;
-  justify-content: space-around;
-  background-color: var(--theme-bg);
-  text-align: center;
-  margin-right: 6px;
-  margin-left: 6px;
-}
-
-.FormButton {
-  vertical-align: middle;
-  height:40px;
-  width: 40px;
-  border-radius: 5px;
-  &.active {
-    background-color: #429bda;
+  .container {
+    margin-left: 20px;
+    margin-top: 20px;
   }
-}
-
-.score {
-  font-size: 14px;
-  color: #808080;
-}
-
-.FeedbackTextArea {
-  margin-top: 20px;
-  border: none;
-  overflow: auto;
-  outline: none;
-  height: 85px;
-  width: 260px;
-  font-size: 16px;
-  resize: none;
-  border-radius: 5px;
-  background-color: var(--theme-bg);
-  color: #808080
-}
-
-.SubmitButton {
-  position: relative;
-  left: 12%;
-  width: 100px;
-  height: 30px;
-  background-color: #429bda;
-  font-size: 16px;
-  margin-top: 13px;
-  text-align: center;
-  margin-left: 51px;
-  border-radius: 5px;
-}
-
-.CloseIcon {
-  margin-left: 250px;
-  position: absolute;
-  opacity: 0.5;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
+  
+  .text {
+    margin-top: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .FeedbackTitle  {
+    font-size: 24px;
+  }
+  
+  .FormButtons div {
+    display: inline-block;
+    justify-content: space-around;
+    background-color: var(--theme-bg);
+    text-align: center;
+    margin-right: 6px;
+    margin-left: 6px;
+  }
+  
+  .FormButton {
+    vertical-align: middle;
+    height:40px;
+    width: 40px;
+    border-radius: 5px;
+    &.active {
+      background-color: #429bda;
+    }
+  }
+  
+  .score {
+    font-size: 14px;
+    color: #808080;
+  }
+  
+  .FeedbackTextArea {
+    margin-top: 20px;
+    border: none;
+    overflow: auto;
+    outline: none;
+    height: 85px;
+    width: 260px;
+    font-size: 16px;
+    resize: none;
+    border-radius: 5px;
+    background-color: var(--theme-bg);
+    color: #808080
+  }
+  
+  .SubmitButton {
+    position: relative;
+    left: 12%;
+    width: 100px;
+    height: 30px;
+    background-color: #429bda;
+    font-size: 16px;
+    margin-top: 13px;
+    text-align: center;
+    margin-left: 51px;
+    border-radius: 5px;
+  }
+  
+  .CloseIcon {
+    margin-left: 250px;
+    position: absolute;
+    opacity: 0.5;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
 }
