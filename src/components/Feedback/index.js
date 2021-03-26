@@ -5,15 +5,18 @@ import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '..';
 import { classes } from '../../utils';
 
+import { FormSubmit } from '../../beans';
+
 export default function Feedback() {
   const [expanded, setExpanded] = useState(false);
   const [submit, setSubmit] = useState(false);
   const [rating, setRating] = useState(null);
+  const [feedback, setFeedback] = useState('');
 
-  const onSubmit = () => {
-    // TODO implement API request
-    setSubmit(true);
-  };
+  const onSubmit = () =>
+    FormSubmit({ rating, feedback })
+      .then(() => setSubmit(true))
+      .catch(() => setSubmit(true));
 
   return (
     <div>
@@ -97,6 +100,8 @@ export default function Feedback() {
                   <textarea
                     className="FeedbackTextArea"
                     placeholder="Please let us know if you have any more feedback!"
+                    onChange={(event) => setFeedback(event.target.value)}
+                    value={feedback}
                   />
                   <Button
                     className="SubmitButton"
