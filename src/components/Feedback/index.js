@@ -14,7 +14,8 @@ export default function Feedback() {
   const [feedback, setFeedback] = useState('');
 
   const onSubmit = () =>
-    FormSubmit({ rating, feedback })
+    // Add 1 to the rating to move it from [0,4] to [1,5]
+    FormSubmit({ rating: rating + 1, feedback })
       .then(() => setSubmit(true))
       .catch(() => setSubmit(true));
 
