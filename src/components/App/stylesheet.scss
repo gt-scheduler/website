@@ -47,6 +47,7 @@
   background-color: $theme-dark-background;
   color: $theme-dark-foreground;
   --theme-bg: #{$theme-dark-background};
+  --theme-card-bg: #434343;
   --dark-overlay: rgba(0, 0, 0, 0.2);
 }
 
@@ -54,6 +55,7 @@
   background-color: $theme-light-background;
   color: $theme-light-foreground;
   --theme-bg: #{$theme-light-background};
+  --theme-card-bg: #e5e5e5;
   --dark-overlay: rgba(0, 0, 0, 0.1);
 }
 
