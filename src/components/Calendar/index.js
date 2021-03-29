@@ -43,17 +43,13 @@ export default function Calendar({
       .meetings.filter((m) => m.period)
       .forEach((meeting) => {
         meeting.days.forEach((day) => {
-          let curRowSize = 1;
-
-          Object.values(dayMap[day])
+          const curRowSize = Object.values(dayMap[day])
             .filter(
               (entry) =>
                 entry.period.start < meeting.period.end &&
                 entry.period.end > meeting.period.start
             )
-            .forEach((entry) => {
-              curRowSize = Math.max(curRowSize, entry.rowSize + 1);
-            });
+            .reduce((acc, entry) => Math.max(acc, entry.rowSize + 1), 1);
 
           const updatePrevious = (arr, seen, curCrn, curPeriod) => {
             if (seen.has(curCrn)) {
