@@ -55,6 +55,7 @@
       .ids {
         display: flex;
         font-weight: bold;
+        overflow: hidden;
 
         span {
           font-size: .8em;
