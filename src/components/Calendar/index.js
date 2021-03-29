@@ -12,7 +12,47 @@ export default function Calendar({
   capture,
   isAutosized
 }) {
-  const [{ pinnedCrns }] = useContext(TermContext);
+  const [{ pinnedCrns, oscar }] = useContext(TermContext);
+  
+  const dayMap = DAYS.reduce((acc, day) => {
+    acc[day] = {};
+    return acc;
+  }, {});
+  
+  [...new Set([...pinnedCrns, ...(overlayCrns || [])])].forEach((crn) => {
+    oscar.findSection(crn).meetings.forEach((meeting) => {
+      meeting.days.forEach((day) => {
+        let curRowSize = 1;
+        let isSingle = true;
+
+        for (const entry of Object.values(dayMap[day])) {
+          if (entry.period.start < meeting.period.end && entry.period.end > meeting.period.start) {
+            curRowSize = Math.max(curRowSize, entry.rowSize + 1);
+            isSingle = false;
+            entry.single = false;
+          }
+        }
+
+        const updatePrevious = (arr, seen, curCrn, curPeriod) => {
+          if (seen.has(curCrn)) {
+            return;
+          }
+          seen.add(curCrn);
+          
+          for (const entry of arr) {
+            if (entry.period.start < curPeriod.end && entry.period.end > curPeriod.start) {
+              entry.rowSize = curRowSize;
+              updatePrevious(arr, seen, entry.crn, entry.period);
+            }
+          }
+        }
+
+        updatePrevious(Object.values(dayMap[day]), new Set(), crn, meeting.period);
+        
+        dayMap[day][[crn, meeting.period.start, meeting.period.end].join('-')] = { crn: crn, period: meeting.period, single: isSingle, rowIndex: curRowSize - 1, rowSize: curRowSize };
+      });
+    });
+  });
 
   return (
     <div
@@ -52,6 +92,7 @@ export default function Calendar({
             preview={preview}
             capture={capture}
             isAutosized={isAutosized}
+            dayMap={dayMap}
           />
         ))}
         {overlayCrns &&
@@ -65,6 +106,7 @@ export default function Calendar({
                 preview={preview}
                 capture={capture}
                 isAutosized
+                dayMap={dayMap}
               />
             ))}
       </div>
