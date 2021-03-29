@@ -19,7 +19,15 @@ export default function Calendar({
     return acc;
   }, {});
 
-  [...new Set([...pinnedCrns, ...(overlayCrns || [])])].forEach((crn) => {
+  const crns = [...new Set([...pinnedCrns, ...(overlayCrns || [])])];
+  const meetingLen = (m) => m.period.end - m.period.start;
+  crns.sort(
+    (a, b) =>
+      Math.max(...oscar.findSection(a).meetings.map(meetingLen)) -
+      Math.max(...oscar.findSection(b).meetings.map(meetingLen))
+  );
+
+  crns.forEach((crn) => {
     oscar.findSection(crn).meetings.forEach((meeting) => {
       meeting.days.forEach((day) => {
         let curRowSize = 1;
