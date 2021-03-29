@@ -46,14 +46,28 @@ export default function TimeBlocks({
                   100
                 }%`,
                 width: `${
-                  20 / (dayMap[day][[crn, meeting.period.start, meeting.period.end].join('-')].single ?
-                    1 :
-                    dayMap[day][[crn, meeting.period.start, meeting.period.end].join('-')].rowSize)
+                  20 /
+                  (dayMap[day][
+                    [crn, meeting.period.start, meeting.period.end].join('-')
+                  ].single
+                    ? 1
+                    : dayMap[day][
+                        [crn, meeting.period.start, meeting.period.end].join(
+                          '-'
+                        )
+                      ].rowSize)
                 }%`,
                 left: `${
                   DAYS.indexOf(day) * 20 +
-                  (dayMap[day][[crn, meeting.period.start, meeting.period.end].join('-')].rowIndex *
-                    (20 / dayMap[day][[crn, meeting.period.start, meeting.period.end].join('-')].rowSize))
+                  dayMap[day][
+                    [crn, meeting.period.start, meeting.period.end].join('-')
+                  ].rowIndex *
+                    (20 /
+                      dayMap[day][
+                        [crn, meeting.period.start, meeting.period.end].join(
+                          '-'
+                        )
+                      ].rowSize)
                 }%`,
                 backgroundColor: color
               }}
