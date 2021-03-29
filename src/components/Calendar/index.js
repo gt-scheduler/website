@@ -23,60 +23,73 @@ export default function Calendar({
   const meetingLen = (m) => m.period.end - m.period.start;
   crns.sort(
     (a, b) =>
-      Math.max(...oscar.findSection(a).meetings.map(meetingLen)) -
-      Math.max(...oscar.findSection(b).meetings.map(meetingLen))
+      Math.max(
+        ...oscar
+          .findSection(a)
+          .meetings.filter((m) => m.period)
+          .map(meetingLen)
+      ) -
+      Math.max(
+        ...oscar
+          .findSection(b)
+          .meetings.filter((m) => m.period)
+          .map(meetingLen)
+      )
   );
 
   crns.forEach((crn) => {
-    oscar.findSection(crn).meetings.forEach((meeting) => {
-      meeting.days.forEach((day) => {
-        let curRowSize = 1;
+    oscar
+      .findSection(crn)
+      .meetings.filter((m) => m.period)
+      .forEach((meeting) => {
+        meeting.days.forEach((day) => {
+          let curRowSize = 1;
 
-        Object.values(dayMap[day])
-          .filter(
-            (entry) =>
-              entry.period.start < meeting.period.end &&
-              entry.period.end > meeting.period.start
-          )
-          .forEach((entry) => {
-            curRowSize = Math.max(curRowSize, entry.rowSize + 1);
-          });
-
-        const updatePrevious = (arr, seen, curCrn, curPeriod) => {
-          if (seen.has(curCrn)) {
-            return;
-          }
-          seen.add(curCrn);
-
-          arr
+          Object.values(dayMap[day])
             .filter(
               (entry) =>
-                entry.period.start < curPeriod.end &&
-                entry.period.end > curPeriod.start
+                entry.period.start < meeting.period.end &&
+                entry.period.end > meeting.period.start
             )
             .forEach((entry) => {
-              entry.rowSize = curRowSize;
-              updatePrevious(arr, seen, entry.crn, entry.period);
+              curRowSize = Math.max(curRowSize, entry.rowSize + 1);
             });
-        };
 
-        updatePrevious(
-          Object.values(dayMap[day]),
-          new Set(),
-          crn,
-          meeting.period
-        );
+          const updatePrevious = (arr, seen, curCrn, curPeriod) => {
+            if (seen.has(curCrn)) {
+              return;
+            }
+            seen.add(curCrn);
 
-        dayMap[day][
-          [crn, meeting.period.start, meeting.period.end].join('-')
-        ] = {
-          crn,
-          period: meeting.period,
-          rowIndex: curRowSize - 1,
-          rowSize: curRowSize
-        };
+            arr
+              .filter(
+                (entry) =>
+                  entry.period.start < curPeriod.end &&
+                  entry.period.end > curPeriod.start
+              )
+              .forEach((entry) => {
+                entry.rowSize = curRowSize;
+                updatePrevious(arr, seen, entry.crn, entry.period);
+              });
+          };
+
+          updatePrevious(
+            Object.values(dayMap[day]),
+            new Set(),
+            crn,
+            meeting.period
+          );
+
+          dayMap[day][
+            [crn, meeting.period.start, meeting.period.end].join('-')
+          ] = {
+            crn,
+            period: meeting.period,
+            rowIndex: curRowSize - 1,
+            rowSize: curRowSize
+          };
+        });
       });
-    });
   });
 
   return (
