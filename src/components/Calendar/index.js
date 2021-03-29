@@ -31,18 +31,16 @@ export default function Calendar({
     oscar.findSection(crn).meetings.forEach((meeting) => {
       meeting.days.forEach((day) => {
         let curRowSize = 1;
-        let isSingle = true;
 
-        for (const entry of Object.values(dayMap[day])) {
-          if (
-            entry.period.start < meeting.period.end &&
-            entry.period.end > meeting.period.start
-          ) {
+        Object.values(dayMap[day])
+          .filter(
+            (entry) =>
+              entry.period.start < meeting.period.end &&
+              entry.period.end > meeting.period.start
+          )
+          .forEach((entry) => {
             curRowSize = Math.max(curRowSize, entry.rowSize + 1);
-            isSingle = false;
-            entry.single = false;
-          }
-        }
+          });
 
         const updatePrevious = (arr, seen, curCrn, curPeriod) => {
           if (seen.has(curCrn)) {
@@ -50,15 +48,16 @@ export default function Calendar({
           }
           seen.add(curCrn);
 
-          for (const entry of arr) {
-            if (
-              entry.period.start < curPeriod.end &&
-              entry.period.end > curPeriod.start
-            ) {
+          arr
+            .filter(
+              (entry) =>
+                entry.period.start < curPeriod.end &&
+                entry.period.end > curPeriod.start
+            )
+            .forEach((entry) => {
               entry.rowSize = curRowSize;
               updatePrevious(arr, seen, entry.crn, entry.period);
-            }
-          }
+            });
         };
 
         updatePrevious(
@@ -73,7 +72,6 @@ export default function Calendar({
         ] = {
           crn,
           period: meeting.period,
-          single: isSingle,
           rowIndex: curRowSize - 1,
           rowSize: curRowSize
         };

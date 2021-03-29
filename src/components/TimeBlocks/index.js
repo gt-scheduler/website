@@ -47,15 +47,9 @@ export default function TimeBlocks({
                 }%`,
                 width: `${
                   20 /
-                  (dayMap[day][
+                  dayMap[day][
                     [crn, meeting.period.start, meeting.period.end].join('-')
-                  ].single
-                    ? 1
-                    : dayMap[day][
-                        [crn, meeting.period.start, meeting.period.end].join(
-                          '-'
-                        )
-                      ].rowSize)
+                  ].rowSize
                 }%`,
                 left: `${
                   DAYS.indexOf(day) * 20 +
