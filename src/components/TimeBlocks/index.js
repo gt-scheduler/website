@@ -12,7 +12,7 @@ export default function TimeBlocks({
   preview,
   capture,
   isAutosized,
-  dayMap
+  sizeInfo
 }) {
   const [{ oscar, colorMap }] = useContext(TermContext);
 
@@ -47,20 +47,18 @@ export default function TimeBlocks({
                 }%`,
                 width: `${
                   20 /
-                  dayMap[day][
-                    [crn, meeting.period.start, meeting.period.end].join('-')
+                  sizeInfo[day][
+                    [meeting.period.start, meeting.period.end].join('-')
                   ].rowSize
                 }%`,
                 left: `${
                   DAYS.indexOf(day) * 20 +
-                  dayMap[day][
-                    [crn, meeting.period.start, meeting.period.end].join('-')
+                  sizeInfo[day][
+                    [meeting.period.start, meeting.period.end].join('-')
                   ].rowIndex *
                     (20 /
-                      dayMap[day][
-                        [crn, meeting.period.start, meeting.period.end].join(
-                          '-'
-                        )
+                      sizeInfo[day][
+                        [meeting.period.start, meeting.period.end].join('-')
                       ].rowSize)
                 }%`,
                 backgroundColor: color

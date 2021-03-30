@@ -14,72 +14,92 @@ export default function Calendar({
 }) {
   const [{ pinnedCrns, oscar }] = useContext(TermContext);
 
-  const dayMap = DAYS.reduce((acc, day) => {
-    acc[day] = {};
-    return acc;
-  }, {});
+  // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
+  // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
+  const crnSizeInfo = {};
+
+  // Recursively sets the rowSize of all time blocks within the current
+  // connected grouping of blocks to the current block's rowSize
+  const updateJoinedRowSizes = (
+    periodInfos,
+    seen,
+    curCrn,
+    curPeriod,
+    newRowSize
+  ) => {
+    if (seen.has(curCrn)) {
+      return;
+    }
+    seen.add(curCrn);
+
+    periodInfos
+      .filter(
+        (period2Info) =>
+          period2Info.period.start < curPeriod.end &&
+          period2Info.period.end > curPeriod.start
+      )
+      .forEach((period2Info) => {
+        period2Info.rowSize = newRowSize;
+        updateJoinedRowSizes(
+          periodInfos,
+          seen,
+          period2Info.crn,
+          period2Info.period,
+          newRowSize
+        );
+      });
+  };
 
   const crns = [...new Set([...pinnedCrns, ...(overlayCrns || [])])];
-  const meetingLen = (m) => m.period.end - m.period.start;
-  crns.sort(
-    (a, b) =>
-      Math.max(
-        ...oscar
-          .findSection(a)
-          .meetings.filter((m) => m.period)
-          .map(meetingLen)
-      ) -
-      Math.max(
-        ...oscar
-          .findSection(b)
-          .meetings.filter((m) => m.period)
-          .map(meetingLen)
-      )
-  );
+  const maxMeetingLen = (crn) =>
+    Math.max(
+      ...oscar
+        .findSection(crn)
+        .meetings.filter((m) => m.period)
+        .map((m) => m.period.end - m.period.start)
+    );
+  crns.sort((a, b) => maxMeetingLen(a) - maxMeetingLen(b));
 
+  // Populates crnSizeInfo by iteratively finding the next time block's
+  // rowSize and rowIndex (1 more than greatest of already processed connected
+  // blocks), updating the processed connected blocks to match its rowSize
   crns.forEach((crn) => {
+    crnSizeInfo[crn] = {};
+
     oscar
       .findSection(crn)
       .meetings.filter((m) => m.period)
       .forEach((meeting) => {
         meeting.days.forEach((day) => {
-          const curRowSize = Object.values(dayMap[day])
+          crnSizeInfo[crn][day] = crnSizeInfo[crn][day] || {};
+
+          const dayPeriodInfos = Object.values(crnSizeInfo)
+            .filter((days) => days[day])
+            .map((days) => Object.values(days[day]))
+            .flat();
+
+          const curRowSize = dayPeriodInfos
             .filter(
-              (entry) =>
-                entry.period.start < meeting.period.end &&
-                entry.period.end > meeting.period.start
+              (period2Info) =>
+                period2Info.period.start < meeting.period.end &&
+                period2Info.period.end > meeting.period.start
             )
-            .reduce((acc, entry) => Math.max(acc, entry.rowSize + 1), 1);
+            .reduce(
+              (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
+              1
+            );
 
-          const updatePrevious = (arr, seen, curCrn, curPeriod) => {
-            if (seen.has(curCrn)) {
-              return;
-            }
-            seen.add(curCrn);
-
-            arr
-              .filter(
-                (entry) =>
-                  entry.period.start < curPeriod.end &&
-                  entry.period.end > curPeriod.start
-              )
-              .forEach((entry) => {
-                entry.rowSize = curRowSize;
-                updatePrevious(arr, seen, entry.crn, entry.period);
-              });
-          };
-
-          updatePrevious(
-            Object.values(dayMap[day]),
+          updateJoinedRowSizes(
+            dayPeriodInfos,
             new Set(),
             crn,
-            meeting.period
+            meeting.period,
+            curRowSize
           );
 
-          dayMap[day][
-            [crn, meeting.period.start, meeting.period.end].join('-')
+          crnSizeInfo[crn][day][
+            [meeting.period.start, meeting.period.end].join('-')
           ] = {
-            crn,
             period: meeting.period,
             rowIndex: curRowSize - 1,
             rowSize: curRowSize
@@ -126,7 +146,7 @@ export default function Calendar({
             preview={preview}
             capture={capture}
             isAutosized={isAutosized}
-            dayMap={dayMap}
+            sizeInfo={crnSizeInfo[crn]}
           />
         ))}
         {overlayCrns &&
@@ -140,7 +160,7 @@ export default function Calendar({
                 preview={preview}
                 capture={capture}
                 isAutosized
-                dayMap={dayMap}
+                sizeInfo={crnSizeInfo[crn]}
               />
             ))}
       </div>
