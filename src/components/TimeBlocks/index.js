@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { classes, getContentClassName, periodToString } from '../../utils';
-import { CLOSE, OPEN } from '../../constants';
+import { CLOSE, OPEN, DAYS } from '../../constants';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
@@ -11,7 +11,8 @@ export default function TimeBlocks({
   overlay,
   preview,
   capture,
-  isAutosized
+  isAutosized,
+  sizeInfo
 }) {
   const [{ oscar, colorMap }] = useContext(TermContext);
 
@@ -43,6 +44,22 @@ export default function TimeBlocks({
                   ((meeting.period.end - meeting.period.start) /
                     (CLOSE - OPEN)) *
                   100
+                }%`,
+                width: `${
+                  20 /
+                  sizeInfo[day][
+                    [meeting.period.start, meeting.period.end].join('-')
+                  ].rowSize
+                }%`,
+                left: `${
+                  DAYS.indexOf(day) * 20 +
+                  sizeInfo[day][
+                    [meeting.period.start, meeting.period.end].join('-')
+                  ].rowIndex *
+                    (20 /
+                      sizeInfo[day][
+                        [meeting.period.start, meeting.period.end].join('-')
+                      ].rowSize)
                 }%`,
                 backgroundColor: color
               }}
