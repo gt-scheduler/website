@@ -124,6 +124,8 @@ const App = () => {
           setOscar(newOscar);
         });
     }
+    // patchTermData and termDataRef are both stable,
+    // so this effect only runs when the term changes
   }, [term, patchTermData, termDataRef]);
 
   // Fetch all terms via the GitHub API
