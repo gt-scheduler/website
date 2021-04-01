@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef
+} from 'react';
 import axios from 'axios';
 import swal from '@sweetalert/with-react';
 import * as Sentry from '@sentry/react';
@@ -76,6 +82,10 @@ const App = () => {
     }
   }, []);
 
+  // Get a stable reference to the current termData value
+  const termDataRef = useRef(termData);
+  termDataRef.current = termData;
+
   // Fetch the current term's scraper information
   useEffect(() => {
     setOscar(null);
@@ -84,10 +94,37 @@ const App = () => {
         .get(`https://gt-scheduler.github.io/crawler/${term}.json`)
         .then((res) => {
           const newOscar = new Oscar(res.data);
+
+          // Ensure that any non-existent courses or CRNs
+          // are removed from the schedule data
+          // before the app is shown again
+          // (fixes issues where a CRN/course is removed from Oscar
+          // after a schedule was made with them)
+          const currentTermData = termDataRef.current;
+          const desiredCourses = currentTermData.desiredCourses.filter(
+            (courseId) => newOscar.findCourse(courseId) != null
+          );
+          const pinnedCrns = currentTermData.pinnedCrns.filter(
+            (crn) => newOscar.findSection(crn) != null
+          );
+          const excludedCrns = currentTermData.excludedCrns.filter(
+            (crn) => newOscar.findSection(crn) != null
+          );
+
+          // Note that this has no race condition
+          // of overwriting another term's data after an oscar fetch
+          // since an oscar fetch disables the ability
+          // to switch terms immediately (by hiding the app)
+          patchTermData({
+            ...currentTermData,
+            desiredCourses,
+            pinnedCrns,
+            excludedCrns
+          });
           setOscar(newOscar);
         });
     }
-  }, [term]);
+  }, [term, patchTermData, termDataRef]);
 
   // Fetch all terms via the GitHub API
   useEffect(() => {
