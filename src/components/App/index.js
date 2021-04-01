@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useRef
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import swal from '@sweetalert/with-react';
 import * as Sentry from '@sentry/react';
@@ -31,15 +25,30 @@ const App = () => {
   const [term, setTerm] = useCookie('term');
   const [termData, patchTermData] = useJsonCookie(term, defaultTermData);
 
+  // Only consider courses and CRNs that exist
+  // (fixes issues where a CRN/course is removed from Oscar
+  // after a schedule was made with them)
+  const filteredTermData = useMemo(() => {
+    const courseFilter = (courseId) =>
+      oscar != null && oscar.findCourse(courseId) != null;
+    const crnFilter = (crn) => oscar != null && oscar.findSection(crn) != null;
+
+    const desiredCourses = termData.desiredCourses.filter(courseFilter);
+    const pinnedCrns = termData.pinnedCrns.filter(crnFilter);
+    const excludedCrns = termData.excludedCrns.filter(crnFilter);
+
+    return { ...termData, desiredCourses, pinnedCrns, excludedCrns };
+  }, [oscar, termData]);
+
   // Memoize context values so that their references are stable
   const themeContextValue = useMemo(() => [theme, setTheme], [theme, setTheme]);
   const termsContextValue = useMemo(() => [terms, setTerms], [terms, setTerms]);
   const termContextValue = useMemo(
     () => [
-      { term, oscar, ...termData },
+      { term, oscar, ...filteredTermData },
       { setTerm, setOscar, patchTermData }
     ],
-    [term, oscar, termData, setTerm, setOscar, patchTermData]
+    [term, oscar, filteredTermData, setTerm, setOscar, patchTermData]
   );
 
   // display popup when first visiting the site
@@ -82,10 +91,6 @@ const App = () => {
     }
   }, []);
 
-  // Get a stable reference to the current termData value
-  const termDataRef = useRef(termData);
-  termDataRef.current = termData;
-
   // Fetch the current term's scraper information
   useEffect(() => {
     setOscar(null);
@@ -94,39 +99,10 @@ const App = () => {
         .get(`https://gt-scheduler.github.io/crawler/${term}.json`)
         .then((res) => {
           const newOscar = new Oscar(res.data);
-
-          // Ensure that any non-existent courses or CRNs
-          // are removed from the schedule data
-          // before the app is shown again
-          // (fixes issues where a CRN/course is removed from Oscar
-          // after a schedule was made with them)
-          const currentTermData = termDataRef.current;
-          const desiredCourses = currentTermData.desiredCourses.filter(
-            (courseId) => newOscar.findCourse(courseId) != null
-          );
-          const pinnedCrns = currentTermData.pinnedCrns.filter(
-            (crn) => newOscar.findSection(crn) != null
-          );
-          const excludedCrns = currentTermData.excludedCrns.filter(
-            (crn) => newOscar.findSection(crn) != null
-          );
-
-          // Note that this has no race condition
-          // of overwriting another term's data after an oscar fetch
-          // since an oscar fetch disables the ability
-          // to switch terms immediately (by hiding the app)
-          patchTermData({
-            ...currentTermData,
-            desiredCourses,
-            pinnedCrns,
-            excludedCrns
-          });
           setOscar(newOscar);
         });
     }
-    // patchTermData and termDataRef are both stable,
-    // so this effect only runs when the term changes
-  }, [term, patchTermData, termDataRef]);
+  }, [term]);
 
   // Fetch all terms via the GitHub API
   useEffect(() => {

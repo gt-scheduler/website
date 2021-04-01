@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useCookie } from '.';
 
 export default function useJsonCookie(key, defaultValue) {
@@ -15,19 +15,15 @@ export default function useJsonCookie(key, defaultValue) {
     return defaultValue;
   }, [rawValue, defaultValue]);
 
-  // Obtain a stable ref to value so that patchValue can also be stable
-  const valueRef = useRef(value);
-  valueRef.current = value;
-
   const patchValue = useCallback(
     (patch) => {
       const rawVal = JSON.stringify({
-        ...valueRef.current,
+        ...value,
         ...patch
       });
       setRawValue(rawVal);
     },
-    [valueRef, setRawValue]
+    [value, setRawValue]
   );
 
   return [value, patchValue];
