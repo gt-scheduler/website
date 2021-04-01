@@ -25,15 +25,30 @@ const App = () => {
   const [term, setTerm] = useCookie('term');
   const [termData, patchTermData] = useJsonCookie(term, defaultTermData);
 
+  // Only consider courses and CRNs that exist
+  // (fixes issues where a CRN/course is removed from Oscar
+  // after a schedule was made with them)
+  const filteredTermData = useMemo(() => {
+    const courseFilter = (courseId) =>
+      oscar != null && oscar.findCourse(courseId) != null;
+    const crnFilter = (crn) => oscar != null && oscar.findSection(crn) != null;
+
+    const desiredCourses = termData.desiredCourses.filter(courseFilter);
+    const pinnedCrns = termData.pinnedCrns.filter(crnFilter);
+    const excludedCrns = termData.excludedCrns.filter(crnFilter);
+
+    return { ...termData, desiredCourses, pinnedCrns, excludedCrns };
+  }, [oscar, termData]);
+
   // Memoize context values so that their references are stable
   const themeContextValue = useMemo(() => [theme, setTheme], [theme, setTheme]);
   const termsContextValue = useMemo(() => [terms, setTerms], [terms, setTerms]);
   const termContextValue = useMemo(
     () => [
-      { term, oscar, ...termData },
+      { term, oscar, ...filteredTermData },
       { setTerm, setOscar, patchTermData }
     ],
-    [term, oscar, termData, setTerm, setOscar, patchTermData]
+    [term, oscar, filteredTermData, setTerm, setOscar, patchTermData]
   );
 
   // display popup when first visiting the site
