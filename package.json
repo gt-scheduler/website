@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@bitwarden/cli": "^1.11.0",
+    "@types/react-virtualized": "^9.21.11",
     "@typescript-eslint/eslint-plugin": "4.0.1",
     "@typescript-eslint/parser": "4.0.1",
     "babel-eslint": "^10.1.0",
@@ -85,7 +86,11 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": ["eslint"],
-    "*.{js,jsx,ts,tsx,css}": ["prettier --write"]
+    "*.{js,jsx,ts,tsx}": [
+      "eslint"
+    ],
+    "*.{js,jsx,ts,tsx,css}": [
+      "prettier --write"
+    ]
   }
 }
