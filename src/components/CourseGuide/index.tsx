@@ -9,9 +9,6 @@ import {
 import { classes } from '../../utils';
 
 export default function CourseGuide() {
-  // TODO implement course selection
-  // const currentCourse = 'CS 2340';
-
   type SectionData = {
     isProfessor: false;
     crn: string;

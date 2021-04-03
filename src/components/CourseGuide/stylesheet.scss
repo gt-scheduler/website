@@ -24,7 +24,6 @@
         flex: auto;
         flex-direction: row;
         background-color: #3D3D3D;
-        color: #FFFFFF;
         font-weight: bold;
         padding: 14px 0px 10px 0px;
 
@@ -43,7 +42,6 @@
         }
 
         .distribution {
-            color: #FFFFFF;
             flex: 1;
             display: inline-flex;
             text-align: right;
@@ -55,7 +53,6 @@
         
             .distributionNumber {
                 flex: 3;
-                color: #FFFFFF;
             }
         }
     }
