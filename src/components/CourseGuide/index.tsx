@@ -4,18 +4,23 @@ import {
   Column,
   Table,
   defaultTableRowRenderer,
-  TableRowProps
+  TableRowProps,
+  TableCellProps
 } from 'react-virtualized';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { classes } from '../../utils';
 
 export default function CourseGuide() {
   type SectionData = {
+    isSelected: boolean;
+    hasConflict: boolean;
     isProfessor: false;
     crn: string;
     section: string;
     day: string;
     time: string;
-    seats: string;
+    seats: [number, number];
     waitlist: string;
     location: string;
   };
@@ -37,52 +42,62 @@ export default function CourseGuide() {
       distribution: { A: 45.5, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 }
     },
     {
+      isSelected: false,
+      hasConflict: false,
       isProfessor: false,
       crn: '12345',
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: '140 / 150',
+      seats: [140, 150],
       waitlist: '10 / 150',
       location: 'College of Business 100'
     },
     {
+      isSelected: false,
+      hasConflict: false,
       isProfessor: false,
       crn: '12345',
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: '140 / 150',
+      seats: [140, 150],
       waitlist: '10 / 150',
       location: 'College of Business 100'
     },
     {
+      isSelected: false,
+      hasConflict: false,
       isProfessor: false,
       crn: '12345',
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: '140 / 150',
+      seats: [140, 150],
       waitlist: '10 / 150',
       location: 'College of Business 100'
     },
     {
+      isSelected: true,
+      hasConflict: false,
       isProfessor: false,
       crn: '12345',
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: '140 / 150',
+      seats: [140, 150],
       waitlist: '10 / 150',
       location: 'College of Business 100'
     },
     {
+      isSelected: false,
+      hasConflict: true,
       isProfessor: false,
       crn: '12345',
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: '140 / 150',
+      seats: [140, 150],
       waitlist: '10 / 150',
       location: 'College of Business 100'
     },
@@ -93,12 +108,14 @@ export default function CourseGuide() {
       distribution: { A: 45.5, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 }
     },
     {
+      isSelected: false,
+      hasConflict: false,
       isProfessor: false,
       crn: '12345',
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: '140 / 150',
+      seats: [140, 150],
       waitlist: '10 / 150',
       location: 'College of Business 100'
     }
@@ -129,6 +146,43 @@ export default function CourseGuide() {
     );
   }
 
+  function logoCellRenderer(props: TableCellProps) {
+    const data = props.rowData as SectionData;
+
+    if (data.isSelected) {
+      return (
+        <div>
+          <button type="button" className="description">
+            <FontAwesomeIcon icon={faCheck} color="#8BD6FB" />
+          </button>
+        </div>
+      );
+    }
+    return (
+      <div>
+        <button type="button" className="description">
+          <FontAwesomeIcon icon={faPlus} color="#8BD6FB" />
+        </button>
+      </div>
+    );
+  }
+
+  function seatsCellRenderer(props: TableCellProps) {
+    return (
+      <div>
+        {props.rowData.seats[0]} {props.rowData.seats[1]}{' '}
+      </div>
+    );
+  }
+
+  function waitlistCellRenderer(props: TableCellProps) {
+    return (
+      <div>
+        {props.rowData.waitlist[0]} {props.rowData.seats[1]}{' '}
+      </div>
+    );
+  }
+
   function rowRenderer(props: TableRowProps) {
     if (props.rowData.isProfessor) {
       return profRowRenderer({
@@ -137,10 +191,25 @@ export default function CourseGuide() {
       });
     }
 
-    return defaultTableRowRenderer({
-      ...props,
-      className: props.className
-    });
+    if (props.rowData.hasConflict) {
+      return (
+        <div>
+          {defaultTableRowRenderer({
+            ...props,
+            className: props.className
+          })}
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {defaultTableRowRenderer({
+          ...props,
+          className: props.className
+        })}
+      </div>
+    );
   }
 
   return (
@@ -149,19 +218,29 @@ export default function CourseGuide() {
       width={875}
       height={600}
       padding={10}
-      rowHeight={45}
+      rowHeight={40}
       headerHeight={30}
       rowCount={rows.length}
       rowGetter={({ index }) => rows[index]}
       rowRenderer={rowRenderer}
     >
-      <Column dataKey="logo" width={25} />
+      <Column dataKey="logo" width={25} cellRenderer={logoCellRenderer} />
       <Column label="CRN" dataKey="crn" width={65} />
       <Column label="Sect." dataKey="section" width={65} />
       <Column label="Day" dataKey="day" width={65} />
       <Column label="Time" dataKey="time" width={150} />
-      <Column label="Seats Filled" dataKey="seats" width={100} />
-      <Column label="Waitlist" dataKey="waitlist" width={100} />
+      <Column
+        label="Seats Filled"
+        dataKey="seats"
+        width={100}
+        cellRenderer={seatsCellRenderer}
+      />
+      <Column
+        label="Waitlist"
+        dataKey="waitlist"
+        width={100}
+        cellRenderer={waitlistCellRenderer}
+      />
       <Column label="Location" dataKey="location" width={155} />
     </Table>
   );

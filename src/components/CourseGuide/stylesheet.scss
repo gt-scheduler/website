@@ -1,5 +1,6 @@
 @import "../../variables";
 
+
 .description {
     background-color: #333333;
     color: #FFFFFF;
@@ -7,6 +8,14 @@
     font-style: normal;
     font-size: 12px;
     line-height: 14px;
+
+    button {
+        border: none;
+    }
+
+    .faPlus {
+        color: #8BD6FB;
+    }
 
     .ReactVirtualized__Table__headerRow {
         color: #ADADAD;
@@ -56,4 +65,5 @@
             }
         }
     }
+
 }
