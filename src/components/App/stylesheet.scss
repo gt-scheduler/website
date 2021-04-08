@@ -98,7 +98,6 @@
   padding: 25px 10px;
 
   h1 { color: #444444; font-weight: 800; }
-  p  { color: #555555; text-align: left; }
   a {
     &:hover { color: #ffaa5a; }
     transition: all 0.33s ease;
@@ -107,18 +106,42 @@
   }
 }
 
+.swal-modal.light {
+  background-color: $theme-light-background;
+  color: $theme-light-foreground;
+  .swal-text{
+    color: $theme-light-foreground;
+  }
+}
+.swal-modal.dark{
+  background-color: $theme-dark-background;
+  color: $theme-dark-foreground;
+  .swal-text{
+    color: $theme-dark-foreground;
+  }
+}
+
+.swal-button--confirm {
+  background-color: #E25A46 !important;
+}
+
 .swal-button {
+  background-color: #429BDA;
   &:hover { background-color: #ffaa5a !important; }
   box-shadow: 0px 0px 20px #00000033;
   transition: all 0.33s ease;
-  background-color: #f37f6a;
   border-radius: 15px;
   margin-top: 0.67em;
   padding: 10px 60px;
   font-size: 12px;
+  color: #FFFFFF;
 }
 
 .swal-footer {
   padding: 0 20px;
   text-align: center;
+}
+
+.swal-text {
+  word-break: break-word;
 }

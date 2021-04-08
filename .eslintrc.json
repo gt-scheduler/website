@@ -29,7 +29,11 @@
     }
   },
   "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
+    // Must be disabled https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md#how-to-use
+    "no-use-before-define": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-use-before-define": ["warn"],
+    "@typescript-eslint/no-unused-vars": "warn",
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".tsx"] }],
     "import/extensions": [
        "error",

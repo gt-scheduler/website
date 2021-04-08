@@ -1,7 +1,7 @@
 export type Theme = 'light' | 'dark';
 
 // TODO ensure types are correct
-export type TermData = {
+export type ScheduleData = {
   desiredCourses: string[];
   pinnedCrns: string[];
   excludedCrns: string[];
@@ -9,7 +9,11 @@ export type TermData = {
   sortingOptionIndex: number;
 };
 
-export const defaultTermData: TermData = {
+export type VersionsData = {
+  [key: string]: string[];
+};
+
+export const defaultScheduleData: ScheduleData = {
   desiredCourses: [],
   pinnedCrns: [],
   excludedCrns: [],

@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import { classes, getContentClassName, periodToString } from '../../utils';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import './stylesheet.scss';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 export default function TimeBlocks({
   className,
@@ -14,7 +14,7 @@ export default function TimeBlocks({
   isAutosized,
   sizeInfo
 }) {
-  const [{ oscar, colorMap }] = useContext(TermContext);
+  const [{ oscar, colorMap }] = useContext(ScheduleContext);
 
   const section = oscar.findSection(crn);
   const color = colorMap[section.course.id];

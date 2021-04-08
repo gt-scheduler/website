@@ -1,0 +1,27 @@
+.header-action-bar {
+  &,
+  .menu {
+    display: flex;
+    align-items: stretch;
+
+    .text {
+      margin-left: 4px;
+
+      // Make the text hidden on all buttons
+      // at sufficiently-small screen sizes
+      @media screen and (max-width: 1200px) {
+        display: none;
+      }
+    }
+
+    .mobile & {
+      flex: 1;
+      margin-left: 0;
+
+      .Button {
+        flex: 1;
+        padding: 0;
+      }
+    }
+  }
+}

@@ -26,6 +26,7 @@ const NavMenu = ({
     <div className={classes('nav-menu', className)} style={style}>
       {items.map((item, idx) => (
         <Button
+          key={idx}
           className={classes('nav-button', currentItem === idx && 'active')}
           onClick={() => onChangeItem(idx)}
         >

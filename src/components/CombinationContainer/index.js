@@ -3,22 +3,22 @@ import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
 import { Button, Calendar, Select } from '..';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import { OverlayCrnsContext, TermContext } from '../../contexts';
+import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
 
 export default function CombinationContainer() {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
-    { patchTermData }
-  ] = useContext(TermContext);
+    { patchScheduleData }
+  ] = useContext(ScheduleContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
 
   const handleResetPinnedCrns = useCallback(() => {
     if (window.confirm('Are you sure to reset sections you selected?')) {
-      patchTermData({
+      patchScheduleData({
         pinnedCrns: []
       });
     }
-  }, [patchTermData]);
+  }, [patchScheduleData]);
 
   const combinations = useMemo(
     () => oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns),
@@ -32,12 +32,13 @@ export default function CombinationContainer() {
   return (
     <div className="CombinationContainer">
       <Select
-        // eslint-disable-next-line no-shadow
-        onChange={(sortingOptionIndex) => patchTermData({ sortingOptionIndex })}
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({
-          value: i,
-          label: sortingOption.label
+          optionId: i,
+          optionLabel: sortingOption.label,
+          // eslint-disable-next-line no-shadow
+          onClick: (sortingOptionIndex) =>
+            patchScheduleData({ sortingOptionIndex })
         }))}
       />
       <Button
@@ -65,7 +66,7 @@ export default function CombinationContainer() {
                       onMouseEnter={() => setOverlayCrns(crns)}
                       onMouseLeave={() => setOverlayCrns([])}
                       onClick={() =>
-                        patchTermData({
+                        patchScheduleData({
                           pinnedCrns: [...pinnedCrns, ...crns]
                         })
                       }

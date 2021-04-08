@@ -8,32 +8,31 @@ import {
 import { classes, simplifyName, unique } from '../../utils';
 import { ActionRow, Section } from '..';
 import './stylesheet.scss';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 export default function Instructor({ className, color, name, sections, gpa }) {
-  const [{ pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
-    TermContext
-  );
+  const [{ pinnedCrns, excludedCrns }, { patchScheduleData }] =
+    useContext(ScheduleContext);
   const [expanded, setExpanded] = useState(true);
 
   const includeSection = useCallback(
     (section) => {
-      patchTermData({
+      patchScheduleData({
         excludedCrns: excludedCrns.filter((crn) => crn !== section.crn)
       });
     },
-    [excludedCrns, patchTermData]
+    [excludedCrns, patchScheduleData]
   );
 
   const excludeSections = useCallback(
     (sectionList) => {
       const crns = sectionList.map((section) => section.crn);
-      patchTermData({
+      patchScheduleData({
         excludedCrns: unique([...excludedCrns, ...crns]),
         pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn))
       });
     },
-    [excludedCrns, pinnedCrns, patchTermData]
+    [excludedCrns, pinnedCrns, patchScheduleData]
   );
 
   const instructorPinned = sections.some((section) =>

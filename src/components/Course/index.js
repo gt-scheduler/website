@@ -11,7 +11,7 @@ import {
 import { classes, getContentClassName } from '../../utils';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 export default function Course({ className, courseId, onAddCourse }) {
   const [expanded, setExpanded] = useState(false);
@@ -21,8 +21,8 @@ export default function Course({ className, courseId, onAddCourse }) {
   const isSearching = Boolean(onAddCourse);
   const [
     { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
-    { patchTermData }
-  ] = useContext(TermContext);
+    { patchScheduleData }
+  ] = useContext(ScheduleContext);
 
   useEffect(() => {
     if (!isSearching) {
@@ -33,7 +33,7 @@ export default function Course({ className, courseId, onAddCourse }) {
 
   const handleRemoveCourse = useCallback(
     (course) => {
-      patchTermData({
+      patchScheduleData({
         desiredCourses: desiredCourses.filter((id) => id !== course.id),
         pinnedCrns: pinnedCrns.filter(
           (crn) => !course.sections.some((section) => section.crn === crn)
@@ -44,17 +44,17 @@ export default function Course({ className, courseId, onAddCourse }) {
         colorMap: { ...colorMap, [course.id]: undefined }
       });
     },
-    [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchTermData]
+    [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchScheduleData]
   );
 
   const handleIncludeSections = useCallback(
     (sections) => {
       const crns = sections.map((section) => section.crn);
-      patchTermData({
+      patchScheduleData({
         excludedCrns: excludedCrns.filter((crn) => !crns.includes(crn))
       });
     },
-    [excludedCrns, patchTermData]
+    [excludedCrns, patchScheduleData]
   );
 
   const course = oscar.findCourse(courseId);
@@ -176,7 +176,7 @@ export default function Course({ className, courseId, onAddCourse }) {
           <Palette
             className="palette"
             onSelectColor={(col) =>
-              patchTermData({ colorMap: { ...colorMap, [courseId]: col } })
+              patchScheduleData({ colorMap: { ...colorMap, [courseId]: col } })
             }
             color={color}
             onMouseLeave={() => setPaletteShown(false)}

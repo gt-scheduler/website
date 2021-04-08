@@ -12,12 +12,6 @@
     font-weight: bold;
     white-space: pre;
     padding: 0 16px;
-
-    .gt {
-    }
-
-    .scheduler {
-    }
   }
 
   .tabs {
@@ -29,28 +23,10 @@
     justify-content: center;
   }
 
-  .semester {
-  }
-
   .credits {
     padding: 12px;
     display: flex;
     align-items: center;
-  }
-
-  .menu {
-    display: flex;
-    align-items: stretch;
-
-    .text {
-      margin-left: 4px;
-
-      // Make the text hidden on all buttons
-      // at sufficiently-small screen sizes
-      @media screen and (max-width: 1200px) {
-        display: none;
-      }
-    }
   }
 }
 
@@ -63,16 +39,6 @@
 
   .credits {
     display: none;
-  }
-
-  .menu {
-    flex: 1;
-    margin-left: 0;
-
-    .Button {
-      flex: 1;
-      padding: 0;
-    }
   }
 }
 
