@@ -5,10 +5,15 @@ import {
   Table,
   defaultTableRowRenderer,
   TableRowProps,
-  TableCellProps
+  TableCellProps,
+  defaultTableCellRenderer
 } from 'react-virtualized';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlus,
+  faCheck,
+  faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons';
 import { classes } from '../../utils';
 
 export default function CourseGuide() {
@@ -21,7 +26,7 @@ export default function CourseGuide() {
     day: string;
     time: string;
     seats: [number, number];
-    waitlist: string;
+    waitlist: [number, number];
     location: string;
   };
 
@@ -50,7 +55,7 @@ export default function CourseGuide() {
       day: 'MWF',
       time: '11:00am - 11:50am',
       seats: [140, 150],
-      waitlist: '10 / 150',
+      waitlist: [10, 150],
       location: 'College of Business 100'
     },
     {
@@ -61,8 +66,8 @@ export default function CourseGuide() {
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: [140, 150],
-      waitlist: '10 / 150',
+      seats: [0, 0],
+      waitlist: [0, 0],
       location: 'College of Business 100'
     },
     {
@@ -73,8 +78,8 @@ export default function CourseGuide() {
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: [140, 150],
-      waitlist: '10 / 150',
+      seats: [10, 10],
+      waitlist: [10, 10],
       location: 'College of Business 100'
     },
     {
@@ -85,8 +90,8 @@ export default function CourseGuide() {
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: [140, 150],
-      waitlist: '10 / 150',
+      seats: [41, 50],
+      waitlist: [41, 50],
       location: 'College of Business 100'
     },
     {
@@ -97,15 +102,15 @@ export default function CourseGuide() {
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: [140, 150],
-      waitlist: '10 / 150',
+      seats: [10, 20],
+      waitlist: [10, 20],
       location: 'College of Business 100'
     },
     {
       isProfessor: true,
       name: 'Mary Hudachek-Buswell',
       gpa: 'GPA: 2.96',
-      distribution: { A: 45.5, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 }
+      distribution: { A: 100.0, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 }
     },
     {
       isSelected: false,
@@ -115,8 +120,8 @@ export default function CourseGuide() {
       section: 'A01',
       day: 'MWF',
       time: '11:00am - 11:50am',
-      seats: [140, 150],
-      waitlist: '10 / 150',
+      seats: [10, 150],
+      waitlist: [10, 150],
       location: 'College of Business 100'
     }
   ];
@@ -167,20 +172,43 @@ export default function CourseGuide() {
     );
   }
 
+  function timeCellRenderer(props: TableCellProps) {
+    if (!props.rowData.isProfessor) {
+      if (props.rowData.hasConflict) {
+        return (
+          <div>
+            {props.rowData.time}{' '}
+            <FontAwesomeIcon icon={faExclamationTriangle} />
+          </div>
+        );
+      }
+    }
+
+    return defaultTableCellRenderer(props);
+  }
+
   function seatsCellRenderer(props: TableCellProps) {
-    return (
-      <div>
-        {props.rowData.seats[0]} {props.rowData.seats[1]}{' '}
-      </div>
-    );
+    if (!props.rowData.isProfessor) {
+      return (
+        <div className="fraction">
+          <div className="taken"> {props.rowData.seats[0]} </div>
+          <div className="slash"> / </div>
+          <div className="total"> {props.rowData.seats[1]} </div>
+        </div>
+      );
+    }
   }
 
   function waitlistCellRenderer(props: TableCellProps) {
-    return (
-      <div>
-        {props.rowData.waitlist[0]} {props.rowData.seats[1]}{' '}
-      </div>
-    );
+    if (!props.rowData.isProfessor) {
+      return (
+        <div className="fraction">
+          <div className="taken"> {props.rowData.waitlist[0]} </div>
+          <div className="slash"> / </div>
+          <div className="total"> {props.rowData.waitlist[1]} </div>
+        </div>
+      );
+    }
   }
 
   function rowRenderer(props: TableRowProps) {
@@ -196,7 +224,7 @@ export default function CourseGuide() {
         <div>
           {defaultTableRowRenderer({
             ...props,
-            className: props.className
+            className: classes(props.className, 'conflict')
           })}
         </div>
       );
@@ -215,9 +243,9 @@ export default function CourseGuide() {
   return (
     <Table
       className="description"
-      width={875}
+      width={830}
       height={600}
-      padding={10}
+      padding={20}
       rowHeight={40}
       headerHeight={30}
       rowCount={rows.length}
@@ -225,10 +253,15 @@ export default function CourseGuide() {
       rowRenderer={rowRenderer}
     >
       <Column dataKey="logo" width={25} cellRenderer={logoCellRenderer} />
-      <Column label="CRN" dataKey="crn" width={65} />
-      <Column label="Sect." dataKey="section" width={65} />
-      <Column label="Day" dataKey="day" width={65} />
-      <Column label="Time" dataKey="time" width={150} />
+      <Column label="CRN" dataKey="crn" width={60} />
+      <Column label="Sect." dataKey="section" width={50} />
+      <Column label="Day" dataKey="day" width={55} />
+      <Column
+        label="Time"
+        dataKey="time"
+        width={150}
+        cellRenderer={timeCellRenderer}
+      />
       <Column
         label="Seats Filled"
         dataKey="seats"
@@ -241,7 +274,7 @@ export default function CourseGuide() {
         width={100}
         cellRenderer={waitlistCellRenderer}
       />
-      <Column label="Location" dataKey="location" width={155} />
+      <Column label="Location" dataKey="location" width={170} />
     </Table>
   );
 }
