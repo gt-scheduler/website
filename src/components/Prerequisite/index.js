@@ -4,7 +4,7 @@ import {
   faAngleUp,
   faAngleDown
 } from '@fortawesome/free-solid-svg-icons';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import { classes, decryptReqs } from '../../utils';
 import { ActionRow } from '..';
 
@@ -16,7 +16,7 @@ export default function Prerequisite({
   isEmpty,
   isLast
 }) {
-  const [{ term }] = useContext(TermContext);
+  const [{ term }] = useContext(ScheduleContext);
   const [expanded, setExpanded] = useState(true);
   const reqStyle = { fontSize: '0.9em', padding: '8px' };
 

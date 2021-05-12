@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
 import MapView from '../MapView';
 import { periodToString } from '../../utils';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import DaySelection from '../DaySelection';
 
 import './stylesheet.scss';
 
 const Map = () => {
-  const [{ oscar, pinnedCrns }] = useContext(TermContext);
+  const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
   const [activeDay, setActiveDay] = useState('M');
   const locations = [];
   const courseDateMap = {

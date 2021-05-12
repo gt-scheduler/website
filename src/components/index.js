@@ -9,6 +9,7 @@ export { default as CourseAdd } from './CourseAdd';
 export { default as CourseContainer } from './CourseContainer';
 export { default as CourseFilter } from './CourseFilter';
 export { default as Header } from './Header';
+export { default as HeaderActionBar } from './HeaderActionBar';
 export { default as Instructor } from './Instructor';
 export { default as Map } from './Map';
 export { default as NavDrawer } from './NavDrawer';

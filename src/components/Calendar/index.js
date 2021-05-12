@@ -3,7 +3,7 @@ import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils';
 import { TimeBlocks } from '..';
 import './stylesheet.scss';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 export default function Calendar({
   className,
@@ -12,7 +12,7 @@ export default function Calendar({
   capture,
   isAutosized
 }) {
-  const [{ pinnedCrns, oscar }] = useContext(TermContext);
+  const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex

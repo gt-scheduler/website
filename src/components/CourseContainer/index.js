@@ -3,10 +3,10 @@ import ago from 's-ago';
 import { Button, Course, CourseAdd } from '..';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 export default function CourseContainer() {
-  const [{ oscar, desiredCourses }] = useContext(TermContext);
+  const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
 
   return (
     <div className="CourseContainer">
