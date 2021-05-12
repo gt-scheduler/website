@@ -6,6 +6,7 @@ export { default as CombinationContainer } from './CombinationContainer';
 export { default as Comparison } from './Comparison';
 export { default as Course } from './Course';
 export { default as CourseAdd } from './CourseAdd';
+export { default as CourseAddCatalog } from './CourseAddCatalog';
 export { default as CourseContainer } from './CourseContainer';
 export { default as CourseFilter } from './CourseFilter';
 export { default as Header } from './Header';

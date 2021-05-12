@@ -68,6 +68,16 @@ const CAMPUSES = {
   'MBA Evening Program': 'MBA Evening'
 };
 
+const CREDIT_HOURS_CLASS_TIME = {
+  'Georgia Tech-Atlanta *': 'Atlanta',
+  'GT Lorraine-Undergrad Programs': 'Lorraine Undergrad',
+  'GT Lorraine-Graduate Programs': 'Lorraine Graduate',
+  'Georgia Tech - Shenzhen': 'Shenzhen',
+  Video: 'Video',
+  Online: 'Online',
+  'MBA Evening Program': 'MBA Evening'
+};
+
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 
 export {
@@ -79,5 +89,6 @@ export {
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,
+  CREDIT_HOURS_CLASS_TIME,
   BACKEND_BASE_URL
 };
