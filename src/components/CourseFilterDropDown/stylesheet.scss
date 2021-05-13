@@ -1,0 +1,51 @@
+@import "../../variables";
+
+.CourseFilterDropDown {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-top: 1px solid $color-border;
+
+  .header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .8em;
+    cursor: pointer;
+    padding: 12px;
+    opacity: .5;
+    transition: opacity .2s;
+
+    &.active,
+    &:hover {
+      opacity: 1;
+    }
+
+    .nameNonBold {
+      font-weight: normal;
+      flex: 1;
+      margin-right: 8px;
+    }
+    .name {
+      font-weight: bold;
+      flex: 1;
+      margin-right: 8px;
+
+      .or {
+        font-weight: normal;
+      }
+    }
+  }
+
+  .select-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -12px;
+    padding: 8px;
+    font-size: .8em;
+    .text{
+      opacity: 0.5;
+    }
+  }
+}

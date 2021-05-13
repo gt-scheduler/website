@@ -70,6 +70,7 @@ const CAMPUSES = {
 
 const CREDIT_HOURS_CLASS_TIME = {
   'Credit Hours': {
+    type: 'list',
     property: 'creditHours',
     '0': '0.0',
     '1': '1.0',
@@ -78,6 +79,7 @@ const CREDIT_HOURS_CLASS_TIME = {
     '4+': '4.0+'
   },
   Days: {
+    type: 'list',
     property: 'days',
     Monday: 'Mon',
     Tuesday: 'Tues',
@@ -85,7 +87,44 @@ const CREDIT_HOURS_CLASS_TIME = {
     Thursday: 'Thu',
     Friday: 'Fri'
   },
+  'Starts After': {
+    type: 'dropdown',
+    property: 'startsAfter',
+    'Any time': 'Any time',
+    '8a': '8:00 am',
+    '9a': '9:00 am',
+    '10a': '10:00 am',
+    '11a': '11:00 am',
+    '12p': '12:00 pm',
+    '1p': '1:00 pm',
+    '2p': '2:00 pm',
+    '3p': '3:00 pm',
+    '4p': '4:00 pm',
+    '5p': '5:00 pm',
+    '6p': '6:00 pm',
+    '7p': '7:00 pm',
+    '8p': '8:00 pm'
+  },
+  'Ends Before': {
+    type: 'dropdown',
+    property: 'endsBefore',
+    'Any time': 'Any time',
+    '8a': '8:00 am',
+    '9a': '9:00 am',
+    '10a': '10:00 am',
+    '11a': '11:00 am',
+    '12p': '12:00 pm',
+    '1p': '1:00 pm',
+    '2p': '2:00 pm',
+    '3p': '3:00 pm',
+    '4p': '4:00 pm',
+    '5p': '5:00 pm',
+    '6p': '6:00 pm',
+    '7p': '7:00 pm',
+    '8p': '8:00 pm'
+  },
   'Course Level': {
+    type: 'list',
     property: 'courseLevel',
     Undergraduate: 'Undergraduate',
     Graduate: 'Graduate'

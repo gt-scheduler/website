@@ -26,12 +26,14 @@ export default function CourseAddCatalog({ className }) {
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState({
     deliveryMode: [],
-    campus: [],
+    campus: []
   });
   const [chctFilter, setChctFilter] = useState({
     creditHours: [],
     days: [],
-    courseLevel: []
+    courseLevel: [],
+    startsAfter: 'Any time',
+    endsBefore: 'Any time'
   });
 
   const [activeIndex, setActiveIndex] = useState(0);
