@@ -29,7 +29,7 @@ export default function CourseAddCatalog({ className }) {
     campus: []
   });
   const [chctFilter, setChctFilter] = useState({
-    creditHours: [],
+    credits: [],
     days: [],
     courseLevel: [],
     startsAfter: 'Any time',
@@ -58,19 +58,45 @@ export default function CourseAddCatalog({ className }) {
 
     setActiveIndex(0);
 
+    const arrayFilters = Object.entries(chctFilter)
+      .concat(Object.entries(filter))
+      .reduce((o, [k, v]) => {
+        if (typeof v === 'object') {
+          if (k === 'credits') {
+            o[k] = v.map((str) => parseInt(str, 10));
+            if (o[k].includes(4)) {
+              o[k] = o[k].concat([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+            }
+          } else {
+            o[k] = v;
+          }
+        }
+        return o;
+      }, {});
+
     return oscar.courses
       .filter((course) => {
         const keywordMatch =
           course.subject === subject && course.number.startsWith(number);
-        const filterMatch = Object.entries(filter).every(
+        const filterMatch = Object.entries(arrayFilters).every(
           ([key, tags]) =>
             tags.length === 0 ||
-            course.sections.some((section) => tags.includes(section[key]))
+            course.sections.some((section) => {
+              return (
+                tags.includes(section[key]) ||
+                section.meetings.some((m) => {
+                  if (m[key]) {
+                    return m[key].every((d) => tags.includes(d));
+                  }
+                  return false;
+                })
+              );
+            })
         );
         return keywordMatch && filterMatch;
       })
       .filter((course) => !desiredCourses.includes(course.id));
-  }, [oscar, keyword, filter, desiredCourses]);
+  }, [oscar, keyword, filter, chctFilter, desiredCourses]);
 
   const handleAddCourse = useCallback(
     (course) => {

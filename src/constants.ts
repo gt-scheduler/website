@@ -71,21 +71,21 @@ const CAMPUSES = {
 const CREDIT_HOURS_CLASS_TIME = {
   'Credit Hours': {
     type: 'list',
-    property: 'creditHours',
-    '0': '0.0',
-    '1': '1.0',
-    '2': '2.0',
-    '3': '3.0',
-    '4+': '4.0+'
+    property: 'credits',
+    0: '0.0',
+    1: '1.0',
+    2: '2.0',
+    3: '3.0',
+    4: '4.0+'
   },
   Days: {
     type: 'list',
     property: 'days',
-    Monday: 'Mon',
-    Tuesday: 'Tues',
-    Wednesday: 'Wed',
-    Thursday: 'Thu',
-    Friday: 'Fri'
+    M: 'Mon',
+    T: 'Tues',
+    W: 'Wed',
+    R: 'Thu',
+    F: 'Fri'
   },
   'Starts After': {
     type: 'dropdown',
