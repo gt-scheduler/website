@@ -61,7 +61,7 @@ export default function CourseAddCatalog({ className }) {
     const arrayFilters = Object.entries(chctFilter)
       .concat(Object.entries(filter))
       .reduce((o, [k, v]) => {
-        if (typeof v === 'object') {
+        if (typeof v === 'object' && k !== 'courseLevel') {
           if (k === 'credits') {
             o[k] = v.map((str) => parseInt(str, 10));
             if (o[k].includes(4)) {
@@ -74,10 +74,23 @@ export default function CourseAddCatalog({ className }) {
         return o;
       }, {});
 
+    let classNumberLowerLimit = 0;
+    let classNumberUpperLimit = 10000;
+    if (chctFilter.courseLevel.length === 1) {
+      if (chctFilter.courseLevel[0] === 'Undergraduate') {
+        classNumberUpperLimit = 6000;
+      } else {
+        classNumberLowerLimit = 5999;
+      }
+    }
+
     return oscar.courses
       .filter((course) => {
         const keywordMatch =
-          course.subject === subject && course.number.startsWith(number);
+          course.subject === subject &&
+          course.number.startsWith(number) &&
+          course.number < classNumberUpperLimit &&
+          course.number > classNumberLowerLimit;
         const filterMatch = Object.entries(arrayFilters).every(
           ([key, tags]) =>
             tags.length === 0 ||
