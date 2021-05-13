@@ -68,6 +68,71 @@ const CAMPUSES = {
   'MBA Evening Program': 'MBA Evening'
 };
 
+const CREDIT_HOURS_CLASS_TIME = {
+  'Credit Hours': {
+    type: 'list',
+    property: 'credits',
+    0: '0.0',
+    1: '1.0',
+    2: '2.0',
+    3: '3.0',
+    4: '4.0+'
+  },
+  Days: {
+    type: 'list',
+    property: 'days',
+    M: 'Mon',
+    T: 'Tues',
+    W: 'Wed',
+    R: 'Thu',
+    F: 'Fri'
+  },
+  'Starts After': {
+    type: 'dropdown',
+    property: 'startsAfter',
+    'Any time': 'Any time',
+    480: '8:00 am',
+    540: '9:00 am',
+    600: '10:00 am',
+    660: '11:00 am',
+    720: '12:00 pm',
+    780: '1:00 pm',
+    840: '2:00 pm',
+    900: '3:00 pm',
+    960: '4:00 pm',
+    1020: '5:00 pm',
+    1080: '6:00 pm',
+    1140: '7:00 pm',
+    1200: '8:00 pm',
+    1260: '9:00 pm'
+  },
+  'Ends Before': {
+    type: 'dropdown',
+    property: 'endsBefore',
+    'Any time': 'Any time',
+    480: '8:00 am',
+    540: '9:00 am',
+    600: '10:00 am',
+    660: '11:00 am',
+    720: '12:00 pm',
+    780: '1:00 pm',
+    840: '2:00 pm',
+    900: '3:00 pm',
+    960: '4:00 pm',
+    1020: '5:00 pm',
+    1080: '6:00 pm',
+    1140: '7:00 pm',
+    1200: '8:00 pm',
+    1260: '9:00 pm'
+  },
+  'Course Level': {
+    type: 'list',
+    property: 'courseLevel',
+    Undergraduate: 'Undergraduate',
+    Graduate: 'Graduate'
+  }
+};
+
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 
 export {
@@ -79,5 +144,6 @@ export {
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,
+  CREDIT_HOURS_CLASS_TIME,
   BACKEND_BASE_URL
 };

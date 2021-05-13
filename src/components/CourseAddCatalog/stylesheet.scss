@@ -1,0 +1,77 @@
+@import "../../variables";
+
+.CourseAddCatalog {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+
+  .add {
+    @include card;
+    background-color: $color-border;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .primary {
+      display: flex;
+      align-items: center;
+
+      .icon {
+        margin-left: 8px;
+        color: $color-neutral;
+        transition: color .2s;
+
+        &.active {
+          color: inherit;
+        }
+      }
+
+      .keyword-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        .keyword {
+          position: relative;
+          flex: 1;
+          background: none;
+          border: none;
+          outline: none;
+          font-size: inherit;
+          font-weight: bold;
+          padding: 12px 8px;
+          text-transform: uppercase;
+
+          &::placeholder {
+            font-weight: normal;
+            color: $color-neutral;
+            text-transform: initial;
+          }
+
+          &.autocomplete {
+            position: absolute;
+            opacity: .5;
+          }
+        }
+      }
+    }
+  }
+
+  .Course {
+    background-color: $color-border;
+    opacity: .6;
+    transition: opacity .2s;
+
+    &:hover,
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  .disclaimer {
+    color: $color-neutral;
+    padding: 4px;
+    font-size: .8em;
+  }
+}
