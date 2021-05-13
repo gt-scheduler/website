@@ -84,13 +84,33 @@ export default function CourseAddCatalog({ className }) {
       }
     }
 
+    let classStartsAfter = 0;
+    let classEndsBefore = 2000;
+    if (chctFilter.startsAfter !== 'Any time') {
+      classStartsAfter = parseInt(chctFilter.startsAfter, 10);
+    }
+    if (chctFilter.endsBefore !== 'Any time') {
+      classEndsBefore = parseInt(chctFilter.endsBefore, 10);
+    }
+
     return oscar.courses
       .filter((course) => {
         const keywordMatch =
-          course.subject === subject &&
-          course.number.startsWith(number) &&
+          course.subject === subject && course.number.startsWith(number);
+        const courseLevelMatch =
           course.number < classNumberUpperLimit &&
           course.number > classNumberLowerLimit;
+        const timeMatch = course.sections.some((section) => {
+          return section.meetings.some((m) => {
+            if (m.period && m.period.start && m.period.end) {
+              return (
+                m.period.start >= classStartsAfter &&
+                m.period.end <= classEndsBefore
+              );
+            }
+            return false;
+          });
+        });
         const filterMatch = Object.entries(arrayFilters).every(
           ([key, tags]) =>
             tags.length === 0 ||
@@ -106,7 +126,7 @@ export default function CourseAddCatalog({ className }) {
               );
             })
         );
-        return keywordMatch && filterMatch;
+        return keywordMatch && filterMatch && courseLevelMatch && timeMatch;
       })
       .filter((course) => !desiredCourses.includes(course.id));
   }, [oscar, keyword, filter, chctFilter, desiredCourses]);
