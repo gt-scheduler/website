@@ -69,13 +69,27 @@ const CAMPUSES = {
 };
 
 const CREDIT_HOURS_CLASS_TIME = {
-  'Georgia Tech-Atlanta *': 'Atlanta',
-  'GT Lorraine-Undergrad Programs': 'Lorraine Undergrad',
-  'GT Lorraine-Graduate Programs': 'Lorraine Graduate',
-  'Georgia Tech - Shenzhen': 'Shenzhen',
-  Video: 'Video',
-  Online: 'Online',
-  'MBA Evening Program': 'MBA Evening'
+  'Credit Hours': {
+    property: 'creditHours',
+    '0': '0.0',
+    '1': '1.0',
+    '2': '2.0',
+    '3': '3.0',
+    '4+': '4.0+'
+  },
+  Days: {
+    property: 'days',
+    Monday: 'Mon',
+    Tuesday: 'Tues',
+    Wednesday: 'Wed',
+    Thursday: 'Thu',
+    Friday: 'Fri'
+  },
+  'Course Level': {
+    property: 'courseLevel',
+    Undergraduate: 'Undergraduate',
+    Graduate: 'Graduate'
+  }
 };
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';

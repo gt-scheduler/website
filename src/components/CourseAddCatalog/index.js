@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { Course, CourseFilter } from '..';
+import { Course, CourseFilter, CourseFilterNested } from '..';
 import { classes, getRandomColor } from '../../utils';
 import './stylesheet.scss';
 import {
@@ -27,8 +27,13 @@ export default function CourseAddCatalog({ className }) {
   const [filter, setFilter] = useState({
     deliveryMode: [],
     campus: [],
-    creditHoursClassTime: []
   });
+  const [chctFilter, setChctFilter] = useState({
+    creditHours: [],
+    days: [],
+    courseLevel: []
+  });
+
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
 
@@ -166,12 +171,14 @@ export default function CourseAddCatalog({ className }) {
             />
           </div>
         </div>
+        <CourseFilterNested
+          key="creditHoursClassTime"
+          name="Credit Hours & Class Time"
+          data={CREDIT_HOURS_CLASS_TIME}
+          filters={chctFilter}
+          setFilters={setChctFilter}
+        />
         {[
-          [
-            'Credit Hours & Class Time',
-            'creditHoursClassTime',
-            CREDIT_HOURS_CLASS_TIME
-          ],
           ['Delivery Mode', 'deliveryMode', DELIVERY_MODES],
           ['Campus', 'campus', CAMPUSES]
         ].map(([name, property, labels]) => (
