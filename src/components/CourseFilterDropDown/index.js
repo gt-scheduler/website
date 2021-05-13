@@ -12,7 +12,12 @@ export default function CourseFilterDropDown({
   return (
     <div className="CourseFilterDropDown">
       <div>
-        <div className={classes('header')}>
+        <div
+          className={classes(
+            'header',
+            selectedTag !== Object.values(labels)[0] && 'active'
+          )}
+        >
           <div className="nameNonBold">{name}</div>
         </div>
         <div className="select-container">
