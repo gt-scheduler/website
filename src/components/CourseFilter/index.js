@@ -21,7 +21,7 @@ export default function CourseFilter({
           <div
             className={classes('header', selectedTags.length > 0 && 'active')}
           >
-            <div className="name">{name}</div>
+            <div className="nameNonBold">{name}</div>
           </div>
           <div className="tag-container">
             <div

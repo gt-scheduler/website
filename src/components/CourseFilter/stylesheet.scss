@@ -22,6 +22,11 @@
       opacity: 1;
     }
 
+    .nameNonBold {
+      font-weight: normal;
+      flex: 1;
+      margin-right: 8px;
+    }
     .name {
       font-weight: bold;
       flex: 1;
