@@ -69,4 +69,4 @@ The project uses pre-commit hooks using [Husky](https://typicode.github.io/husky
 
 The GT Scheduler project welcomes (and encourages) contributions from the community. Regular development is performed by the project owners (Jason Park and [Bits of Good](https://bitsofgood.org/)), but we still encourage others to work on adding new features or fixing existing bugs and make the registration process better for the Georgia Tech community.
 
-More information on how to contributing can be found [in the contributing guide](/CONTRIBUTING.md).
+More information on how to contribute can be found [in the contributing guide](/CONTRIBUTING.md).
