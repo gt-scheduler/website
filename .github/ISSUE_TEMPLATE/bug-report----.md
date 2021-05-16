@@ -1,7 +1,7 @@
 ---
 name: "Bug report \U0001F41B️"
 about: Report a bug you found in the site
-title: "[BUG]"
+title: ''
 labels: bug
 assignees: ''
 
@@ -11,7 +11,7 @@ assignees: ''
 A clear 2-3 sentence description of the bug.
 
 **To Reproduce**
-Steps to reproduce the behavior:
+Steps to reproduce the behavior. Example:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
