@@ -45,7 +45,7 @@ class Section {
         where,
         location: oscar.locations[locationIndex],
         instructors: instructors.map((instructor) =>
-          instructor.replace(/ \(P\)$/, '')
+          instructor.replace(/ \(P\)$/, '').trim()
         ),
         dateRange: oscar.dateRanges[dateRangeIndex]
       })

@@ -23,14 +23,39 @@ class Course {
     this.hasLab = onlyLectures.length && onlyLabs.length;
     if (this.hasLab) {
       for (const lecture of onlyLectures) {
-        lecture.associatedLabs = onlyLabs.filter((lab) =>
-          lab.id.startsWith(lecture.id)
+        lecture.associatedLabs = onlyLabs.filter(
+          (lab) =>
+            // note: checking both ways because gech registrar
+            // reversed studio and lecture sections for MATH 1553
+            lecture.id.startsWith(lab.id) || lab.id.startsWith(lecture.id)
         );
+        // if no matching section id letters found, match by profs
+        if (!lecture.associatedLabs.length) {
+          // match lecture and lab sections if there are *any* matching instructors
+          // fixes issue with PHYS 2211 and 2212 no longer matching section id letters
+          lecture.associatedLabs = onlyLabs.filter(
+            (lab) =>
+              lab.instructors.filter((instructor) =>
+                lecture.instructors.includes(instructor)
+              ).length
+          );
+        }
       }
       for (const lab of onlyLabs) {
-        lab.associatedLectures = onlyLectures.filter((lecture) =>
-          lab.id.startsWith(lecture.id)
+        // note: now that the lab/lecture matching is symmetric
+        // we have duplicated code
+        lab.associatedLectures = onlyLectures.filter(
+          (lecture) =>
+            lab.id.startsWith(lecture.id) || lecture.id.startsWith(lab.id)
         );
+        if (!lab.associatedLectures.length) {
+          lab.associatedLectures = onlyLectures.filter(
+            (lecture) =>
+              lab.instructors.filter((instructor) =>
+                lecture.instructors.includes(instructor)
+              ).length
+          );
+        }
       }
       const lonelyLectures = onlyLectures.filter(
         (lecture) => !lecture.associatedLabs.length
