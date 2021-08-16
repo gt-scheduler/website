@@ -77,7 +77,7 @@ class Oscar {
     const crnsList = [];
     const stack = [[0, []]]; // seed the stack with default values
 
-    while (stack.length > 0 && crnsList.length >= 1000) {
+    while (stack.length > 0 && crnsList.length < 1000) {
       // max number here
       // if (crnsList.length >= 1000) {
       //   break;
@@ -85,7 +85,7 @@ class Oscar {
 
       // process next value on stack
       const [courseIndex, crns] = stack.pop();
-      // console.log(courseIndex, crns)
+      // console.log(courseIndex, crns);
 
       // apparently this isn't allowed because of husky linting no-continue
       // if (courseIndex === desiredCourses.length) {
