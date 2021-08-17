@@ -73,61 +73,157 @@ class Oscar {
   }
 
   getCombinations(desiredCourses, pinnedCrns, excludedCrns) {
+    // idea: do with a stack, then you can easily break out
     const crnsList = [];
-    const dfs = (courseIndex = 0, crns = []) => {
+    const stack = [[0, []]]; // seed the stack with default values
+
+    while (stack.length > 0 && crnsList.length < 1000) {
+      // max number here
+      // if (crnsList.length >= 1000) {
+      //   break;
+      // }
+
+      // process next value on stack
+      const [courseIndex, crns] = stack.pop();
+      // console.log(courseIndex, crns);
+
+      // apparently this isn't allowed because of husky linting no-continue
+      // if (courseIndex === desiredCourses.length) {
+      //   crnsList.push(crns);
+      //   // return;
+      //   continue;
+      // }
+
       if (courseIndex === desiredCourses.length) {
         crnsList.push(crns);
-        return;
-      }
-      const course = this.findCourse(desiredCourses[courseIndex]);
-      const isIncluded = (section) => !excludedCrns.includes(section.crn);
-      const isPinned = (section) => pinnedCrns.includes(section.crn);
-      const hasConflict = (section) =>
-        [...pinnedCrns, ...crns].some((crn) =>
-          hasConflictBetween(this.findSection(crn), section)
-        );
-      if (course.hasLab) {
-        const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
-        const pinnedOnlyLab = course.onlyLabs.find(isPinned);
-        const pinnedAllInOne = course.allInOnes.find(isPinned);
-        if ((pinnedOnlyLecture && pinnedOnlyLab) || pinnedAllInOne) {
-          dfs(courseIndex + 1, crns);
-        } else if (pinnedOnlyLecture) {
-          pinnedOnlyLecture.associatedLabs.filter(isIncluded).forEach((lab) => {
-            if (hasConflict(lab)) return;
-            dfs(courseIndex + 1, [...crns, lab.crn]);
-          });
-        } else if (pinnedOnlyLab) {
-          pinnedOnlyLab.associatedLectures
-            .filter(isIncluded)
-            .forEach((lecture) => {
+      } else {
+        const course = this.findCourse(desiredCourses[courseIndex]);
+        const isIncluded = (section) => !excludedCrns.includes(section.crn);
+        const isPinned = (section) => pinnedCrns.includes(section.crn);
+        const hasConflict = (section) =>
+          [...pinnedCrns, ...crns].some((crn) =>
+            hasConflictBetween(this.findSection(crn), section)
+          );
+        if (course.hasLab) {
+          const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
+          const pinnedOnlyLab = course.onlyLabs.find(isPinned);
+          const pinnedAllInOne = course.allInOnes.find(isPinned);
+          if ((pinnedOnlyLecture && pinnedOnlyLab) || pinnedAllInOne) {
+            // dfs(courseIndex + 1, crns);
+            stack.push([courseIndex + 1, crns]);
+          } else if (pinnedOnlyLecture) {
+            pinnedOnlyLecture.associatedLabs
+              .filter(isIncluded)
+              .forEach((lab) => {
+                if (hasConflict(lab)) return;
+                // dfs(courseIndex + 1, [...crns, lab.crn]);
+                stack.push([courseIndex + 1, [...crns, lab.crn]]);
+              });
+          } else if (pinnedOnlyLab) {
+            pinnedOnlyLab.associatedLectures
+              .filter(isIncluded)
+              .forEach((lecture) => {
+                if (hasConflict(lecture)) return;
+                // dfs(courseIndex + 1, [...crns, lecture.crn]);
+                stack.push([courseIndex + 1, [...crns, lecture.crn]]);
+              });
+          } else {
+            course.onlyLectures.filter(isIncluded).forEach((lecture) => {
               if (hasConflict(lecture)) return;
-              dfs(courseIndex + 1, [...crns, lecture.crn]);
+              lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+                if (hasConflict(lab)) return;
+                // dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
+                stack.push([courseIndex + 1, [...crns, lecture.crn, lab.crn]]);
+              });
             });
+            course.allInOnes.filter(isIncluded).forEach((section) => {
+              if (hasConflict(section)) return;
+              // dfs(courseIndex + 1, [...crns, section.crn]);
+              stack.push([courseIndex + 1, [...crns, section.crn]]);
+            });
+          }
+        } else if (course.sections.some(isPinned)) {
+          // dfs(courseIndex + 1, crns);
+          stack.push([courseIndex + 1, crns]);
         } else {
-          course.onlyLectures.filter(isIncluded).forEach((lecture) => {
-            if (hasConflict(lecture)) return;
-            lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
-              if (hasConflict(lab)) return;
-              dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
-            });
-          });
-          course.allInOnes.filter(isIncluded).forEach((section) => {
-            if (hasConflict(section)) return;
-            dfs(courseIndex + 1, [...crns, section.crn]);
+          Object.values(course.sectionGroups).forEach((sectionGroup) => {
+            // if (crnsList.length >= 1000) {
+            //   return;
+            // }
+
+            const section = sectionGroup.sections.find(isIncluded);
+            if (!section || hasConflict(section)) return;
+            // dfs(courseIndex + 1, [...crns, section.crn]);
+            stack.push([courseIndex + 1, [...crns, section.crn]]);
           });
         }
-      } else if (course.sections.some(isPinned)) {
-        dfs(courseIndex + 1, crns);
-      } else {
-        Object.values(course.sectionGroups).forEach((sectionGroup) => {
-          const section = sectionGroup.sections.find(isIncluded);
-          if (!section || hasConflict(section)) return;
-          dfs(courseIndex + 1, [...crns, section.crn]);
-        });
       }
-    };
-    dfs();
+    }
+
+    // const dfs = (courseIndex = 0, crns = []) => {
+    //   if (crnsList.length >= 1000) {
+    //     return;
+    //   }
+
+    //   if (courseIndex === desiredCourses.length) {
+    //     crnsList.push(crns);
+    //     return;
+    //   }
+    //   const course = this.findCourse(desiredCourses[courseIndex]);
+    //   const isIncluded = (section) => !excludedCrns.includes(section.crn);
+    //   const isPinned = (section) => pinnedCrns.includes(section.crn);
+    //   const hasConflict = (section) =>
+    //     [...pinnedCrns, ...crns].some((crn) =>
+    //       hasConflictBetween(this.findSection(crn), section)
+    //     );
+    //   if (course.hasLab) {
+    //     const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
+    //     const pinnedOnlyLab = course.onlyLabs.find(isPinned);
+    //     const pinnedAllInOne = course.allInOnes.find(isPinned);
+    //     if ((pinnedOnlyLecture && pinnedOnlyLab) || pinnedAllInOne) {
+    //       dfs(courseIndex + 1, crns);
+    //     } else if (pinnedOnlyLecture) {
+    // pinnedOnlyLecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+    //         if (hasConflict(lab)) return;
+    //         dfs(courseIndex + 1, [...crns, lab.crn]);
+    //       });
+    //     } else if (pinnedOnlyLab) {
+    //       pinnedOnlyLab.associatedLectures
+    //         .filter(isIncluded)
+    //         .forEach((lecture) => {
+    //           if (hasConflict(lecture)) return;
+    //           dfs(courseIndex + 1, [...crns, lecture.crn]);
+    //         });
+    //     } else {
+    //       course.onlyLectures.filter(isIncluded).forEach((lecture) => {
+    //         if (hasConflict(lecture)) return;
+    //         lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+    //           if (hasConflict(lab)) return;
+    //           dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
+    //         });
+    //       });
+    //       course.allInOnes.filter(isIncluded).forEach((section) => {
+    //         if (hasConflict(section)) return;
+    //         dfs(courseIndex + 1, [...crns, section.crn]);
+    //       });
+    //     }
+    //   } else if (course.sections.some(isPinned)) {
+    //     dfs(courseIndex + 1, crns);
+    //   } else {
+    //     Object.values(course.sectionGroups).forEach((sectionGroup) => {
+    //       if (crnsList.length >= 1000) {
+    //         return;
+    //       }
+
+    //       const section = sectionGroup.sections.find(isIncluded);
+    //       if (!section || hasConflict(section)) return;
+    //       dfs(courseIndex + 1, [...crns, section.crn]);
+    //     });
+    //   }
+    // };
+    // dfs();
+    // console.log(crnsList);
+
     return crnsList.map((crns) => {
       const startMap = {};
       const endMap = {};
