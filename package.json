@@ -38,7 +38,7 @@
     "redux-actions": "^2.6.5",
     "s-ago": "^2.2.0",
     "sweetalert": "^2.1.2",
-    "typescript": "^3.9.7"
+    "typescript": "^4"
   },
   "devDependencies": {
     "@bitwarden/cli": "^1.11.0",
