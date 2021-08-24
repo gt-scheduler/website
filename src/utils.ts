@@ -113,6 +113,12 @@ const decryptReqs = (
   openPar: boolean = false,
   closePar: boolean = false
 ): string => {
+  // This function accepts the index of a sub-clause
+  // from the sub-clause slice of a compound prereq clause
+  // (i.e. the [...sub-clauses] part of a clause
+  // that itself is of the form [operator, ...sub-clauses]).
+  // As such, we compare to the clause length - 2
+  // (since the sub-clauses[0] is really reqs[1])
   const last = (i: number) => Array.isArray(reqs) && i === reqs.length - 2;
   let string = '';
 
