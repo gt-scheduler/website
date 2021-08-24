@@ -1,6 +1,6 @@
 import { Section } from './beans';
 import { DAYS, PALETTE } from './constants';
-import { Period, PrerequisiteClause } from './types';
+import { Period, PrerequisiteClause, PrerequisiteCourse } from './types';
 
 const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -133,6 +133,14 @@ const decryptReqs = (
     const [, ...subClauses] = reqs;
     subClauses.forEach((req, i) => {
       string += decryptReqs(req) + (last(i) ? '' : ' or ');
+    });
+  } else {
+    // TODO(jazevedo620) 08-24-2021: under what conditions is this code run?
+    // It seems like (if `reqs` is indeed of type `PrerequisiteClause`)
+    // that this code isn't run, but I'm wary of removing it for now
+    // until types are added to the dependent `<Prerequisite>` component.
+    (reqs as PrerequisiteCourse[]).forEach((req, i) => {
+      string += req.id + (i === reqs.length - 1 ? '' : ' or ');
     });
   }
 
