@@ -1,11 +1,15 @@
+import { Section } from './beans';
 import { DAYS, PALETTE } from './constants';
+import { Period, PrerequisiteClause } from './types';
 
-const stringToTime = (string) => {
-  const [, hour, minute, ampm] = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
+const stringToTime = (string: string): number => {
+  const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
+  if (regexResult === null) return 0;
+  const [, hour, minute, ampm] = regexResult;
   return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
-const timeToString = (time, ampm = true) => {
+const timeToString = (time: number, ampm: boolean = true): string => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
   const hh = hour > 12 ? hour - 12 : hour;
@@ -14,23 +18,23 @@ const timeToString = (time, ampm = true) => {
   return ampm ? `${hh}:${mm} ${A}` : `${hh}:${mm}`;
 };
 
-const timeToShortString = (time) => {
+const timeToShortString = (time: number): string => {
   const hour = (time / 60) | 0;
   return `${hour > 12 ? hour - 12 : hour}${hour < 12 ? 'a' : 'p'}m`;
 };
 
-const periodToString = (period) =>
+const periodToString = (period: Period): string =>
   period
     ? `${timeToString(period.start, false)} - ${timeToString(period.end)}`
     : 'TBA';
 
-const getRandomColor = () => {
+const getRandomColor = (): string => {
   const colors = PALETTE.flat();
   const index = (Math.random() * colors.length) | 0;
   return colors[index];
 };
 
-const getContentClassName = (color) => {
+const getContentClassName = (color: string): string => {
   const r = parseInt(color.substring(1, 3), 16);
   const g = parseInt(color.substring(3, 5), 16);
   const b = parseInt(color.substring(5, 7), 16);
@@ -39,7 +43,7 @@ const getContentClassName = (color) => {
     : 'dark-content';
 };
 
-const hasConflictBetween = (section1, section2) =>
+const hasConflictBetween = (section1: Section, section2: Section): boolean =>
   section1.meetings.some((meeting1) =>
     section2.meetings.some(
       (meeting2) =>
@@ -53,25 +57,27 @@ const hasConflictBetween = (section1, section2) =>
     )
   );
 
-const classes = (...classList) => classList.filter((c) => c).join(' ');
+const classes = (...classList: (string | boolean | null | undefined)[]) =>
+  classList.filter((c) => c).join(' ');
 
-const isMobile = () => window.innerWidth < 1024;
+const isMobile = (): boolean => window.innerWidth < 1024;
 
-const simplifyName = (name) => {
+const simplifyName = (name: string): string => {
   const tokens = name.split(' ');
   const firstName = tokens.shift();
   const lastName = tokens.pop();
   return [firstName, lastName].join(' ');
 };
 
-const unique = (array) => [...new Set(array)];
+const unique = <T>(array: T[]): T[] => Array.from(new Set(array));
 
-const isLab = (section) =>
+const isLab = (section: Section): boolean =>
   ['Lab', 'Studio'].some((type) => section.scheduleType.includes(type));
 
-const isLecture = (section) => section.scheduleType.includes('Lecture');
+const isLecture = (section: Section): boolean =>
+  section.scheduleType.includes('Lecture');
 
-const getSemesterName = (term) => {
+const getSemesterName = (term: string): string => {
   const year = term.substring(0, 4);
   const semester = (() => {
     switch (Number.parseInt(term.substring(4), 10)) {
@@ -93,7 +99,7 @@ const getSemesterName = (term) => {
   return `${semester} ${year}`;
 };
 
-const humanizeArray = (array, conjunction = 'and') => {
+const humanizeArray = <T>(array: T[], conjunction: string = 'and'): string => {
   if (array.length <= 2) {
     return array.join(` ${conjunction} `);
   }
@@ -102,24 +108,27 @@ const humanizeArray = (array, conjunction = 'and') => {
   return `${init.join(', ')}, ${conjunction} ${last}`;
 };
 
-const decryptReqs = (reqs, openPar = false, closePar = false) => {
-  const last = (i) => i === reqs.length - 2;
+const decryptReqs = (
+  reqs: PrerequisiteClause,
+  openPar: boolean = false,
+  closePar: boolean = false
+): string => {
+  const last = (i: number) => Array.isArray(reqs) && i === reqs.length - 2;
   let string = '';
 
-  if (!reqs[0])
+  if (!Array.isArray(reqs)) {
     string += (openPar ? '(' : '') + reqs.id + (closePar ? ')' : '');
-  else if (reqs[0] === 'and')
-    reqs.slice(1, reqs.length).forEach((req, i) => {
+  } else if (reqs[0] === 'and') {
+    const [, ...subClauses] = reqs;
+    subClauses.forEach((req, i) => {
       string += decryptReqs(req, i === 0, last(i)) + (last(i) ? '' : ' and ');
     });
-  else if (reqs[0] === 'or')
-    reqs.slice(1, reqs.length).forEach((req, i) => {
+  } else if (reqs[0] === 'or') {
+    const [, ...subClauses] = reqs;
+    subClauses.forEach((req, i) => {
       string += decryptReqs(req) + (last(i) ? '' : ' or ');
     });
-  else
-    reqs.forEach((req, i) => {
-      string += req.id + (i === reqs.length - 1 ? '' : ' or ');
-    });
+  }
 
   return string;
 };

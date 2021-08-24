@@ -1,8 +1,44 @@
-import { Course, SortingOption } from '.';
+import { Course, Section, SortingOption } from '.';
 import { hasConflictBetween, stringToTime } from '../utils';
+import {
+  Combination,
+  Period,
+  DateRange,
+  Location,
+  CrawlerTermData
+} from '../types';
+
+// `new Oscar(...)` gets the entirety of the crawler JSON data
+type OscarConstructionDate = CrawlerTermData;
 
 class Oscar {
-  constructor(data) {
+  periods: (Period | undefined)[];
+
+  dateRanges: DateRange[];
+
+  scheduleTypes: string[];
+
+  campuses: string[];
+
+  attributes: string[];
+
+  gradeBases: string[];
+
+  locations: (Location | null)[];
+
+  updatedAt: Date;
+
+  version: number;
+
+  courses: Course[];
+
+  courseMap: Record<string, Course>;
+
+  crnMap: Record<string, Section>;
+
+  sortingOptions: SortingOption[];
+
+  constructor(data: OscarConstructionDate) {
     const { courses, caches, updatedAt, version } = data;
 
     this.periods = caches.periods.map((period) => {
@@ -64,32 +100,43 @@ class Oscar {
     ];
   }
 
-  findCourse(courseId) {
+  findCourse(courseId: string): Course | undefined {
     return this.courseMap[courseId];
   }
 
-  findSection(crn) {
+  findSection(crn: string): Section | undefined {
     return this.crnMap[crn];
   }
 
-  getCombinations(desiredCourses, pinnedCrns, excludedCrns) {
-    const crnsList = [];
-    const dfs = (courseIndex = 0, crns = []) => {
+  getCombinations(
+    desiredCourses: string[],
+    pinnedCrns: string[],
+    excludedCrns: string[]
+  ): Combination[] {
+    const crnsList: string[][] = [];
+    const dfs = (courseIndex: number = 0, crns: string[] = []): void => {
       if (courseIndex === desiredCourses.length) {
         crnsList.push(crns);
         return;
       }
       const course = this.findCourse(desiredCourses[courseIndex]);
-      const isIncluded = (section) => !excludedCrns.includes(section.crn);
-      const isPinned = (section) => pinnedCrns.includes(section.crn);
-      const hasConflict = (section) =>
-        [...pinnedCrns, ...crns].some((crn) =>
-          hasConflictBetween(this.findSection(crn), section)
-        );
+      if (course === undefined) return;
+      const isIncluded = (section: Section) =>
+        !excludedCrns.includes(section.crn);
+      const isPinned = (section: Section) => pinnedCrns.includes(section.crn);
+      const hasConflict = (section: Section) =>
+        [...pinnedCrns, ...crns].some((crn) => {
+          const crnSection = this.findSection(crn);
+          if (crnSection === undefined) return false;
+          return hasConflictBetween(crnSection, section);
+        });
       if (course.hasLab) {
-        const pinnedOnlyLecture = course.onlyLectures.find(isPinned);
-        const pinnedOnlyLab = course.onlyLabs.find(isPinned);
-        const pinnedAllInOne = course.allInOnes.find(isPinned);
+        // If a course has a lab, then `onlyLectures`, `onlyLabs`,
+        // and `allInOnes` should be non-undefined, but we have to check
+        // anyways here to satisfy TypeScript
+        const pinnedOnlyLecture = (course.onlyLectures ?? []).find(isPinned);
+        const pinnedOnlyLab = (course.onlyLabs ?? []).find(isPinned);
+        const pinnedAllInOne = (course.allInOnes ?? []).find(isPinned);
         if ((pinnedOnlyLecture && pinnedOnlyLab) || pinnedAllInOne) {
           dfs(courseIndex + 1, crns);
         } else if (pinnedOnlyLecture) {
@@ -105,14 +152,14 @@ class Oscar {
               dfs(courseIndex + 1, [...crns, lecture.crn]);
             });
         } else {
-          course.onlyLectures.filter(isIncluded).forEach((lecture) => {
+          (course.onlyLectures ?? []).filter(isIncluded).forEach((lecture) => {
             if (hasConflict(lecture)) return;
             lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
               if (hasConflict(lab)) return;
               dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
             });
           });
-          course.allInOnes.filter(isIncluded).forEach((section) => {
+          (course.allInOnes ?? []).filter(isIncluded).forEach((section) => {
             if (hasConflict(section)) return;
             dfs(courseIndex + 1, [...crns, section.crn]);
           });
@@ -120,7 +167,10 @@ class Oscar {
       } else if (course.sections.some(isPinned)) {
         dfs(courseIndex + 1, crns);
       } else {
-        Object.values(course.sectionGroups).forEach((sectionGroup) => {
+        // If a course does not have a lab, then `sectionGroups` should be
+        // non-undefined, but we have to check anyways here to satisfy
+        // TypeScript
+        Object.values(course.sectionGroups ?? []).forEach((sectionGroup) => {
           const section = sectionGroup.sections.find(isIncluded);
           if (!section || hasConflict(section)) return;
           dfs(courseIndex + 1, [...crns, section.crn]);
@@ -129,9 +179,10 @@ class Oscar {
     };
     dfs();
     return crnsList.map((crns) => {
-      const startMap = {};
-      const endMap = {};
+      const startMap: Record<string, number> = {};
+      const endMap: Record<string, number> = {};
       this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
+        if (period === undefined) return;
         if (!(day in startMap) || startMap[day] > period.start)
           startMap[day] = period.start;
         if (!(day in endMap) || endMap[day] < period.end)
@@ -145,7 +196,10 @@ class Oscar {
     });
   }
 
-  sortCombinations(combinations, sortingOptionIndex) {
+  sortCombinations(
+    combinations: Combination[],
+    sortingOptionIndex: number
+  ): Combination[] {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
     return combinations
       .map((combination) => ({
@@ -155,15 +209,21 @@ class Oscar {
       .sort((a, b) => a.factor - b.factor);
   }
 
-  iterateTimeBlocks(crns, callback) {
+  iterateTimeBlocks(
+    crns: string[],
+    callback: (day: string, period: Period | undefined) => void
+  ): void {
     crns.forEach((crn) => {
-      this.findSection(crn).meetings.forEach(
-        (meeting) =>
-          meeting.period &&
-          meeting.days.forEach((day) => {
-            callback(day, meeting.period);
-          })
-      );
+      const section = this.findSection(crn);
+      if (section !== undefined) {
+        section.meetings.forEach(
+          (meeting) =>
+            meeting.period &&
+            meeting.days.forEach((day) => {
+              callback(day, meeting.period);
+            })
+        );
+      }
     });
   }
 }

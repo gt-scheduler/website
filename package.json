@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@bitwarden/cli": "^1.11.0",
+    "@types/cheerio": "^0.22.30",
     "@types/dom-to-image": "^2.6.2",
     "@types/file-saver": "^2.0.1",
     "@types/js-cookie": "^2.2.6",
