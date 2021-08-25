@@ -4,28 +4,41 @@ import { classes, timeToShortString } from '../../utils';
 import { TimeBlocks } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
+import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
+import { Period, SafeRecord } from '../../types';
+
+export type CalendarProps = {
+  className?: string;
+  overlayCrns: string[];
+  preview?: boolean;
+  capture?: boolean;
+  isAutosized?: boolean;
+};
 
 export default function Calendar({
   className,
   overlayCrns,
-  preview,
-  capture,
-  isAutosized
-}) {
+  preview = false,
+  capture = false,
+  isAutosized = false
+}: CalendarProps): React.ReactElement {
   const [{ pinnedCrns, oscar }] = useContext(TermContext);
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
-  const crnSizeInfo = {};
+  const crnSizeInfo: SafeRecord<
+    string,
+    SafeRecord<string, SafeRecord<string, TimeBlockPosition>>
+  > = {};
 
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
   const updateJoinedRowSizes = (
-    periodInfos,
-    seen,
-    curCrn,
-    curPeriod,
-    newRowSize
+    periodInfos: TimeBlockPosition[],
+    seen: Set<string>,
+    curCrn: string,
+    curPeriod: Period,
+    newRowSize: number
   ) => {
     if (seen.has(curCrn)) {
       return;
@@ -50,39 +63,45 @@ export default function Calendar({
       });
   };
 
-  const crns = [...new Set([...pinnedCrns, ...(overlayCrns || [])])];
-  const maxMeetingLen = (crn) =>
-    Math.max(
-      ...oscar
-        .findSection(crn)
-        .meetings.filter((m) => m.period)
-        .map((m) => m.period.end - m.period.start)
+  const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
+  const maxMeetingLen = (crn: string) => {
+    const section = oscar.findSection(crn);
+    if (section == null) return 0;
+    return Math.max(
+      ...section.meetings.flatMap(({ period }) => {
+        if (period == null) return [];
+        return [period.end - period.start];
+      })
     );
+  };
+
   crns.sort((a, b) => maxMeetingLen(a) - maxMeetingLen(b));
 
   // Populates crnSizeInfo by iteratively finding the next time block's
   // rowSize and rowIndex (1 more than greatest of already processed connected
   // blocks), updating the processed connected blocks to match its rowSize
   crns.forEach((crn) => {
-    crnSizeInfo[crn] = {};
+    const section = oscar.findSection(crn);
+    if (section == null) return;
 
-    oscar
-      .findSection(crn)
-      .meetings.filter((m) => m.period)
+    section.meetings
+      .filter((m) => m.period)
       .forEach((meeting) => {
-        meeting.days.forEach((day) => {
-          crnSizeInfo[crn][day] = crnSizeInfo[crn][day] || {};
+        const { period } = meeting;
+        if (period == null) return;
 
+        meeting.days.forEach((day) => {
           const dayPeriodInfos = Object.values(crnSizeInfo)
-            .filter((days) => days[day])
-            .map((days) => Object.values(days[day]))
-            .flat();
+            .flatMap<TimeBlockPosition | undefined>((days) =>
+              days != null ? Object.values(days[day] ?? {}) : []
+            )
+            .flatMap<TimeBlockPosition>((info) => (info == null ? [] : [info]));
 
           const curRowSize = dayPeriodInfos
             .filter(
               (period2Info) =>
-                period2Info.period.start < meeting.period.end &&
-                period2Info.period.end > meeting.period.start
+                period2Info.period.start < period.end &&
+                period2Info.period.end > period.start
             )
             .reduce(
               (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
@@ -93,14 +112,19 @@ export default function Calendar({
             dayPeriodInfos,
             new Set(),
             crn,
-            meeting.period,
+            period,
             curRowSize
           );
 
-          crnSizeInfo[crn][day][
-            [meeting.period.start, meeting.period.end].join('-')
-          ] = {
-            period: meeting.period,
+          const courseSizeInfo = crnSizeInfo[crn] || {};
+          crnSizeInfo[crn] = courseSizeInfo;
+
+          const daySizeInfo = courseSizeInfo[day] || {};
+          courseSizeInfo[day] = daySizeInfo;
+
+          daySizeInfo[makeSizeInfoKey(period)] = {
+            period,
+            crn,
             rowIndex: curRowSize - 1,
             rowSize: curRowSize
           };
@@ -146,7 +170,7 @@ export default function Calendar({
             preview={preview}
             capture={capture}
             isAutosized={isAutosized}
-            sizeInfo={crnSizeInfo[crn]}
+            sizeInfo={crnSizeInfo[crn] ?? {}}
           />
         ))}
         {overlayCrns &&
@@ -160,7 +184,7 @@ export default function Calendar({
                 preview={preview}
                 capture={capture}
                 isAutosized
-                sizeInfo={crnSizeInfo[crn]}
+                sizeInfo={crnSizeInfo[crn] ?? {}}
               />
             ))}
       </div>

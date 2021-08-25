@@ -17,7 +17,7 @@ export type Action = {
 
 type BaseActionRowProps = {
   label: string;
-  actions: Action[];
+  actions: (Action | null | undefined)[];
   className?: string;
   children?: React.ReactNode;
 };
@@ -37,7 +37,7 @@ export default function ActionRow({
         <div className="label">{label}</div>
         <div className={classes('actions', 'default')}>
           {actions
-            .filter((action) => action)
+            .flatMap((action) => (action != null ? [action] : []))
             .map(
               (
                 {

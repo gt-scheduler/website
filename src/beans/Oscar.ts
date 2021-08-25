@@ -5,7 +5,8 @@ import {
   Period,
   DateRange,
   Location,
-  CrawlerTermData
+  CrawlerTermData,
+  CrawlerCourse
 } from '../types';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
@@ -32,9 +33,9 @@ class Oscar {
 
   courses: Course[];
 
-  courseMap: Record<string, Course>;
+  courseMap: Record<string, Course | undefined>;
 
-  crnMap: Record<string, Section>;
+  crnMap: Record<string, Section | undefined>;
 
   sortingOptions: SortingOption[];
 
@@ -64,7 +65,10 @@ class Oscar {
     this.updatedAt = new Date(updatedAt);
     this.version = version;
     this.courses = Object.keys(courses).map(
-      (courseId) => new Course(this, courseId, courses[courseId])
+      // `courseId` comes from `Object.keys[courses]`,
+      // so `courses[courseId]` cannot be undefined
+      (courseId) =>
+        new Course(this, courseId, courses[courseId] as CrawlerCourse)
     );
     this.courseMap = {};
     this.crnMap = {};
@@ -77,23 +81,26 @@ class Oscar {
     this.sortingOptions = [
       new SortingOption('Most Compact', (combination) => {
         const { startMap, endMap } = combination;
-        const diffs = Object.keys(startMap).map(
-          (day) => endMap[day] - startMap[day]
-        );
+        const diffs = Object.keys(startMap).map((day) => {
+          const end = endMap[day];
+          const start = startMap[day];
+          if (end == null || start == null) return 0;
+          return end - start;
+        });
         const sum = diffs.reduce((tot, min) => tot + min, 0);
         return +sum;
       }),
       new SortingOption('Earliest Ending', (combination) => {
         const { endMap } = combination;
-        const ends = Object.values(endMap);
-        const sum = ends.reduce((tot, end) => tot + end, 0);
+        const ends = Object.values(endMap) as number[];
+        const sum = ends.reduce<number>((tot, end) => tot + (end ?? 0), 0);
         const avg = sum / ends.length;
         return +avg;
       }),
       new SortingOption('Latest Beginning', (combination) => {
         const { startMap } = combination;
         const starts = Object.values(startMap);
-        const sum = starts.reduce((tot, min) => tot + min, 0);
+        const sum = starts.reduce<number>((tot, min) => tot + (min ?? 0), 0);
         const avg = sum / starts.length;
         return -avg;
       })
@@ -171,6 +178,7 @@ class Oscar {
         // non-undefined, but we have to check anyways here to satisfy
         // TypeScript
         Object.values(course.sectionGroups ?? []).forEach((sectionGroup) => {
+          if (sectionGroup == null) return;
           const section = sectionGroup.sections.find(isIncluded);
           if (!section || hasConflict(section)) return;
           dfs(courseIndex + 1, [...crns, section.crn]);
@@ -179,14 +187,14 @@ class Oscar {
     };
     dfs();
     return crnsList.map((crns) => {
-      const startMap: Record<string, number> = {};
-      const endMap: Record<string, number> = {};
+      const startMap: Record<string, number | undefined> = {};
+      const endMap: Record<string, number | undefined> = {};
       this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
         if (period === undefined) return;
-        if (!(day in startMap) || startMap[day] > period.start)
-          startMap[day] = period.start;
-        if (!(day in endMap) || endMap[day] < period.end)
-          endMap[day] = period.end;
+        const end = endMap[day];
+        const start = startMap[day];
+        if (start == null || start > period.start) startMap[day] = period.start;
+        if (end == null || end < period.end) endMap[day] = period.end;
       });
       return {
         crns,

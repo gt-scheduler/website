@@ -1,32 +1,47 @@
 import React, { useState } from 'react';
 import ReactMapGL, { Marker, NavigationControl } from 'react-map-gl';
+import { ViewState } from 'react-map-gl/src/mapbox/mapbox';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin } from '@fortawesome/free-solid-svg-icons';
+import { Location } from '../../types';
 import './stylesheet.scss';
 
-const MapView = ({ locations }) => {
-  const [viewport, setViewport] = useState({
+export type MapLocation = {
+  section: string;
+  id: string;
+  title: string;
+  days: string[];
+  time: string;
+  coords: Location | null;
+};
+
+export type MapViewProps = {
+  locations: MapLocation[];
+};
+
+const MapView = ({ locations }: MapViewProps): React.ReactElement => {
+  const [viewState, setViewState] = useState<ViewState>({
     latitude: 33.7765,
     longitude: -84.3963,
-    height: '100%',
-    width: '100%',
     zoom: 15
   });
 
-  const unknown = [];
+  const unknown: MapLocation[] = [];
   locations.forEach((location) => {
-    if (!location.coords) unknown.push(location);
+    if (location.coords === null) unknown.push(location);
   });
 
   return (
     <div className="mapbox">
       <ReactMapGL
-        {...viewport}
-        showZoom
-        showCompass
+        height="100%"
+        width="100%"
+        viewState={viewState}
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-        onViewportChange={(display) => setViewport(display)}
+        onViewStateChange={(newViewState: ViewState) =>
+          setViewState(newViewState)
+        }
       >
         {locations.map((location, i) =>
           !location.coords ? (
@@ -55,7 +70,7 @@ const MapView = ({ locations }) => {
           </div>
         )}
         <div className="navigation">
-          <NavigationControl />
+          <NavigationControl showZoom showCompass />
         </div>
       </ReactMapGL>
     </div>

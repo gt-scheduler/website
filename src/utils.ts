@@ -23,8 +23,8 @@ const timeToShortString = (time: number): string => {
   return `${hour > 12 ? hour - 12 : hour}${hour < 12 ? 'a' : 'p'}m`;
 };
 
-const periodToString = (period: Period): string =>
-  period
+const periodToString = (period: Period | undefined): string =>
+  period != null
     ? `${timeToString(period.start, false)} - ${timeToString(period.end)}`
     : 'TBA';
 
@@ -34,10 +34,7 @@ const getRandomColor = (): string => {
   return colors[index];
 };
 
-// TODO(jazevedo620) 2021-08-25: revert the type of `color` to `string`
-// once src/components/TimeBlocks/index.js and src/components/Course/index.js
-// are converted to TypeScript
-const getContentClassName = (color: string | undefined | null): string => {
+const getContentClassName = (color: string | undefined): string => {
   if (color == null) return 'light-content';
   const r = parseInt(color.substring(1, 3), 16);
   const g = parseInt(color.substring(3, 5), 16);

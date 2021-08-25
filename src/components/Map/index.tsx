@@ -1,16 +1,16 @@
 import React, { useContext, useState } from 'react';
-import MapView from '../MapView';
+import MapView, { MapLocation } from '../MapView';
 import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
-import DaySelection from '../DaySelection';
+import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 
 import './stylesheet.scss';
 
 const Map = () => {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
-  const [activeDay, setActiveDay] = useState('M');
-  const locations = [];
-  const courseDateMap = {
+  const [activeDay, setActiveDay] = useState<Day | ''>('M');
+  const locations: MapLocation[] = [];
+  const courseDateMap: Record<Day, CourseDateItem[]> = {
     M: [],
     T: [],
     W: [],
@@ -20,29 +20,31 @@ const Map = () => {
 
   // Construct the courseDateMap and locations data structures
   pinnedCrns.forEach((crn) => {
-    const info = oscar.crnMap[crn.toString()];
-    const meetings = info.meetings[0];
+    const section = oscar.findSection(crn);
+    if (section == null) return;
 
+    const meetings = section.meetings[0];
     meetings.days.forEach((day) => {
+      if (!isDay(day)) return;
       courseDateMap[day].push({
-        id: info.course.id,
-        title: info.course.title,
+        id: section.course.id,
+        title: section.course.title,
         times: meetings.period,
         daysOfWeek: meetings.days
       });
     });
 
     locations.push({
-      section: info.id,
-      id: info.course.id,
-      title: info.course.title,
+      section: section.id,
+      id: section.course.id,
+      title: section.course.title,
       days: meetings.days,
       time: periodToString(meetings.period),
       coords: meetings.location
     });
   });
 
-  let activeLocations = [];
+  let activeLocations: MapLocation[] = [];
   if (activeDay !== '') {
     activeLocations = locations.filter((loc) =>
       courseDateMap[activeDay].some((course) => course.id === loc.id)

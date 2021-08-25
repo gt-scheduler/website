@@ -13,7 +13,7 @@ export default function CourseContainer() {
       <div className="scroller">
         <div className="course-list">
           {desiredCourses.map((courseId) => {
-            return <Course courseId={courseId} expandable key={courseId} />;
+            return <Course courseId={courseId} key={courseId} />;
           })}
         </div>
         <CourseAdd className="course-add" />

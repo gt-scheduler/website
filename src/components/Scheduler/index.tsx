@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { classes } from '../../utils';
 import { Button, Calendar, CombinationContainer, CourseContainer } from '..';
-import { OverlayCrnsContext } from '../../contexts';
+import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { useMobile } from '../../hooks';
 
 /**
@@ -11,16 +11,16 @@ const Scheduler = () => {
   const mobile = useMobile();
 
   // Store the current set of CRNs that are shown on the Calendar overlay
-  const [overlayCrns, setOverlayCrns] = useState([]);
+  const [overlayCrns, setOverlayCrns] = useState<string[]>([]);
 
   // Control second-level navigation between panes on mobile
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState<number>(0);
 
   // Memoize the CRN overlay set's context value so it is stable
-  const overlayContextValue = useMemo(() => [overlayCrns, setOverlayCrns], [
-    overlayCrns,
-    setOverlayCrns
-  ]);
+  const overlayContextValue = useMemo<OverlayCrnsContextValue>(
+    () => [overlayCrns, setOverlayCrns],
+    [overlayCrns, setOverlayCrns]
+  );
 
   return (
     <>

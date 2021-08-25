@@ -43,7 +43,7 @@ class Course {
 
   allInOnes: Section[] | undefined;
 
-  sectionGroups: Record<string, SectionGroup> | undefined;
+  sectionGroups: Record<string, SectionGroup | undefined> | undefined;
 
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     const [title, sections, prereqs] = data;
@@ -51,9 +51,11 @@ class Course {
     this.id = courseId;
     [this.subject, this.number] = this.id.split(' ');
     this.title = title;
-    this.sections = Object.keys(sections).map(
-      (sectionId) => new Section(oscar, this, sectionId, sections[sectionId])
-    );
+    this.sections = Object.keys(sections).flatMap<Section>((sectionId) => {
+      const crawlerSection = sections[sectionId];
+      if (crawlerSection == null) return [];
+      return [new Section(oscar, this, sectionId, crawlerSection)];
+    });
     this.prereqs = prereqs;
 
     const onlyLectures = this.sections.filter(
@@ -100,8 +102,8 @@ class Course {
     }
   }
 
-  distinct(sections: Section[]): Record<string, SectionGroup> {
-    const groups: Record<string, SectionGroup> = {};
+  distinct(sections: Section[]): Record<string, SectionGroup | undefined> {
+    const groups: Record<string, SectionGroup | undefined> = {};
     sections.forEach((section) => {
       const sectionGroupMeetings = section.meetings.map<SectionGroupMeeting>(
         ({ days, period }) => ({

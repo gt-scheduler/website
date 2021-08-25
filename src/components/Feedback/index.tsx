@@ -7,17 +7,17 @@ import { classes } from '../../utils';
 
 import { FormSubmit } from '../../beans';
 
-export default function Feedback() {
-  const [expanded, setExpanded] = useState(false);
-  const [submit, setSubmit] = useState(false);
-  const [rating, setRating] = useState(null);
-  const [feedback, setFeedback] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function Feedback(): React.ReactElement {
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const [submit, setSubmit] = useState<boolean>(false);
+  const [rating, setRating] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = () => {
     setLoading(true);
     // Add 1 to the rating to move it from [0,4] to [1,5]
-    FormSubmit({ rating: rating + 1, feedback })
+    FormSubmit({ rating: (rating ?? 0) + 1, feedback })
       .then(() => {
         setSubmit(true);
         setLoading(false);
@@ -31,11 +31,7 @@ export default function Feedback() {
   return (
     <div>
       {!expanded && (
-        <Button
-          className="FeedbackButton"
-          onClick={() => setExpanded(true)}
-          onMouse
-        >
+        <Button className="FeedbackButton" onClick={() => setExpanded(true)}>
           <FontAwesomeIcon icon={faCommentAlt} size="2x" />
         </Button>
       )}

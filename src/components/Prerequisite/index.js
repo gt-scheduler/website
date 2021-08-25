@@ -10,11 +10,11 @@ import { ActionRow } from '..';
 
 export default function Prerequisite({
   course,
-  req,
-  option,
-  isHeader,
-  isEmpty,
-  isLast
+  req = undefined,
+  option = undefined,
+  isHeader = false,
+  isEmpty = false,
+  isLast = false
 }) {
   const [{ term }] = useContext(TermContext);
   const [expanded, setExpanded] = useState(true);

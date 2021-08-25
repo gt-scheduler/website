@@ -1,6 +1,6 @@
 export type Theme = 'light' | 'dark';
 
-// TODO ensure types are correct
+// TODO(jazevedo620) 2020-11-02: ensure types are correct
 export type TermData = {
   desiredCourses: string[];
   pinnedCrns: string[];
@@ -32,8 +32,8 @@ export type ICS = {
 
 export interface Combination {
   crns: string[];
-  startMap: Record<string, number>;
-  endMap: Record<string, number>;
+  startMap: Record<string, number | undefined>;
+  endMap: Record<string, number | undefined>;
 }
 
 export interface Period {
@@ -237,7 +237,8 @@ export type CrawlerCourse = [
    * a JSON object with information about each section of the course;
    * the section IDs are the keys (`"A"`, `"B"`, `"S2"`, etc.)
    */
-  sections: Record<string, CrawlerSection>,
+  // ! Type had `undefined` explicitly added to ensure we check when accessing
+  sections: Record<string, CrawlerSection | undefined>,
   /**
      * a tree of prerequisite classes and the necessary grades in them
      * (using boolean expressions in prefix order)
@@ -276,7 +277,7 @@ export interface CrawlerTermData {
    * this makes up the vast bulk of the resultant JSON.
    * The course IDs are the keys (`"ACCT 2101"`, `"CS 2340"`, etc.)
    */
-  courses: Record<string, CrawlerCourse>;
+  courses: Record<string, CrawlerCourse | undefined>;
   /**
    * Contains data shared by multiple class descriptions
    */
@@ -290,3 +291,12 @@ export interface CrawlerTermData {
    */
   version: number;
 }
+
+/**
+ * Small utility type to encode a record
+ * that requires undefined checks when accessing
+ */
+export type SafeRecord<K extends string | number | symbol, V> = Record<
+  K,
+  V | undefined
+>;

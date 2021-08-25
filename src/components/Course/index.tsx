@@ -12,12 +12,24 @@ import { classes, getContentClassName } from '../../utils';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
+import { Course as CourseBean, Section } from '../../beans';
+import { CourseGpa } from '../../types';
 
-export default function Course({ className, courseId, onAddCourse }) {
-  const [expanded, setExpanded] = useState(false);
-  const [prereqOpen, setPrereqOpen] = useState(false);
-  const [paletteShown, setPaletteShown] = useState(false);
-  const [gpaMap, setGpaMap] = useState({});
+export type CourseProps = {
+  className?: string;
+  courseId: string;
+  onAddCourse?: () => void;
+};
+
+export default function Course({
+  className,
+  courseId,
+  onAddCourse
+}: CourseProps): React.ReactElement | null {
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
+  const [paletteShown, setPaletteShown] = useState<boolean>(false);
+  const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
     { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
@@ -27,12 +39,13 @@ export default function Course({ className, courseId, onAddCourse }) {
   useEffect(() => {
     if (!isSearching) {
       const course = oscar.findCourse(courseId);
+      if (course == null) return;
       course.fetchGpa().then(setGpaMap);
     }
   }, [isSearching, oscar, courseId]);
 
   const handleRemoveCourse = useCallback(
-    (course) => {
+    (course: CourseBean) => {
       patchTermData({
         desiredCourses: desiredCourses.filter((id) => id !== course.id),
         pinnedCrns: pinnedCrns.filter(
@@ -48,7 +61,7 @@ export default function Course({ className, courseId, onAddCourse }) {
   );
 
   const handleIncludeSections = useCallback(
-    (sections) => {
+    (sections: Section[]) => {
       const crns = sections.map((section) => section.crn);
       patchTermData({
         excludedCrns: excludedCrns.filter((crn) => !crns.includes(crn))
@@ -58,39 +71,45 @@ export default function Course({ className, courseId, onAddCourse }) {
   );
 
   const course = oscar.findCourse(courseId);
+  if (course == null) return null;
+
   const color = colorMap[course.id];
-  const contentClassName = color && getContentClassName(color);
+  const contentClassName = color != null && getContentClassName(color);
 
   const hasPrereqs = oscar.version > 1;
   let prereqs = null;
 
   if (hasPrereqs) {
+    // TODO(jazevedo620) 2021-08-25: This might be broken -- it assumes
+    // that the top-level operator is always OR (is this always true?)
+    // (also what is going on with the nested array?)
     prereqs = course.prereqs.slice(1, course.prereqs.length);
-    if (prereqs.length && prereqs.every((prereq) => !prereq[0]))
+    if (prereqs.length > 0 && prereqs.every((prereq) => !Array.isArray(prereq)))
       prereqs = [prereqs];
   }
 
-  const instructorMap = {};
+  const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
     const [primaryInstructor = 'Not Assigned'] = section.instructors;
-    if (!(primaryInstructor in instructorMap)) {
-      instructorMap[primaryInstructor] = [];
-    }
-    instructorMap[primaryInstructor].push(section);
+    let mapEntry = instructorMap[primaryInstructor];
+    if (mapEntry === undefined) mapEntry = [];
+    mapEntry.push(section);
+    instructorMap[primaryInstructor] = mapEntry;
   });
 
   const instructors = Object.keys(instructorMap);
   const excludedInstructors = instructors.filter((instructor) => {
     const sections = instructorMap[instructor];
+    if (sections == null) return false;
     return sections.every((section) => excludedCrns.includes(section.crn));
   });
   const includedInstructors = instructors.filter(
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const prereqControl = (pre, exp) => {
-    setPrereqOpen(pre);
-    setExpanded(exp);
+  const prereqControl = (nextPrereqOpen: boolean, nextExpanded: boolean) => {
+    setPrereqOpen(nextPrereqOpen);
+    setExpanded(nextExpanded);
   };
   const prereqAction = {
     icon: faShareAlt,
@@ -161,7 +180,7 @@ export default function Course({ className, courseId, onAddCourse }) {
           <div className="course-row">
             <span className="gpa">
               Course GPA:{' '}
-              {Object.keys(gpaMap).length === 0
+              {gpaMap === null
                 ? 'Loading...'
                 : gpaMap.averageGpa
                 ? gpaMap.averageGpa.toFixed(2)
@@ -178,35 +197,45 @@ export default function Course({ className, courseId, onAddCourse }) {
             onSelectColor={(col) =>
               patchTermData({ colorMap: { ...colorMap, [courseId]: col } })
             }
-            color={color}
+            color={color ?? null}
             onMouseLeave={() => setPaletteShown(false)}
           />
         )}
       </ActionRow>
       {expanded && !prereqOpen && (
         <div className={classes('hover-container', 'nested')}>
-          {includedInstructors.map((name) => (
-            <Instructor
-              key={name}
-              color={color}
-              name={name}
-              sections={instructorMap[name]}
-              gpa={
-                Object.keys(gpaMap).length === 0
-                  ? 'Loading...'
-                  : gpaMap[name]
-                  ? gpaMap[name].toFixed(2)
-                  : 'N/A'
-              }
-            />
-          ))}
+          {includedInstructors.map((name) => {
+            let instructorGpa: number | undefined = 0;
+            if (gpaMap !== null) {
+              instructorGpa = gpaMap[name];
+            }
+            return (
+              <Instructor
+                key={name}
+                color={color}
+                name={name}
+                sections={instructorMap[name] ?? []}
+                gpa={
+                  gpaMap === null
+                    ? 'Loading...'
+                    : instructorGpa
+                    ? instructorGpa.toFixed(2)
+                    : 'N/A'
+                }
+              />
+            );
+          })}
           {excludedInstructors.length > 0 && (
             <div className="excluded-instructor-container">
               {excludedInstructors.map((name) => (
                 <span
                   className="excluded-instructor"
                   key={name}
-                  onClick={() => handleIncludeSections(instructorMap[name])}
+                  onClick={() => {
+                    const instructorSections = instructorMap[name];
+                    if (instructorSections == null) return;
+                    handleIncludeSections(instructorSections);
+                  }}
                 >
                   {name}
                 </span>
@@ -225,7 +254,8 @@ export default function Course({ className, courseId, onAddCourse }) {
           >
             <Prerequisite course={course} isHeader />
             <div className={classes('nested')}>
-              {!!prereqs.length > 0 &&
+              {prereqs != null &&
+                prereqs.length > 0 &&
                 prereqs.map((req, i) => (
                   <Prerequisite
                     key={i}
@@ -235,7 +265,9 @@ export default function Course({ className, courseId, onAddCourse }) {
                     isHeader
                   />
                 ))}
-              {!prereqs.length && <Prerequisite course={course} isEmpty />}
+              {(prereqs == null || !prereqs.length) && (
+                <Prerequisite course={course} isEmpty />
+              )}
             </div>
           </div>
         </div>

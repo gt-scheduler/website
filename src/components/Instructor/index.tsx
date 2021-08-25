@@ -6,11 +6,26 @@ import {
   faGraduationCap
 } from '@fortawesome/free-solid-svg-icons';
 import { classes, simplifyName, unique } from '../../utils';
+import { Section as SectionBean } from '../../beans';
 import { ActionRow, Section } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export default function Instructor({ className, color, name, sections, gpa }) {
+export type InstructorProps = {
+  className?: string;
+  color: string | undefined;
+  name: string;
+  sections: SectionBean[];
+  gpa: string;
+};
+
+export default function Instructor({
+  className,
+  color,
+  name,
+  sections,
+  gpa
+}: InstructorProps): React.ReactElement {
   const [{ pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
   );
@@ -26,7 +41,7 @@ export default function Instructor({ className, color, name, sections, gpa }) {
   );
 
   const excludeSections = useCallback(
-    (sectionList) => {
+    (sectionList: SectionBean[]) => {
       const crns = sectionList.map((section) => section.crn);
       patchTermData({
         excludedCrns: unique([...excludedCrns, ...crns]),
@@ -62,15 +77,17 @@ export default function Instructor({ className, color, name, sections, gpa }) {
             icon: expanded ? faAngleUp : faAngleDown,
             onClick: () => setExpanded(!expanded)
           },
-          !['TBA', 'Not Assigned'].includes(name) && {
-            icon: faGraduationCap,
-            href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
-              simplifyName(name)
-            )}`
-          },
+          !['TBA', 'Not Assigned'].includes(name)
+            ? {
+                icon: faGraduationCap,
+                href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
+                  simplifyName(name)
+                )}`
+              }
+            : null,
           {
             icon: faBan,
-            title: 'Exclude from Combinations',
+            dataTip: 'Exclude from Combinations',
             onClick: () => excludeSections(sections)
           }
         ]}

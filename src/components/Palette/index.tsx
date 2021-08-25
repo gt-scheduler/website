@@ -3,14 +3,20 @@ import { classes } from '../../utils';
 import { PALETTE } from '../../constants';
 import './stylesheet.scss';
 
+export type PaletteProps = {
+  className?: string;
+  color: string | null;
+  onSelectColor: (newColor: string) => void;
+  onMouseLeave: () => void;
+};
+
 export default function Palette({
   className,
   color,
-  onSelectColor,
-  ...restProps
-}) {
+  onSelectColor
+}: PaletteProps): React.ReactElement {
   return (
-    <div className={classes('Palette', className)} {...restProps}>
+    <div className={classes('Palette', className)}>
       {PALETTE.map((colors, i) => (
         <div className="palette-row" key={i}>
           {colors.map((paletteColor) => (

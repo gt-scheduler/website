@@ -3,6 +3,15 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { classes, humanizeArray } from '../../utils';
 import './stylesheet.scss';
+import { SafeRecord } from '../../types';
+
+export type CourseFilterProps = {
+  name: string;
+  labels: SafeRecord<string, string>;
+  selectedTags: string[];
+  onReset: () => void;
+  onToggle: (tag: string) => void;
+};
 
 export default function CourseFilter({
   name,
@@ -10,7 +19,7 @@ export default function CourseFilter({
   selectedTags,
   onReset,
   onToggle
-}) {
+}: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -25,7 +34,10 @@ export default function CourseFilter({
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: humanizeArray(
-                selectedTags.map((tag) => labels[tag]),
+                selectedTags.flatMap<string>((tag) => {
+                  const selectedTag = labels[tag];
+                  return selectedTag != null ? [selectedTag] : [];
+                }),
                 '<span class="or">or</span>'
               )
             }}

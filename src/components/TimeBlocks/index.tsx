@@ -4,19 +4,48 @@ import { classes, getContentClassName, periodToString } from '../../utils';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
+import { Period, SafeRecord } from '../../types';
+
+export interface TimeBlockPosition {
+  rowIndex: number;
+  rowSize: number;
+  period: Period;
+  crn: string;
+}
+
+export type SizeInfo = SafeRecord<
+  string,
+  SafeRecord<string, TimeBlockPosition>
+>;
+
+export type TimeBlocksProps = {
+  className?: string;
+  crn: string;
+  overlay?: boolean;
+  capture: boolean;
+  preview: boolean;
+  isAutosized: boolean;
+  sizeInfo: SizeInfo;
+};
+
+export function makeSizeInfoKey(period: Period): string {
+  return [period.start, period.end].join('-');
+}
 
 export default function TimeBlocks({
   className,
   crn,
-  overlay,
+  overlay = false,
   preview,
   capture,
   isAutosized,
   sizeInfo
-}) {
+}: TimeBlocksProps): React.ReactElement | null {
   const [{ oscar, colorMap }] = useContext(TermContext);
 
   const section = oscar.findSection(crn);
+  if (section == null) return null;
+
   const color = colorMap[section.course.id];
   const contentClassName = getContentClassName(color);
 
@@ -29,37 +58,30 @@ export default function TimeBlocks({
         className
       )}
     >
-      {section.meetings.map(
-        (meeting, i) =>
-          meeting.period &&
-          meeting.days.map((day) => (
+      {section.meetings.map((meeting, i) => {
+        const { period } = meeting;
+        if (period == null) return;
+
+        const sizeInfoKey = makeSizeInfoKey(period);
+        return meeting.days.map((day) => {
+          const sizeInfoDay = sizeInfo[day];
+          if (sizeInfoDay == null) return;
+          const sizeInfoPeriodDay = sizeInfoDay[sizeInfoKey];
+          if (sizeInfoPeriodDay == null) return;
+
+          return (
             <div
               className={classes('meeting', contentClassName, 'default', day)}
               key={[i, day].join('-')}
               style={{
-                top: `${
-                  ((meeting.period.start - OPEN) / (CLOSE - OPEN)) * 100
-                }%`,
+                top: `${((period.start - OPEN) / (CLOSE - OPEN)) * 100}%`,
                 height: `${
-                  ((meeting.period.end - meeting.period.start) /
-                    (CLOSE - OPEN)) *
-                  100
+                  ((period.end - period.start) / (CLOSE - OPEN)) * 100
                 }%`,
-                width: `${
-                  20 /
-                  sizeInfo[day][
-                    [meeting.period.start, meeting.period.end].join('-')
-                  ].rowSize
-                }%`,
+                width: `${20 / sizeInfoPeriodDay.rowSize}%`,
                 left: `${
                   DAYS.indexOf(day) * 20 +
-                  sizeInfo[day][
-                    [meeting.period.start, meeting.period.end].join('-')
-                  ].rowIndex *
-                    (20 /
-                      sizeInfo[day][
-                        [meeting.period.start, meeting.period.end].join('-')
-                      ].rowSize)
+                  sizeInfoPeriodDay.rowIndex * (20 / sizeInfoPeriodDay.rowSize)
                 }%`,
                 backgroundColor: color
               }}
@@ -72,9 +94,7 @@ export default function TimeBlocks({
                     <span className="course-id">{section.course.id}</span>
                     <span className="section-id">&nbsp;{section.id}</span>
                   </div>
-                  <span className="period">
-                    {periodToString(meeting.period)}
-                  </span>
+                  <span className="period">{periodToString(period)}</span>
                   <span className="where">{meeting.where}</span>
                   <span className="instructors">
                     {meeting.instructors.join(', ')}
@@ -82,8 +102,9 @@ export default function TimeBlocks({
                 </div>
               )}
             </div>
-          ))
-      )}
+          );
+        });
+      })}
 
       {!isAutosized && (
         <ReactTooltip
