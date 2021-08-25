@@ -229,10 +229,7 @@ const Header = ({
 
       {/* Fake calendar used to capture screenshots */}
       <div className="capture-container" ref={captureRef}>
-        {/* TODO(jazevedo620) 2020-11-02: remove once Calendar gets typing */}
-        {/*
-          // @ts-ignore */}
-        <Calendar className="fake-calendar" capture />
+        <Calendar className="fake-calendar" capture overlayCrns={[]} />
       </div>
     </div>
   );
