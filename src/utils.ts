@@ -34,7 +34,11 @@ const getRandomColor = (): string => {
   return colors[index];
 };
 
-const getContentClassName = (color: string): string => {
+// TODO(jazevedo620) 2021-08-25: revert the type of `color` to `string`
+// once src/components/TimeBlocks/index.js and src/components/Course/index.js
+// are converted to TypeScript
+const getContentClassName = (color: string | undefined | null): string => {
+  if (color == null) return 'light-content';
   const r = parseInt(color.substring(1, 3), 16);
   const g = parseInt(color.substring(3, 5), 16);
   const b = parseInt(color.substring(5, 7), 16);
@@ -135,7 +139,7 @@ const decryptReqs = (
       string += decryptReqs(req) + (last(i) ? '' : ' or ');
     });
   } else {
-    // TODO(jazevedo620) 08-24-2021: under what conditions is this code run?
+    // TODO(jazevedo620) 2021-08-24: under what conditions is this code run?
     // It seems like (if `reqs` is indeed of type `PrerequisiteClause`)
     // that this code isn't run, but I'm wary of removing it for now
     // until types are added to the dependent `<Prerequisite>` component.
