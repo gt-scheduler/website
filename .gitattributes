@@ -1,2 +1,2 @@
 # Ignore ics.js from repo stats since it's a vendored library
-./ics.js linguist-vendored
+src/libs/ics.js linguist-vendored
