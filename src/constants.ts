@@ -1,3 +1,5 @@
+import { SafeRecord } from './types';
+
 const OPEN = 8 * 60;
 const CLOSE = 21 * 60;
 const DAYS = ['M', 'T', 'W', 'R', 'F'];
@@ -51,14 +53,14 @@ const PALETTE = [
 
 const ASYNC_DELIVERY_MODE = 'Remote Asynchronous Course';
 
-const DELIVERY_MODES = {
+const DELIVERY_MODES: SafeRecord<string, string> = {
   'Hybrid Course': 'Hybrid',
   'Remote Synchronous Course': 'Remote Synchronous',
   'Remote Asynchronous Course': 'Remote Asynchronous',
   'Residential Course': 'Residential'
 };
 
-const CAMPUSES = {
+const CAMPUSES: SafeRecord<string, string> = {
   'Georgia Tech-Atlanta *': 'Atlanta',
   'GT Lorraine-Undergrad Programs': 'Lorraine Undergrad',
   'GT Lorraine-Graduate Programs': 'Lorraine Graduate',

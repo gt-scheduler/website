@@ -9,7 +9,7 @@ type FontAwesomeProps = React.ComponentProps<typeof FontAwesomeIcon>;
 export type Action = {
   icon: FontAwesomeProps['icon'];
   styling?: React.CSSProperties;
-  dataTip?: string;
+  dataTip?: boolean;
   dataFor?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;

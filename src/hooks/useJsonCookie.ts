@@ -1,12 +1,15 @@
 import { useCallback, useMemo } from 'react';
 import { useCookie } from '.';
 
-export default function useJsonCookie(key, defaultValue) {
+export default function useJsonCookie<T extends object>(
+  key: string,
+  defaultValue: T
+): [T, (patch: Partial<T>) => void] {
   const [rawValue, setRawValue] = useCookie(key);
 
   const value = useMemo(() => {
     if (rawValue !== undefined) {
-      const parsedValue = JSON.parse(rawValue);
+      const parsedValue = JSON.parse(rawValue) as T;
       return {
         ...defaultValue,
         ...parsedValue

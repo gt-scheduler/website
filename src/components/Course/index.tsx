@@ -13,7 +13,7 @@ import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../beans';
-import { CourseGpa } from '../../types';
+import { CourseGpa, PrerequisiteClause, PrerequisiteSet } from '../../types';
 
 export type CourseProps = {
   className?: string;
@@ -77,15 +77,20 @@ export default function Course({
   const contentClassName = color != null && getContentClassName(color);
 
   const hasPrereqs = oscar.version > 1;
-  let prereqs = null;
+  let prereqOptions: PrerequisiteClause[] | null = null;
 
   if (hasPrereqs) {
-    // TODO(jazevedo620) 2021-08-25: This might be broken -- it assumes
-    // that the top-level operator is always OR (is this always true?)
-    // (also what is going on with the nested array?)
-    prereqs = course.prereqs.slice(1, course.prereqs.length);
-    if (prereqs.length > 0 && prereqs.every((prereq) => !Array.isArray(prereq)))
-      prereqs = [prereqs];
+    const rawPrereqs = course.prereqs;
+    if (rawPrereqs != null && rawPrereqs.length > 0) {
+      // We just checked the length, so `rawPrereqs` can't be the empty array []
+      // Therefore, it must be `PrerequisiteSet`.
+      const [rootOperator, ...clauses] = rawPrereqs as PrerequisiteSet;
+      if (rootOperator === 'or') {
+        prereqOptions = clauses;
+      } else {
+        prereqOptions = [[rootOperator, ...clauses]];
+      }
+    }
   }
 
   const instructorMap: Record<string, Section[] | undefined> = {};
@@ -254,9 +259,8 @@ export default function Course({
           >
             <Prerequisite course={course} isHeader />
             <div className={classes('nested')}>
-              {prereqs != null &&
-                prereqs.length > 0 &&
-                prereqs.map((req, i) => (
+              {prereqOptions !== null &&
+                prereqOptions.map((req, i) => (
                   <Prerequisite
                     key={i}
                     option={i + 1}
@@ -265,7 +269,7 @@ export default function Course({
                     isHeader
                   />
                 ))}
-              {(prereqs == null || !prereqs.length) && (
+              {prereqOptions === null && (
                 <Prerequisite course={course} isEmpty />
               )}
             </div>

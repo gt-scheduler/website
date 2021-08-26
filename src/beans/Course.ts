@@ -33,7 +33,7 @@ class Course {
 
   sections: Section[];
 
-  prereqs: CrawlerPrerequisites;
+  prereqs: CrawlerPrerequisites | undefined;
 
   hasLab: boolean;
 

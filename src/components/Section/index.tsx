@@ -11,13 +11,27 @@ import { ActionRow } from '..';
 import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
+import { Section as SectionBean } from '../../beans';
+import { Seating } from '../../beans/Section';
 
-export default function Section({ className, section, pinned, color }) {
+export type SectionProps = {
+  className?: string;
+  section: SectionBean;
+  pinned: boolean;
+  color: string | undefined;
+};
+
+export default function Section({
+  className,
+  section,
+  pinned,
+  color
+}: SectionProps): React.ReactElement {
   const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
   );
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
-  const [seating, setSeating] = useState([[], []]);
+  const [seating, setSeating] = useState<Seating>([[], 0]);
 
   let hovering = false;
   const handleHover = () => {
@@ -53,6 +67,7 @@ export default function Section({ className, section, pinned, color }) {
     [pinnedCrns, excludedCrns, patchTermData]
   );
 
+  const excludeTooltipId = `section-exclude-${section.id}`;
   return (
     <ActionRow
       label={section.id}
@@ -72,15 +87,27 @@ export default function Section({ className, section, pinned, color }) {
         },
         {
           icon: faBan,
-          title: 'Exclude from Combinations',
+          dataTip: true,
+          dataFor: excludeTooltipId,
           onClick: () => excludeSection(section)
         }
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
+      <ReactTooltip
+        id={excludeTooltipId}
+        className="tooltip"
+        type="dark"
+        place="right"
+        effect="solid"
+      >
+        Exclude from Combinations
+      </ReactTooltip>
       <div className="section-details">
         <div className="delivery-mode">
-          {DELIVERY_MODES[section.deliveryMode]}
+          {section.deliveryMode != null
+            ? DELIVERY_MODES[section.deliveryMode]
+            : ''}
         </div>
         <div className="meeting-container">
           {section.meetings.map((meeting, i) => {

@@ -12,19 +12,73 @@ import { classes, getRandomColor } from '../../utils';
 import './stylesheet.scss';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { TermContext } from '../../contexts';
+import { Course as CourseBean, Section } from '../../beans';
 
-export default function CourseAdd({ className }) {
+export type CourseAddProps = {
+  className?: string;
+};
+
+type SortKey = 'deliveryMode' | 'campus';
+
+type SortFilter = {
+  [sortKey in SortKey]: string[];
+};
+
+function isSortKey(sortKey: string): sortKey is SortKey {
+  switch (sortKey) {
+    case 'deliveryMode':
+    case 'campus':
+      return true;
+    default:
+      return false;
+  }
+}
+
+function doesFilterMatchCourse(
+  course: CourseBean,
+  filter: SortFilter
+): boolean {
+  return Object.entries(filter).every(([key, tags]) => {
+    if (!isSortKey(key)) return true;
+
+    return (
+      tags.length === 0 ||
+      course.sections.some((section) => {
+        const sortValue = section[key];
+        if (sortValue == null) return false;
+
+        return tags.includes(sortValue);
+      })
+    );
+  });
+}
+
+function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
+  return Object.entries(filter).every(([key, tags]) => {
+    if (tags.length === 0) return true;
+    if (!isSortKey(key)) return true;
+
+    const sortValue = section[key];
+    if (sortValue == null) return false;
+
+    return tags.includes(sortValue);
+  });
+}
+
+export default function CourseAdd({
+  className
+}: CourseAddProps): React.ReactElement {
   const [
     { oscar, desiredCourses, excludedCrns, colorMap },
     { patchTermData }
   ] = useContext(TermContext);
   const [keyword, setKeyword] = useState('');
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
     campus: []
   });
   const [activeIndex, setActiveIndex] = useState(0);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChangeKeyword = useCallback((e) => {
     let input = e.target.value.trim();
@@ -49,18 +103,14 @@ export default function CourseAdd({ className }) {
       .filter((course) => {
         const keywordMatch =
           course.subject === subject && course.number.startsWith(number);
-        const filterMatch = Object.entries(filter).every(
-          ([key, tags]) =>
-            tags.length === 0 ||
-            course.sections.some((section) => tags.includes(section[key]))
-        );
+        const filterMatch = doesFilterMatchCourse(course, filter);
         return keywordMatch && filterMatch;
       })
       .filter((course) => !desiredCourses.includes(course.id));
   }, [oscar, keyword, filter, desiredCourses]);
 
   const handleAddCourse = useCallback(
-    (course) => {
+    (course: CourseBean) => {
       if (desiredCourses.includes(course.id)) return;
       const toBeExcludedCrns = course.sections
         .filter((section) => {
@@ -70,9 +120,7 @@ export default function CourseAdd({ className }) {
               section.meetings.every(
                 (meeting) => meeting.days.length && meeting.period
               ));
-          const filterMatch = Object.entries(filter).every(
-            ([key, tags]) => tags.length === 0 || tags.includes(section[key])
-          );
+          const filterMatch = doesFilterMatchSection(section, filter);
           return !timeDecided || !filterMatch;
         })
         .map((section) => section.crn);
@@ -82,7 +130,7 @@ export default function CourseAdd({ className }) {
         colorMap: { ...colorMap, [course.id]: getRandomColor() }
       });
       setKeyword('');
-      inputRef.current.focus();
+      inputRef.current?.focus();
     },
     [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchTermData]
   );
@@ -110,7 +158,7 @@ export default function CourseAdd({ className }) {
   );
 
   const handleToggleFilter = useCallback(
-    (key, tag) => {
+    (key: 'deliveryMode' | 'campus', tag: string) => {
       const tags = filter[key];
       setFilter({
         ...filter,
@@ -139,7 +187,7 @@ export default function CourseAdd({ className }) {
       <div className="add">
         <div className="primary">
           <FontAwesomeIcon
-            className={classes('icon', courses.length && 'active')}
+            className={classes('icon', !!courses.length && 'active')}
             fixedWidth
             icon={faPlus}
           />
@@ -161,8 +209,8 @@ export default function CourseAdd({ className }) {
           </div>
         </div>
         {[
-          ['Delivery Mode', 'deliveryMode', DELIVERY_MODES],
-          ['Campus', 'campus', CAMPUSES]
+          ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
+          ['Campus', 'campus', CAMPUSES] as const
         ].map(([name, property, labels]) => (
           <CourseFilter
             key={property}
@@ -178,9 +226,8 @@ export default function CourseAdd({ className }) {
         courses.map((course) => (
           <Course
             key={course.id}
-            className={course === activeCourse && 'active'}
+            className={classes(course === activeCourse && 'active')}
             courseId={course.id}
-            pinnedCrns={[]}
             onAddCourse={() => handleAddCourse(course)}
           />
         ))

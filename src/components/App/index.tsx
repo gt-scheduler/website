@@ -7,31 +7,39 @@ import { classes } from '../../utils';
 import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
 import Feedback from '../Feedback';
 import { Oscar } from '../../beans';
-import { useCookie, useJsonCookie, useMobile } from '../../hooks';
-import { TermContext, TermsContext, ThemeContext } from '../../contexts';
-import { defaultTermData } from '../../types';
+import { useCookieWithDefault, useJsonCookie, useMobile } from '../../hooks';
+import {
+  TermContext,
+  TermContextValue,
+  TermsContext,
+  TermsContextValue,
+  ThemeContext,
+  ThemeContextValue
+} from '../../contexts';
+import { defaultTermData, isTheme } from '../../types';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 const NAV_TABS = ['Scheduler', 'Map'];
 
-const App = () => {
-  const [terms, setTerms] = useState([]);
-  const [oscar, setOscar] = useState(null);
+const App = (): React.ReactElement => {
+  const [terms, setTerms] = useState<string[]>([]);
+  const [oscar, setOscar] = useState<Oscar | null>(null);
 
   // Persist the theme, term, and some term data as cookies
-  const [theme, setTheme] = useCookie('theme', 'dark');
-  const [term, setTerm] = useCookie('term');
+  const [theme, setTheme] = useCookieWithDefault('theme', 'dark');
+  const [term, setTerm] = useCookieWithDefault('term', '');
   const [termData, patchTermData] = useJsonCookie(term, defaultTermData);
 
   // Only consider courses and CRNs that exist
   // (fixes issues where a CRN/course is removed from Oscar
   // after a schedule was made with them)
   const filteredTermData = useMemo(() => {
-    const courseFilter = (courseId) =>
+    const courseFilter = (courseId: string) =>
       oscar != null && oscar.findCourse(courseId) != null;
-    const crnFilter = (crn) => oscar != null && oscar.findSection(crn) != null;
+    const crnFilter = (crn: string) =>
+      oscar != null && oscar.findSection(crn) != null;
 
     const desiredCourses = termData.desiredCourses.filter(courseFilter);
     const pinnedCrns = termData.pinnedCrns.filter(crnFilter);
@@ -41,11 +49,20 @@ const App = () => {
   }, [oscar, termData]);
 
   // Memoize context values so that their references are stable
-  const themeContextValue = useMemo(() => [theme, setTheme], [theme, setTheme]);
-  const termsContextValue = useMemo(() => [terms, setTerms], [terms, setTerms]);
-  const termContextValue = useMemo(
+  const themeContextValue = useMemo<ThemeContextValue>(
+    () => [isTheme(theme) ? theme : 'dark', setTheme],
+    [theme, setTheme]
+  );
+  const termsContextValue = useMemo<TermsContextValue>(
+    () => [terms, setTerms],
+    [terms, setTerms]
+  );
+  const termContextValue = useMemo<TermContextValue>(
     () => [
-      { term, oscar, ...filteredTermData },
+      // We ensure that oscar is non-null when we give this to the context
+      // provider, so while this is an unsafe cast we ensure the safety
+      // manually.
+      { term, oscar: oscar as Oscar, ...filteredTermData },
       { setTerm, setOscar, patchTermData }
     ],
     [term, oscar, filteredTermData, setTerm, setOscar, patchTermData]
@@ -87,7 +104,7 @@ const App = () => {
         )
       });
 
-      Cookies.set(cookieKey, true, { expires: 365 });
+      Cookies.set(cookieKey, 'true', { expires: 365 });
     }
   }, []);
 
@@ -111,7 +128,7 @@ const App = () => {
         'https://api.github.com/repos/gt-scheduler/crawler/contents?ref=gh-pages'
       )
       .then((res) => {
-        const newTerms = res.data
+        const newTerms = (res.data as { name: string }[])
           .map((content) => content.name)
           .filter((name) => /\d{6}\.json/.test(name))
           .map((name) => name.replace(/\.json$/, ''))

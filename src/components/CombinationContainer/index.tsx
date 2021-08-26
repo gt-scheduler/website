@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useMemo } from 'react';
-import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
+import { AutoSizer, List } from 'react-virtualized';
 import { Button, Calendar, Select } from '..';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 
-export default function CombinationContainer() {
+export default function CombinationContainer(): React.ReactElement {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
     { patchTermData }

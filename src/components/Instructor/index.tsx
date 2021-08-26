@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
+import ReactTooltip from 'react-tooltip';
 import {
   faAngleDown,
   faAngleUp,
@@ -62,6 +63,7 @@ export default function Instructor({
     excludedCrns.includes(section.crn)
   );
 
+  const excludeTooltipId = `exclude-instructor-${name.replace(' ', '-')}`;
   return (
     <div
       className={classes(
@@ -87,7 +89,8 @@ export default function Instructor({
             : null,
           {
             icon: faBan,
-            dataTip: 'Exclude from Combinations',
+            dataTip: true,
+            dataFor: excludeTooltipId,
             onClick: () => excludeSections(sections)
           }
         ]}
@@ -97,6 +100,14 @@ export default function Instructor({
           <span className="gpa">Instructor GPA: {gpa || 'N/A'}</span>
         </div>
       </ActionRow>
+      <ReactTooltip
+        id={excludeTooltipId}
+        type="dark"
+        place="bottom"
+        effect="solid"
+      >
+        Exclude from Combinations
+      </ReactTooltip>
       {expanded && (
         <div className={classes('section-container', 'nested')}>
           {includedSections.map((section) => {

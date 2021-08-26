@@ -1,5 +1,15 @@
 export type Theme = 'light' | 'dark';
 
+export function isTheme(theme: string): theme is Theme {
+  switch (theme) {
+    case 'light':
+    case 'dark':
+      return true;
+    default:
+      return false;
+  }
+}
+
 // TODO(jazevedo620) 2020-11-02: ensure types are correct
 export type TermData = {
   desiredCourses: string[];
@@ -256,7 +266,8 @@ export type CrawlerCourse = [
        ]
      * ```
      */
-  prerequisites: CrawlerPrerequisites,
+  // ! Type had `undefined` explicitly added to ensure we check when accessing
+  prerequisites: CrawlerPrerequisites | undefined,
   /**
    * Description pulled from Oscar
    */
