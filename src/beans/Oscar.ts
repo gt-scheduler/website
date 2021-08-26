@@ -237,3 +237,22 @@ class Oscar {
 }
 
 export default Oscar;
+
+/**
+ * Create an empty instance of the Oscar bean
+ * to use as the default context value
+ */
+export const EMPTY_OSCAR = new Oscar({
+  courses: {},
+  caches: {
+    periods: [],
+    dateRanges: [],
+    scheduleTypes: [],
+    campuses: [],
+    attributes: [],
+    gradeBases: [],
+    locations: []
+  },
+  updatedAt: new Date(),
+  version: 1
+});

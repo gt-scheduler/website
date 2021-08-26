@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme, defaultTermData, TermData } from '../types';
-import Oscar from '../beans/Oscar';
+import Oscar, { EMPTY_OSCAR } from '../beans/Oscar';
 
 type Setter<T> = (next: T) => void;
 
@@ -29,7 +29,7 @@ export type TermContextValue = [TermContextData, TermContextSetters];
 export const TermContext = React.createContext<TermContextValue>([
   {
     term: '',
-    oscar: (null as unknown) as Oscar,
+    oscar: EMPTY_OSCAR,
     ...defaultTermData
   },
   {
