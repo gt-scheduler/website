@@ -1,9 +1,51 @@
 import axios from 'axios';
-import { Section } from '.';
+import { Oscar, Section } from '.';
+import {
+  CourseGpa,
+  CrawlerCourse,
+  CrawlerPrerequisites,
+  Period
+} from '../types';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
 
+interface SectionGroupMeeting {
+  days: string[];
+  period: Period | undefined;
+}
+
+interface SectionGroup {
+  /**
+   * Equal to`JSON.stringify(this.sectionGroupMeetings)`
+   */
+  hash: string;
+  meetings: SectionGroupMeeting[];
+  sections: Section[];
+}
+
 class Course {
-  constructor(oscar, courseId, data) {
+  id: string;
+
+  subject: string;
+
+  number: string;
+
+  title: string;
+
+  sections: Section[];
+
+  prereqs: CrawlerPrerequisites;
+
+  hasLab: boolean;
+
+  onlyLectures: Section[] | undefined;
+
+  onlyLabs: Section[] | undefined;
+
+  allInOnes: Section[] | undefined;
+
+  sectionGroups: Record<string, SectionGroup> | undefined;
+
+  constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     const [title, sections, prereqs] = data;
 
     this.id = courseId;
@@ -20,7 +62,7 @@ class Course {
     const onlyLabs = this.sections.filter(
       (section) => isLab(section) && !isLecture(section)
     );
-    this.hasLab = onlyLectures.length && onlyLabs.length;
+    this.hasLab = !!onlyLectures.length && !!onlyLabs.length;
     if (this.hasLab) {
       for (const lecture of onlyLectures) {
         lecture.associatedLabs = onlyLabs.filter((lab) =>
@@ -58,13 +100,15 @@ class Course {
     }
   }
 
-  distinct(sections) {
-    const groups = {};
+  distinct(sections: Section[]): Record<string, SectionGroup> {
+    const groups: Record<string, SectionGroup> = {};
     sections.forEach((section) => {
-      const sectionGroupMeetings = section.meetings.map(({ days, period }) => ({
-        days,
-        period
-      }));
+      const sectionGroupMeetings = section.meetings.map<SectionGroupMeeting>(
+        ({ days, period }) => ({
+          days,
+          period
+        })
+      );
       const sectionGroupHash = JSON.stringify(sectionGroupMeetings);
       const sectionGroup = groups[sectionGroupHash];
       if (sectionGroup) {
@@ -80,7 +124,7 @@ class Course {
     return groups;
   }
 
-  async fetchGpa() {
+  async fetchGpa(): Promise<CourseGpa> {
     const base =
       'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
     // We have to clean up the course ID before sending it to the API,
@@ -100,9 +144,9 @@ class Course {
       .then((response) => {
         const { data } = response;
         const averageGpa = data.header[0].avg_gpa;
-        const gpaMap = { averageGpa };
+        const gpaMap: CourseGpa = { averageGpa };
 
-        data.raw.forEach((datum) => {
+        data.raw.forEach((datum: { instructor_name: string; GPA: number }) => {
           const instructor = datum.instructor_name;
           const gpa = datum.GPA;
 

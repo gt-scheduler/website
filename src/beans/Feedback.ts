@@ -1,10 +1,15 @@
 import axios from 'axios';
 import { BACKEND_BASE_URL } from '../constants';
 
-// Returns a axios chain
-const FormSubmit = ({ rating, feedback }) => {
+const FormSubmit = async ({
+  rating,
+  feedback
+}: {
+  rating: number;
+  feedback: string;
+}): Promise<void> => {
   const url = `${BACKEND_BASE_URL}/feedback`;
-  return axios({
+  await axios({
     method: 'post',
     url,
     data: {

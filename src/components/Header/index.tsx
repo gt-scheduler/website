@@ -53,7 +53,8 @@ const Header = ({
 
   const totalCredits = useMemo(() => {
     return pinnedCrns.reduce((credits, crn) => {
-      return credits + oscar.findSection(crn).credits;
+      const crnSection = oscar.findSection(crn);
+      return credits + (crnSection != null ? crnSection.credits : 0);
     }, 0);
   }, [pinnedCrns, oscar]);
 
@@ -66,8 +67,9 @@ const Header = ({
 
     pinnedCrns.forEach((crn) => {
       const section = oscar.findSection(crn);
-      // TODO supply better types
-      section.meetings.forEach((meeting: any) => {
+      if (section == null) return;
+
+      section.meetings.forEach((meeting) => {
         if (!meeting.period || !meeting.days.length) return;
         const { from, to } = meeting.dateRange;
         const subject = section.course.id;
@@ -87,10 +89,12 @@ const Header = ({
         const rrule = {
           freq: 'WEEKLY',
           until: to,
-          byday: meeting.days.map(
-            (day: 'M' | 'T' | 'W' | 'R' | 'F') =>
-              ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day])
-          )
+          byday: meeting.days
+            .map(
+              (day) =>
+                ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
+            )
+            .filter((day) => !!day)
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
       });

@@ -2,9 +2,69 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import { unique } from '../utils';
 import { DELIVERY_MODES, BACKEND_BASE_URL } from '../constants';
+import Course from './Course';
+import Oscar from './Oscar';
+import { CrawlerMeeting, Meeting } from '../types';
+
+export type Seating = [
+  seating:
+    | [] // Loading state
+    | [
+        // Loaded state
+        seatsCurrent: number,
+        seatsTotal: number,
+        waitlistCurrent: number,
+        waitlistTotal: number
+      ]
+    | string[], // Error state
+  fetchTime: number
+];
+
+type SectionConstructionData = [
+  crn: string,
+  meetings: CrawlerMeeting[],
+  credits: number,
+  scheduleTypeIndex: number,
+  campusIndex: number,
+  attributeIndices: number[],
+  gradeBasisIndex: number
+];
 
 class Section {
-  constructor(oscar, course, sectionId, data) {
+  course: Course;
+
+  id: string;
+
+  crn: string;
+
+  seating: Seating;
+
+  credits: number;
+
+  scheduleType: string;
+
+  campus: string;
+
+  deliveryMode: string | undefined;
+
+  gradeBasis: string;
+
+  meetings: Meeting[];
+
+  instructors: string[];
+
+  // This field is initialized after construction inside `Course.constructor`
+  associatedLabs: Section[];
+
+  // This field is initialized after construction inside `Course.constructor`
+  associatedLectures: Section[];
+
+  constructor(
+    oscar: Oscar,
+    course: Course,
+    sectionId: string,
+    data: SectionConstructionData
+  ) {
     const [
       crn,
       meetings,
@@ -31,7 +91,7 @@ class Section {
     );
 
     this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
-    this.meetings = meetings.map(
+    this.meetings = meetings.map<Meeting>(
       ([
         periodIndex,
         days,
@@ -41,7 +101,7 @@ class Section {
         dateRangeIndex
       ]) => ({
         period: oscar.periods[periodIndex],
-        days: days === '&nbsp;' ? [] : [...days],
+        days: days === '&nbsp;' ? [] : days.split(''),
         where,
         location: oscar.locations[locationIndex],
         instructors: instructors.map((instructor) =>
@@ -51,14 +111,18 @@ class Section {
       })
     );
     this.instructors = unique(
-      this.meetings.reduce(
-        (instructors, meeting) => [...instructors, ...meeting.instructors],
-        []
-      )
+      this.meetings
+        .map<string[]>(({ instructors }) => instructors)
+        .reduce((accum, instructors) => [...accum, ...instructors], [])
     );
+
+    // These fields are initialized after construction
+    // inside `Course.constructor`
+    this.associatedLabs = [];
+    this.associatedLectures = [];
   }
 
-  async fetchSeating(term) {
+  async fetchSeating(term: string): Promise<Seating> {
     const prevDate = this.seating[1];
     const currDate = Date.now();
 
