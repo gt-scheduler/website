@@ -10,12 +10,11 @@ export function isTheme(theme: string): theme is Theme {
   }
 }
 
-// TODO(jazevedo620) 2020-11-02: ensure types are correct
 export type TermData = {
   desiredCourses: string[];
   pinnedCrns: string[];
   excludedCrns: string[];
-  colorMap: Record<string, string | undefined>;
+  colorMap: SafeRecord<string, string>;
   sortingOptionIndex: number;
 };
 
@@ -42,8 +41,8 @@ export type ICS = {
 
 export interface Combination {
   crns: string[];
-  startMap: Record<string, number | undefined>;
-  endMap: Record<string, number | undefined>;
+  startMap: SafeRecord<string, number>;
+  endMap: SafeRecord<string, number>;
 }
 
 export interface Period {
@@ -247,8 +246,8 @@ export type CrawlerCourse = [
    * a JSON object with information about each section of the course;
    * the section IDs are the keys (`"A"`, `"B"`, `"S2"`, etc.)
    */
-  // ! Type had `undefined` explicitly added to ensure we check when accessing
-  sections: Record<string, CrawlerSection | undefined>,
+  // ! Type had `SafeRecord` explicitly added to ensure we check when accessing
+  sections: SafeRecord<string, CrawlerSection>,
   /**
      * a tree of prerequisite classes and the necessary grades in them
      * (using boolean expressions in prefix order)
@@ -288,7 +287,8 @@ export interface CrawlerTermData {
    * this makes up the vast bulk of the resultant JSON.
    * The course IDs are the keys (`"ACCT 2101"`, `"CS 2340"`, etc.)
    */
-  courses: Record<string, CrawlerCourse | undefined>;
+  // ! Type had `SafeRecord` explicitly added to ensure we check when accessing
+  courses: SafeRecord<string, CrawlerCourse>;
   /**
    * Contains data shared by multiple class descriptions
    */

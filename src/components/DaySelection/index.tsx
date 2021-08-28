@@ -2,7 +2,7 @@ import React from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { ActionRow } from '..';
 import { classes, getContentClassName } from '../../utils';
-import { Period } from '../../types';
+import { Period, SafeRecord } from '../../types';
 
 import './stylesheet.scss';
 
@@ -29,7 +29,7 @@ export interface CourseDateItem {
 }
 
 export type DaySelectionProps = {
-  courseDateMap: Record<Day, CourseDateItem[]>;
+  courseDateMap: SafeRecord<Day, CourseDateItem[]>;
   activeDay: Day | '';
   setActiveDay: (next: Day | '') => void;
 };
@@ -65,6 +65,7 @@ export default function DaySelection({
     <div className="date-container">
       {Object.keys(courseDateMap).map((date, i) => {
         if (!isDay(date)) return null;
+        const courses = courseDateMap[date];
         return (
           <div
             key={date}
@@ -88,12 +89,12 @@ export default function DaySelection({
             />
             {activeDay === date && (
               <div className="dropdown-content">
-                {courseDateMap[date].length === 0 ? (
+                {courses == null || courses.length === 0 ? (
                   <div className="course-content" style={{ padding: 8 }}>
                     No classes this day!
                   </div>
                 ) : (
-                  courseDateMap[date].map((course) => {
+                  courses.map((course) => {
                     let timeLabel = 'TBA';
                     const { times } = course;
                     if (times != null) {

@@ -5,12 +5,13 @@ import { TermContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 
 import './stylesheet.scss';
+import { SafeRecord } from '../../types';
 
 const Map = () => {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('M');
   const locations: MapLocation[] = [];
-  const courseDateMap: Record<Day, CourseDateItem[]> = {
+  const courseDateMap: SafeRecord<Day, CourseDateItem[]> = {
     M: [],
     T: [],
     W: [],
@@ -26,12 +27,14 @@ const Map = () => {
     const meetings = section.meetings[0];
     meetings.days.forEach((day) => {
       if (!isDay(day)) return;
-      courseDateMap[day].push({
+      const courses = courseDateMap[day] ?? [];
+      courses.push({
         id: section.course.id,
         title: section.course.title,
         times: meetings.period,
         daysOfWeek: meetings.days
       });
+      courseDateMap[day] = courses;
     });
 
     locations.push({
@@ -47,7 +50,7 @@ const Map = () => {
   let activeLocations: MapLocation[] = [];
   if (activeDay !== '') {
     activeLocations = locations.filter((loc) =>
-      courseDateMap[activeDay].some((course) => course.id === loc.id)
+      (courseDateMap[activeDay] ?? []).some((course) => course.id === loc.id)
     );
   }
 

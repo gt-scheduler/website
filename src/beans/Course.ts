@@ -4,7 +4,8 @@ import {
   CourseGpa,
   CrawlerCourse,
   CrawlerPrerequisites,
-  Period
+  Period,
+  SafeRecord
 } from '../types';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
 
@@ -43,7 +44,7 @@ class Course {
 
   allInOnes: Section[] | undefined;
 
-  sectionGroups: Record<string, SectionGroup | undefined> | undefined;
+  sectionGroups: SafeRecord<string, SectionGroup> | undefined;
 
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     const [title, sections, prereqs] = data;
@@ -102,8 +103,8 @@ class Course {
     }
   }
 
-  distinct(sections: Section[]): Record<string, SectionGroup | undefined> {
-    const groups: Record<string, SectionGroup | undefined> = {};
+  distinct(sections: Section[]): SafeRecord<string, SectionGroup> {
+    const groups: SafeRecord<string, SectionGroup> = {};
     sections.forEach((section) => {
       const sectionGroupMeetings = section.meetings.map<SectionGroupMeeting>(
         ({ days, period }) => ({

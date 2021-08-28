@@ -6,7 +6,8 @@ import {
   DateRange,
   Location,
   CrawlerTermData,
-  CrawlerCourse
+  CrawlerCourse,
+  SafeRecord
 } from '../types';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
@@ -33,9 +34,9 @@ class Oscar {
 
   courses: Course[];
 
-  courseMap: Record<string, Course | undefined>;
+  courseMap: SafeRecord<string, Course>;
 
-  crnMap: Record<string, Section | undefined>;
+  crnMap: SafeRecord<string, Section>;
 
   sortingOptions: SortingOption[];
 
@@ -187,8 +188,8 @@ class Oscar {
     };
     dfs();
     return crnsList.map((crns) => {
-      const startMap: Record<string, number | undefined> = {};
-      const endMap: Record<string, number | undefined> = {};
+      const startMap: SafeRecord<string, number> = {};
+      const endMap: SafeRecord<string, number> = {};
       this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
         if (period === undefined) return;
         const end = endMap[day];
