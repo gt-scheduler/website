@@ -34,7 +34,7 @@ export default function Section({
   const [seating, setSeating] = useState<Seating>([[], 0]);
 
   let hovering = false;
-  const handleHover = () => {
+  const handleHover = (): void => {
     hovering = true;
     setTimeout(async () => {
       if (hovering) setSeating(await section.fetchSeating(term));
@@ -72,12 +72,12 @@ export default function Section({
     <ActionRow
       label={section.id}
       className={classes('Section', className)}
-      onMouseEnter={() => setOverlayCrns([section.crn])}
-      onMouseLeave={() => setOverlayCrns([])}
+      onMouseEnter={(): void => setOverlayCrns([section.crn])}
+      onMouseLeave={(): void => setOverlayCrns([])}
       actions={[
         {
           icon: pinned ? faTimes : faThumbtack,
-          onClick: () => pinSection(section)
+          onClick: (): void => pinSection(section)
         },
         {
           icon: faChair,
@@ -89,7 +89,7 @@ export default function Section({
           icon: faBan,
           dataTip: true,
           dataFor: excludeTooltipId,
-          onClick: () => excludeSection(section)
+          onClick: (): void => excludeSection(section)
         }
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
@@ -126,8 +126,8 @@ export default function Section({
           type="dark"
           place="right"
           effect="solid"
-          afterShow={() => handleHover()}
-          afterHide={() => {
+          afterShow={(): void => handleHover()}
+          afterHide={(): void => {
             hovering = false;
           }}
         >

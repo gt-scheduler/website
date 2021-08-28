@@ -15,7 +15,11 @@ export type NavDrawerProps = {
 /**
  * Renders a nav drawer and the overlay when it is open
  */
-const NavDrawer = ({ open, onClose, children }: NavDrawerProps) => {
+export default function NavDrawer({
+  open,
+  onClose,
+  children
+}: NavDrawerProps): React.ReactElement {
   return (
     <>
       <div
@@ -34,6 +38,4 @@ const NavDrawer = ({ open, onClose, children }: NavDrawerProps) => {
       </div>
     </>
   );
-};
-
-export default NavDrawer;
+}

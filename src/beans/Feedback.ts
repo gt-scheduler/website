@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { BACKEND_BASE_URL } from '../constants';
 
-const FormSubmit = async ({
+export default async function FormSubmit({
   rating,
   feedback
 }: {
   rating: number;
   feedback: string;
-}): Promise<void> => {
+}): Promise<void> {
   const url = `${BACKEND_BASE_URL}/feedback`;
   await axios({
     method: 'post',
@@ -20,6 +20,4 @@ const FormSubmit = async ({
       'Content-Type': 'application/json;charset=UTF-8'
     }
   });
-};
-
-export default FormSubmit;
+}

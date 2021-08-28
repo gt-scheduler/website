@@ -7,7 +7,7 @@ import { useMobile } from '../../hooks';
 /**
  * Wraps around the root top-level component of the Scheduler tab
  */
-const Scheduler = () => {
+export default function Scheduler(): React.ReactElement {
   const mobile = useMobile();
 
   // Store the current set of CRNs that are shown on the Calendar overlay
@@ -30,7 +30,7 @@ const Scheduler = () => {
             <Button
               key={tabTitle}
               className={classes('tab', tabIndex === i && 'active')}
-              onClick={() => setTabIndex(i)}
+              onClick={(): void => setTabIndex(i)}
             >
               {tabTitle}
             </Button>
@@ -50,6 +50,4 @@ const Scheduler = () => {
       </OverlayCrnsContext.Provider>
     </>
   );
-};
-
-export default Scheduler;
+}

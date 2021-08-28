@@ -13,7 +13,7 @@ import {
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
 
-class Oscar {
+export default class Oscar {
   periods: (Period | undefined)[];
 
   dateRanges: DateRange[];
@@ -129,10 +129,11 @@ class Oscar {
       }
       const course = this.findCourse(desiredCourses[courseIndex]);
       if (course === undefined) return;
-      const isIncluded = (section: Section) =>
+      const isIncluded = (section: Section): boolean =>
         !excludedCrns.includes(section.crn);
-      const isPinned = (section: Section) => pinnedCrns.includes(section.crn);
-      const hasConflict = (section: Section) =>
+      const isPinned = (section: Section): boolean =>
+        pinnedCrns.includes(section.crn);
+      const hasConflict = (section: Section): boolean =>
         [...pinnedCrns, ...crns].some((crn) => {
           const crnSection = this.findSection(crn);
           if (crnSection === undefined) return false;
@@ -236,8 +237,6 @@ class Oscar {
     });
   }
 }
-
-export default Oscar;
 
 /**
  * Create an empty instance of the Oscar bean

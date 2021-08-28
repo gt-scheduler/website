@@ -14,7 +14,7 @@ export default function Feedback(): React.ReactElement {
   const [feedback, setFeedback] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setLoading(true);
     // Add 1 to the rating to move it from [0,4] to [1,5]
     FormSubmit({ rating: (rating ?? 0) + 1, feedback })
@@ -31,7 +31,10 @@ export default function Feedback(): React.ReactElement {
   return (
     <div>
       {!expanded && (
-        <Button className="FeedbackButton" onClick={() => setExpanded(true)}>
+        <Button
+          className="FeedbackButton"
+          onClick={(): void => setExpanded(true)}
+        >
           <FontAwesomeIcon icon={faCommentAlt} size="2x" />
         </Button>
       )}
@@ -42,7 +45,7 @@ export default function Feedback(): React.ReactElement {
               <FontAwesomeIcon
                 icon={faTimes}
                 className="CloseIcon"
-                onClick={() => setExpanded(false)}
+                onClick={(): void => setExpanded(false)}
               />
               <h3 className="FeedbackTitle">Feedback</h3>
               {!submit && (
@@ -55,7 +58,7 @@ export default function Feedback(): React.ReactElement {
                           'FormButton',
                           rating === i - 1 && 'active'
                         )}
-                        onClick={() => setRating(i - 1)}
+                        onClick={(): void => setRating(i - 1)}
                       >
                         {i}
                       </Button>
@@ -72,7 +75,7 @@ export default function Feedback(): React.ReactElement {
                   <textarea
                     className="FeedbackTextArea"
                     placeholder="Please let us know if you have any more feedback!"
-                    onChange={(event) => setFeedback(event.target.value)}
+                    onChange={(event): void => setFeedback(event.target.value)}
                     value={feedback}
                   />
                   <Button
@@ -92,7 +95,7 @@ export default function Feedback(): React.ReactElement {
                   <div>
                     <Button
                       className="SubmitButton"
-                      onClick={() => setExpanded(false)}
+                      onClick={(): void => setExpanded(false)}
                     >
                       Close
                     </Button>

@@ -5,7 +5,7 @@ import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export default function CourseContainer() {
+export default function CourseContainer(): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(TermContext);
 
   return (

@@ -30,7 +30,7 @@ export default function ActionRow({
   children,
   actions,
   ...restProps
-}: ActionRowProps) {
+}: ActionRowProps): React.ReactElement {
   return (
     <div className={classes('ActionRow', className)} {...restProps}>
       <div className="action-row-header">

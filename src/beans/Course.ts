@@ -23,7 +23,7 @@ interface SectionGroup {
   sections: Section[];
 }
 
-class Course {
+export default class Course {
   id: string;
 
   subject: string;
@@ -167,5 +167,3 @@ class Course {
       });
   }
 }
-
-export default Course;

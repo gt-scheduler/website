@@ -117,14 +117,17 @@ export default function Course({
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const prereqControl = (nextPrereqOpen: boolean, nextExpanded: boolean) => {
+  const prereqControl = (
+    nextPrereqOpen: boolean,
+    nextExpanded: boolean
+  ): void => {
     setPrereqOpen(nextPrereqOpen);
     setExpanded(nextExpanded);
   };
   const prereqAction = {
     icon: faShareAlt,
     styling: { transform: 'rotate(90deg)' },
-    onClick: () => {
+    onClick: (): void => {
       prereqControl(true, !prereqOpen ? true : !expanded);
     }
   };
@@ -165,14 +168,17 @@ export default function Course({
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: () => prereqControl(false, !expanded)
+                  onClick: (): void => prereqControl(false, !expanded)
                 },
                 hasPrereqs ? prereqAction : infoAction,
                 {
                   icon: faPalette,
-                  onClick: () => setPaletteShown(!paletteShown)
+                  onClick: (): void => setPaletteShown(!paletteShown)
                 },
-                { icon: faTrash, onClick: () => handleRemoveCourse(course) }
+                {
+                  icon: faTrash,
+                  onClick: (): void => handleRemoveCourse(course)
+                }
               ]
         }
       >
@@ -204,11 +210,11 @@ export default function Course({
         {paletteShown && (
           <Palette
             className="palette"
-            onSelectColor={(col) =>
+            onSelectColor={(col): void =>
               patchTermData({ colorMap: { ...colorMap, [courseId]: col } })
             }
             color={color ?? null}
-            onMouseLeave={() => setPaletteShown(false)}
+            onMouseLeave={(): void => setPaletteShown(false)}
           />
         )}
       </ActionRow>
@@ -241,7 +247,7 @@ export default function Course({
                 <span
                   className="excluded-instructor"
                   key={name}
-                  onClick={() => {
+                  onClick={(): void => {
                     const instructorSections = instructorMap[name];
                     if (instructorSections == null) return;
                     handleIncludeSections(instructorSections);

@@ -19,7 +19,9 @@ export type MapViewProps = {
   locations: MapLocation[];
 };
 
-const MapView = ({ locations }: MapViewProps): React.ReactElement => {
+export default function MapView({
+  locations
+}: MapViewProps): React.ReactElement {
   const [viewState, setViewState] = useState<ViewState>({
     latitude: 33.7765,
     longitude: -84.3963,
@@ -39,7 +41,7 @@ const MapView = ({ locations }: MapViewProps): React.ReactElement => {
         viewState={viewState}
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-        onViewStateChange={(newViewState: ViewState) =>
+        onViewStateChange={(newViewState: ViewState): void =>
           setViewState(newViewState)
         }
       >
@@ -75,6 +77,4 @@ const MapView = ({ locations }: MapViewProps): React.ReactElement => {
       </ReactMapGL>
     </div>
   );
-};
-
-export default MapView;
+}

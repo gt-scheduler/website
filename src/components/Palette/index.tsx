@@ -24,7 +24,7 @@ export default function Palette({
               className={classes('color', paletteColor === color && 'frame')}
               key={paletteColor}
               style={{ backgroundColor: paletteColor }}
-              onClick={() => onSelectColor(paletteColor)}
+              onClick={(): void => onSelectColor(paletteColor)}
             />
           ))}
         </div>

@@ -77,7 +77,7 @@ export default function Instructor({
         actions={[
           {
             icon: expanded ? faAngleUp : faAngleDown,
-            onClick: () => setExpanded(!expanded)
+            onClick: (): void => setExpanded(!expanded)
           },
           !['TBA', 'Not Assigned'].includes(name)
             ? {
@@ -91,7 +91,7 @@ export default function Instructor({
             icon: faBan,
             dataTip: true,
             dataFor: excludeTooltipId,
-            onClick: () => excludeSections(sections)
+            onClick: (): void => excludeSections(sections)
           }
         ]}
         style={instructorPinned ? { backgroundColor: color } : undefined}
@@ -128,7 +128,7 @@ export default function Instructor({
                 <span
                   className="excluded-section"
                   key={section.id}
-                  onClick={() => includeSection(section)}
+                  onClick={(): void => includeSection(section)}
                 >
                   {section.id}
                 </span>

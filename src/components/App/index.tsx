@@ -23,7 +23,7 @@ import './stylesheet.scss';
 
 const NAV_TABS = ['Scheduler', 'Map'];
 
-const App = (): React.ReactElement => {
+export default function App(): React.ReactElement {
   const [terms, setTerms] = useState<string[]>([]);
   const [oscar, setOscar] = useState<Oscar | null>(null);
 
@@ -36,9 +36,9 @@ const App = (): React.ReactElement => {
   // (fixes issues where a CRN/course is removed from Oscar
   // after a schedule was made with them)
   const filteredTermData = useMemo(() => {
-    const courseFilter = (courseId: string) =>
+    const courseFilter = (courseId: string): boolean =>
       oscar != null && oscar.findCourse(courseId) != null;
-    const crnFilter = (crn: string) =>
+    const crnFilter = (crn: string): boolean =>
       oscar != null && oscar.findSection(crn) != null;
 
     const desiredCourses = termData.desiredCourses.filter(courseFilter);
@@ -206,6 +206,4 @@ const App = (): React.ReactElement => {
       </TermsContext.Provider>
     </ThemeContext.Provider>
   );
-};
-
-export default App;
+}

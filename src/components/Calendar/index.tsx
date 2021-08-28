@@ -39,7 +39,7 @@ export default function Calendar({
     curCrn: string,
     curPeriod: Period,
     newRowSize: number
-  ) => {
+  ): void => {
     if (seen.has(curCrn)) {
       return;
     }
@@ -64,7 +64,7 @@ export default function Calendar({
   };
 
   const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
-  const maxMeetingLen = (crn: string) => {
+  const maxMeetingLen = (crn: string): number => {
     const section = oscar.findSection(crn);
     if (section == null) return 0;
     return Math.max(

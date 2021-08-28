@@ -22,7 +22,7 @@ export default function Select<V extends string | number>({
   value,
   onChange,
   options
-}: SelectProps<V>) {
+}: SelectProps<V>): React.ReactElement {
   const [opened, setOpened] = useState(false);
 
   const selectedOption = options.find((option) => option.value === value);
@@ -31,18 +31,20 @@ export default function Select<V extends string | number>({
   return (
     <div
       className={classes('Button', 'Select', className)}
-      onClick={() => setOpened(!opened)}
+      onClick={(): void => setOpened(!opened)}
     >
       <div className="text">{label}</div>
       <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-      {opened && <div className="intercept" onClick={() => setOpened(false)} />}
+      {opened && (
+        <div className="intercept" onClick={(): void => setOpened(false)} />
+      )}
       {opened && (
         <div className="option-container">
           {options.map(({ value: optionValue, label: optionLabel }) => (
             <Button
               className="option"
               key={optionValue}
-              onClick={() => onChange(optionValue)}
+              onClick={(): void => onChange(optionValue)}
             >
               {optionLabel}
             </Button>

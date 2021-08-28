@@ -15,25 +15,23 @@ export type NavMenuProps = {
 /**
  * Renders a vertical nav menu with a single active item
  */
-const NavMenu = ({
+export default function NavMenu({
   items,
   currentItem,
   onChangeItem,
   className,
   style
-}: NavMenuProps) => {
+}: NavMenuProps): React.ReactElement {
   return (
     <div className={classes('nav-menu', className)} style={style}>
       {items.map((item, idx) => (
         <Button
           className={classes('nav-button', currentItem === idx && 'active')}
-          onClick={() => onChangeItem(idx)}
+          onClick={(): void => onChangeItem(idx)}
         >
           {item}
         </Button>
       ))}
     </div>
   );
-};
-
-export default NavMenu;
+}

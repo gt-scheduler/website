@@ -30,7 +30,7 @@ type SectionConstructionData = [
   gradeBasisIndex: number
 ];
 
-class Section {
+export default class Section {
   course: Course;
 
   id: string;
@@ -158,5 +158,3 @@ class Section {
     return this.seating;
   }
 }
-
-export default Section;

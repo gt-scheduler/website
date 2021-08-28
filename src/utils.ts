@@ -58,8 +58,9 @@ const hasConflictBetween = (section1: Section, section2: Section): boolean =>
     )
   );
 
-const classes = (...classList: (string | boolean | null | undefined)[]) =>
-  classList.filter((c) => c).join(' ');
+const classes = (
+  ...classList: (string | boolean | null | undefined)[]
+): string => classList.filter((c) => c).join(' ');
 
 const isMobile = (): boolean => window.innerWidth < 1024;
 
@@ -80,7 +81,7 @@ const isLecture = (section: Section): boolean =>
 
 const getSemesterName = (term: string): string => {
   const year = term.substring(0, 4);
-  const semester = (() => {
+  const semester = ((): string => {
     switch (Number.parseInt(term.substring(4), 10)) {
       case 1:
         return 'Winter';
@@ -120,7 +121,8 @@ const decryptReqs = (
   // that itself is of the form [operator, ...sub-clauses]).
   // As such, we compare to the clause length - 2
   // (since the sub-clauses[0] is really reqs[1])
-  const last = (i: number) => Array.isArray(reqs) && i === reqs.length - 2;
+  const last = (i: number): boolean =>
+    Array.isArray(reqs) && i === reqs.length - 2;
   let string = '';
 
   if (!Array.isArray(reqs)) {

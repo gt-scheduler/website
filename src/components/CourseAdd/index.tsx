@@ -217,8 +217,8 @@ export default function CourseAdd({
             name={name}
             labels={labels}
             selectedTags={filter[property]}
-            onReset={() => handleResetFilter(property)}
-            onToggle={(tag) => handleToggleFilter(property, tag)}
+            onReset={(): void => handleResetFilter(property)}
+            onToggle={(tag): void => handleToggleFilter(property, tag)}
           />
         ))}
       </div>
@@ -228,7 +228,7 @@ export default function CourseAdd({
             key={course.id}
             className={classes(course === activeCourse && 'active')}
             courseId={course.id}
-            onAddCourse={() => handleAddCourse(course)}
+            onAddCourse={(): void => handleAddCourse(course)}
           />
         ))
       ) : (

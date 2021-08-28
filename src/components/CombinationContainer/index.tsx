@@ -33,7 +33,9 @@ export default function CombinationContainer(): React.ReactElement {
     <div className="CombinationContainer">
       <Select
         // eslint-disable-next-line no-shadow
-        onChange={(sortingOptionIndex) => patchTermData({ sortingOptionIndex })}
+        onChange={(sortingOptionIndex): void =>
+          patchTermData({ sortingOptionIndex })
+        }
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({
           value: i,
@@ -49,22 +51,22 @@ export default function CombinationContainer(): React.ReactElement {
       </Button>
       <div className="scroller">
         <AutoSizer>
-          {({ width, height }) => (
+          {({ width, height }): React.ReactElement => (
             <List
               width={width}
               height={height}
               style={{ outline: 'none' }}
               rowCount={sortedCombinations.length}
               rowHeight={108}
-              rowRenderer={({ index, key, style }) => {
+              rowRenderer={({ index, key, style }): React.ReactElement => {
                 const { crns } = sortedCombinations[index];
                 return (
                   <div className="list-item" style={style} key={key}>
                     <div
                       className="combination"
-                      onMouseEnter={() => setOverlayCrns(crns)}
-                      onMouseLeave={() => setOverlayCrns([])}
-                      onClick={() =>
+                      onMouseEnter={(): void => setOverlayCrns(crns)}
+                      onMouseLeave={(): void => setOverlayCrns([])}
+                      onClick={(): void =>
                         patchTermData({
                           pinnedCrns: [...pinnedCrns, ...crns]
                         })

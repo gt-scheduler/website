@@ -26,7 +26,7 @@ export default function CourseFilter({
     <div className="CourseFilter">
       <div
         className={classes('header', selectedTags.length > 0 && 'active')}
-        onClick={() => setExpanded(!expanded)}
+        onClick={(): void => setExpanded(!expanded)}
       >
         {!expanded && selectedTags.length > 0 ? (
           <div
@@ -60,7 +60,7 @@ export default function CourseFilter({
               key={tag}
               className={classes('tag', selectedTags.includes(tag) && 'active')}
               property={tag}
-              onClick={() => onToggle(tag)}
+              onClick={(): void => onToggle(tag)}
             >
               {labels[tag]}
             </div>

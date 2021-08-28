@@ -7,7 +7,7 @@ import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 import './stylesheet.scss';
 import { SafeRecord } from '../../types';
 
-const Map = () => {
+export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('M');
   const locations: MapLocation[] = [];
@@ -64,6 +64,4 @@ const Map = () => {
       <MapView locations={activeLocations} />
     </div>
   );
-};
-
-export default Map;
+}

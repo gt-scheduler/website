@@ -1,8 +1,6 @@
 import React from 'react';
 
-const Comparison = (): React.ReactElement => {
+export default function Comparison(): React.ReactElement {
   // TODO implement
   return <>Not yet implemented</>;
-};
-
-export default Comparison;
+}

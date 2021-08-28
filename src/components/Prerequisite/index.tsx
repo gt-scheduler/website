@@ -65,7 +65,7 @@ export default function Prerequisite({
               : null,
             req && {
               icon: expanded ? faAngleUp : faAngleDown,
-              onClick: () => setExpanded(!expanded)
+              onClick: (): void => setExpanded(!expanded)
             }
           ]}
         />

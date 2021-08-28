@@ -34,12 +34,12 @@ export type HeaderProps = {
  * Renders the top header component,
  * and includes controls for top-level tab-based navigation
  */
-const Header = ({
+export default function Header({
   currentTab,
   onChangeTab,
   onToggleMenu,
   tabs
-}: HeaderProps) => {
+}: HeaderProps): React.ReactElement {
   const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
   const [terms] = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
@@ -164,7 +164,7 @@ const Header = ({
             <Tab
               key={tabIdx}
               active={tabIdx === currentTab}
-              onClick={() => onChangeTab(tabIdx)}
+              onClick={(): void => onChangeTab(tabIdx)}
               label={tabLabel}
             />
           ))}
@@ -205,7 +205,7 @@ const Header = ({
             effect="solid"
             event="click"
             delayHide={1000}
-            afterShow={() => {
+            afterShow={(): void => {
               copy(pinnedCrns.join(', '));
               setTimeout(
                 () => ReactTooltip.hide(crnButton.current ?? undefined),
@@ -233,6 +233,4 @@ const Header = ({
       </div>
     </div>
   );
-};
-
-export default Header;
+}
