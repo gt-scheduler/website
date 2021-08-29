@@ -4,83 +4,128 @@ import {
   faBan,
   faChair,
   faThumbtack,
-  faTimes
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
+
 import { classes, periodToString } from '../../utils';
 import { ActionRow } from '..';
-import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
+import { Section as SectionBean } from '../../beans';
+import { Seating } from '../../beans/Section';
+import { ErrorWithFields, softError } from '../../log';
 
-export default function Section({ className, section, pinned, color }) {
+import './stylesheet.scss';
+
+export type SectionProps = {
+  className?: string;
+  section: SectionBean;
+  pinned: boolean;
+  color: string | undefined;
+};
+
+export default function Section({
+  className,
+  section,
+  pinned,
+  color,
+}: SectionProps): React.ReactElement {
   const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
   );
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
-  const [seating, setSeating] = useState([[], []]);
+  const [seating, setSeating] = useState<Seating>([[], 0]);
 
   let hovering = false;
-  const handleHover = () => {
+  const handleHover = (): void => {
     hovering = true;
-    setTimeout(async () => {
-      if (hovering) setSeating(await section.fetchSeating(term));
+    setTimeout(() => {
+      if (hovering) {
+        section
+          .fetchSeating(term)
+          .then((newSeating) => {
+            setSeating(newSeating);
+          })
+          .catch((err) =>
+            softError(
+              new ErrorWithFields({
+                message: 'error while fetching seating',
+                source: err,
+                fields: { crn: section.crn },
+              })
+            )
+          );
+      }
     }, 333);
   };
 
   const excludeSection = useCallback(
-    (sect) => {
+    (sect: SectionBean) => {
       patchTermData({
         excludedCrns: [...excludedCrns, sect.crn],
-        pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
+        pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn),
       });
     },
     [pinnedCrns, excludedCrns, patchTermData]
   );
 
   const pinSection = useCallback(
-    (sect) => {
+    (sect: SectionBean) => {
       if (pinnedCrns.includes(sect.crn)) {
         patchTermData({
-          pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
+          pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn),
         });
       } else {
         patchTermData({
           pinnedCrns: [...pinnedCrns, sect.crn],
-          excludedCrns: excludedCrns.filter((crn) => crn !== sect.crn)
+          excludedCrns: excludedCrns.filter((crn) => crn !== sect.crn),
         });
       }
     },
     [pinnedCrns, excludedCrns, patchTermData]
   );
 
+  const excludeTooltipId = `section-exclude-${section.id}`;
   return (
     <ActionRow
       label={section.id}
       className={classes('Section', className)}
-      onMouseEnter={() => setOverlayCrns([section.crn])}
-      onMouseLeave={() => setOverlayCrns([])}
+      onMouseEnter={(): void => setOverlayCrns([section.crn])}
+      onMouseLeave={(): void => setOverlayCrns([])}
       actions={[
         {
           icon: pinned ? faTimes : faThumbtack,
-          onClick: () => pinSection(section)
+          onClick: (): void => pinSection(section),
         },
         {
           icon: faChair,
           dataTip: true,
           dataFor: section.id,
-          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`
+          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
           icon: faBan,
-          title: 'Exclude from Combinations',
-          onClick: () => excludeSection(section)
-        }
+          dataTip: true,
+          dataFor: excludeTooltipId,
+          onClick: (): void => excludeSection(section),
+        },
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
+      <ReactTooltip
+        id={excludeTooltipId}
+        className="tooltip"
+        type="dark"
+        place="right"
+        effect="solid"
+      >
+        Exclude from Combinations
+      </ReactTooltip>
       <div className="section-details">
         <div className="delivery-mode">
-          {DELIVERY_MODES[section.deliveryMode]}
+          {section.deliveryMode != null
+            ? DELIVERY_MODES[section.deliveryMode]
+            : ''}
         </div>
         <div className="meeting-container">
           {section.meetings.map((meeting, i) => {
@@ -99,8 +144,8 @@ export default function Section({ className, section, pinned, color }) {
           type="dark"
           place="right"
           effect="solid"
-          afterShow={() => handleHover()}
-          afterHide={() => {
+          afterShow={(): void => handleHover()}
+          afterHide={(): void => {
             hovering = false;
           }}
         >
@@ -114,7 +159,9 @@ export default function Section({ className, section, pinned, color }) {
                   {seating[0].length === 0
                     ? `Loading...`
                     : typeof seating[0][1] === 'number'
-                    ? `${seating[0][1]} of ${seating[0][0]}`
+                    ? `${seating[0][1] ?? '<unknown>'} of ${
+                        seating[0][0] ?? '<unknown>'
+                      }`
                     : `N/A`}
                 </td>
               </tr>
@@ -126,7 +173,9 @@ export default function Section({ className, section, pinned, color }) {
                   {seating[0].length === 0
                     ? `Loading...`
                     : typeof seating[0][1] === 'number'
-                    ? `${seating[0][3]} of ${seating[0][2]}`
+                    ? `${seating[0][3] ?? '<unknown>'} of ${
+                        seating[0][2] ?? '<unknown>'
+                      }`
                     : `N/A`}
                 </td>
               </tr>

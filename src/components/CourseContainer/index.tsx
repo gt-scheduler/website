@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
 import ago from 's-ago';
+
 import { Button, Course, CourseAdd } from '..';
-import 'react-virtualized/styles.css';
-import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export default function CourseContainer() {
+import 'react-virtualized/styles.css';
+import './stylesheet.scss';
+
+export default function CourseContainer(): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(TermContext);
 
   return (
@@ -13,7 +15,7 @@ export default function CourseContainer() {
       <div className="scroller">
         <div className="course-list">
           {desiredCourses.map((courseId) => {
-            return <Course courseId={courseId} expandable key={courseId} />;
+            return <Course courseId={courseId} key={courseId} />;
           })}
         </div>
         <CourseAdd className="course-add" />

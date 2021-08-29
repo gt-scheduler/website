@@ -5,13 +5,14 @@ import {
   Period,
   DateRange,
   Location,
-  CrawlerTermData
+  CrawlerTermData,
 } from '../types';
+import { ErrorWithFields, softError } from '../log';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
 
-class Oscar {
+export default class Oscar {
   periods: (Period | undefined)[];
 
   dateRanges: DateRange[];
@@ -41,21 +42,54 @@ class Oscar {
   constructor(data: OscarConstructionDate) {
     const { courses, caches, updatedAt, version } = data;
 
-    this.periods = caches.periods.map((period) => {
+    this.periods = caches.periods.map((period, i) => {
       if (period === 'TBA') {
         return undefined;
       }
+
+      const periodSegments = period.split(' - ');
+      if (periodSegments.length !== 2) {
+        softError(
+          new ErrorWithFields({
+            message: 'period did not follow expected format',
+            fields: {
+              period,
+              cacheIndex: i,
+            },
+          })
+        );
+        return undefined;
+      }
+
+      const [start, end] = periodSegments as [string, string];
       return {
-        start: stringToTime(period.split(' - ')[0]),
-        end: stringToTime(period.split(' - ')[1])
+        start: stringToTime(start),
+        end: stringToTime(end),
       };
     });
-    this.dateRanges = caches.dateRanges.map((dateRange) => {
-      const [from, to] = dateRange.split(' - ').map((v) => new Date(v));
+
+    this.dateRanges = caches.dateRanges.map((dateRange, i) => {
+      let segments = dateRange.split(' - ');
+      if (segments.length !== 2) {
+        softError(
+          new ErrorWithFields({
+            message: 'date range did not follow expected format',
+            fields: {
+              dateRange,
+              cacheIndex: i,
+            },
+          })
+        );
+        // We need some fallback here
+        segments = ['Jan 1, 1970', 'Jan 2, 1970'];
+      }
+
+      const [from, to] = segments.map((v) => new Date(v)) as [Date, Date];
       from.setHours(0);
       to.setHours(23, 59, 59, 999);
       return { from, to };
     });
+
     this.scheduleTypes = caches.scheduleTypes;
     this.campuses = caches.campuses;
     this.attributes = caches.attributes;
@@ -63,9 +97,24 @@ class Oscar {
     this.locations = caches.locations;
     this.updatedAt = new Date(updatedAt);
     this.version = version;
-    this.courses = Object.keys(courses).map(
-      (courseId) => new Course(this, courseId, courses[courseId])
-    );
+
+    this.courses = Object.entries(courses).flatMap(([courseId, source]) => {
+      try {
+        return [new Course(this, courseId, source)];
+      } catch (err) {
+        softError(
+          new ErrorWithFields({
+            message: 'could not initialize Course bean',
+            fields: {
+              courseId,
+              source,
+            },
+          })
+        );
+        return [];
+      }
+    });
+
     this.courseMap = {};
     this.crnMap = {};
     this.courses.forEach((course) => {
@@ -74,29 +123,33 @@ class Oscar {
         this.crnMap[section.crn] = section;
       });
     });
+
     this.sortingOptions = [
       new SortingOption('Most Compact', (combination) => {
         const { startMap, endMap } = combination;
-        const diffs = Object.keys(startMap).map(
-          (day) => endMap[day] - startMap[day]
-        );
+        const diffs = Object.keys(startMap).map((day) => {
+          const end = endMap[day];
+          const start = startMap[day];
+          if (end == null || start == null) return 0;
+          return end - start;
+        });
         const sum = diffs.reduce((tot, min) => tot + min, 0);
         return +sum;
       }),
       new SortingOption('Earliest Ending', (combination) => {
         const { endMap } = combination;
         const ends = Object.values(endMap);
-        const sum = ends.reduce((tot, end) => tot + end, 0);
+        const sum = ends.reduce<number>((tot, end) => tot + (end ?? 0), 0);
         const avg = sum / ends.length;
         return +avg;
       }),
       new SortingOption('Latest Beginning', (combination) => {
         const { startMap } = combination;
         const starts = Object.values(startMap);
-        const sum = starts.reduce((tot, min) => tot + min, 0);
+        const sum = starts.reduce<number>((tot, min) => tot + (min ?? 0), 0);
         const avg = sum / starts.length;
         return -avg;
-      })
+      }),
     ];
   }
 
@@ -114,17 +167,20 @@ class Oscar {
     excludedCrns: string[]
   ): Combination[] {
     const crnsList: string[][] = [];
-    const dfs = (courseIndex: number = 0, crns: string[] = []): void => {
+    const dfs = (courseIndex = 0, crns: string[] = []): void => {
       if (courseIndex === desiredCourses.length) {
         crnsList.push(crns);
         return;
       }
-      const course = this.findCourse(desiredCourses[courseIndex]);
+      const courseId = desiredCourses[courseIndex];
+      if (courseId === undefined) return;
+      const course = this.findCourse(courseId);
       if (course === undefined) return;
-      const isIncluded = (section: Section) =>
+      const isIncluded = (section: Section): boolean =>
         !excludedCrns.includes(section.crn);
-      const isPinned = (section: Section) => pinnedCrns.includes(section.crn);
-      const hasConflict = (section: Section) =>
+      const isPinned = (section: Section): boolean =>
+        pinnedCrns.includes(section.crn);
+      const hasConflict = (section: Section): boolean =>
         [...pinnedCrns, ...crns].some((crn) => {
           const crnSection = this.findSection(crn);
           if (crnSection === undefined) return false;
@@ -170,7 +226,8 @@ class Oscar {
         // If a course does not have a lab, then `sectionGroups` should be
         // non-undefined, but we have to check anyways here to satisfy
         // TypeScript
-        Object.values(course.sectionGroups ?? []).forEach((sectionGroup) => {
+        Object.values(course.sectionGroups ?? {}).forEach((sectionGroup) => {
+          if (sectionGroup == null) return;
           const section = sectionGroup.sections.find(isIncluded);
           if (!section || hasConflict(section)) return;
           dfs(courseIndex + 1, [...crns, section.crn]);
@@ -183,15 +240,15 @@ class Oscar {
       const endMap: Record<string, number> = {};
       this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
         if (period === undefined) return;
-        if (!(day in startMap) || startMap[day] > period.start)
-          startMap[day] = period.start;
-        if (!(day in endMap) || endMap[day] < period.end)
-          endMap[day] = period.end;
+        const end = endMap[day];
+        const start = startMap[day];
+        if (start == null || start > period.start) startMap[day] = period.start;
+        if (end == null || end < period.end) endMap[day] = period.end;
       });
       return {
         crns,
         startMap,
-        endMap
+        endMap,
       };
     });
   }
@@ -201,10 +258,20 @@ class Oscar {
     sortingOptionIndex: number
   ): Combination[] {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
+    if (sortingOption === undefined) {
+      throw new ErrorWithFields({
+        message: `sorting option index was out of bounds`,
+        fields: {
+          sortingOptionIndex,
+          actualSortingOptionsLength: this.sortingOptions.length,
+        },
+      });
+    }
+
     return combinations
       .map((combination) => ({
         ...combination,
-        factor: sortingOption.calculateFactor(combination)
+        factor: sortingOption.calculateFactor(combination),
       }))
       .sort((a, b) => a.factor - b.factor);
   }
@@ -228,4 +295,21 @@ class Oscar {
   }
 }
 
-export default Oscar;
+/**
+ * Create an empty instance of the Oscar bean
+ * to use as the default context value
+ */
+export const EMPTY_OSCAR = new Oscar({
+  courses: {},
+  caches: {
+    periods: [],
+    dateRanges: [],
+    scheduleTypes: [],
+    campuses: [],
+    attributes: [],
+    gradeBases: [],
+    locations: [],
+  },
+  updatedAt: new Date(),
+  version: 1,
+});

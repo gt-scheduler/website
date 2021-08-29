@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { classes } from '../../utils';
+
 import './stylesheet.scss';
 
 export type ButtonProps = {
@@ -15,8 +17,8 @@ export default function Button({
   disabled = false,
   href,
   onClick,
-  children
-}: ButtonProps) {
+  children,
+}: ButtonProps): React.ReactElement {
   if (disabled)
     return (
       <div className={classes('Button', 'disabled', className)}>{children}</div>
@@ -39,7 +41,7 @@ export default function Button({
       className={classes('Button', className)}
       onClick={onClick}
       tabIndex={0}
-      onKeyDown={(event) => {
+      onKeyDown={(event): void => {
         // Intercept enter presses
         if (event.key === 'Enter' && onClick != null) onClick();
       }}

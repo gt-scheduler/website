@@ -1,21 +1,24 @@
 import React, { useCallback, useContext, useMemo } from 'react';
-import { AutoSizer, List } from 'react-virtualized/dist/commonjs';
+import { AutoSizer, List } from 'react-virtualized';
+
 import { Button, Calendar, Select } from '..';
+import { OverlayCrnsContext, TermContext } from '../../contexts';
+import { Combination } from '../../types';
+
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import { OverlayCrnsContext, TermContext } from '../../contexts';
 
-export default function CombinationContainer() {
+export default function CombinationContainer(): React.ReactElement {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
-    { patchTermData }
+    { patchTermData },
   ] = useContext(TermContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
 
   const handleResetPinnedCrns = useCallback(() => {
     if (window.confirm('Are you sure to reset sections you selected?')) {
       patchTermData({
-        pinnedCrns: []
+        pinnedCrns: [],
       });
     }
   }, [patchTermData]);
@@ -32,12 +35,13 @@ export default function CombinationContainer() {
   return (
     <div className="CombinationContainer">
       <Select
-        // eslint-disable-next-line no-shadow
-        onChange={(sortingOptionIndex) => patchTermData({ sortingOptionIndex })}
+        onChange={(newSortingOptionIndex): void =>
+          patchTermData({ sortingOptionIndex: newSortingOptionIndex })
+        }
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({
           value: i,
-          label: sortingOption.label
+          label: sortingOption.label,
         }))}
       />
       <Button
@@ -49,24 +53,24 @@ export default function CombinationContainer() {
       </Button>
       <div className="scroller">
         <AutoSizer>
-          {({ width, height }) => (
+          {({ width, height }): React.ReactElement => (
             <List
               width={width}
               height={height}
               style={{ outline: 'none' }}
               rowCount={sortedCombinations.length}
               rowHeight={108}
-              rowRenderer={({ index, key, style }) => {
-                const { crns } = sortedCombinations[index];
+              rowRenderer={({ index, key, style }): React.ReactElement => {
+                const { crns } = sortedCombinations[index] as Combination;
                 return (
                   <div className="list-item" style={style} key={key}>
                     <div
                       className="combination"
-                      onMouseEnter={() => setOverlayCrns(crns)}
-                      onMouseLeave={() => setOverlayCrns([])}
-                      onClick={() =>
+                      onMouseEnter={(): void => setOverlayCrns(crns)}
+                      onMouseLeave={(): void => setOverlayCrns([])}
+                      onClick={(): void =>
                         patchTermData({
-                          pinnedCrns: [...pinnedCrns, ...crns]
+                          pinnedCrns: [...pinnedCrns, ...crns],
                         })
                       }
                     >

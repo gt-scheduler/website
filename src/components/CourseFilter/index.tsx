@@ -1,35 +1,44 @@
 import React, { useState } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { classes, humanizeArray } from '../../utils';
+
+import { classes, humanizeArrayReact } from '../../utils';
+
 import './stylesheet.scss';
+
+export type CourseFilterProps = {
+  name: string;
+  labels: Record<string, string>;
+  selectedTags: string[];
+  onReset: () => void;
+  onToggle: (tag: string) => void;
+};
 
 export default function CourseFilter({
   name,
   labels,
   selectedTags,
   onReset,
-  onToggle
-}) {
+  onToggle,
+}: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="CourseFilter">
       <div
         className={classes('header', selectedTags.length > 0 && 'active')}
-        onClick={() => setExpanded(!expanded)}
+        onClick={(): void => setExpanded(!expanded)}
       >
         {!expanded && selectedTags.length > 0 ? (
-          <div
-            className="name"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{
-              __html: humanizeArray(
-                selectedTags.map((tag) => labels[tag]),
-                '<span class="or">or</span>'
-              )
-            }}
-          />
+          <div className="name">
+            {humanizeArrayReact(
+              selectedTags.flatMap<string>((tag) => {
+                const selectedTag = labels[tag];
+                return selectedTag != null ? [selectedTag] : [];
+              }),
+              <span className="or">or</span>
+            )}
+          </div>
         ) : (
           <div className="name">{name}</div>
         )}
@@ -48,7 +57,7 @@ export default function CourseFilter({
               key={tag}
               className={classes('tag', selectedTags.includes(tag) && 'active')}
               property={tag}
-              onClick={() => onToggle(tag)}
+              onClick={(): void => onToggle(tag)}
             >
               {labels[tag]}
             </div>

@@ -1,6 +1,6 @@
 import { Combination } from '../types';
 
-class SortingOption {
+export default class SortingOption {
   label: string;
 
   calculateFactor: (combo: Combination) => number;
@@ -10,5 +10,3 @@ class SortingOption {
     this.calculateFactor = calculateFactor;
   }
 }
-
-export default SortingOption;

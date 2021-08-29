@@ -1,15 +1,22 @@
+import React from 'react';
+
 import { Section } from './beans';
 import { DAYS, PALETTE } from './constants';
-import { Period, PrerequisiteClause, PrerequisiteCourse } from './types';
+import { Period, PrerequisiteClause } from './types';
 
-const stringToTime = (string: string): number => {
+export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
   if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = regexResult;
+  const [, hour, minute, ampm] = (regexResult as unknown) as [
+    string,
+    string,
+    string,
+    string
+  ];
   return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
-const timeToString = (time: number, ampm: boolean = true): string => {
+export const timeToString = (time: number, ampm = true): string => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
   const hh = hour > 12 ? hour - 12 : hour;
@@ -18,23 +25,24 @@ const timeToString = (time: number, ampm: boolean = true): string => {
   return ampm ? `${hh}:${mm} ${A}` : `${hh}:${mm}`;
 };
 
-const timeToShortString = (time: number): string => {
+export const timeToShortString = (time: number): string => {
   const hour = (time / 60) | 0;
   return `${hour > 12 ? hour - 12 : hour}${hour < 12 ? 'a' : 'p'}m`;
 };
 
-const periodToString = (period: Period): string =>
-  period
+export const periodToString = (period: Period | undefined): string =>
+  period != null
     ? `${timeToString(period.start, false)} - ${timeToString(period.end)}`
     : 'TBA';
 
-const getRandomColor = (): string => {
+export const getRandomColor = (): string => {
   const colors = PALETTE.flat();
   const index = (Math.random() * colors.length) | 0;
-  return colors[index];
+  return colors[index] ?? '#333333';
 };
 
-const getContentClassName = (color: string): string => {
+export const getContentClassName = (color: string | undefined): string => {
+  if (color == null) return 'light-content';
   const r = parseInt(color.substring(1, 3), 16);
   const g = parseInt(color.substring(3, 5), 16);
   const b = parseInt(color.substring(5, 7), 16);
@@ -43,7 +51,10 @@ const getContentClassName = (color: string): string => {
     : 'dark-content';
 };
 
-const hasConflictBetween = (section1: Section, section2: Section): boolean =>
+export const hasConflictBetween = (
+  section1: Section,
+  section2: Section
+): boolean =>
   section1.meetings.some((meeting1) =>
     section2.meetings.some(
       (meeting2) =>
@@ -57,29 +68,32 @@ const hasConflictBetween = (section1: Section, section2: Section): boolean =>
     )
   );
 
-const classes = (...classList: (string | boolean | null | undefined)[]) =>
-  classList.filter((c) => c).join(' ');
+export const classes = (
+  ...classList: (string | boolean | null | undefined)[]
+): string => classList.filter((c) => c).join(' ');
 
-const isMobile = (): boolean => window.innerWidth < 1024;
+export const isMobile = (): boolean => window.innerWidth < 1024;
 
-const simplifyName = (name: string): string => {
+export const simplifyName = (name: string): string => {
   const tokens = name.split(' ');
   const firstName = tokens.shift();
   const lastName = tokens.pop();
   return [firstName, lastName].join(' ');
 };
 
-const unique = <T>(array: T[]): T[] => Array.from(new Set(array));
+export function unique<T>(array: T[]): T[] {
+  return Array.from(new Set(array));
+}
 
-const isLab = (section: Section): boolean =>
+export const isLab = (section: Section): boolean =>
   ['Lab', 'Studio'].some((type) => section.scheduleType.includes(type));
 
-const isLecture = (section: Section): boolean =>
+export const isLecture = (section: Section): boolean =>
   section.scheduleType.includes('Lecture');
 
-const getSemesterName = (term: string): string => {
+export const getSemesterName = (term: string): string => {
   const year = term.substring(0, 4);
-  const semester = (() => {
+  const semester = ((): string => {
     switch (Number.parseInt(term.substring(4), 10)) {
       case 1:
         return 'Winter';
@@ -99,19 +113,46 @@ const getSemesterName = (term: string): string => {
   return `${semester} ${year}`;
 };
 
-const humanizeArray = <T>(array: T[], conjunction: string = 'and'): string => {
+export function humanizeArray<T>(array: T[], conjunction = 'and'): string {
   if (array.length <= 2) {
     return array.join(` ${conjunction} `);
   }
   const init = [...array];
   const last = init.pop();
-  return `${init.join(', ')}, ${conjunction} ${last}`;
-};
+  return `${init.join(', ')}, ${conjunction} ${String(last)}`;
+}
 
-const decryptReqs = (
+export function humanizeArrayReact<T>(
+  array: T[],
+  conjunction: React.ReactNode = 'and'
+): React.ReactNode {
+  if (array.length === 0) {
+    return null;
+  }
+  if (array.length === 1) {
+    return String(array[0]);
+  }
+  if (array.length === 2) {
+    return (
+      <>
+        {String(array[0])} {conjunction} {String(array[1])}
+      </>
+    );
+  }
+
+  const init = [...array];
+  const last = init.pop();
+  return (
+    <>
+      {`${init.join(', ')},`.trim()} {conjunction} {String(last)}
+    </>
+  );
+}
+
+export const decryptReqs = (
   reqs: PrerequisiteClause,
-  openPar: boolean = false,
-  closePar: boolean = false
+  openPar = false,
+  closePar = false
 ): string => {
   // This function accepts the index of a sub-clause
   // from the sub-clause slice of a compound prereq clause
@@ -119,7 +160,8 @@ const decryptReqs = (
   // that itself is of the form [operator, ...sub-clauses]).
   // As such, we compare to the clause length - 2
   // (since the sub-clauses[0] is really reqs[1])
-  const last = (i: number) => Array.isArray(reqs) && i === reqs.length - 2;
+  const last = (i: number): boolean =>
+    Array.isArray(reqs) && i === reqs.length - 2;
   let string = '';
 
   if (!Array.isArray(reqs)) {
@@ -134,34 +176,7 @@ const decryptReqs = (
     subClauses.forEach((req, i) => {
       string += decryptReqs(req) + (last(i) ? '' : ' or ');
     });
-  } else {
-    // TODO(jazevedo620) 08-24-2021: under what conditions is this code run?
-    // It seems like (if `reqs` is indeed of type `PrerequisiteClause`)
-    // that this code isn't run, but I'm wary of removing it for now
-    // until types are added to the dependent `<Prerequisite>` component.
-    (reqs as PrerequisiteCourse[]).forEach((req, i) => {
-      string += req.id + (i === reqs.length - 1 ? '' : ' or ');
-    });
   }
 
   return string;
-};
-
-export {
-  stringToTime,
-  timeToString,
-  timeToShortString,
-  periodToString,
-  getRandomColor,
-  getContentClassName,
-  hasConflictBetween,
-  classes,
-  isMobile,
-  simplifyName,
-  unique,
-  isLab,
-  isLecture,
-  getSemesterName,
-  humanizeArray,
-  decryptReqs
 };

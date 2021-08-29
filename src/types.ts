@@ -1,11 +1,20 @@
 export type Theme = 'light' | 'dark';
 
-// TODO ensure types are correct
+export function isTheme(theme: string): theme is Theme {
+  switch (theme) {
+    case 'light':
+    case 'dark':
+      return true;
+    default:
+      return false;
+  }
+}
+
 export type TermData = {
   desiredCourses: string[];
   pinnedCrns: string[];
   excludedCrns: string[];
-  colorMap: Record<string, string | undefined>;
+  colorMap: Record<string, string>;
   sortingOptionIndex: number;
 };
 
@@ -14,7 +23,7 @@ export const defaultTermData: TermData = {
   pinnedCrns: [],
   excludedCrns: [],
   colorMap: {},
-  sortingOptionIndex: 0
+  sortingOptionIndex: 0,
 };
 
 // Declare (better) types for the ICS library
@@ -26,7 +35,7 @@ export type ICS = {
     location: string,
     begin: string | Date,
     stop: string | Date,
-    rrule: any
+    rrule: unknown
   ): false | string[];
 };
 
@@ -150,8 +159,6 @@ export type CrawlerSection = [
 
 export type MinimumGrade = 'A' | 'B' | 'C' | 'D' | 'T';
 export type PrerequisiteCourse = { id: string; grade?: MinimumGrade };
-// Recursive definition: disable lint rule
-// eslint-disable-next-line no-use-before-define
 export type PrerequisiteClause = PrerequisiteCourse | PrerequisiteSet;
 export type PrerequisiteOperator = 'and' | 'or';
 export type PrerequisiteSet = [
@@ -255,7 +262,8 @@ export type CrawlerCourse = [
        ]
      * ```
      */
-  prerequisites: CrawlerPrerequisites,
+  // ! Type had `undefined` explicitly added to ensure we check when accessing
+  prerequisites: CrawlerPrerequisites | undefined,
   /**
    * Description pulled from Oscar
    */

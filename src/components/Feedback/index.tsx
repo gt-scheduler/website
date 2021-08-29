@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
-import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import { Button } from '..';
 import { classes } from '../../utils';
-
 import { FormSubmit } from '../../beans';
 
-export default function Feedback() {
-  const [expanded, setExpanded] = useState(false);
-  const [submit, setSubmit] = useState(false);
-  const [rating, setRating] = useState(null);
-  const [feedback, setFeedback] = useState('');
-  const [loading, setLoading] = useState(false);
+import './stylesheet.scss';
 
-  const onSubmit = () => {
+export default function Feedback(): React.ReactElement {
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const [submit, setSubmit] = useState<boolean>(false);
+  const [rating, setRating] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onSubmit = (): void => {
     setLoading(true);
     // Add 1 to the rating to move it from [0,4] to [1,5]
-    FormSubmit({ rating: rating + 1, feedback })
+    FormSubmit({ rating: (rating ?? 0) + 1, feedback })
       .then(() => {
         setSubmit(true);
         setLoading(false);
@@ -33,8 +34,7 @@ export default function Feedback() {
       {!expanded && (
         <Button
           className="FeedbackButton"
-          onClick={() => setExpanded(true)}
-          onMouse
+          onClick={(): void => setExpanded(true)}
         >
           <FontAwesomeIcon icon={faCommentAlt} size="2x" />
         </Button>
@@ -46,7 +46,7 @@ export default function Feedback() {
               <FontAwesomeIcon
                 icon={faTimes}
                 className="CloseIcon"
-                onClick={() => setExpanded(false)}
+                onClick={(): void => setExpanded(false)}
               />
               <h3 className="FeedbackTitle">Feedback</h3>
               {!submit && (
@@ -55,11 +55,12 @@ export default function Feedback() {
                   <div className="FormButtons">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <Button
+                        key={i}
                         className={classes(
                           'FormButton',
                           rating === i - 1 && 'active'
                         )}
-                        onClick={() => setRating(i - 1)}
+                        onClick={(): void => setRating(i - 1)}
                       >
                         {i}
                       </Button>
@@ -76,7 +77,7 @@ export default function Feedback() {
                   <textarea
                     className="FeedbackTextArea"
                     placeholder="Please let us know if you have any more feedback!"
-                    onChange={(event) => setFeedback(event.target.value)}
+                    onChange={(event): void => setFeedback(event.target.value)}
                     value={feedback}
                   />
                   <Button
@@ -96,7 +97,7 @@ export default function Feedback() {
                   <div>
                     <Button
                       className="SubmitButton"
-                      onClick={() => setExpanded(false)}
+                      onClick={(): void => setExpanded(false)}
                     >
                       Close
                     </Button>

@@ -1,13 +1,11 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import 'react-virtualized/styles.css';
-import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faAdjust,
   faBars,
   faCalendarAlt,
   faDownload,
-  faPaste
+  faPaste,
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
@@ -15,13 +13,18 @@ import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import ReactTooltip from 'react-tooltip';
 import copy from 'copy-to-clipboard';
+
 import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import ics from '../../libs/ics';
+import ics from '../../vendor/ics';
 import { Button, Calendar, Select, Tab } from '..';
 import { useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 import { ICS } from '../../types';
+import { ErrorWithFields, softError } from '../../log';
+
+import './stylesheet.scss';
+import 'react-virtualized/styles.css';
 
 export type HeaderProps = {
   currentTab: number;
@@ -34,12 +37,12 @@ export type HeaderProps = {
  * Renders the top header component,
  * and includes controls for top-level tab-based navigation
  */
-const Header = ({
+export default function Header({
   currentTab,
   onChangeTab,
   onToggleMenu,
-  tabs
-}: HeaderProps) => {
+  tabs,
+}: HeaderProps): React.ReactElement {
   const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
   const [terms] = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
@@ -78,7 +81,7 @@ const Header = ({
         const begin = new Date(from.getTime());
         while (
           !meeting.days.includes(
-            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()]
+            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
           )
         ) {
           begin.setDate(begin.getDate() + 1);
@@ -94,7 +97,7 @@ const Header = ({
               (day) =>
                 ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
             )
-            .filter((day) => !!day)
+            .filter((day) => !!day),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
       });
@@ -117,10 +120,19 @@ const Header = ({
         style: {
           transform: `scale(${PNG_SCALE_FACTOR})`,
           'transform-origin': `${computed} 0px`,
-          'background-color': theme === 'light' ? '#FFFFFF' : '#333333'
-        }
+          'background-color': theme === 'light' ? '#FFFFFF' : '#333333',
+        },
       })
-      .then((blob) => saveAs(blob, 'schedule.png'));
+      .then((blob) => saveAs(blob, 'schedule.png'))
+      .catch((err) =>
+        softError(
+          new ErrorWithFields({
+            message:
+              'could not take screenshot of shadow calendar for schedule export',
+            source: err,
+          })
+        )
+      );
   }, [captureRef, theme]);
 
   // Obtain a ref to the copy button to only close its tooltip
@@ -150,7 +162,7 @@ const Header = ({
         value={term}
         options={terms.map((currentTerm) => ({
           value: currentTerm,
-          label: getSemesterName(currentTerm)
+          label: getSemesterName(currentTerm),
         }))}
         className="semester"
       />
@@ -164,7 +176,7 @@ const Header = ({
             <Tab
               key={tabIdx}
               active={tabIdx === currentTab}
-              onClick={() => onChangeTab(tabIdx)}
+              onClick={(): void => onChangeTab(tabIdx)}
               label={tabLabel}
             />
           ))}
@@ -205,7 +217,7 @@ const Header = ({
             effect="solid"
             event="click"
             delayHide={1000}
-            afterShow={() => {
+            afterShow={(): void => {
               copy(pinnedCrns.join(', '));
               setTimeout(
                 () => ReactTooltip.hide(crnButton.current ?? undefined),
@@ -229,13 +241,8 @@ const Header = ({
 
       {/* Fake calendar used to capture screenshots */}
       <div className="capture-container" ref={captureRef}>
-        {/* TODO remove once Calendar gets typing */}
-        {/*
-          // @ts-ignore */}
-        <Calendar className="fake-calendar" capture />
+        <Calendar className="fake-calendar" capture overlayCrns={[]} />
       </div>
     </div>
   );
-};
-
-export default Header;
+}

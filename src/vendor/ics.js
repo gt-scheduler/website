@@ -23,7 +23,7 @@ const ics = (uidDomain, prodId) => {
   const calendarStart = [
     'BEGIN:VCALENDAR',
     `PRODID:${prodId}`,
-    'VERSION:2.0'
+    'VERSION:2.0',
   ].join(SEPARATOR);
   const calendarEnd = `${SEPARATOR}END:VCALENDAR`;
   const BYDAY_VALUES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -220,7 +220,7 @@ const ics = (uidDomain, prodId) => {
         `LOCATION:${location}`,
         `SUMMARY;LANGUAGE=en-us:${subject}`,
         'TRANSP:TRANSPARENT',
-        'END:VEVENT'
+        'END:VEVENT',
       ];
 
       if (rruleString) {
@@ -280,7 +280,7 @@ const ics = (uidDomain, prodId) => {
         calendarEnd;
 
       return calendar;
-    }
+    },
   };
 };
 

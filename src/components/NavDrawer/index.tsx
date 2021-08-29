@@ -1,6 +1,7 @@
 import React from 'react';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { classes } from '../../utils';
 import { Button } from '..';
 
@@ -15,7 +16,11 @@ export type NavDrawerProps = {
 /**
  * Renders a nav drawer and the overlay when it is open
  */
-const NavDrawer = ({ open, onClose, children }: NavDrawerProps) => {
+export default function NavDrawer({
+  open,
+  onClose,
+  children,
+}: NavDrawerProps): React.ReactElement {
   return (
     <>
       <div
@@ -34,6 +39,4 @@ const NavDrawer = ({ open, onClose, children }: NavDrawerProps) => {
       </div>
     </>
   );
-};
-
-export default NavDrawer;
+}

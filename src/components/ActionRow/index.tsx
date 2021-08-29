@@ -1,5 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { classes } from '../../utils';
 import Button, { ButtonProps } from '../Button';
 
@@ -9,7 +10,7 @@ type FontAwesomeProps = React.ComponentProps<typeof FontAwesomeIcon>;
 export type Action = {
   icon: FontAwesomeProps['icon'];
   styling?: React.CSSProperties;
-  dataTip?: string;
+  dataTip?: boolean;
   dataFor?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -17,7 +18,7 @@ export type Action = {
 
 type BaseActionRowProps = {
   label: string;
-  actions: Action[];
+  actions: (Action | null | undefined)[];
   className?: string;
   children?: React.ReactNode;
 };
@@ -30,14 +31,14 @@ export default function ActionRow({
   children,
   actions,
   ...restProps
-}: ActionRowProps) {
+}: ActionRowProps): React.ReactElement {
   return (
     <div className={classes('ActionRow', className)} {...restProps}>
       <div className="action-row-header">
         <div className="label">{label}</div>
         <div className={classes('actions', 'default')}>
           {actions
-            .filter((action) => action)
+            .flatMap((action) => (action != null ? [action] : []))
             .map(
               (
                 {

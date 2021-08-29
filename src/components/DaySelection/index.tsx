@@ -1,13 +1,36 @@
 import React from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+
 import { ActionRow } from '..';
 import { classes, getContentClassName } from '../../utils';
+import { Period } from '../../types';
 
 import './stylesheet.scss';
 
-type Day = 'M' | 'T' | 'W' | 'R' | 'F';
+export type Day = 'M' | 'T' | 'W' | 'R' | 'F';
+
+export function isDay(rawDay: string): rawDay is Day {
+  switch (rawDay) {
+    case 'M':
+    case 'T':
+    case 'W':
+    case 'R':
+    case 'F':
+      return true;
+    default:
+      return false;
+  }
+}
+
+export interface CourseDateItem {
+  id: string;
+  title: string;
+  times: Period | undefined;
+  daysOfWeek: string[];
+}
+
 export type DaySelectionProps = {
-  courseDateMap: Record<Day, object[]>;
+  courseDateMap: Record<Day, CourseDateItem[]>;
   activeDay: Day | '';
   setActiveDay: (next: Day | '') => void;
 };
@@ -15,15 +38,15 @@ export type DaySelectionProps = {
 export default function DaySelection({
   courseDateMap,
   activeDay,
-  setActiveDay
-}: DaySelectionProps) {
+  setActiveDay,
+}: DaySelectionProps): React.ReactElement {
   const colorPalette = ['#FCB9AA', '#FFDBCC', '#ECEAE4', '#A2E1DB', '#55CBCD'];
   const daysOfTheWeek = [
     'Monday',
     'Tuesday',
     'Wednesday',
     'Thursday',
-    'Friday'
+    'Friday',
   ];
 
   const formatTime = (time: number): string => {
@@ -41,51 +64,61 @@ export default function DaySelection({
 
   return (
     <div className="date-container">
-      {Object.keys(courseDateMap).map((date, i) => (
-        <div
-          key={date}
-          className={classes(
-            'date',
-            getContentClassName(colorPalette[i]),
-            'default'
-          )}
-          style={{ backgroundColor: colorPalette[i] }}
-        >
-          <ActionRow
-            label={daysOfTheWeek[i]}
-            className="day-select"
-            actions={[
-              {
-                icon: date === activeDay ? faAngleUp : faAngleDown,
-                onClick: () =>
-                  date !== activeDay
-                    ? setActiveDay(date as Day)
-                    : setActiveDay('')
-              }
-            ]}
-          />
-          {activeDay === date && (
-            <div className="dropdown-content">
-              {courseDateMap[date as Day].length === 0 ? (
-                <div className="course-content" style={{ padding: 8 }}>
-                  No classes this day!
-                </div>
-              ) : (
-                courseDateMap[date as Day].map((course: any) => (
-                  <div className="course-content">
-                    <div className="course-id">{course.id}</div>
-                    <span className="course-row">{course.title}</span>
-                    <span className="course-row">
-                      {course.daysOfWeek} {formatTime(course.times.start)} -{' '}
-                      {formatTime(course.times.end)}
-                    </span>
+      {Object.keys(courseDateMap).map((date, i) => {
+        if (!isDay(date)) return null;
+        const courses = courseDateMap[date];
+        return (
+          <div
+            key={date}
+            className={classes(
+              'date',
+              getContentClassName(colorPalette[i]),
+              'default'
+            )}
+            style={{ backgroundColor: colorPalette[i] }}
+          >
+            <ActionRow
+              label={daysOfTheWeek[i] ?? ''}
+              className="day-select"
+              actions={[
+                {
+                  icon: date === activeDay ? faAngleUp : faAngleDown,
+                  onClick: (): void =>
+                    date !== activeDay ? setActiveDay(date) : setActiveDay(''),
+                },
+              ]}
+            />
+            {activeDay === date && (
+              <div className="dropdown-content">
+                {courses == null || courses.length === 0 ? (
+                  <div className="course-content" style={{ padding: 8 }}>
+                    No classes this day!
                   </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-      ))}
+                ) : (
+                  courses.map((course) => {
+                    let timeLabel = 'TBA';
+                    const { times } = course;
+                    if (times != null) {
+                      const { start, end } = times;
+                      timeLabel = `${formatTime(start)} - ${formatTime(end)}`;
+                    }
+
+                    return (
+                      <div className="course-content" key={course.id}>
+                        <div className="course-id">{course.id}</div>
+                        <span className="course-row">{course.title}</span>
+                        <span className="course-row">
+                          {course.daysOfWeek} {timeLabel}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

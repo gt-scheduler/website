@@ -1,9 +1,11 @@
 import React from 'react';
-import './stylesheet.scss';
+
 import { classes } from '../../utils';
 import { useMobile } from '../../hooks';
 
-export default function Attribution() {
+import './stylesheet.scss';
+
+export default function Attribution(): React.ReactElement {
   const mobile = useMobile();
   return (
     <div className={classes('Attribution')}>

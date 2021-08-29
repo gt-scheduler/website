@@ -1,36 +1,54 @@
 import React, { useCallback, useContext, useState } from 'react';
+import ReactTooltip from 'react-tooltip';
 import {
   faAngleDown,
   faAngleUp,
   faBan,
-  faGraduationCap
+  faGraduationCap,
 } from '@fortawesome/free-solid-svg-icons';
+
 import { classes, simplifyName, unique } from '../../utils';
+import { Section as SectionBean } from '../../beans';
 import { ActionRow, Section } from '..';
-import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 
-export default function Instructor({ className, color, name, sections, gpa }) {
+import './stylesheet.scss';
+
+export type InstructorProps = {
+  className?: string;
+  color: string | undefined;
+  name: string;
+  sections: SectionBean[];
+  gpa: string;
+};
+
+export default function Instructor({
+  className,
+  color,
+  name,
+  sections,
+  gpa,
+}: InstructorProps): React.ReactElement {
   const [{ pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
   );
   const [expanded, setExpanded] = useState(true);
 
   const includeSection = useCallback(
-    (section) => {
+    (section: SectionBean) => {
       patchTermData({
-        excludedCrns: excludedCrns.filter((crn) => crn !== section.crn)
+        excludedCrns: excludedCrns.filter((crn) => crn !== section.crn),
       });
     },
     [excludedCrns, patchTermData]
   );
 
   const excludeSections = useCallback(
-    (sectionList) => {
+    (sectionList: SectionBean[]) => {
       const crns = sectionList.map((section) => section.crn);
       patchTermData({
         excludedCrns: unique([...excludedCrns, ...crns]),
-        pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn))
+        pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn)),
       });
     },
     [excludedCrns, pinnedCrns, patchTermData]
@@ -47,6 +65,7 @@ export default function Instructor({ className, color, name, sections, gpa }) {
     excludedCrns.includes(section.crn)
   );
 
+  const excludeTooltipId = `exclude-instructor-${name.replace(' ', '-')}`;
   return (
     <div
       className={classes(
@@ -60,19 +79,22 @@ export default function Instructor({ className, color, name, sections, gpa }) {
         actions={[
           {
             icon: expanded ? faAngleUp : faAngleDown,
-            onClick: () => setExpanded(!expanded)
+            onClick: (): void => setExpanded(!expanded),
           },
-          !['TBA', 'Not Assigned'].includes(name) && {
-            icon: faGraduationCap,
-            href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
-              simplifyName(name)
-            )}`
-          },
+          !['TBA', 'Not Assigned'].includes(name)
+            ? {
+                icon: faGraduationCap,
+                href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
+                  simplifyName(name)
+                )}`,
+              }
+            : null,
           {
             icon: faBan,
-            title: 'Exclude from Combinations',
-            onClick: () => excludeSections(sections)
-          }
+            dataTip: true,
+            dataFor: excludeTooltipId,
+            onClick: (): void => excludeSections(sections),
+          },
         ]}
         style={instructorPinned ? { backgroundColor: color } : undefined}
       >
@@ -80,6 +102,14 @@ export default function Instructor({ className, color, name, sections, gpa }) {
           <span className="gpa">Instructor GPA: {gpa || 'N/A'}</span>
         </div>
       </ActionRow>
+      <ReactTooltip
+        id={excludeTooltipId}
+        type="dark"
+        place="bottom"
+        effect="solid"
+      >
+        Exclude from Combinations
+      </ReactTooltip>
       {expanded && (
         <div className={classes('section-container', 'nested')}>
           {includedSections.map((section) => {
@@ -100,7 +130,7 @@ export default function Instructor({ className, color, name, sections, gpa }) {
                 <span
                   className="excluded-section"
                   key={section.id}
-                  onClick={() => includeSection(section)}
+                  onClick={(): void => includeSection(section)}
                 >
                   {section.id}
                 </span>

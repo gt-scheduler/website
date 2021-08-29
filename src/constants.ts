@@ -17,7 +17,7 @@ const PALETTE = [
     '#68CCCA',
     '#73D8FF',
     '#AEA1FF',
-    '#FDA1FF'
+    '#FDA1FF',
   ],
   [
     '#333333',
@@ -31,7 +31,7 @@ const PALETTE = [
     '#16A5A5',
     '#009CE0',
     '#7B64FF',
-    '#FA28FF'
+    '#FA28FF',
   ],
   [
     '#000000',
@@ -45,27 +45,27 @@ const PALETTE = [
     '#0C797D',
     '#0062B1',
     '#653294',
-    '#AB149E'
-  ]
+    '#AB149E',
+  ],
 ];
 
 const ASYNC_DELIVERY_MODE = 'Remote Asynchronous Course';
 
-const DELIVERY_MODES = {
+const DELIVERY_MODES: Record<string, string> = {
   'Hybrid Course': 'Hybrid',
   'Remote Synchronous Course': 'Remote Synchronous',
   'Remote Asynchronous Course': 'Remote Asynchronous',
-  'Residential Course': 'Residential'
+  'Residential Course': 'Residential',
 };
 
-const CAMPUSES = {
+const CAMPUSES: Record<string, string> = {
   'Georgia Tech-Atlanta *': 'Atlanta',
   'GT Lorraine-Undergrad Programs': 'Lorraine Undergrad',
   'GT Lorraine-Graduate Programs': 'Lorraine Graduate',
   'Georgia Tech - Shenzhen': 'Shenzhen',
   Video: 'Video',
   Online: 'Online',
-  'MBA Evening Program': 'MBA Evening'
+  'MBA Evening Program': 'MBA Evening',
 };
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
@@ -79,5 +79,5 @@ export {
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,
-  BACKEND_BASE_URL
+  BACKEND_BASE_URL,
 };

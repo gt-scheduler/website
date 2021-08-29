@@ -1,5 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
+
 import { unique } from '../utils';
 import { DELIVERY_MODES, BACKEND_BASE_URL } from '../constants';
 import Course from './Course';
@@ -30,7 +31,7 @@ type SectionConstructionData = [
   gradeBasisIndex: number
 ];
 
-class Section {
+export default class Section {
   course: Course;
 
   id: string;
@@ -72,7 +73,7 @@ class Section {
       scheduleTypeIndex,
       campusIndex,
       attributeIndices,
-      gradeBasisIndex
+      gradeBasisIndex,
     ] = data;
 
     this.course = course;
@@ -80,17 +81,17 @@ class Section {
     this.crn = crn;
     this.seating = [[], 0];
     this.credits = credits;
-    this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex];
-    this.campus = oscar.campuses[campusIndex];
+    this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
+    this.campus = oscar.campuses[campusIndex] ?? 'unknown';
 
-    const attributes = attributeIndices.map(
-      (attributeIndex) => oscar.attributes[attributeIndex]
-    );
+    const attributes = attributeIndices
+      .map((attributeIndex) => oscar.attributes[attributeIndex])
+      .flatMap((attribute) => (attribute == null ? [] : [attribute]));
     this.deliveryMode = attributes.find(
       (attribute) => attribute in DELIVERY_MODES
     );
 
-    this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
+    this.gradeBasis = oscar.gradeBases[gradeBasisIndex] ?? 'unknown';
     this.meetings = meetings.map<Meeting>(
       ([
         periodIndex,
@@ -98,16 +99,20 @@ class Section {
         where,
         locationIndex,
         instructors,
-        dateRangeIndex
+        dateRangeIndex,
       ]) => ({
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : days.split(''),
         where,
-        location: oscar.locations[locationIndex],
+        location: oscar.locations[locationIndex] ?? null,
         instructors: instructors.map((instructor) =>
           instructor.replace(/ \(P\)$/, '')
         ),
-        dateRange: oscar.dateRanges[dateRangeIndex]
+        // We need some fallback here
+        dateRange: oscar.dateRanges[dateRangeIndex] ?? {
+          from: new Date(),
+          to: new Date(),
+        },
       })
     );
     this.instructors = unique(
@@ -133,8 +138,8 @@ class Section {
         method: 'get',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'text/html'
-        }
+          'Content-Type': 'text/html',
+        },
       })
         .then((response) => {
           const $ = cheerio.load(response.data);
@@ -146,9 +151,9 @@ class Section {
               parseInt(tableRow.eq(1).children('td').first().text(), 10),
               parseInt(tableRow.eq(1).children('td').eq(1).text(), 10),
               parseInt(tableRow.eq(2).children('td').first().text(), 10),
-              parseInt(tableRow.eq(2).children('td').eq(1).text(), 10)
+              parseInt(tableRow.eq(2).children('td').eq(1).text(), 10),
             ],
-            currDate
+            currDate,
           ];
 
           return this.seating;
@@ -158,5 +163,3 @@ class Section {
     return this.seating;
   }
 }
-
-export default Section;

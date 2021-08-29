@@ -1,11 +1,30 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+
 import { classes } from '../../utils';
 import { Button } from '..';
+
 import './stylesheet.scss';
 
-export default function Select({ className, value, onChange, options }) {
+export type SelectProps<V extends string | number> = {
+  className?: string;
+  value: V;
+  onChange: (newValue: V) => void;
+  options: SelectOption<V>[];
+};
+
+export type SelectOption<V> = {
+  value: V;
+  label: React.ReactNode;
+};
+
+export default function Select<V extends string | number>({
+  className,
+  value,
+  onChange,
+  options,
+}: SelectProps<V>): React.ReactElement {
   const [opened, setOpened] = useState(false);
 
   const selectedOption = options.find((option) => option.value === value);
@@ -14,21 +33,22 @@ export default function Select({ className, value, onChange, options }) {
   return (
     <div
       className={classes('Button', 'Select', className)}
-      onClick={() => setOpened(!opened)}
+      onClick={(): void => setOpened(!opened)}
     >
       <div className="text">{label}</div>
       <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-      {opened && <div className="intercept" onClick={() => setOpened(false)} />}
+      {opened && (
+        <div className="intercept" onClick={(): void => setOpened(false)} />
+      )}
       {opened && (
         <div className="option-container">
-          {/* eslint-disable-next-line no-shadow */}
-          {options.map(({ value, label }) => (
+          {options.map(({ value: optionValue, label: optionLabel }) => (
             <Button
               className="option"
-              key={value}
-              onClick={() => onChange(value)}
+              key={optionValue}
+              onClick={(): void => onChange(optionValue)}
             >
-              {label}
+              {optionLabel}
             </Button>
           ))}
         </div>
