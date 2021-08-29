@@ -3,13 +3,12 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes, humanizeArray } from '../../utils';
-import { SafeRecord } from '../../types';
 
 import './stylesheet.scss';
 
 export type CourseFilterProps = {
   name: string;
-  labels: SafeRecord<string, string>;
+  labels: Record<string, string>;
   selectedTags: string[];
   onReset: () => void;
   onToggle: (tag: string) => void;

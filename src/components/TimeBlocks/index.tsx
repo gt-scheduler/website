@@ -4,7 +4,7 @@ import ReactTooltip from 'react-tooltip';
 import { classes, getContentClassName, periodToString } from '../../utils';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import { TermContext } from '../../contexts';
-import { Period, SafeRecord } from '../../types';
+import { Period } from '../../types';
 
 import './stylesheet.scss';
 
@@ -15,10 +15,7 @@ export interface TimeBlockPosition {
   crn: string;
 }
 
-export type SizeInfo = SafeRecord<
-  string,
-  SafeRecord<string, TimeBlockPosition>
->;
+export type SizeInfo = Record<string, Record<string, TimeBlockPosition>>;
 
 export type TimeBlocksProps = {
   className?: string;

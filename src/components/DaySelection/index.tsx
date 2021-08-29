@@ -3,7 +3,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
 import { classes, getContentClassName } from '../../utils';
-import { Period, SafeRecord } from '../../types';
+import { Period } from '../../types';
 
 import './stylesheet.scss';
 
@@ -30,7 +30,7 @@ export interface CourseDateItem {
 }
 
 export type DaySelectionProps = {
-  courseDateMap: SafeRecord<Day, CourseDateItem[]>;
+  courseDateMap: Record<Day, CourseDateItem[]>;
   activeDay: Day | '';
   setActiveDay: (next: Day | '') => void;
 };

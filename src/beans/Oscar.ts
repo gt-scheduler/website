@@ -7,7 +7,6 @@ import {
   Location,
   CrawlerTermData,
   CrawlerCourse,
-  SafeRecord,
 } from '../types';
 import { ErrorWithFields, softError } from '../log';
 
@@ -35,9 +34,9 @@ export default class Oscar {
 
   courses: Course[];
 
-  courseMap: SafeRecord<string, Course>;
+  courseMap: Record<string, Course>;
 
-  crnMap: SafeRecord<string, Section>;
+  crnMap: Record<string, Section>;
 
   sortingOptions: SortingOption[];
 
@@ -143,7 +142,7 @@ export default class Oscar {
       }),
       new SortingOption('Earliest Ending', (combination) => {
         const { endMap } = combination;
-        const ends = Object.values(endMap) as number[];
+        const ends = Object.values(endMap);
         const sum = ends.reduce<number>((tot, end) => tot + (end ?? 0), 0);
         const avg = sum / ends.length;
         return +avg;
@@ -241,8 +240,8 @@ export default class Oscar {
     };
     dfs();
     return crnsList.map((crns) => {
-      const startMap: SafeRecord<string, number> = {};
-      const endMap: SafeRecord<string, number> = {};
+      const startMap: Record<string, number> = {};
+      const endMap: Record<string, number> = {};
       this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
         if (period === undefined) return;
         const end = endMap[day];

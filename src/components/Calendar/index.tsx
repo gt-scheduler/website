@@ -5,7 +5,7 @@ import { classes, timeToShortString } from '../../utils';
 import { TimeBlocks } from '..';
 import { TermContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
-import { Period, SafeRecord } from '../../types';
+import { Period } from '../../types';
 
 import './stylesheet.scss';
 
@@ -28,9 +28,9 @@ export default function Calendar({
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
-  const crnSizeInfo: SafeRecord<
+  const crnSizeInfo: Record<
     string,
-    SafeRecord<string, SafeRecord<string, TimeBlockPosition>>
+    Record<string, Record<string, TimeBlockPosition>>
   > = {};
 
   // Recursively sets the rowSize of all time blocks within the current

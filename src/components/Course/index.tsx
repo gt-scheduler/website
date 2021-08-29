@@ -13,12 +13,7 @@ import { classes, getContentClassName } from '../../utils';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { TermContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../beans';
-import {
-  CourseGpa,
-  PrerequisiteClause,
-  PrerequisiteSet,
-  SafeRecord,
-} from '../../types';
+import { CourseGpa, PrerequisiteClause, PrerequisiteSet } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
@@ -114,7 +109,7 @@ export default function Course({
     }
   }
 
-  const instructorMap: SafeRecord<string, Section[] | undefined> = {};
+  const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
     const [primaryInstructor = 'Not Assigned'] = section.instructors;
     let mapEntry = instructorMap[primaryInstructor];

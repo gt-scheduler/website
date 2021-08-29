@@ -4,7 +4,7 @@ import MapView, { MapLocation } from '../MapView';
 import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
-import { Meeting, SafeRecord } from '../../types';
+import { Meeting } from '../../types';
 
 import './stylesheet.scss';
 
@@ -12,7 +12,7 @@ export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('M');
   const locations: MapLocation[] = [];
-  const courseDateMap: SafeRecord<Day, CourseDateItem[]> = {
+  const courseDateMap: Record<Day, CourseDateItem[]> = {
     M: [],
     T: [],
     W: [],

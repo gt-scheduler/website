@@ -14,7 +14,7 @@ export type TermData = {
   desiredCourses: string[];
   pinnedCrns: string[];
   excludedCrns: string[];
-  colorMap: SafeRecord<string, string>;
+  colorMap: Record<string, string>;
   sortingOptionIndex: number;
 };
 
@@ -41,8 +41,8 @@ export type ICS = {
 
 export interface Combination {
   crns: string[];
-  startMap: SafeRecord<string, number>;
-  endMap: SafeRecord<string, number>;
+  startMap: Record<string, number>;
+  endMap: Record<string, number>;
 }
 
 export interface Period {
@@ -246,8 +246,7 @@ export type CrawlerCourse = [
    * a JSON object with information about each section of the course;
    * the section IDs are the keys (`"A"`, `"B"`, `"S2"`, etc.)
    */
-  // ! Type had `SafeRecord` explicitly added to ensure we check when accessing
-  sections: SafeRecord<string, CrawlerSection>,
+  sections: Record<string, CrawlerSection>,
   /**
      * a tree of prerequisite classes and the necessary grades in them
      * (using boolean expressions in prefix order)
@@ -287,8 +286,7 @@ export interface CrawlerTermData {
    * this makes up the vast bulk of the resultant JSON.
    * The course IDs are the keys (`"ACCT 2101"`, `"CS 2340"`, etc.)
    */
-  // ! Type had `SafeRecord` explicitly added to ensure we check when accessing
-  courses: SafeRecord<string, CrawlerCourse>;
+  courses: Record<string, CrawlerCourse>;
   /**
    * Contains data shared by multiple class descriptions
    */
@@ -302,11 +300,3 @@ export interface CrawlerTermData {
    */
   version: number;
 }
-
-/**
- * Small utility type to encode a record
- * that requires undefined checks when accessing
- */
-export type SafeRecord<K extends string | number | symbol, V> = {
-  [P in K]?: V;
-};
