@@ -239,35 +239,37 @@ export default class Course {
 }
 
 // Based on response for CS 6035 on 2021-08-28
-// from the Course Critique API
+// from the Course Critique API.
+// Each field has `| unknown` added to ensure
+// that we narrow the type before using them.
 interface CourseDetailsAPIResponse {
   header: [
     {
-      course_name: string;
-      description: string;
-      credits: number;
-      avg_gpa: number;
-      avg_a: number;
-      avg_b: number;
-      avg_c: number;
-      avg_d: number;
-      avg_f: number;
-      avg_w: number;
-      full_name: string;
+      course_name: string | unknown;
+      description: string | unknown;
+      credits: number | unknown;
+      avg_gpa: number | unknown;
+      avg_a: number | unknown;
+      avg_b: number | unknown;
+      avg_c: number | unknown;
+      avg_d: number | unknown;
+      avg_f: number | unknown;
+      avg_w: number | unknown;
+      full_name: string | unknown;
     }
   ];
   raw: Array<{
-    instructor_gt_username: string;
-    instructor_name: string;
-    link: string;
-    class_size_group: string;
-    GPA: number;
-    A: number;
-    B: number;
-    C: number;
-    D: number;
-    F: number;
-    W: number;
-    sections: number;
+    instructor_gt_username: string | unknown;
+    instructor_name: string | unknown;
+    link: string | unknown;
+    class_size_group: string | unknown;
+    GPA: number | unknown;
+    A: number | unknown;
+    B: number | unknown;
+    C: number | unknown;
+    D: number | unknown;
+    F: number | unknown;
+    W: number | unknown;
+    sections: number | unknown;
   }>;
 }
