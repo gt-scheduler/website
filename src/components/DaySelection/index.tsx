@@ -14,7 +14,7 @@ export function isDay(rawDay: string): rawDay is Day {
     case 'M':
     case 'T':
     case 'W':
-    case 'H':
+    case 'R':
     case 'F':
       return true;
     default:
