@@ -81,17 +81,17 @@ export default class Section {
     this.crn = crn;
     this.seating = [[], 0];
     this.credits = credits;
-    this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex];
-    this.campus = oscar.campuses[campusIndex];
+    this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
+    this.campus = oscar.campuses[campusIndex] ?? 'unknown';
 
-    const attributes = attributeIndices.map(
-      (attributeIndex) => oscar.attributes[attributeIndex]
-    );
+    const attributes = attributeIndices
+      .map((attributeIndex) => oscar.attributes[attributeIndex])
+      .flatMap((attribute) => (attribute == null ? [] : [attribute]));
     this.deliveryMode = attributes.find(
       (attribute) => attribute in DELIVERY_MODES
     );
 
-    this.gradeBasis = oscar.gradeBases[gradeBasisIndex];
+    this.gradeBasis = oscar.gradeBases[gradeBasisIndex] ?? 'unknown';
     this.meetings = meetings.map<Meeting>(
       ([
         periodIndex,
@@ -104,11 +104,14 @@ export default class Section {
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : days.split(''),
         where,
-        location: oscar.locations[locationIndex],
+        location: oscar.locations[locationIndex] ?? null,
         instructors: instructors.map((instructor) =>
           instructor.replace(/ \(P\)$/, '')
         ),
-        dateRange: oscar.dateRanges[dateRangeIndex]
+        dateRange: oscar.dateRanges[dateRangeIndex] ?? {
+          from: new Date(),
+          to: new Date()
+        }
       })
     );
     this.instructors = unique(

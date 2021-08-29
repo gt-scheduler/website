@@ -307,7 +307,6 @@ export interface CrawlerTermData {
  * Small utility type to encode a record
  * that requires undefined checks when accessing
  */
-export type SafeRecord<K extends string | number | symbol, V> = Record<
-  K,
-  V | undefined
->;
+export type SafeRecord<K extends string | number | symbol, V> = {
+  [P in K]?: V;
+};

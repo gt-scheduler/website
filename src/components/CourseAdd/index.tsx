@@ -88,8 +88,12 @@ export default function CourseAdd({
     (e: ChangeEvent<HTMLInputElement>) => {
       let input = e.target.value.trim();
       const results = /^([A-Z]+)(\d.*)$/i.exec(input);
-      if (results) {
-        const [, subject, number] = results;
+      if (results != null) {
+        const [, subject, number] = (results as unknown) as [
+          string,
+          string,
+          string
+        ];
         input = `${subject} ${number}`;
       }
       setKeyword(input);
@@ -102,7 +106,11 @@ export default function CourseAdd({
     if (!results) {
       return [];
     }
-    const [, subject, number] = results;
+    const [, subject, number] = (results as unknown) as [
+      string,
+      string,
+      string
+    ];
 
     setActiveIndex(0);
 
@@ -145,11 +153,13 @@ export default function CourseAdd({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       switch (e.key) {
-        case 'Enter':
-          if (courses[activeIndex]) {
-            handleAddCourse(courses[activeIndex]);
+        case 'Enter': {
+          const course = courses[activeIndex];
+          if (course != null) {
+            handleAddCourse(course);
           }
           break;
+        }
         case 'ArrowDown':
           setActiveIndex(Math.min(activeIndex + 1, courses.length - 1));
           break;

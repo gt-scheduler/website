@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { useCookie } from '.';
-import { hardError } from '../log';
+import { ErrorWithFields } from '../log';
 
 export default function useJsonCookie<
   T extends Record<string, unknown> | Array<unknown>
@@ -17,10 +17,14 @@ export default function useJsonCookie<
           ...parsedValue
         };
       } catch (err) {
-        hardError(`failed to parse cookie data`, err, {
-          rawValue,
-          key,
-          defaultValue
+        throw new ErrorWithFields({
+          message: `failed to parse cookie data`,
+          source: err,
+          fields: {
+            rawValue,
+            key,
+            defaultValue
+          }
         });
       }
     }

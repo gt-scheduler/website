@@ -21,7 +21,7 @@ import { Button, Calendar, Select, Tab } from '..';
 import { useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 import { ICS } from '../../types';
-import { softError } from '../../log';
+import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
 import 'react-virtualized/styles.css';
@@ -81,7 +81,7 @@ export default function Header({
         const begin = new Date(from.getTime());
         while (
           !meeting.days.includes(
-            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()]
+            ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
           )
         ) {
           begin.setDate(begin.getDate() + 1);
@@ -126,8 +126,11 @@ export default function Header({
       .then((blob) => saveAs(blob, 'schedule.png'))
       .catch((err) =>
         softError(
-          'could not take screenshot of shadow calendar for schedule export',
-          err
+          new ErrorWithFields({
+            message:
+              'could not take screenshot of shadow calendar for schedule export',
+            source: err
+          })
         )
       );
   }, [captureRef, theme]);

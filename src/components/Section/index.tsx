@@ -13,7 +13,7 @@ import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
 import { Section as SectionBean } from '../../beans';
 import { Seating } from '../../beans/Section';
-import { softError } from '../../log';
+import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
 
@@ -47,9 +47,13 @@ export default function Section({
             setSeating(newSeating);
           })
           .catch((err) =>
-            softError('error while fetching seating', err, {
-              crn: section.crn
-            })
+            softError(
+              new ErrorWithFields({
+                message: 'error while fetching seating',
+                source: err,
+                fields: { crn: section.crn }
+              })
+            )
           );
       }
     }, 333);

@@ -18,7 +18,7 @@ import {
   ThemeContextValue
 } from '../../contexts';
 import { defaultTermData, isTheme } from '../../types';
-import { softError } from '../../log';
+import { ErrorWithFields, softError } from '../../log';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -105,7 +105,15 @@ export default function App(): React.ReactElement {
           </div>
         )
       }).catch((err) => {
-        softError(`error with swal call`, err, { cookieKey });
+        softError(
+          new ErrorWithFields({
+            message: 'error with swal call',
+            source: err,
+            fields: {
+              cookieKey
+            }
+          })
+        );
       });
 
       Cookies.set(cookieKey, 'true', { expires: 365 });
@@ -124,7 +132,16 @@ export default function App(): React.ReactElement {
           setOscar(newOscar);
         })
         .catch((err) => {
-          softError(`error fetching crawler data`, err, { term, url });
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching crawler data',
+              source: err,
+              fields: {
+                term,
+                url
+              }
+            })
+          );
         });
     }
   }, [term]);
@@ -145,7 +162,15 @@ export default function App(): React.ReactElement {
         setTerms(newTerms);
       })
       .catch((err) => {
-        softError(`error fetching list of terms`, err, { url });
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching list of terms',
+            source: err,
+            fields: {
+              url
+            }
+          })
+        );
       });
   }, [setTerms]);
 
@@ -153,7 +178,7 @@ export default function App(): React.ReactElement {
   // (once the terms load)
   useEffect(() => {
     if (term === '' && terms.length > 0) {
-      const [recentTerm] = terms;
+      const [recentTerm] = terms as [string];
       setTerm(recentTerm);
     }
   }, [terms, term, setTerm]);

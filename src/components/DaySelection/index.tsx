@@ -78,7 +78,7 @@ export default function DaySelection({
             style={{ backgroundColor: colorPalette[i] }}
           >
             <ActionRow
-              label={daysOfTheWeek[i]}
+              label={daysOfTheWeek[i] ?? ''}
               className="day-select"
               actions={[
                 {

@@ -9,6 +9,7 @@ import {
   CrawlerCourse,
   SafeRecord
 } from '../types';
+import { ErrorWithFields, softError } from '../log';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
@@ -43,21 +44,54 @@ export default class Oscar {
   constructor(data: OscarConstructionDate) {
     const { courses, caches, updatedAt, version } = data;
 
-    this.periods = caches.periods.map((period) => {
+    this.periods = caches.periods.map((period, i) => {
       if (period === 'TBA') {
         return undefined;
       }
+
+      const periodSegments = period.split(' - ');
+      if (periodSegments.length !== 2) {
+        softError(
+          new ErrorWithFields({
+            message: 'period did not follow expected format',
+            fields: {
+              period,
+              cacheIndex: i
+            }
+          })
+        );
+        return undefined;
+      }
+
+      const [start, end] = periodSegments as [string, string];
       return {
-        start: stringToTime(period.split(' - ')[0]),
-        end: stringToTime(period.split(' - ')[1])
+        start: stringToTime(start),
+        end: stringToTime(end)
       };
     });
-    this.dateRanges = caches.dateRanges.map((dateRange) => {
-      const [from, to] = dateRange.split(' - ').map((v) => new Date(v));
+
+    this.dateRanges = caches.dateRanges.map((dateRange, i) => {
+      let segments = dateRange.split(' - ');
+      if (segments.length !== 2) {
+        softError(
+          new ErrorWithFields({
+            message: 'date range did not follow expected format',
+            fields: {
+              dateRange,
+              cacheIndex: i
+            }
+          })
+        );
+        // We need some fallback here
+        segments = ['Jan 1, 1970', 'Jan 2, 1970'];
+      }
+
+      const [from, to] = segments.map((v) => new Date(v)) as [Date, Date];
       from.setHours(0);
       to.setHours(23, 59, 59, 999);
       return { from, to };
     });
+
     this.scheduleTypes = caches.scheduleTypes;
     this.campuses = caches.campuses;
     this.attributes = caches.attributes;
@@ -65,12 +99,27 @@ export default class Oscar {
     this.locations = caches.locations;
     this.updatedAt = new Date(updatedAt);
     this.version = version;
-    this.courses = Object.keys(courses).map(
+
+    this.courses = Object.keys(courses).flatMap((courseId) => {
       // `courseId` comes from `Object.keys[courses]`,
       // so `courses[courseId]` cannot be undefined
-      (courseId) =>
-        new Course(this, courseId, courses[courseId] as CrawlerCourse)
-    );
+      const source = courses[courseId] as CrawlerCourse;
+      try {
+        return [new Course(this, courseId, source)];
+      } catch (err) {
+        softError(
+          new ErrorWithFields({
+            message: 'could not initialize Course bean',
+            fields: {
+              courseId,
+              source
+            }
+          })
+        );
+        return [];
+      }
+    });
+
     this.courseMap = {};
     this.crnMap = {};
     this.courses.forEach((course) => {
@@ -79,6 +128,7 @@ export default class Oscar {
         this.crnMap[section.crn] = section;
       });
     });
+
     this.sortingOptions = [
       new SortingOption('Most Compact', (combination) => {
         const { startMap, endMap } = combination;
@@ -127,7 +177,9 @@ export default class Oscar {
         crnsList.push(crns);
         return;
       }
-      const course = this.findCourse(desiredCourses[courseIndex]);
+      const courseId = desiredCourses[courseIndex];
+      if (courseId === undefined) return;
+      const course = this.findCourse(courseId);
       if (course === undefined) return;
       const isIncluded = (section: Section): boolean =>
         !excludedCrns.includes(section.crn);
@@ -211,6 +263,16 @@ export default class Oscar {
     sortingOptionIndex: number
   ): Combination[] {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
+    if (sortingOption === undefined) {
+      throw new ErrorWithFields({
+        message: `sorting option was null when sorting combinations`,
+        fields: {
+          sortingOptionIndex,
+          actualSortingOptionsLength: this.sortingOptions.length
+        }
+      });
+    }
+
     return combinations
       .map((combination) => ({
         ...combination,

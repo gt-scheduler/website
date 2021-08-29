@@ -44,7 +44,10 @@ export default function MapView({
         width="100%"
         viewState={viewState}
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
-        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+        // TypeScript wants this to use square-brackets since it's an index
+        // signature
+        // eslint-disable-next-line dot-notation
+        mapboxApiAccessToken={process.env['REACT_APP_MAPBOX_TOKEN'] ?? ''}
         onViewStateChange={({
           viewState: newViewState
         }: {

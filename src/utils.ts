@@ -5,7 +5,12 @@ import { Period, PrerequisiteClause } from './types';
 const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
   if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = regexResult;
+  const [, hour, minute, ampm] = (regexResult as unknown) as [
+    string,
+    string,
+    string,
+    string
+  ];
   return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
@@ -31,7 +36,7 @@ const periodToString = (period: Period | undefined): string =>
 const getRandomColor = (): string => {
   const colors = PALETTE.flat();
   const index = (Math.random() * colors.length) | 0;
-  return colors[index];
+  return colors[index] ?? '#333333';
 };
 
 const getContentClassName = (color: string | undefined): string => {

@@ -19,7 +19,7 @@ import {
   PrerequisiteSet,
   SafeRecord
 } from '../../types';
-import { softError } from '../../log';
+import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
 
@@ -52,7 +52,15 @@ export default function Course({
         .fetchGpa()
         .then(setGpaMap)
         .catch((err) => {
-          softError(`error fetching course GPA`, err, { courseId });
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching course GPA',
+              source: err,
+              fields: {
+                courseId
+              }
+            })
+          );
         });
     }
   }, [isSearching, oscar, courseId]);

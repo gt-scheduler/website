@@ -9,7 +9,7 @@ import {
   SafeRecord
 } from '../types';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
-import { softError } from '../log';
+import { ErrorWithFields, softError } from '../log';
 
 interface SectionGroupMeeting {
   days: string[];
@@ -52,13 +52,40 @@ export default class Course {
     const [title, sections, prereqs] = data;
 
     this.id = courseId;
-    [this.subject, this.number] = this.id.split(' ');
+    const [subject, number] = this.id.split(' ');
+    if (subject == null || number == null) {
+      throw new ErrorWithFields({
+        message: 'course ID could not be parsed',
+        fields: {
+          id: this.id,
+          subject,
+          number
+        }
+      });
+    }
+    this.subject = subject;
+    this.number = number;
+
     this.title = title;
-    this.sections = Object.keys(sections).flatMap<Section>((sectionId) => {
-      const crawlerSection = sections[sectionId];
-      if (crawlerSection == null) return [];
-      return [new Section(oscar, this, sectionId, crawlerSection)];
-    });
+    this.sections = Object.entries(sections).flatMap<Section>(
+      ([sectionId, sectionData]) => {
+        if (sectionData == null) return [];
+        try {
+          return [new Section(oscar, this, sectionId, sectionData)];
+        } catch (err) {
+          softError(
+            new ErrorWithFields({
+              message: 'could not construct Section bean',
+              source: err,
+              fields: {
+                courseId
+              }
+            })
+          );
+          return [];
+        }
+      }
+    );
     this.prereqs = prereqs;
 
     const onlyLectures = this.sections.filter(
@@ -134,13 +161,7 @@ export default class Course {
       'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
     // We have to clean up the course ID before sending it to the API,
     // since courses like CHEM 1212K should become CHEM 1212
-    let { id } = this;
-    try {
-      const [subject, number] = id.split(' ');
-      id = `${subject} ${number.replace(/\D/g, '')}`;
-    } catch (_) {
-      // Ignore errors during cleaning
-    }
+    const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
     const url = `${base}/course?courseID=${encodedCourse}`;
 
@@ -148,11 +169,17 @@ export default class Course {
     try {
       responseData = (await axios.get<CourseDetailsAPIResponse>(url)).data;
     } catch (err) {
-      softError(`fetching course details from Course Critique API`, err, {
-        baseId: this.id,
-        cleanedId: id,
-        url
-      });
+      softError(
+        new ErrorWithFields({
+          message: 'fetching course details from Course Critique API',
+          source: err,
+          fields: {
+            baseId: this.id,
+            cleanedId: id,
+            url
+          }
+        })
+      );
       return {};
     }
 
@@ -184,8 +211,9 @@ export default class Course {
 
         // Normalize the instructor name from "LN, FN" to "FN LN"
         let instructor = rawInstructor;
-        if (instructor.indexOf(',') !== -1) {
-          const [lastName, firstName] = instructor.split(', ');
+        const nameSegments = instructor.split(', ');
+        if (nameSegments.length === 2) {
+          const [lastName, firstName] = nameSegments as [string, string];
           instructor = `${firstName} ${lastName}`;
         }
 
@@ -195,14 +223,16 @@ export default class Course {
       return gpaMap;
     } catch (err) {
       softError(
-        `extracting course GPA from Course Critique API response`,
-        err,
-        {
-          baseId: this.id,
-          cleanedId: id,
-          url,
-          responseData
-        }
+        new ErrorWithFields({
+          message: 'extracting course GPA from Course Critique API response',
+          source: err,
+          fields: {
+            baseId: this.id,
+            cleanedId: id,
+            url,
+            responseData
+          }
+        })
       );
       return {};
     }
@@ -212,19 +242,21 @@ export default class Course {
 // Based on response for CS 6035 on 2021-08-28
 // from the Course Critique API
 interface CourseDetailsAPIResponse {
-  header: Array<{
-    course_name: string;
-    description: string;
-    credits: number;
-    avg_gpa: number;
-    avg_a: number;
-    avg_b: number;
-    avg_c: number;
-    avg_d: number;
-    avg_f: number;
-    avg_w: number;
-    full_name: string;
-  }>;
+  header: [
+    {
+      course_name: string;
+      description: string;
+      credits: number;
+      avg_gpa: number;
+      avg_a: number;
+      avg_b: number;
+      avg_c: number;
+      avg_d: number;
+      avg_f: number;
+      avg_w: number;
+      full_name: string;
+    }
+  ];
   raw: Array<{
     instructor_gt_username: string;
     instructor_name: string;

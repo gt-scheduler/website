@@ -4,7 +4,7 @@ import MapView, { MapLocation } from '../MapView';
 import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
-import { SafeRecord } from '../../types';
+import { Meeting, SafeRecord } from '../../types';
 
 import './stylesheet.scss';
 
@@ -24,16 +24,18 @@ export default function Map(): React.ReactElement {
   pinnedCrns.forEach((crn) => {
     const section = oscar.findSection(crn);
     if (section == null) return;
+    const { meetings } = section;
+    if (meetings.length === 0) return;
+    const firstMeeting = meetings[0] as Meeting;
 
-    const meetings = section.meetings[0];
-    meetings.days.forEach((day) => {
+    firstMeeting.days.forEach((day) => {
       if (!isDay(day)) return;
       const courses = courseDateMap[day] ?? [];
       courses.push({
         id: section.course.id,
         title: section.course.title,
-        times: meetings.period,
-        daysOfWeek: meetings.days
+        times: firstMeeting.period,
+        daysOfWeek: firstMeeting.days
       });
       courseDateMap[day] = courses;
     });
@@ -42,9 +44,9 @@ export default function Map(): React.ReactElement {
       section: section.id,
       id: section.course.id,
       title: section.course.title,
-      days: meetings.days,
-      time: periodToString(meetings.period),
-      coords: meetings.location
+      days: firstMeeting.days,
+      time: periodToString(firstMeeting.period),
+      coords: firstMeeting.location
     });
   });
 

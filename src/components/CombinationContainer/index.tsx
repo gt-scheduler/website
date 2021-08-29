@@ -3,6 +3,7 @@ import { AutoSizer, List } from 'react-virtualized';
 
 import { Button, Calendar, Select } from '..';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
+import { Combination } from '../../types';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -61,7 +62,7 @@ export default function CombinationContainer(): React.ReactElement {
               rowCount={sortedCombinations.length}
               rowHeight={108}
               rowRenderer={({ index, key, style }): React.ReactElement => {
-                const { crns } = sortedCombinations[index];
+                const { crns } = sortedCombinations[index] as Combination;
                 return (
                   <div className="list-item" style={style} key={key}>
                     <div
