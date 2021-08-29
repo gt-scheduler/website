@@ -35,9 +35,8 @@ export default function CombinationContainer(): React.ReactElement {
   return (
     <div className="CombinationContainer">
       <Select
-        // eslint-disable-next-line no-shadow
-        onChange={(sortingOptionIndex): void =>
-          patchTermData({ sortingOptionIndex })
+        onChange={(newSortingOptionIndex): void =>
+          patchTermData({ sortingOptionIndex: newSortingOptionIndex })
         }
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({

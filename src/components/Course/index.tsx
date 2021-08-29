@@ -62,6 +62,9 @@ export default function Course({
 
   const handleRemoveCourse = useCallback(
     (course: CourseBean) => {
+      const newColorMap = { ...colorMap };
+      delete newColorMap[course.id];
+
       patchTermData({
         desiredCourses: desiredCourses.filter((id) => id !== course.id),
         pinnedCrns: pinnedCrns.filter(
@@ -70,7 +73,7 @@ export default function Course({
         excludedCrns: excludedCrns.filter(
           (crn) => !course.sections.some((section) => section.crn === crn)
         ),
-        colorMap: { ...colorMap, [course.id]: undefined },
+        colorMap: newColorMap,
       });
     },
     [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchTermData]
@@ -194,11 +197,7 @@ export default function Course({
         }
       >
         <div className="course-row">
-          <span
-            className="course-title"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: course.title }}
-          />
+          <span className="course-title">{course.title}</span>
           <span className="section-crns">
             {pinnedSections.map((section) => section.crn).join(', ')}
           </span>

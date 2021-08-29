@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { classes, humanizeArray } from '../../utils';
+import { classes, humanizeArrayReact } from '../../utils';
 
 import './stylesheet.scss';
 
@@ -30,19 +30,15 @@ export default function CourseFilter({
         onClick={(): void => setExpanded(!expanded)}
       >
         {!expanded && selectedTags.length > 0 ? (
-          <div
-            className="name"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{
-              __html: humanizeArray(
-                selectedTags.flatMap<string>((tag) => {
-                  const selectedTag = labels[tag];
-                  return selectedTag != null ? [selectedTag] : [];
-                }),
-                '<span class="or">or</span>'
-              ),
-            }}
-          />
+          <div className="name">
+            {humanizeArrayReact(
+              selectedTags.flatMap<string>((tag) => {
+                const selectedTag = labels[tag];
+                return selectedTag != null ? [selectedTag] : [];
+              }),
+              <span className="or">or</span>
+            )}
+          </div>
         ) : (
           <div className="name">{name}</div>
         )}

@@ -6,7 +6,6 @@ import {
   DateRange,
   Location,
   CrawlerTermData,
-  CrawlerCourse,
 } from '../types';
 import { ErrorWithFields, softError } from '../log';
 
@@ -99,10 +98,7 @@ export default class Oscar {
     this.updatedAt = new Date(updatedAt);
     this.version = version;
 
-    this.courses = Object.keys(courses).flatMap((courseId) => {
-      // `courseId` comes from `Object.keys[courses]`,
-      // so `courses[courseId]` cannot be undefined
-      const source = courses[courseId] as CrawlerCourse;
+    this.courses = Object.entries(courses).flatMap(([courseId, source]) => {
       try {
         return [new Course(this, courseId, source)];
       } catch (err) {
@@ -230,7 +226,7 @@ export default class Oscar {
         // If a course does not have a lab, then `sectionGroups` should be
         // non-undefined, but we have to check anyways here to satisfy
         // TypeScript
-        Object.values(course.sectionGroups ?? []).forEach((sectionGroup) => {
+        Object.values(course.sectionGroups ?? {}).forEach((sectionGroup) => {
           if (sectionGroup == null) return;
           const section = sectionGroup.sections.find(isIncluded);
           if (!section || hasConflict(section)) return;
@@ -264,7 +260,7 @@ export default class Oscar {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
     if (sortingOption === undefined) {
       throw new ErrorWithFields({
-        message: `sorting option was null when sorting combinations`,
+        message: `sorting option index was out of bounds`,
         fields: {
           sortingOptionIndex,
           actualSortingOptionsLength: this.sortingOptions.length,

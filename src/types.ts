@@ -160,7 +160,6 @@ export type CrawlerSection = [
 export type MinimumGrade = 'A' | 'B' | 'C' | 'D' | 'T';
 export type PrerequisiteCourse = { id: string; grade?: MinimumGrade };
 // Recursive definition: disable lint rule
-// eslint-disable-next-line no-use-before-define
 export type PrerequisiteClause = PrerequisiteCourse | PrerequisiteSet;
 export type PrerequisiteOperator = 'and' | 'or';
 export type PrerequisiteSet = [

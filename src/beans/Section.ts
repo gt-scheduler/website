@@ -108,6 +108,7 @@ export default class Section {
         instructors: instructors.map((instructor) =>
           instructor.replace(/ \(P\)$/, '')
         ),
+        // We need some fallback here
         dateRange: oscar.dateRanges[dateRangeIndex] ?? {
           from: new Date(),
           to: new Date(),
