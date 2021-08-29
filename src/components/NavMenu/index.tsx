@@ -21,7 +21,7 @@ export default function NavMenu({
   currentItem,
   onChangeItem,
   className,
-  style
+  style,
 }: NavMenuProps): React.ReactElement {
   return (
     <div className={classes('nav-menu', className)} style={style}>

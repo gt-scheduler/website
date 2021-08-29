@@ -5,7 +5,7 @@ import {
   faBars,
   faCalendarAlt,
   faDownload,
-  faPaste
+  faPaste,
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
@@ -41,7 +41,7 @@ export default function Header({
   currentTab,
   onChangeTab,
   onToggleMenu,
-  tabs
+  tabs,
 }: HeaderProps): React.ReactElement {
   const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
   const [terms] = useContext(TermsContext);
@@ -97,7 +97,7 @@ export default function Header({
               (day) =>
                 ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
             )
-            .filter((day) => !!day)
+            .filter((day) => !!day),
         };
         cal.addEvent(subject, description, location, begin, end, rrule);
       });
@@ -120,8 +120,8 @@ export default function Header({
         style: {
           transform: `scale(${PNG_SCALE_FACTOR})`,
           'transform-origin': `${computed} 0px`,
-          'background-color': theme === 'light' ? '#FFFFFF' : '#333333'
-        }
+          'background-color': theme === 'light' ? '#FFFFFF' : '#333333',
+        },
       })
       .then((blob) => saveAs(blob, 'schedule.png'))
       .catch((err) =>
@@ -129,7 +129,7 @@ export default function Header({
           new ErrorWithFields({
             message:
               'could not take screenshot of shadow calendar for schedule export',
-            source: err
+            source: err,
           })
         )
       );
@@ -162,7 +162,7 @@ export default function Header({
         value={term}
         options={terms.map((currentTerm) => ({
           value: currentTerm,
-          label: getSemesterName(currentTerm)
+          label: getSemesterName(currentTerm),
         }))}
         className="semester"
       />

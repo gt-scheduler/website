@@ -17,7 +17,7 @@ export default function Button({
   disabled = false,
   href,
   onClick,
-  children
+  children,
 }: ButtonProps): React.ReactElement {
   if (disabled)
     return (

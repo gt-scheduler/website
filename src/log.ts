@@ -17,7 +17,7 @@ export class ErrorWithFields extends Error {
     message,
     source,
     fields = {},
-    baseName = 'ErrorWithFields'
+    baseName = 'ErrorWithFields',
   }: {
     message: string;
     source?: unknown;

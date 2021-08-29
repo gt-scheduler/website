@@ -15,7 +15,7 @@ import {
   TermsContext,
   TermsContextValue,
   ThemeContext,
-  ThemeContextValue
+  ThemeContextValue,
 } from '../../contexts';
 import { defaultTermData, isTheme } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
@@ -65,7 +65,7 @@ export default function App(): React.ReactElement {
       // provider, so while this is an unsafe cast we ensure the safety
       // manually.
       { term, oscar: oscar as Oscar, ...filteredTermData },
-      { setTerm, setOscar, patchTermData }
+      { setTerm, setOscar, patchTermData },
     ],
     [term, oscar, filteredTermData, setTerm, setOscar, patchTermData]
   );
@@ -103,15 +103,15 @@ export default function App(): React.ReactElement {
               with your improvements. Thank you and enjoy!
             </p>
           </div>
-        )
+        ),
       }).catch((err) => {
         softError(
           new ErrorWithFields({
             message: 'error with swal call',
             source: err,
             fields: {
-              cookieKey
-            }
+              cookieKey,
+            },
           })
         );
       });
@@ -138,8 +138,8 @@ export default function App(): React.ReactElement {
               source: err,
               fields: {
                 term,
-                url
-              }
+                url,
+              },
             })
           );
         });
@@ -167,8 +167,8 @@ export default function App(): React.ReactElement {
             message: 'error fetching list of terms',
             source: err,
             fields: {
-              url
-            }
+              url,
+            },
           })
         );
       });

@@ -19,7 +19,7 @@ export type NavDrawerProps = {
 export default function NavDrawer({
   open,
   onClose,
-  children
+  children,
 }: NavDrawerProps): React.ReactElement {
   return (
     <>

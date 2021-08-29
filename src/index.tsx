@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'production') {
     dsn:
       'https://8955ef982197469e97c7644a8c090db1@o552970.ingest.sentry.io/5679614',
     integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: 0.2
+    tracesSampleRate: 0.2,
   });
 }
 

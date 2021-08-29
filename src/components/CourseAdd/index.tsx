@@ -5,7 +5,7 @@ import React, {
   useContext,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -70,16 +70,16 @@ function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
 }
 
 export default function CourseAdd({
-  className
+  className,
 }: CourseAddProps): React.ReactElement {
   const [
     { oscar, desiredCourses, excludedCrns, colorMap },
-    { patchTermData }
+    { patchTermData },
   ] = useContext(TermContext);
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
-    campus: []
+    campus: [],
   });
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -142,7 +142,7 @@ export default function CourseAdd({
       patchTermData({
         desiredCourses: [...desiredCourses, course.id],
         excludedCrns: [...excludedCrns, ...toBeExcludedCrns],
-        colorMap: { ...colorMap, [course.id]: getRandomColor() }
+        colorMap: { ...colorMap, [course.id]: getRandomColor() },
       });
       setKeyword('');
       inputRef.current?.focus();
@@ -181,7 +181,7 @@ export default function CourseAdd({
         ...filter,
         [key]: tags.includes(tag)
           ? tags.filter((v) => v !== tag)
-          : [...tags, tag]
+          : [...tags, tag],
       });
     },
     [filter]
@@ -191,7 +191,7 @@ export default function CourseAdd({
     (key) => {
       setFilter({
         ...filter,
-        [key]: []
+        [key]: [],
       });
     },
     [filter]
@@ -227,7 +227,7 @@ export default function CourseAdd({
         </div>
         {[
           ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
-          ['Campus', 'campus', CAMPUSES] as const
+          ['Campus', 'campus', CAMPUSES] as const,
         ].map(([name, property, labels]) => (
           <CourseFilter
             key={property}

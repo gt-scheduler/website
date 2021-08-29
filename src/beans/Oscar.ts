@@ -7,7 +7,7 @@ import {
   Location,
   CrawlerTermData,
   CrawlerCourse,
-  SafeRecord
+  SafeRecord,
 } from '../types';
 import { ErrorWithFields, softError } from '../log';
 
@@ -56,8 +56,8 @@ export default class Oscar {
             message: 'period did not follow expected format',
             fields: {
               period,
-              cacheIndex: i
-            }
+              cacheIndex: i,
+            },
           })
         );
         return undefined;
@@ -66,7 +66,7 @@ export default class Oscar {
       const [start, end] = periodSegments as [string, string];
       return {
         start: stringToTime(start),
-        end: stringToTime(end)
+        end: stringToTime(end),
       };
     });
 
@@ -78,8 +78,8 @@ export default class Oscar {
             message: 'date range did not follow expected format',
             fields: {
               dateRange,
-              cacheIndex: i
-            }
+              cacheIndex: i,
+            },
           })
         );
         // We need some fallback here
@@ -112,8 +112,8 @@ export default class Oscar {
             message: 'could not initialize Course bean',
             fields: {
               courseId,
-              source
-            }
+              source,
+            },
           })
         );
         return [];
@@ -154,7 +154,7 @@ export default class Oscar {
         const sum = starts.reduce<number>((tot, min) => tot + (min ?? 0), 0);
         const avg = sum / starts.length;
         return -avg;
-      })
+      }),
     ];
   }
 
@@ -253,7 +253,7 @@ export default class Oscar {
       return {
         crns,
         startMap,
-        endMap
+        endMap,
       };
     });
   }
@@ -268,15 +268,15 @@ export default class Oscar {
         message: `sorting option was null when sorting combinations`,
         fields: {
           sortingOptionIndex,
-          actualSortingOptionsLength: this.sortingOptions.length
-        }
+          actualSortingOptionsLength: this.sortingOptions.length,
+        },
       });
     }
 
     return combinations
       .map((combination) => ({
         ...combination,
-        factor: sortingOption.calculateFactor(combination)
+        factor: sortingOption.calculateFactor(combination),
       }))
       .sort((a, b) => a.factor - b.factor);
   }
@@ -313,8 +313,8 @@ export const EMPTY_OSCAR = new Oscar({
     campuses: [],
     attributes: [],
     gradeBases: [],
-    locations: []
+    locations: [],
   },
   updatedAt: new Date(),
-  version: 1
+  version: 1,
 });

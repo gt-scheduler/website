@@ -23,7 +23,7 @@ export default function Select<V extends string | number>({
   className,
   value,
   onChange,
-  options
+  options,
 }: SelectProps<V>): React.ReactElement {
   const [opened, setOpened] = useState(false);
 

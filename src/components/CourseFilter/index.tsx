@@ -20,7 +20,7 @@ export default function CourseFilter({
   labels,
   selectedTags,
   onReset,
-  onToggle
+  onToggle,
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
 
@@ -41,7 +41,7 @@ export default function CourseFilter({
                   return selectedTag != null ? [selectedTag] : [];
                 }),
                 '<span class="or">or</span>'
-              )
+              ),
             }}
           />
         ) : (

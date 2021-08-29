@@ -20,7 +20,7 @@ export default function Tab({
   active = false,
   onClick,
   className,
-  style
+  style,
 }: TabProps): React.ReactElement {
   return (
     <button

@@ -38,7 +38,7 @@ export type DaySelectionProps = {
 export default function DaySelection({
   courseDateMap,
   activeDay,
-  setActiveDay
+  setActiveDay,
 }: DaySelectionProps): React.ReactElement {
   const colorPalette = ['#FCB9AA', '#FFDBCC', '#ECEAE4', '#A2E1DB', '#55CBCD'];
   const daysOfTheWeek = [
@@ -46,7 +46,7 @@ export default function DaySelection({
     'Tuesday',
     'Wednesday',
     'Thursday',
-    'Friday'
+    'Friday',
   ];
 
   const formatTime = (time: number): string => {
@@ -84,8 +84,8 @@ export default function DaySelection({
                 {
                   icon: date === activeDay ? faAngleUp : faAngleDown,
                   onClick: (): void =>
-                    date !== activeDay ? setActiveDay(date) : setActiveDay('')
-                }
+                    date !== activeDay ? setActiveDay(date) : setActiveDay(''),
+                },
               ]}
             />
             {activeDay === date && (

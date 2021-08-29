@@ -41,7 +41,7 @@ export default function TimeBlocks({
   preview,
   capture,
   isAutosized,
-  sizeInfo
+  sizeInfo,
 }: TimeBlocksProps): React.ReactElement | null {
   const [{ oscar, colorMap }] = useContext(TermContext);
 
@@ -85,7 +85,7 @@ export default function TimeBlocks({
                   DAYS.indexOf(day) * 20 +
                   sizeInfoPeriodDay.rowIndex * (20 / sizeInfoPeriodDay.rowSize)
                 }%`,
-                backgroundColor: color
+                backgroundColor: color,
               }}
               data-tip
               data-for={crn}

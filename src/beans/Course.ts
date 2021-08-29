@@ -6,7 +6,7 @@ import {
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
-  SafeRecord
+  SafeRecord,
 } from '../types';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
 import { ErrorWithFields, softError } from '../log';
@@ -59,8 +59,8 @@ export default class Course {
         fields: {
           id: this.id,
           subject,
-          number
-        }
+          number,
+        },
       });
     }
     this.subject = subject;
@@ -78,8 +78,8 @@ export default class Course {
               message: 'could not construct Section bean',
               source: err,
               fields: {
-                courseId
-              }
+                courseId,
+              },
             })
           );
           return [];
@@ -138,7 +138,7 @@ export default class Course {
       const sectionGroupMeetings = section.meetings.map<SectionGroupMeeting>(
         ({ days, period }) => ({
           days,
-          period
+          period,
         })
       );
       const sectionGroupHash = JSON.stringify(sectionGroupMeetings);
@@ -149,7 +149,7 @@ export default class Course {
         groups[sectionGroupHash] = {
           hash: sectionGroupHash,
           meetings: sectionGroupMeetings,
-          sections: [section]
+          sections: [section],
         };
       }
     });
@@ -176,8 +176,8 @@ export default class Course {
           fields: {
             baseId: this.id,
             cleanedId: id,
-            url
-          }
+            url,
+          },
         })
       );
       return {};
@@ -230,8 +230,8 @@ export default class Course {
             baseId: this.id,
             cleanedId: id,
             url,
-            responseData
-          }
+            responseData,
+          },
         })
       );
       return {};

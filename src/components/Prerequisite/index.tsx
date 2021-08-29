@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import {
   faInfoCircle,
   faAngleUp,
-  faAngleDown
+  faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { TermContext } from '../../contexts';
@@ -26,7 +26,7 @@ export default function Prerequisite({
   option,
   isHeader = false,
   isEmpty = false,
-  isLast = false
+  isLast = false,
 }: PrerequisiteProps): React.ReactElement {
   const [{ term }] = useContext(TermContext);
   const [expanded, setExpanded] = useState(true);
@@ -61,13 +61,13 @@ export default function Prerequisite({
                   href:
                     `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
                     `course_detail?cat_term_in=${term}&subj_code_in=` +
-                    `${course.subject}&crse_numb_in=${course.number}`
+                    `${course.subject}&crse_numb_in=${course.number}`,
                 }
               : null,
             req && {
               icon: expanded ? faAngleUp : faAngleDown,
-              onClick: (): void => setExpanded(!expanded)
-            }
+              onClick: (): void => setExpanded(!expanded),
+            },
           ]}
         />
       )}

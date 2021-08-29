@@ -17,7 +17,7 @@ export default function Map(): React.ReactElement {
     T: [],
     W: [],
     R: [],
-    F: []
+    F: [],
   };
 
   // Construct the courseDateMap and locations data structures
@@ -35,7 +35,7 @@ export default function Map(): React.ReactElement {
         id: section.course.id,
         title: section.course.title,
         times: firstMeeting.period,
-        daysOfWeek: firstMeeting.days
+        daysOfWeek: firstMeeting.days,
       });
       courseDateMap[day] = courses;
     });
@@ -46,7 +46,7 @@ export default function Map(): React.ReactElement {
       title: section.course.title,
       days: firstMeeting.days,
       time: periodToString(firstMeeting.period),
-      coords: firstMeeting.location
+      coords: firstMeeting.location,
     });
   });
 

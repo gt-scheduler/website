@@ -4,7 +4,7 @@ import { BACKEND_BASE_URL } from '../constants';
 
 export default async function FormSubmit({
   rating,
-  feedback
+  feedback,
 }: {
   rating: number;
   feedback: string;
@@ -15,10 +15,10 @@ export default async function FormSubmit({
     url,
     data: {
       rating,
-      feedback
+      feedback,
     },
     headers: {
-      'Content-Type': 'application/json;charset=UTF-8'
-    }
+      'Content-Type': 'application/json;charset=UTF-8',
+    },
   });
 }

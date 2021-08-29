@@ -23,7 +23,7 @@ export const defaultTermData: TermData = {
   pinnedCrns: [],
   excludedCrns: [],
   colorMap: {},
-  sortingOptionIndex: 0
+  sortingOptionIndex: 0,
 };
 
 // Declare (better) types for the ICS library

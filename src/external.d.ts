@@ -3,7 +3,7 @@ declare module '@sweetalert/with-react' {
   import swal, {
     ActionOptions,
     SwalState,
-    SwalOptions as BaseSwalOptions
+    SwalOptions as BaseSwalOptions,
   } from 'sweetalert';
 
   // Types taken from sweetalert typings:

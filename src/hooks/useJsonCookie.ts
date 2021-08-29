@@ -14,7 +14,7 @@ export default function useJsonCookie<
         const parsedValue = JSON.parse(rawValue) as T;
         return {
           ...defaultValue,
-          ...parsedValue
+          ...parsedValue,
         };
       } catch (err) {
         throw new ErrorWithFields({
@@ -23,8 +23,8 @@ export default function useJsonCookie<
           fields: {
             rawValue,
             key,
-            defaultValue
-          }
+            defaultValue,
+          },
         });
       }
     }
@@ -35,7 +35,7 @@ export default function useJsonCookie<
     (patch) => {
       const rawVal = JSON.stringify({
         ...value,
-        ...patch
+        ...patch,
       });
       setRawValue(rawVal);
     },

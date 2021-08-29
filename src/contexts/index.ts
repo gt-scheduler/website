@@ -11,9 +11,9 @@ export const ThemeContext = React.createContext<ThemeContextValue>([
   'light',
   (): void => {
     throw new ErrorWithFields({
-      message: 'empty ThemeContext.setTheme value being used'
+      message: 'empty ThemeContext.setTheme value being used',
     });
-  }
+  },
 ]);
 
 export type TermsContextValue = [string[], Setter<string[]>];
@@ -21,9 +21,9 @@ export const TermsContext = React.createContext<TermsContextValue>([
   [],
   (): void => {
     throw new ErrorWithFields({
-      message: 'empty TermsContext.setTerms value being used'
+      message: 'empty TermsContext.setTerms value being used',
     });
-  }
+  },
 ]);
 
 export type TermContextData = {
@@ -40,25 +40,25 @@ export const TermContext = React.createContext<TermContextValue>([
   {
     term: '',
     oscar: EMPTY_OSCAR,
-    ...defaultTermData
+    ...defaultTermData,
   },
   {
     setTerm: (): void => {
       throw new ErrorWithFields({
-        message: 'empty TermContext.setTerm value being used'
+        message: 'empty TermContext.setTerm value being used',
       });
     },
     setOscar: (): void => {
       throw new ErrorWithFields({
-        message: 'empty TermContext.setOscar value being used'
+        message: 'empty TermContext.setOscar value being used',
       });
     },
     patchTermData: (): void => {
       throw new ErrorWithFields({
-        message: 'empty TermContext.patchTermData value being used'
+        message: 'empty TermContext.patchTermData value being used',
       });
-    }
-  }
+    },
+  },
 ]);
 
 export type OverlayCrnsContextValue = [string[], Setter<string[]>];
@@ -66,7 +66,7 @@ export const OverlayCrnsContext = React.createContext<OverlayCrnsContextValue>([
   [],
   (): void => {
     throw new ErrorWithFields({
-      message: 'empty OverlayCrnsContext.setOverlayCrns value being used'
+      message: 'empty OverlayCrnsContext.setOverlayCrns value being used',
     });
-  }
+  },
 ]);

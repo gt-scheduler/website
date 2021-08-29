@@ -4,7 +4,7 @@ import {
   faBan,
   faChair,
   faThumbtack,
-  faTimes
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, periodToString } from '../../utils';
@@ -28,7 +28,7 @@ export default function Section({
   className,
   section,
   pinned,
-  color
+  color,
 }: SectionProps): React.ReactElement {
   const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
@@ -51,7 +51,7 @@ export default function Section({
               new ErrorWithFields({
                 message: 'error while fetching seating',
                 source: err,
-                fields: { crn: section.crn }
+                fields: { crn: section.crn },
               })
             )
           );
@@ -63,7 +63,7 @@ export default function Section({
     (sect: SectionBean) => {
       patchTermData({
         excludedCrns: [...excludedCrns, sect.crn],
-        pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
+        pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn),
       });
     },
     [pinnedCrns, excludedCrns, patchTermData]
@@ -73,12 +73,12 @@ export default function Section({
     (sect: SectionBean) => {
       if (pinnedCrns.includes(sect.crn)) {
         patchTermData({
-          pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
+          pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn),
         });
       } else {
         patchTermData({
           pinnedCrns: [...pinnedCrns, sect.crn],
-          excludedCrns: excludedCrns.filter((crn) => crn !== sect.crn)
+          excludedCrns: excludedCrns.filter((crn) => crn !== sect.crn),
         });
       }
     },
@@ -95,20 +95,20 @@ export default function Section({
       actions={[
         {
           icon: pinned ? faTimes : faThumbtack,
-          onClick: (): void => pinSection(section)
+          onClick: (): void => pinSection(section),
         },
         {
           icon: faChair,
           dataTip: true,
           dataFor: section.id,
-          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`
+          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
           icon: faBan,
           dataTip: true,
           dataFor: excludeTooltipId,
-          onClick: (): void => excludeSection(section)
-        }
+          onClick: (): void => excludeSection(section),
+        },
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >

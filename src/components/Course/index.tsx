@@ -6,7 +6,7 @@ import {
   faShareAlt,
   faPalette,
   faPlus,
-  faTrash
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, getContentClassName } from '../../utils';
@@ -17,7 +17,7 @@ import {
   CourseGpa,
   PrerequisiteClause,
   PrerequisiteSet,
-  SafeRecord
+  SafeRecord,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
@@ -32,7 +32,7 @@ export type CourseProps = {
 export default function Course({
   className,
   courseId,
-  onAddCourse
+  onAddCourse,
 }: CourseProps): React.ReactElement | null {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
@@ -41,7 +41,7 @@ export default function Course({
   const isSearching = Boolean(onAddCourse);
   const [
     { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
-    { patchTermData }
+    { patchTermData },
   ] = useContext(TermContext);
 
   useEffect(() => {
@@ -57,8 +57,8 @@ export default function Course({
               message: 'error fetching course GPA',
               source: err,
               fields: {
-                courseId
-              }
+                courseId,
+              },
             })
           );
         });
@@ -75,7 +75,7 @@ export default function Course({
         excludedCrns: excludedCrns.filter(
           (crn) => !course.sections.some((section) => section.crn === crn)
         ),
-        colorMap: { ...colorMap, [course.id]: undefined }
+        colorMap: { ...colorMap, [course.id]: undefined },
       });
     },
     [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchTermData]
@@ -85,7 +85,7 @@ export default function Course({
     (sections: Section[]) => {
       const crns = sections.map((section) => section.crn);
       patchTermData({
-        excludedCrns: excludedCrns.filter((crn) => !crns.includes(crn))
+        excludedCrns: excludedCrns.filter((crn) => !crns.includes(crn)),
       });
     },
     [excludedCrns, patchTermData]
@@ -145,7 +145,7 @@ export default function Course({
     styling: { transform: 'rotate(90deg)' },
     onClick: (): void => {
       prereqControl(true, !prereqOpen ? true : !expanded);
-    }
+    },
   };
 
   const infoAction = {
@@ -153,7 +153,7 @@ export default function Course({
     href:
       `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
       `course_detail?cat_term_in=${term}&subj_code_in=` +
-      `${course.subject}&crse_numb_in=${course.number}`
+      `${course.subject}&crse_numb_in=${course.number}`,
   };
 
   const pinnedSections = course.sections.filter((section) =>
@@ -173,28 +173,28 @@ export default function Course({
       <ActionRow
         label={[
           course.id,
-          pinnedSections.map((section) => section.id).join(', ')
+          pinnedSections.map((section) => section.id).join(', '),
         ].join(' ')}
         actions={
           isSearching
             ? [
                 { icon: faPlus, onClick: onAddCourse },
-                hasPrereqs ? prereqAction : infoAction
+                hasPrereqs ? prereqAction : infoAction,
               ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: (): void => prereqControl(false, !expanded)
+                  onClick: (): void => prereqControl(false, !expanded),
                 },
                 hasPrereqs ? prereqAction : infoAction,
                 {
                   icon: faPalette,
-                  onClick: (): void => setPaletteShown(!paletteShown)
+                  onClick: (): void => setPaletteShown(!paletteShown),
                 },
                 {
                   icon: faTrash,
-                  onClick: (): void => handleRemoveCourse(course)
-                }
+                  onClick: (): void => handleRemoveCourse(course),
+                },
               ]
         }
       >

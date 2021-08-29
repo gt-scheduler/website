@@ -22,7 +22,7 @@ export default function Calendar({
   overlayCrns,
   preview = false,
   capture = false,
-  isAutosized = false
+  isAutosized = false,
 }: CalendarProps): React.ReactElement {
   const [{ pinnedCrns, oscar }] = useContext(TermContext);
 
@@ -128,7 +128,7 @@ export default function Calendar({
             period,
             crn,
             rowIndex: curRowSize - 1,
-            rowSize: curRowSize
+            rowSize: curRowSize,
           };
         });
       });

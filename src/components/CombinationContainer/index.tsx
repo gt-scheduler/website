@@ -11,14 +11,14 @@ import './stylesheet.scss';
 export default function CombinationContainer(): React.ReactElement {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
-    { patchTermData }
+    { patchTermData },
   ] = useContext(TermContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
 
   const handleResetPinnedCrns = useCallback(() => {
     if (window.confirm('Are you sure to reset sections you selected?')) {
       patchTermData({
-        pinnedCrns: []
+        pinnedCrns: [],
       });
     }
   }, [patchTermData]);
@@ -42,7 +42,7 @@ export default function CombinationContainer(): React.ReactElement {
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({
           value: i,
-          label: sortingOption.label
+          label: sortingOption.label,
         }))}
       />
       <Button
@@ -71,7 +71,7 @@ export default function CombinationContainer(): React.ReactElement {
                       onMouseLeave={(): void => setOverlayCrns([])}
                       onClick={(): void =>
                         patchTermData({
-                          pinnedCrns: [...pinnedCrns, ...crns]
+                          pinnedCrns: [...pinnedCrns, ...crns],
                         })
                       }
                     >

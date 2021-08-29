@@ -73,7 +73,7 @@ export default class Section {
       scheduleTypeIndex,
       campusIndex,
       attributeIndices,
-      gradeBasisIndex
+      gradeBasisIndex,
     ] = data;
 
     this.course = course;
@@ -99,7 +99,7 @@ export default class Section {
         where,
         locationIndex,
         instructors,
-        dateRangeIndex
+        dateRangeIndex,
       ]) => ({
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : days.split(''),
@@ -110,8 +110,8 @@ export default class Section {
         ),
         dateRange: oscar.dateRanges[dateRangeIndex] ?? {
           from: new Date(),
-          to: new Date()
-        }
+          to: new Date(),
+        },
       })
     );
     this.instructors = unique(
@@ -137,8 +137,8 @@ export default class Section {
         method: 'get',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'text/html'
-        }
+          'Content-Type': 'text/html',
+        },
       })
         .then((response) => {
           const $ = cheerio.load(response.data);
@@ -150,9 +150,9 @@ export default class Section {
               parseInt(tableRow.eq(1).children('td').first().text(), 10),
               parseInt(tableRow.eq(1).children('td').eq(1).text(), 10),
               parseInt(tableRow.eq(2).children('td').first().text(), 10),
-              parseInt(tableRow.eq(2).children('td').eq(1).text(), 10)
+              parseInt(tableRow.eq(2).children('td').eq(1).text(), 10),
             ],
-            currDate
+            currDate,
           ];
 
           return this.seating;

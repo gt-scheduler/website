@@ -4,7 +4,7 @@ import {
   faAngleDown,
   faAngleUp,
   faBan,
-  faGraduationCap
+  faGraduationCap,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, simplifyName, unique } from '../../utils';
@@ -27,7 +27,7 @@ export default function Instructor({
   color,
   name,
   sections,
-  gpa
+  gpa,
 }: InstructorProps): React.ReactElement {
   const [{ pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
     TermContext
@@ -37,7 +37,7 @@ export default function Instructor({
   const includeSection = useCallback(
     (section: SectionBean) => {
       patchTermData({
-        excludedCrns: excludedCrns.filter((crn) => crn !== section.crn)
+        excludedCrns: excludedCrns.filter((crn) => crn !== section.crn),
       });
     },
     [excludedCrns, patchTermData]
@@ -48,7 +48,7 @@ export default function Instructor({
       const crns = sectionList.map((section) => section.crn);
       patchTermData({
         excludedCrns: unique([...excludedCrns, ...crns]),
-        pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn))
+        pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn)),
       });
     },
     [excludedCrns, pinnedCrns, patchTermData]
@@ -79,22 +79,22 @@ export default function Instructor({
         actions={[
           {
             icon: expanded ? faAngleUp : faAngleDown,
-            onClick: (): void => setExpanded(!expanded)
+            onClick: (): void => setExpanded(!expanded),
           },
           !['TBA', 'Not Assigned'].includes(name)
             ? {
                 icon: faGraduationCap,
                 href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
                   simplifyName(name)
-                )}`
+                )}`,
               }
             : null,
           {
             icon: faBan,
             dataTip: true,
             dataFor: excludeTooltipId,
-            onClick: (): void => excludeSections(sections)
-          }
+            onClick: (): void => excludeSections(sections),
+          },
         ]}
         style={instructorPinned ? { backgroundColor: color } : undefined}
       >

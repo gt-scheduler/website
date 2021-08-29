@@ -23,13 +23,13 @@ export type MapViewProps = {
 };
 
 export default function MapView({
-  locations
+  locations,
 }: MapViewProps): React.ReactElement {
   // These initial coordinates start the map looking at the GT Atlanta campus
   const [viewState, setViewState] = useState<ViewState>({
     latitude: 33.7765,
     longitude: -84.3963,
-    zoom: 15
+    zoom: 15,
   });
 
   const unknown: MapLocation[] = [];
@@ -49,7 +49,7 @@ export default function MapView({
         // eslint-disable-next-line dot-notation
         mapboxApiAccessToken={process.env['REACT_APP_MAPBOX_TOKEN'] ?? ''}
         onViewStateChange={({
-          viewState: newViewState
+          viewState: newViewState,
         }: {
           viewState: ViewState;
         }): void => setViewState(newViewState)}

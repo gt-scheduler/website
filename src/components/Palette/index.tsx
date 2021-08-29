@@ -16,7 +16,7 @@ export default function Palette({
   className,
   color,
   onSelectColor,
-  onMouseLeave
+  onMouseLeave,
 }: PaletteProps): React.ReactElement {
   return (
     <div className={classes('Palette', className)} onMouseLeave={onMouseLeave}>

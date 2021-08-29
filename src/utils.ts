@@ -163,5 +163,5 @@ export {
   isLecture,
   getSemesterName,
   humanizeArray,
-  decryptReqs
+  decryptReqs,
 };
