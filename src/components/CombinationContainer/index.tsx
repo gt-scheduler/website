@@ -1,9 +1,11 @@
 import React, { useCallback, useContext, useMemo } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
+
 import { Button, Calendar, Select } from '..';
+import { OverlayCrnsContext, TermContext } from '../../contexts';
+
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import { OverlayCrnsContext, TermContext } from '../../contexts';
 
 export default function CombinationContainer(): React.ReactElement {
   const [

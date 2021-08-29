@@ -1,19 +1,25 @@
 import React from 'react';
+
 import { Theme, defaultTermData, TermData } from '../types';
 import Oscar, { EMPTY_OSCAR } from '../beans/Oscar';
+import { hardError } from '../log';
 
 type Setter<T> = (next: T) => void;
 
 export type ThemeContextValue = [Theme, Setter<Theme>];
 export const ThemeContext = React.createContext<ThemeContextValue>([
   'light',
-  (): void => {}
+  (): void => {
+    hardError('empty ThemeContext.setTheme value being used', null);
+  }
 ]);
 
 export type TermsContextValue = [string[], Setter<string[]>];
 export const TermsContext = React.createContext<TermsContextValue>([
   [],
-  (): void => {}
+  (): void => {
+    hardError('empty TermsContext.setTerms value being used', null);
+  }
 ]);
 
 export type TermContextData = {
@@ -33,14 +39,22 @@ export const TermContext = React.createContext<TermContextValue>([
     ...defaultTermData
   },
   {
-    setTerm: (): void => {},
-    setOscar: (): void => {},
-    patchTermData: (): void => {}
+    setTerm: (): void => {
+      hardError('empty TermContext.setTerm value being used', null);
+    },
+    setOscar: (): void => {
+      hardError('empty TermContext.setOscar value being used', null);
+    },
+    patchTermData: (): void => {
+      hardError('empty TermContext.patchTermData value being used', null);
+    }
   }
 ]);
 
 export type OverlayCrnsContextValue = [string[], Setter<string[]>];
 export const OverlayCrnsContext = React.createContext<OverlayCrnsContextValue>([
   [],
-  (): void => {}
+  (): void => {
+    hardError('empty OverlayCrnsContext.setOverlayCrns value being used', null);
+  }
 ]);

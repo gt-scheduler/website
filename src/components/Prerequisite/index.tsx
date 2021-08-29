@@ -4,6 +4,7 @@ import {
   faAngleUp,
   faAngleDown
 } from '@fortawesome/free-solid-svg-icons';
+
 import { TermContext } from '../../contexts';
 import { classes, decryptReqs } from '../../utils';
 import { ActionRow } from '..';
@@ -49,7 +50,7 @@ export default function Prerequisite({
           {decryptReqs(req)} {!isLast && <strong>and</strong>}
         </div>
       )}
-      {isHeader && course != null && (
+      {isHeader && course != null && option != null && (
         <ActionRow
           className={classes('hover-container')}
           label={req ? `Option ${option}` : `Prerequisites`}

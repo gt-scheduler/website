@@ -1,5 +1,6 @@
 import React from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+
 import { ActionRow } from '..';
 import { classes, getContentClassName } from '../../utils';
 import { Period, SafeRecord } from '../../types';
@@ -103,7 +104,7 @@ export default function DaySelection({
                     }
 
                     return (
-                      <div className="course-content">
+                      <div className="course-content" key={course.id}>
                         <div className="course-id">{course.id}</div>
                         <span className="course-row">{course.title}</span>
                         <span className="course-row">

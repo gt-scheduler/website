@@ -1,6 +1,8 @@
 import React from 'react';
+
 import { classes } from '../../utils';
 import { PALETTE } from '../../constants';
+
 import './stylesheet.scss';
 
 export type PaletteProps = {
@@ -13,10 +15,11 @@ export type PaletteProps = {
 export default function Palette({
   className,
   color,
-  onSelectColor
+  onSelectColor,
+  onMouseLeave
 }: PaletteProps): React.ReactElement {
   return (
-    <div className={classes('Palette', className)}>
+    <div className={classes('Palette', className)} onMouseLeave={onMouseLeave}>
       {PALETTE.map((colors, i) => (
         <div className="palette-row" key={i}>
           {colors.map((paletteColor) => (

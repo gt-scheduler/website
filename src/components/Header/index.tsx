@@ -1,6 +1,4 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import 'react-virtualized/styles.css';
-import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faAdjust,
@@ -15,13 +13,18 @@ import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import ReactTooltip from 'react-tooltip';
 import copy from 'copy-to-clipboard';
+
 import { getSemesterName } from '../../utils';
 import { PNG_SCALE_FACTOR } from '../../constants';
-import ics from '../../libs/ics';
+import ics from '../../vendor/ics';
 import { Button, Calendar, Select, Tab } from '..';
 import { useMobile } from '../../hooks';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 import { ICS } from '../../types';
+import { softError } from '../../log';
+
+import './stylesheet.scss';
+import 'react-virtualized/styles.css';
 
 export type HeaderProps = {
   currentTab: number;
@@ -120,7 +123,13 @@ export default function Header({
           'background-color': theme === 'light' ? '#FFFFFF' : '#333333'
         }
       })
-      .then((blob) => saveAs(blob, 'schedule.png'));
+      .then((blob) => saveAs(blob, 'schedule.png'))
+      .catch((err) =>
+        softError(
+          'could not take screenshot of shadow calendar for schedule export',
+          err
+        )
+      );
   }, [captureRef, theme]);
 
   // Obtain a ref to the copy button to only close its tooltip

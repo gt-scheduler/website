@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
 import ago from 's-ago';
+
 import { Button, Course, CourseAdd } from '..';
+import { TermContext } from '../../contexts';
+
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import { TermContext } from '../../contexts';
 
 export default function CourseContainer(): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(TermContext);

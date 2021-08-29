@@ -1,4 +1,6 @@
 import React, {
+  ChangeEvent,
+  KeyboardEvent,
   useCallback,
   useContext,
   useMemo,
@@ -7,12 +9,14 @@ import React, {
 } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+
 import { Course, CourseFilter } from '..';
 import { classes, getRandomColor } from '../../utils';
-import './stylesheet.scss';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { TermContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../beans';
+
+import './stylesheet.scss';
 
 export type CourseAddProps = {
   className?: string;
@@ -80,15 +84,18 @@ export default function CourseAdd({
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleChangeKeyword = useCallback((e) => {
-    let input = e.target.value.trim();
-    const results = input.match(/^([A-Z]+)(\d.*)$/i);
-    if (results) {
-      const [, subject, number] = results;
-      input = `${subject} ${number}`;
-    }
-    setKeyword(input);
-  }, []);
+  const handleChangeKeyword = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      let input = e.target.value.trim();
+      const results = /^([A-Z]+)(\d.*)$/i.exec(input);
+      if (results) {
+        const [, subject, number] = results;
+        input = `${subject} ${number}`;
+      }
+      setKeyword(input);
+    },
+    []
+  );
 
   const courses = useMemo(() => {
     const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(keyword.toUpperCase());
@@ -136,7 +143,7 @@ export default function CourseAdd({
   );
 
   const handleKeyDown = useCallback(
-    (e) => {
+    (e: KeyboardEvent<HTMLInputElement>) => {
       switch (e.key) {
         case 'Enter':
           if (courses[activeIndex]) {

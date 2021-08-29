@@ -8,9 +8,9 @@ import {
   faPlus,
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
+
 import { classes, getContentClassName } from '../../utils';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
-import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../beans';
 import {
@@ -19,6 +19,9 @@ import {
   PrerequisiteSet,
   SafeRecord
 } from '../../types';
+import { softError } from '../../log';
+
+import './stylesheet.scss';
 
 export type CourseProps = {
   className?: string;
@@ -45,7 +48,12 @@ export default function Course({
     if (!isSearching) {
       const course = oscar.findCourse(courseId);
       if (course == null) return;
-      course.fetchGpa().then(setGpaMap);
+      course
+        .fetchGpa()
+        .then(setGpaMap)
+        .catch((err) => {
+          softError(`error fetching course GPA`, err, { courseId });
+        });
     }
   }, [isSearching, oscar, courseId]);
 

@@ -6,13 +6,16 @@ import {
   faThumbtack,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
+
 import { classes, periodToString } from '../../utils';
 import { ActionRow } from '..';
-import './stylesheet.scss';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
 import { Section as SectionBean } from '../../beans';
 import { Seating } from '../../beans/Section';
+import { softError } from '../../log';
+
+import './stylesheet.scss';
 
 export type SectionProps = {
   className?: string;
@@ -36,13 +39,24 @@ export default function Section({
   let hovering = false;
   const handleHover = (): void => {
     hovering = true;
-    setTimeout(async () => {
-      if (hovering) setSeating(await section.fetchSeating(term));
+    setTimeout(() => {
+      if (hovering) {
+        section
+          .fetchSeating(term)
+          .then((newSeating) => {
+            setSeating(newSeating);
+          })
+          .catch((err) =>
+            softError('error while fetching seating', err, {
+              crn: section.crn
+            })
+          );
+      }
     }, 333);
   };
 
   const excludeSection = useCallback(
-    (sect) => {
+    (sect: SectionBean) => {
       patchTermData({
         excludedCrns: [...excludedCrns, sect.crn],
         pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
@@ -52,7 +66,7 @@ export default function Section({
   );
 
   const pinSection = useCallback(
-    (sect) => {
+    (sect: SectionBean) => {
       if (pinnedCrns.includes(sect.crn)) {
         patchTermData({
           pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn)
@@ -141,7 +155,9 @@ export default function Section({
                   {seating[0].length === 0
                     ? `Loading...`
                     : typeof seating[0][1] === 'number'
-                    ? `${seating[0][1]} of ${seating[0][0]}`
+                    ? `${seating[0][1] ?? '<unknown>'} of ${
+                        seating[0][0] ?? '<unknown>'
+                      }`
                     : `N/A`}
                 </td>
               </tr>
@@ -153,7 +169,9 @@ export default function Section({
                   {seating[0].length === 0
                     ? `Loading...`
                     : typeof seating[0][1] === 'number'
-                    ? `${seating[0][3]} of ${seating[0][2]}`
+                    ? `${seating[0][3] ?? '<unknown>'} of ${
+                        seating[0][2] ?? '<unknown>'
+                      }`
                     : `N/A`}
                 </td>
               </tr>

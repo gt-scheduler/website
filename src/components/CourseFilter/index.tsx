@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { classes, humanizeArray } from '../../utils';
-import './stylesheet.scss';
 import { SafeRecord } from '../../types';
+
+import './stylesheet.scss';
 
 export type CourseFilterProps = {
   name: string;

@@ -16,11 +16,12 @@ declare module '@sweetalert/with-react' {
   export declare type SwalParams = (string | Partial<SwalOptions>)[];
 
   export interface SweetAlert {
-    (...params: SwalParams): Promise<any>;
+    (...params: SwalParams): Promise<unknown>;
     close?(namespace?: string): void;
     getState?(): SwalState;
     setActionValue?(opts: string | ActionOptions): void;
     stopLoading?(): void;
+    // eslint-disable-next-line @typescript-eslint/ban-types
     setDefaults?(opts: object): void;
   }
 

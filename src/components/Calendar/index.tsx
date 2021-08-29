@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
+
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils';
 import { TimeBlocks } from '..';
-import './stylesheet.scss';
 import { TermContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
 import { Period, SafeRecord } from '../../types';
+
+import './stylesheet.scss';
 
 export type CalendarProps = {
   className?: string;

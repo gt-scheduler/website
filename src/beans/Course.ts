@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { Oscar, Section } from '.';
 import {
   CourseGpa,
@@ -8,6 +9,7 @@ import {
   SafeRecord
 } from '../types';
 import { hasConflictBetween, isLab, isLecture } from '../utils';
+import { softError } from '../log';
 
 interface SectionGroupMeeting {
   days: string[];
@@ -140,30 +142,101 @@ export default class Course {
       // Ignore errors during cleaning
     }
     const encodedCourse = encodeURIComponent(id);
-    return axios({
-      url: `${base}/course?courseID=${encodedCourse}`,
-      method: 'get'
-    })
-      .then((response) => {
-        const { data } = response;
-        const averageGpa = data.header[0].avg_gpa;
-        const gpaMap: CourseGpa = { averageGpa };
+    const url = `${base}/course?courseID=${encodedCourse}`;
 
-        data.raw.forEach((datum: { instructor_name: string; GPA: number }) => {
-          const instructor = datum.instructor_name;
-          const gpa = datum.GPA;
-
-          const [lastName, firstName] = instructor.split(', ');
-          const fullName = `${firstName} ${lastName}`;
-          gpaMap[fullName] = gpa;
-        });
-
-        return gpaMap;
-      })
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        return {};
+    let responseData: CourseDetailsAPIResponse;
+    try {
+      responseData = (await axios.get<CourseDetailsAPIResponse>(url)).data;
+    } catch (err) {
+      softError(`fetching course details from Course Critique API`, err, {
+        baseId: this.id,
+        cleanedId: id,
+        url
       });
+      return {};
+    }
+
+    // Extract the relevant fields from the response
+    // We catch (or even throw) errors here to defensively ensure that
+    // the data coming out of this function is safely typed
+    try {
+      const gpaMap: CourseGpa = {};
+
+      // Extract the course-wide average GPA
+      const rawAverageGpa = responseData.header[0].avg_gpa;
+      if (typeof rawAverageGpa !== 'number')
+        throw new Error(`data at ".header[0].avg_gpa" was not a number`);
+      gpaMap.averageGpa = rawAverageGpa;
+
+      // Extract the GPA for each instructor
+      responseData.raw.forEach((instructorData, i) => {
+        // Extract the instructor's name
+        const rawInstructor = instructorData.instructor_name;
+        if (typeof rawInstructor !== 'string')
+          throw new Error(
+            `data at ".raw[${i}].instructor_name" was not a string`
+          );
+
+        // Extract the instructor's GPA
+        const instructorGpa = instructorData.GPA;
+        if (typeof instructorGpa !== 'number')
+          throw new Error(`data at ".raw[${i}].GPA" was not a number`);
+
+        // Normalize the instructor name from "LN, FN" to "FN LN"
+        let instructor = rawInstructor;
+        if (instructor.indexOf(',') !== -1) {
+          const [lastName, firstName] = instructor.split(', ');
+          instructor = `${firstName} ${lastName}`;
+        }
+
+        gpaMap[instructor] = instructorGpa;
+      });
+
+      return gpaMap;
+    } catch (err) {
+      softError(
+        `extracting course GPA from Course Critique API response`,
+        err,
+        {
+          baseId: this.id,
+          cleanedId: id,
+          url,
+          responseData
+        }
+      );
+      return {};
+    }
   }
+}
+
+// Based on response for CS 6035 on 2021-08-28
+// from the Course Critique API
+interface CourseDetailsAPIResponse {
+  header: Array<{
+    course_name: string;
+    description: string;
+    credits: number;
+    avg_gpa: number;
+    avg_a: number;
+    avg_b: number;
+    avg_c: number;
+    avg_d: number;
+    avg_f: number;
+    avg_w: number;
+    full_name: string;
+  }>;
+  raw: Array<{
+    instructor_gt_username: string;
+    instructor_name: string;
+    link: string;
+    class_size_group: string;
+    GPA: number;
+    A: number;
+    B: number;
+    C: number;
+    D: number;
+    F: number;
+    W: number;
+    sections: number;
+  }>;
 }

@@ -1,6 +1,6 @@
 import { Section } from './beans';
 import { DAYS, PALETTE } from './constants';
-import { Period, PrerequisiteClause, PrerequisiteCourse } from './types';
+import { Period, PrerequisiteClause } from './types';
 
 const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -9,7 +9,7 @@ const stringToTime = (string: string): number => {
   return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
-const timeToString = (time: number, ampm: boolean = true): string => {
+const timeToString = (time: number, ampm = true): string => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
   const hh = hour > 12 ? hour - 12 : hour;
@@ -101,19 +101,19 @@ const getSemesterName = (term: string): string => {
   return `${semester} ${year}`;
 };
 
-const humanizeArray = <T>(array: T[], conjunction: string = 'and'): string => {
+const humanizeArray = <T>(array: T[], conjunction = 'and'): string => {
   if (array.length <= 2) {
     return array.join(` ${conjunction} `);
   }
   const init = [...array];
   const last = init.pop();
-  return `${init.join(', ')}, ${conjunction} ${last}`;
+  return `${init.join(', ')}, ${conjunction} ${String(last)}`;
 };
 
 const decryptReqs = (
   reqs: PrerequisiteClause,
-  openPar: boolean = false,
-  closePar: boolean = false
+  openPar = false,
+  closePar = false
 ): string => {
   // This function accepts the index of a sub-clause
   // from the sub-clause slice of a compound prereq clause
@@ -136,14 +136,6 @@ const decryptReqs = (
     const [, ...subClauses] = reqs;
     subClauses.forEach((req, i) => {
       string += decryptReqs(req) + (last(i) ? '' : ' or ');
-    });
-  } else {
-    // TODO(jazevedo620) 2021-08-24: under what conditions is this code run?
-    // It seems like (if `reqs` is indeed of type `PrerequisiteClause`)
-    // that this code isn't run, but I'm wary of removing it for now
-    // until types are added to the dependent `<Prerequisite>` component.
-    (reqs as PrerequisiteCourse[]).forEach((req, i) => {
-      string += req.id + (i === reqs.length - 1 ? '' : ' or ');
     });
   }
 

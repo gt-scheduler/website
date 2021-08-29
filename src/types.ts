@@ -35,7 +35,7 @@ export type ICS = {
     location: string,
     begin: string | Date,
     stop: string | Date,
-    rrule: any
+    rrule: unknown
   ): false | string[];
 };
 

@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react';
+
 import MapView, { MapLocation } from '../MapView';
 import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
+import { SafeRecord } from '../../types';
 
 import './stylesheet.scss';
-import { SafeRecord } from '../../types';
 
 export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);

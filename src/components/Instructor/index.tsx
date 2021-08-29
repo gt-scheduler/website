@@ -6,11 +6,13 @@ import {
   faBan,
   faGraduationCap
 } from '@fortawesome/free-solid-svg-icons';
+
 import { classes, simplifyName, unique } from '../../utils';
 import { Section as SectionBean } from '../../beans';
 import { ActionRow, Section } from '..';
-import './stylesheet.scss';
 import { TermContext } from '../../contexts';
+
+import './stylesheet.scss';
 
 export type InstructorProps = {
   className?: string;
@@ -33,7 +35,7 @@ export default function Instructor({
   const [expanded, setExpanded] = useState(true);
 
   const includeSection = useCallback(
-    (section) => {
+    (section: SectionBean) => {
       patchTermData({
         excludedCrns: excludedCrns.filter((crn) => crn !== section.crn)
       });

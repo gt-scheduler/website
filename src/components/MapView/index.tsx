@@ -3,7 +3,10 @@ import ReactMapGL, { Marker, NavigationControl } from 'react-map-gl';
 import { ViewState } from 'react-map-gl/src/mapbox/mapbox';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin } from '@fortawesome/free-solid-svg-icons';
+
 import { Location } from '../../types';
+
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
 
 export type MapLocation = {
@@ -22,6 +25,7 @@ export type MapViewProps = {
 export default function MapView({
   locations
 }: MapViewProps): React.ReactElement {
+  // These initial coordinates start the map looking at the GT Atlanta campus
   const [viewState, setViewState] = useState<ViewState>({
     latitude: 33.7765,
     longitude: -84.3963,
@@ -41,9 +45,11 @@ export default function MapView({
         viewState={viewState}
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-        onViewStateChange={(newViewState: ViewState): void =>
-          setViewState(newViewState)
-        }
+        onViewStateChange={({
+          viewState: newViewState
+        }: {
+          viewState: ViewState;
+        }): void => setViewState(newViewState)}
       >
         {locations.map((location, i) =>
           !location.coords ? (

@@ -122,7 +122,7 @@ export default class Oscar {
     excludedCrns: string[]
   ): Combination[] {
     const crnsList: string[][] = [];
-    const dfs = (courseIndex: number = 0, crns: string[] = []): void => {
+    const dfs = (courseIndex = 0, crns: string[] = []): void => {
       if (courseIndex === desiredCourses.length) {
         crnsList.push(crns);
         return;

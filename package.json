@@ -17,6 +17,7 @@
     "dom-to-image": "^2.6.0",
     "file-saver": "^2.0.2",
     "js-cookie": "^2.2.1",
+    "mapbox-gl": "^2.4.1",
     "node-sass": "^4.14.1",
     "normalize.css": "^8.0.1",
     "react": "^17",
@@ -67,8 +68,8 @@
     "deploy": "gh-pages -d build",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
-    "format": "prettier \"**/*.{js,jsx,ts,tsx}\" --write",
-    "format:check": "prettier \"**/*.{js,jsx,ts,tsx}\" -l"
+    "format": "prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
+    "format:check": "prettier \"**/*.{js,jsx,ts,tsx,json}\" -l"
   },
   "eslintConfig": {
     "extends": "react-app"

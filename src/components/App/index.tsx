@@ -3,6 +3,7 @@ import axios from 'axios';
 import swal from '@sweetalert/with-react';
 import * as Sentry from '@sentry/react';
 import Cookies from 'js-cookie';
+
 import { classes } from '../../utils';
 import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
 import Feedback from '../Feedback';
@@ -17,6 +18,7 @@ import {
   ThemeContextValue
 } from '../../contexts';
 import { defaultTermData, isTheme } from '../../types';
+import { softError } from '../../log';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -102,6 +104,8 @@ export default function App(): React.ReactElement {
             </p>
           </div>
         )
+      }).catch((err) => {
+        softError(`error with swal call`, err, { cookieKey });
       });
 
       Cookies.set(cookieKey, 'true', { expires: 365 });
@@ -112,21 +116,25 @@ export default function App(): React.ReactElement {
   useEffect(() => {
     setOscar(null);
     if (term) {
+      const url = `https://gt-scheduler.github.io/crawler/${term}.json`;
       axios
-        .get(`https://gt-scheduler.github.io/crawler/${term}.json`)
+        .get(url)
         .then((res) => {
           const newOscar = new Oscar(res.data);
           setOscar(newOscar);
+        })
+        .catch((err) => {
+          softError(`error fetching crawler data`, err, { term, url });
         });
     }
   }, [term]);
 
   // Fetch all terms via the GitHub API
   useEffect(() => {
+    const url =
+      'https://api.github.com/repos/gt-scheduler/crawler/contents?ref=gh-pages';
     axios
-      .get(
-        'https://api.github.com/repos/gt-scheduler/crawler/contents?ref=gh-pages'
-      )
+      .get(url)
       .then((res) => {
         const newTerms = (res.data as { name: string }[])
           .map((content) => content.name)
@@ -135,13 +143,16 @@ export default function App(): React.ReactElement {
           .sort()
           .reverse();
         setTerms(newTerms);
+      })
+      .catch((err) => {
+        softError(`error fetching list of terms`, err, { url });
       });
   }, [setTerms]);
 
   // Set the term to be the first one if it is unset
   // (once the terms load)
   useEffect(() => {
-    if (!term) {
+    if (term === '' && terms.length > 0) {
       const [recentTerm] = terms;
       setTerm(recentTerm);
     }

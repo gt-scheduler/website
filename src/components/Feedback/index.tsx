@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import './stylesheet.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import { Button } from '..';
 import { classes } from '../../utils';
-
 import { FormSubmit } from '../../beans';
+
+import './stylesheet.scss';
 
 export default function Feedback(): React.ReactElement {
   const [expanded, setExpanded] = useState<boolean>(false);

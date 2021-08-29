@@ -16,7 +16,7 @@ export default function useCookie(
 
   useEffect(() => {
     let val;
-    if (key !== undefined) {
+    if (key !== undefined && key !== '') {
       val = Cookies.get(key);
     }
     setValue(val);
