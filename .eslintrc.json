@@ -77,7 +77,13 @@
     // Disable the normal `no-use-before-define` in favor of the one in `@typescript-eslint`.
     // From https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md#how-to-use
     "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": ["warn"],
+    "@typescript-eslint/no-use-before-define": [
+      "off",
+      {
+        "typedefs": false,
+        "functions": false
+      }
+    ],
     "@typescript-eslint/no-unused-vars": ["warn"],
     // Configure import order
     "import/order": [
