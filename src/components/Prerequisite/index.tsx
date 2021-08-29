@@ -50,10 +50,10 @@ export default function Prerequisite({
           {decryptReqs(req)} {!isLast && <strong>and</strong>}
         </div>
       )}
-      {isHeader && course != null && option != null && (
+      {isHeader && course != null && (
         <ActionRow
           className={classes('hover-container')}
-          label={req ? `Option ${option}` : `Prerequisites`}
+          label={req ? `Option ${option ?? '?'}` : `Prerequisites`}
           actions={[
             !req
               ? {

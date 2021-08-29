@@ -3,9 +3,10 @@ import { useCallback, useMemo } from 'react';
 import { useCookie } from '.';
 import { ErrorWithFields } from '../log';
 
-export default function useJsonCookie<
-  T extends Record<string, unknown> | Array<unknown>
->(key: string, defaultValue: T): [T, (patch: Partial<T>) => void] {
+export default function useJsonCookie<T extends Record<string, unknown>>(
+  key: string,
+  defaultValue: T
+): [T, (patch: Partial<T>) => void] {
   const [rawValue, setRawValue] = useCookie(key);
 
   const value = useMemo(() => {

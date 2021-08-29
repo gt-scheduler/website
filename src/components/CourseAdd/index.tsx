@@ -175,7 +175,7 @@ export default function CourseAdd({
   );
 
   const handleToggleFilter = useCallback(
-    (key: 'deliveryMode' | 'campus', tag: string) => {
+    (key: SortKey, tag: string) => {
       const tags = filter[key];
       setFilter({
         ...filter,
@@ -204,7 +204,7 @@ export default function CourseAdd({
       <div className="add">
         <div className="primary">
           <FontAwesomeIcon
-            className={classes('icon', !!courses.length && 'active')}
+            className={classes('icon', courses.length > 0 && 'active')}
             fixedWidth
             icon={faPlus}
           />

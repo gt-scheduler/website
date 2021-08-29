@@ -115,10 +115,10 @@ export default function Course({
   const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
     const [primaryInstructor = 'Not Assigned'] = section.instructors;
-    let mapEntry = instructorMap[primaryInstructor];
-    if (mapEntry === undefined) mapEntry = [];
-    mapEntry.push(section);
-    instructorMap[primaryInstructor] = mapEntry;
+
+    const instructorSections = instructorMap[primaryInstructor] ?? [];
+    instructorSections.push(section);
+    instructorMap[primaryInstructor] = instructorSections;
   });
 
   const instructors = Object.keys(instructorMap);
