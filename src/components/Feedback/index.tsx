@@ -55,6 +55,7 @@ export default function Feedback(): React.ReactElement {
                   <div className="FormButtons">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <Button
+                        key={i}
                         className={classes(
                           'FormButton',
                           rating === i - 1 && 'active'
