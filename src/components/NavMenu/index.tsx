@@ -29,6 +29,7 @@ export default function NavMenu({
         <Button
           className={classes('nav-button', currentItem === idx && 'active')}
           onClick={(): void => onChangeItem(idx)}
+          key={idx}
         >
           {item}
         </Button>

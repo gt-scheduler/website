@@ -13,7 +13,7 @@ import { classes, getContentClassName } from '../../utils';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { TermContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../beans';
-import { CourseGpa, PrerequisiteClause, PrerequisiteSet } from '../../types';
+import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
@@ -96,20 +96,9 @@ export default function Course({
   const contentClassName = color != null && getContentClassName(color);
 
   const hasPrereqs = oscar.version > 1;
-  let prereqOptions: PrerequisiteClause[] | null = null;
-
+  let prereqs: CrawlerPrerequisites | null = null;
   if (hasPrereqs) {
-    const rawPrereqs = course.prereqs;
-    if (rawPrereqs != null && rawPrereqs.length > 0) {
-      // We just checked the length, so `rawPrereqs` can't be the empty array []
-      // Therefore, it must be `PrerequisiteSet`.
-      const [rootOperator, ...clauses] = rawPrereqs as PrerequisiteSet;
-      if (rootOperator === 'or') {
-        prereqOptions = clauses;
-      } else {
-        prereqOptions = [[rootOperator, ...clauses]];
-      }
-    }
+    prereqs = course.prereqs ?? [];
   }
 
   const instructorMap: Record<string, Section[] | undefined> = {};
@@ -270,32 +259,8 @@ export default function Course({
           )}
         </div>
       )}
-      {expanded && prereqOpen && (
-        <div className={classes('hover-container')}>
-          <div
-            className={classes(
-              !desiredCourses.includes(course.id) && 'dark-content',
-              'nested'
-            )}
-          >
-            <Prerequisite course={course} isHeader />
-            <div className={classes('nested')}>
-              {prereqOptions !== null &&
-                prereqOptions.map((req, i) => (
-                  <Prerequisite
-                    key={i}
-                    option={i + 1}
-                    course={course}
-                    req={req}
-                    isHeader
-                  />
-                ))}
-              {prereqOptions === null && (
-                <Prerequisite course={course} isEmpty />
-              )}
-            </div>
-          </div>
-        </div>
+      {expanded && prereqOpen && prereqs !== null && (
+        <Prerequisite course={course} prereqs={prereqs} />
       )}
     </div>
   );

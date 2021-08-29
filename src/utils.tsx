@@ -149,7 +149,7 @@ export function humanizeArrayReact<T>(
   );
 }
 
-export const decryptReqs = (
+export const serializePrereqs = (
   reqs: PrerequisiteClause,
   openPar = false,
   closePar = false
@@ -169,12 +169,13 @@ export const decryptReqs = (
   } else if (reqs[0] === 'and') {
     const [, ...subClauses] = reqs;
     subClauses.forEach((req, i) => {
-      string += decryptReqs(req, i === 0, last(i)) + (last(i) ? '' : ' and ');
+      string +=
+        serializePrereqs(req, i === 0, last(i)) + (last(i) ? '' : ' and ');
     });
   } else if (reqs[0] === 'or') {
     const [, ...subClauses] = reqs;
     subClauses.forEach((req, i) => {
-      string += decryptReqs(req) + (last(i) ? '' : ' or ');
+      string += serializePrereqs(req) + (last(i) ? '' : ' or ');
     });
   }
 
