@@ -89,7 +89,7 @@
     "*.{js,jsx,ts,tsx}": [
       "eslint"
     ],
-    "*.{js,jsx,ts,tsx,css}": [
+    "*.{js,jsx,ts,tsx,json}": [
       "prettier --write"
     ]
   }
