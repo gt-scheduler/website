@@ -16,7 +16,7 @@ Copyright (c) 2020 the Bits of Good "GT Scheduler" team
 
 ## 🔍 Overview
 
-The app is a React single-page application (SPA) (built using [`create-react-app`](https://github.com/facebook/create-react-app)) that forms the frontend website users interact with when they go to https://gt-scheduler.org/. It is written partially in JavaScript and partially in [TypeScript](https://www.typescriptlang.org/) (with TypeScript being the preference for any future contributions), and uses [SCSS](https://sass-lang.com/) for styling (a superset of CSS that supports advanced features).
+The app is a React single-page application (SPA) (built using [`create-react-app`](https://github.com/facebook/create-react-app)) that forms the frontend website users interact with when they go to https://gt-scheduler.org/. It is written in [TypeScript](https://www.typescriptlang.org/) (a typed superset of JavaScript), and uses [SCSS](https://sass-lang.com/) for styling (a superset of CSS that supports advanced features).
 
 To implement its goal of facilitating schedule creation and class exploration, GT Scheduler stores all data **locally in cookies**. Then, it sources any relevant data at runtime from a variety of sources, such as:
 
