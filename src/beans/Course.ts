@@ -190,6 +190,8 @@ export default class Course {
 
       // Extract the course-wide average GPA
       const rawAverageGpa = responseData.header[0].avg_gpa;
+      // If the field is null, then the course has no GPA information
+      if (rawAverageGpa === null) return {};
       if (typeof rawAverageGpa !== 'number')
         throw new ErrorWithFields({
           message: `data at ".header[0].avg_gpa" was not a number`,
@@ -259,17 +261,17 @@ export default class Course {
 interface CourseDetailsAPIResponse {
   header: [
     {
-      course_name: string | unknown;
-      description: string | unknown;
-      credits: number | unknown;
-      avg_gpa: number | unknown;
-      avg_a: number | unknown;
-      avg_b: number | unknown;
-      avg_c: number | unknown;
-      avg_d: number | unknown;
-      avg_f: number | unknown;
-      avg_w: number | unknown;
-      full_name: string | unknown;
+      course_name: string | null | unknown;
+      description: string | null | unknown;
+      credits: number | null | unknown;
+      avg_gpa: number | null | unknown;
+      avg_a: number | null | unknown;
+      avg_b: number | null | unknown;
+      avg_c: number | null | unknown;
+      avg_d: number | null | unknown;
+      avg_f: number | null | unknown;
+      avg_w: number | null | unknown;
+      full_name: string | null | unknown;
     }
   ];
   raw: Array<{
