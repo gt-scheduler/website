@@ -25,6 +25,19 @@ import './stylesheet.scss';
 
 const NAV_TABS = ['Scheduler', 'Map'];
 
+/**
+ * Determines if the given term is considered "valid";
+ * helps to recover from invalid cookie values if possible.
+ */
+function hasValidTerm(term: unknown): boolean {
+  return (
+    term != null &&
+    typeof term === 'string' &&
+    term !== '' &&
+    term !== 'undefined'
+  );
+}
+
 export default function App(): React.ReactElement {
   const [terms, setTerms] = useState<string[]>([]);
   const [oscar, setOscar] = useState<Oscar | null>(null);
@@ -123,7 +136,7 @@ export default function App(): React.ReactElement {
   // Fetch the current term's scraper information
   useEffect(() => {
     setOscar(null);
-    if (term) {
+    if (hasValidTerm(term)) {
       const url = `https://gt-scheduler.github.io/crawler/${term}.json`;
       axios
         .get(url)
@@ -177,7 +190,7 @@ export default function App(): React.ReactElement {
   // Set the term to be the first one if it is unset
   // (once the terms load)
   useEffect(() => {
-    if (term === '' && terms.length > 0) {
+    if (terms.length > 0 && !hasValidTerm(term)) {
       const [recentTerm] = terms as [string];
       setTerm(recentTerm);
     }
