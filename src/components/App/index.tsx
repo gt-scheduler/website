@@ -239,7 +239,7 @@ export default function App(): React.ReactElement {
       <TermsContext.Provider value={termsContextValue}>
         <TermContext.Provider value={termContextValue}>
           <div className={classes('App', className)}>
-            <Sentry.ErrorBoundary fallback="An error has occurred">
+            <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
               {/* On mobile, show the nav drawer + overlay */}
               {mobile && (
                 <NavDrawer open={isDrawerOpen} onClose={closeDrawer}>
