@@ -191,7 +191,12 @@ export default class Course {
       // Extract the course-wide average GPA
       const rawAverageGpa = responseData.header[0].avg_gpa;
       if (typeof rawAverageGpa !== 'number')
-        throw new Error(`data at ".header[0].avg_gpa" was not a number`);
+        throw new ErrorWithFields({
+          message: `data at ".header[0].avg_gpa" was not a number`,
+          fields: {
+            actual: rawAverageGpa,
+          },
+        });
       gpaMap.averageGpa = rawAverageGpa;
 
       // Extract the GPA for each instructor
@@ -199,14 +204,24 @@ export default class Course {
         // Extract the instructor's name
         const rawInstructor = instructorData.instructor_name;
         if (typeof rawInstructor !== 'string')
-          throw new Error(
-            `data at ".raw[${i}].instructor_name" was not a string`
-          );
+          throw new ErrorWithFields({
+            message: `data at ".raw[idx].instructor_name" was not a string`,
+            fields: {
+              idx: i,
+              actual: rawInstructor,
+            },
+          });
 
         // Extract the instructor's GPA
         const instructorGpa = instructorData.GPA;
         if (typeof instructorGpa !== 'number')
-          throw new Error(`data at ".raw[${i}].GPA" was not a number`);
+          throw new ErrorWithFields({
+            message: `data at ".raw[idx].GPA" was not a number`,
+            fields: {
+              idx: i,
+              actual: instructorGpa,
+            },
+          });
 
         // Normalize the instructor name from "LN, FN" to "FN LN"
         let instructor = rawInstructor;
@@ -229,7 +244,6 @@ export default class Course {
             baseId: this.id,
             cleanedId: id,
             url,
-            responseData,
           },
         })
       );

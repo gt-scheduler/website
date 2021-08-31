@@ -82,6 +82,13 @@ export function softError(error: ErrorWithFields): void {
 
   // Report the error to Sentry if in production
   if (process.env.NODE_ENV === 'production') {
-    Sentry.captureException(error, error.getAllFields());
+    const fields = error.getAllFields();
+    const { type, ...rest } = fields;
+    Sentry.captureException(error, {
+      contexts: {
+        // https://docs.sentry.io/platforms/ruby/enriching-events/context/#structured-context
+        fields: { ...rest, __do_not_use_type_in_sentry_it_is_special: type },
+      },
+    });
   }
 }
