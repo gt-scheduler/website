@@ -25,6 +25,19 @@ import './stylesheet.scss';
 
 const NAV_TABS = ['Scheduler', 'Map'];
 
+/**
+ * Determines if the given term is considered "valid";
+ * helps to recover from invalid cookie values if possible.
+ */
+function isValidTerm(term: unknown): boolean {
+  return (
+    term != null &&
+    typeof term === 'string' &&
+    term !== '' &&
+    term !== 'undefined'
+  );
+}
+
 export default function App(): React.ReactElement {
   const [terms, setTerms] = useState<string[]>([]);
   const [oscar, setOscar] = useState<Oscar | null>(null);
@@ -123,7 +136,7 @@ export default function App(): React.ReactElement {
   // Fetch the current term's scraper information
   useEffect(() => {
     setOscar(null);
-    if (term) {
+    if (isValidTerm(term)) {
       const url = `https://gt-scheduler.github.io/crawler/${term}.json`;
       axios
         .get(url)
@@ -177,9 +190,22 @@ export default function App(): React.ReactElement {
   // Set the term to be the first one if it is unset
   // (once the terms load)
   useEffect(() => {
-    if (term === '' && terms.length > 0) {
+    if (terms.length > 0 && !isValidTerm(term)) {
       const [recentTerm] = terms as [string];
-      setTerm(recentTerm);
+      if (isValidTerm(recentTerm)) {
+        setTerm(recentTerm);
+      } else {
+        // TODO(jazevedo620) 08-30-2021: present this as a hard error to user
+        softError(
+          new ErrorWithFields({
+            message: 'most recent term is not valid; can not fallback',
+            fields: {
+              recentTerm,
+              terms,
+            },
+          })
+        );
+      }
     }
   }, [terms, term, setTerm]);
 
