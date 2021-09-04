@@ -33,8 +33,15 @@ export default function MapView({
   });
 
   const unknown: MapLocation[] = [];
+  const coordsToLocationsMap = new Map<Location, MapLocation[]>();
   locations.forEach((location) => {
-    if (location.coords === null) unknown.push(location);
+    if (location.coords === null) {
+      unknown.push(location);
+    } else if (coordsToLocationsMap.has(location.coords)) {
+      coordsToLocationsMap.get(location.coords)?.push(location);
+    } else {
+      coordsToLocationsMap.set(location.coords, [location]);
+    }
   });
 
   return (
@@ -54,18 +61,16 @@ export default function MapView({
           viewState: ViewState;
         }): void => setViewState(newViewState)}
       >
-        {locations.map((location, i) =>
-          !location.coords ? (
-            <React.Fragment key={i} />
-          ) : (
-            <Marker
-              key={i}
-              latitude={location.coords.lat}
-              longitude={location.coords.long}
-            >
+        {Array.from(coordsToLocationsMap.entries()).map(
+          ([coords, coordLocations], i) => (
+            <Marker key={i} latitude={coords.lat} longitude={coords.long}>
               <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
               <p className="pin-text">
-                {location.id} {location.section}
+                {coordLocations.map((coordLocation) => (
+                  <div key={coordLocation.id + coordLocation.section}>
+                    {coordLocation.id} {coordLocation.section}
+                  </div>
+                ))}
               </p>
             </Marker>
           )
