@@ -18,7 +18,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    // Configure sourcemaps for Sentry
+    // https://docs.sentry.io/platforms/javascript/guides/react/sourcemaps/generating/#typescript
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/"
   },
   "include": ["src"]
 }
