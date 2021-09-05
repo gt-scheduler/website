@@ -12,6 +12,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           persist-credentials: false
+          # Fetch all history for Sentry to properly create the release
+          fetch-depth: 0
 
       - name: Install
         run: yarn install --frozen-lockfile
