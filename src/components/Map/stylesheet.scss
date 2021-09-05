@@ -1,6 +1,8 @@
 .map-content {
   display: flex;
-  height: 100vh;
+  flex-grow: 1;
+  overflow: hidden;
+  flex: 1;
 
   @media (max-width: 500px) {
     flex-direction: column;

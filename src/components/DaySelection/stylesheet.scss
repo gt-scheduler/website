@@ -2,6 +2,8 @@
 
 .date-container {
   width: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   @media (max-width: 900px) {
     width: 220px;
@@ -27,13 +29,19 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        padding: 8px 8px 4px 8px;
+        padding: 8px;
+
         .course-id {
           font-weight: bold;
         }
+
         .course-row {
-          padding: 4px;
+          padding: 0 4px;
           display: flex;
+        }
+
+        & > :not(:last-child) {
+          margin-bottom: 4px;
         }
       }
     }
