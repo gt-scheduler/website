@@ -20,6 +20,18 @@ jobs:
         run: CI=false yarn build
         env:
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
+          REACT_SENTRY_VERSION: ${{ github.sha }}
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          sourcemaps: 'build/static/js'
+          version: ${{ github.sha }}
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
