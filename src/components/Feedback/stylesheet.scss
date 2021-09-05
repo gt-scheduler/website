@@ -1,8 +1,16 @@
-.FeedbackButton {
-  position: absolute;
-  bottom: 40px;
-  right: 24px;
+// Create a wrapper with a solid background color
+// so that hover states properly lighten the button
+.FeedbackButtonWrapper {
   background-color: var(--theme-card-bg);
+  border-radius: 5px;
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+}
+
+.FeedbackButton {
   width: 60px;
   height: 60px;
   border-radius: 5px;
@@ -11,7 +19,7 @@
 
 .FeedbackForm {
   position: absolute;
-  bottom: 40px;
+  bottom: 24px;
   right: 24px;
   background-color: var(--theme-card-bg);
   width: 300px;

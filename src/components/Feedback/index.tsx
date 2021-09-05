@@ -32,12 +32,14 @@ export default function Feedback(): React.ReactElement {
   return (
     <div>
       {!expanded && (
-        <Button
-          className="FeedbackButton"
-          onClick={(): void => setExpanded(true)}
-        >
-          <FontAwesomeIcon icon={faCommentAlt} size="2x" />
-        </Button>
+        <div className="FeedbackButtonWrapper">
+          <Button
+            className="FeedbackButton"
+            onClick={(): void => setExpanded(true)}
+          >
+            <FontAwesomeIcon icon={faCommentAlt} size="2x" />
+          </Button>
+        </div>
       )}
       {expanded && (
         <div>
