@@ -1,18 +1,20 @@
 import React, { useContext, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
-import { periodToString } from '../../utils';
 import { TermContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 import { Meeting } from '../../types';
 
 import './stylesheet.scss';
 
+// Construct combined course data
+// to pass to `<MapView>` and `<DaySelection>`
+type CombinedCourseData = CourseDateItem & MapLocation;
+
 export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns }] = useContext(TermContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('M');
-  const locations: MapLocation[] = [];
-  const courseDateMap: Record<Day, CourseDateItem[]> = {
+  const courseDateMap: Record<Day, CombinedCourseData[]> = {
     M: [],
     T: [],
     W: [],
@@ -20,7 +22,7 @@ export default function Map(): React.ReactElement {
     F: [],
   };
 
-  // Construct the courseDateMap and locations data structures
+  // Construct the course data for the first meeting of each class
   pinnedCrns.forEach((crn) => {
     const section = oscar.findSection(crn);
     if (section == null) return;
@@ -36,31 +38,37 @@ export default function Map(): React.ReactElement {
         title: section.course.title,
         times: firstMeeting.period,
         daysOfWeek: firstMeeting.days,
+        section: section.id,
+        coords: firstMeeting.location,
       });
       courseDateMap[day] = courses;
     });
+  });
 
-    locations.push({
-      section: section.id,
-      id: section.course.id,
-      title: section.course.title,
-      days: firstMeeting.days,
-      time: periodToString(firstMeeting.period),
-      coords: firstMeeting.location,
-    });
+  // Sort each list of course data by their times
+  const sortedCourseDateMap: Record<Day, CombinedCourseData[]> = {
+    M: [],
+    T: [],
+    W: [],
+    R: [],
+    F: [],
+  };
+  Object.entries(courseDateMap).forEach(([day, courseDataList]) => {
+    if (!isDay(day)) return;
+    sortedCourseDateMap[day] = courseDataList.sort(
+      (a, b) => (a.times?.start ?? 0) - (b.times?.start ?? 0)
+    );
   });
 
   let activeLocations: MapLocation[] = [];
   if (activeDay !== '') {
-    activeLocations = locations.filter((loc) =>
-      (courseDateMap[activeDay] ?? []).some((course) => course.id === loc.id)
-    );
+    activeLocations = sortedCourseDateMap[activeDay];
   }
 
   return (
     <div className="map-content">
       <DaySelection
-        courseDateMap={courseDateMap}
+        courseDateMap={sortedCourseDateMap}
         activeDay={activeDay}
         setActiveDay={setActiveDay}
       />

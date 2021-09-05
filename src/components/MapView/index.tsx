@@ -12,9 +12,6 @@ import './stylesheet.scss';
 export type MapLocation = {
   section: string;
   id: string;
-  title: string;
-  days: string[];
-  time: string;
   coords: Location | null;
 };
 
@@ -65,13 +62,13 @@ export default function MapView({
           ([coords, coordLocations], i) => (
             <Marker key={i} latitude={coords.lat} longitude={coords.long}>
               <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
-              <p className="pin-text">
+              <div className="pin-text">
                 {coordLocations.map((coordLocation) => (
                   <div key={coordLocation.id + coordLocation.section}>
                     {coordLocation.id} {coordLocation.section}
                   </div>
                 ))}
-              </p>
+              </div>
             </Marker>
           )
         )}
