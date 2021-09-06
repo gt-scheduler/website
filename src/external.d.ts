@@ -21,8 +21,7 @@ declare module '@sweetalert/with-react' {
     getState?(): SwalState;
     setActionValue?(opts: string | ActionOptions): void;
     stopLoading?(): void;
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    setDefaults?(opts: object): void;
+    setDefaults?(opts: Record<string, unknown>): void;
   }
 
   declare const swal: SweetAlert;
