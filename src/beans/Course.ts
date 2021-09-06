@@ -7,7 +7,12 @@ import {
   CrawlerPrerequisites,
   Period,
 } from '../types';
-import { hasConflictBetween, isLab, isLecture } from '../utils';
+import {
+  hasConflictBetween,
+  isLab,
+  isLecture,
+  isAxiosNetworkError,
+} from '../utils';
 import { ErrorWithFields, softError } from '../log';
 
 interface SectionGroupMeeting {
@@ -168,17 +173,21 @@ export default class Course {
     try {
       responseData = (await axios.get<CourseDetailsAPIResponse>(url)).data;
     } catch (err) {
-      softError(
-        new ErrorWithFields({
-          message: 'fetching course details from Course Critique API',
-          source: err,
-          fields: {
-            baseId: this.id,
-            cleanedId: id,
-            url,
-          },
-        })
-      );
+      // Ignore network errors
+      if (!isAxiosNetworkError(err)) {
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching course details from Course Critique API',
+            source: err,
+            fields: {
+              baseId: this.id,
+              cleanedId: id,
+              url,
+            },
+          })
+        );
+      }
+
       return {};
     }
 
@@ -240,7 +249,8 @@ export default class Course {
     } catch (err) {
       softError(
         new ErrorWithFields({
-          message: 'extracting course GPA from Course Critique API response',
+          message:
+            'error extracting course GPA from Course Critique API response',
           source: err,
           fields: {
             baseId: this.id,

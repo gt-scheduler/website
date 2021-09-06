@@ -19,10 +19,11 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build
-        run: CI=false yarn build
+        run: yarn build
         env:
+          CI: "true"
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
-          REACT_SENTRY_VERSION: ${{ github.sha }}
+          REACT_APP_SENTRY_VERSION: ${{ github.sha }}
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
