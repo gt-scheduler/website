@@ -181,3 +181,12 @@ export const serializePrereqs = (
 
   return string;
 };
+
+// Determines whether an error is an axios network error,
+// which is used when determining whether to send it to Sentry
+// (since we can't do anything about a client-side NetworkError)--
+// it's either an error in the user's network
+// or downtime in a third-party service.
+export const isAxiosNetworkError = (err: unknown): boolean => {
+  return err instanceof Error && err.message.includes('Network Error');
+};

@@ -7,67 +7,93 @@ import * as Sentry from '@sentry/react';
 export class ErrorWithFields extends Error {
   fields: Record<string, unknown>;
 
-  source: unknown;
-
   topMessage: string;
 
-  baseName: string;
+  source: Error | null;
 
   constructor({
     message,
     source,
     fields = {},
-    baseName = 'ErrorWithFields',
   }: {
     message: string;
     source?: unknown;
     fields?: Record<string, unknown>;
-    baseName?: string;
   }) {
     super();
+
+    this.fields = fields;
+    this.topMessage = message;
+
+    // Make sure the given source is an error if given,
+    // otherwise add its string serialization as a field
     if (source instanceof Error) {
+      this.source = source;
       this.message = `${message}: ${source.message}`;
-      if (source.stack != null) this.stack = source.stack;
+
+      // Try to inherit the stacktrace of the given error
+      // (otherwise, fall back to the stacktrace created
+      // when this error was constructed)
+      if (source.stack != null) {
+        this.stack = source.stack;
+      }
     } else {
+      this.source = null;
       this.message = message;
+
+      if (this.source !== null) {
+        // The source was non-null but was not an Error:
+        // add a naive string serialization as a context
+        this.fields['__non_error_source'] = 'true';
+        try {
+          this.fields['__source'] = JSON.stringify(source);
+        } catch (_) {
+          // Ignore errors here
+          this.fields['__failed_to_stringify_source'] = 'true';
+        }
+      }
     }
 
-    this.baseName = baseName;
-    this.name = this.getName();
-    this.fields = fields;
-    this.source = source;
-    this.topMessage = message;
+    // Configure the name based on whether this is wrapping
+    // an existing non-wrapped error
+    const rootError = this.getRootError();
+    if (rootError === this || rootError instanceof ErrorWithFields) {
+      this.name = 'ErrorWithFields';
+    } else {
+      this.name = `ErrorWithFields(${rootError.name})`;
+    }
   }
 
   logToConsole(): void {
-    console.group(`error: ${this.topMessage}`);
-    console.error({ source: this.source });
+    console.group(this.topMessage);
+    console.error(this.getRootError());
 
     const allFields = this.getAllFields();
     if (Object.keys(allFields).length > 0) {
-      console.log(allFields);
+      console.info(allFields);
     }
 
     console.groupEnd();
-  }
-
-  getName(): string {
-    let baseName: string | null = null;
-    if (this.source instanceof ErrorWithFields) {
-      baseName = this.source.getName();
-    } else if (this.source instanceof Error) {
-      baseName = this.source.name;
-    }
-
-    if (baseName === null) return this.name;
-    return `${this.name}(${baseName})`;
   }
 
   getAllFields(): Record<string, unknown> {
     if (this.source instanceof ErrorWithFields) {
       return { ...this.source.getAllFields(), ...this.fields };
     }
+
     return this.fields;
+  }
+
+  getRootError(): Error {
+    if (this.source === null) {
+      return this;
+    }
+
+    if (this.source instanceof ErrorWithFields) {
+      return this.source.getRootError();
+    }
+
+    return this.source;
   }
 }
 
@@ -82,17 +108,22 @@ export function softError(error: ErrorWithFields): void {
 
   // Report the error to Sentry if in production
   if (process.env.NODE_ENV === 'production') {
+    // Ensure we don't include `type` in the fields
     let fields = error.getAllFields();
     if (Object.keys(fields).includes('type')) {
       const { type, ...rest } = fields;
       fields = { __do_not_use_type_in_sentry_it_is_special: type, ...rest };
     }
 
-    Sentry.captureException(error, {
+    Sentry.captureException(error.getRootError(), {
+      // https://docs.sentry.io/platforms/ruby/enriching-events/context/#structured-context
       contexts: {
-        // https://docs.sentry.io/platforms/ruby/enriching-events/context/#structured-context
         fields,
+        error: {
+          message: error.message,
+        },
       },
+      fingerprint: [error.message],
     });
   }
 }

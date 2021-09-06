@@ -4,7 +4,7 @@ import swal from '@sweetalert/with-react';
 import * as Sentry from '@sentry/react';
 import Cookies from 'js-cookie';
 
-import { classes } from '../../utils';
+import { classes, isAxiosNetworkError } from '../../utils';
 import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
 import Feedback from '../Feedback';
 import { Oscar } from '../../beans';
@@ -145,16 +145,20 @@ export default function App(): React.ReactElement {
           setOscar(newOscar);
         })
         .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'error fetching crawler data',
-              source: err,
-              fields: {
-                term,
-                url,
-              },
-            })
-          );
+          // TODO(jazevedo620) 09-05-2021: present this as a hard error to user
+          // Ignore network errors
+          if (!isAxiosNetworkError(err)) {
+            softError(
+              new ErrorWithFields({
+                message: 'error fetching crawler data',
+                source: err,
+                fields: {
+                  term,
+                  url,
+                },
+              })
+            );
+          }
         });
     }
   }, [term]);
@@ -175,15 +179,19 @@ export default function App(): React.ReactElement {
         setTerms(newTerms);
       })
       .catch((err) => {
-        softError(
-          new ErrorWithFields({
-            message: 'error fetching list of terms',
-            source: err,
-            fields: {
-              url,
-            },
-          })
-        );
+        // TODO(jazevedo620) 09-05-2021: present this as a hard error to user
+        // Ignore network errors
+        if (!isAxiosNetworkError(err)) {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching list of terms',
+              source: err,
+              fields: {
+                url,
+              },
+            })
+          );
+        }
       });
   }, [setTerms]);
 

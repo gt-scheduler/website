@@ -16,9 +16,9 @@ if (process.env.NODE_ENV === 'production') {
     dsn:
       'https://8955ef982197469e97c7644a8c090db1@o552970.ingest.sentry.io/5679614',
     integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: 0.2,
+    tracesSampleRate: 1.0,
     ignoreErrors: ['ResizeObserver loop limit exceeded'],
-    release: process.env['REACT_SENTRY_VERSION'],
+    release: process.env['REACT_APP_SENTRY_VERSION'],
   });
 }
 
