@@ -72,10 +72,8 @@ function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
 export default function CourseAdd({
   className,
 }: CourseAddProps): React.ReactElement {
-  const [
-    { oscar, desiredCourses, excludedCrns, colorMap },
-    { patchTermData },
-  ] = useContext(TermContext);
+  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchTermData }] =
+    useContext(TermContext);
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
@@ -89,7 +87,7 @@ export default function CourseAdd({
       let input = e.target.value.trim();
       const results = /^([A-Z]+)(\d.*)$/i.exec(input);
       if (results != null) {
-        const [, subject, number] = (results as unknown) as [
+        const [, subject, number] = results as unknown as [
           string,
           string,
           string
@@ -106,11 +104,7 @@ export default function CourseAdd({
     if (!results) {
       return [];
     }
-    const [, subject, number] = (results as unknown) as [
-      string,
-      string,
-      string
-    ];
+    const [, subject, number] = results as unknown as [string, string, string];
 
     setActiveIndex(0);
 

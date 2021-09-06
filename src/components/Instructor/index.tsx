@@ -29,9 +29,8 @@ export default function Instructor({
   sections,
   gpa,
 }: InstructorProps): React.ReactElement {
-  const [{ pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
-    TermContext
-  );
+  const [{ pinnedCrns, excludedCrns }, { patchTermData }] =
+    useContext(TermContext);
   const [expanded, setExpanded] = useState(true);
 
   const includeSection = useCallback(
