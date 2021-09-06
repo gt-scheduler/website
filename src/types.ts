@@ -1,3 +1,5 @@
+import React from 'react';
+
 export type Theme = 'light' | 'dark';
 
 export function isTheme(theme: string): theme is Theme {
@@ -9,6 +11,19 @@ export function isTheme(theme: string): theme is Theme {
       return false;
   }
 }
+
+export type LoadingState<T> =
+  | LoadingStateLoaded<T>
+  | LoadingStateLoading
+  | LoadingStateError;
+export type LoadingStateLoaded<T> = { type: 'loaded'; result: T };
+export type LoadingStateLoading = { type: 'loading' };
+export type LoadingStateError = {
+  type: 'error';
+  overview: React.ReactNode;
+  error: Error;
+  stillLoading: boolean;
+};
 
 export type TermData = {
   desiredCourses: string[];
@@ -25,6 +40,8 @@ export const defaultTermData: TermData = {
   colorMap: {},
   sortingOptionIndex: 0,
 };
+
+export const defaultTermDataRaw: string = JSON.stringify(defaultTermData);
 
 // Declare (better) types for the ICS library
 export type ICS = {

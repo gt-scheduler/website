@@ -1,10 +1,13 @@
 import React from 'react';
+import { IBackOffOptions } from 'exponential-backoff';
+import { DelayFactory } from 'exponential-backoff/dist/delay/delay.factory';
+import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 
 import { Oscar, Section } from './beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from './constants';
-import { softError, ErrorWithFields } from './log';
+import { ErrorWithFields, softError } from './log';
 import { ICS, Period, PrerequisiteClause, Theme } from './types';
 import ics from './vendor/ics';
 
@@ -194,6 +197,67 @@ export const serializePrereqs = (
 export const isAxiosNetworkError = (err: unknown): boolean => {
   return err instanceof Error && err.message.includes('Network Error');
 };
+
+/**
+ * Gives an awaitable class (via `promise`) that can be cancelled at any time.
+ * Useful when combined with `Promise.race` to cancel background tasks.
+ */
+export class Cancellable {
+  isCancelled: boolean;
+
+  cancel: () => void;
+
+  cancelledSymbol: symbol;
+
+  promise: Promise<symbol>;
+
+  constructor() {
+    this.isCancelled = false;
+    this.cancel = (): void => undefined;
+    this.cancelledSymbol = Symbol('__#Cancellable-cancelled-symbol');
+    this.promise = new Promise<symbol>((resolve) => {
+      this.cancel = (): void => {
+        this.isCancelled = true;
+        resolve(this.cancelledSymbol);
+      };
+    });
+  }
+}
+
+/**
+ * Sleeps for a delay controlled by an exponential backoff function with jitter.
+ * Acts as a thin wrapper around `exponential-backoff`
+ * that provides a lower-level API
+ * @param attemptNumber - The number of attempts that have occurred so far
+ * @param options - [optional] config for exponential-backoff
+ */
+export async function exponentialBackoff(
+  attemptNumber: number,
+  options: Partial<IBackOffOptions> = {}
+): Promise<void> {
+  await DelayFactory(
+    getSanitizedOptions({
+      // See https://github.com/coveooss/exponential-backoff for options API
+      jitter: 'full',
+      numOfAttempts: Number.MAX_SAFE_INTEGER,
+      ...options,
+    }),
+    attemptNumber
+  ).apply();
+}
+
+/**
+ * Promise version of `setTimeout`; used to wait for a specific delay
+ */
+export async function sleep({
+  amount_ms,
+}: {
+  amount_ms: number;
+}): Promise<void> {
+  await new Promise((resolve) =>
+    setTimeout(() => resolve(undefined), amount_ms)
+  );
+}
 
 /**
  * Exports the current schedule to a `.ics` file,

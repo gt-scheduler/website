@@ -15,6 +15,8 @@ import { getSemesterName } from '../../utils';
 import { Button, Select, Tab } from '..';
 import { useMobile } from '../../hooks';
 import { ThemeContext } from '../../contexts';
+import { LoadingSelect } from '../Select';
+import Spinner from '../Spinner';
 
 import './stylesheet.scss';
 
@@ -30,9 +32,14 @@ export type HeaderDisplayProps = {
   enableExportCalendar?: boolean;
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
-  terms: string[];
-  currentTerm: string;
-  onChangeTerm: (next: string) => void;
+  termsState:
+    | { type: 'loading' }
+    | {
+        type: 'loaded';
+        terms: string[];
+        currentTerm: string;
+        onChangeTerm: (next: string) => void;
+      };
 };
 
 /**
@@ -53,9 +60,7 @@ export default function HeaderDisplay({
   enableExportCalendar = false,
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
-  terms,
-  currentTerm,
-  onChangeTerm,
+  termsState,
 }: HeaderDisplayProps): React.ReactElement {
   const [theme, setTheme] = useContext(ThemeContext);
 
@@ -87,17 +92,28 @@ export default function HeaderDisplay({
       </Button>
 
       {/* Term selector */}
-      <Select
-        onChange={onChangeTerm}
-        value={currentTerm}
-        options={terms.map((term) => ({
-          value: term,
-          label: getSemesterName(term),
-        }))}
-        className="semester"
-      />
+      {termsState.type === 'loaded' ? (
+        <Select
+          onChange={termsState.onChangeTerm}
+          value={termsState.currentTerm}
+          options={termsState.terms.map((currentTerm) => ({
+            value: currentTerm,
+            label: getSemesterName(currentTerm),
+          }))}
+          className="semester"
+        />
+      ) : (
+        <LoadingSelect />
+      )}
 
-      <span className="credits">{totalCredits} Credits</span>
+      <span className="credits">
+        {totalCredits === null ? (
+          <Spinner size="small" style={{ marginRight: 8 }} />
+        ) : (
+          totalCredits
+        )}{' '}
+        Credits
+      </span>
 
       {/* Include middle-aligned tabs on desktop */}
       {!mobile && (

@@ -30,6 +30,26 @@
       }
     }
   }
+
+  .skeleton {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .skeleton-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      width: 100%;
+
+      .skeleton-content-inner {
+        margin: auto auto;
+        max-width: 640px;
+        padding: 2rem;
+        width: 100%;
+      }
+    }
+  }
 }
 
 body.dark .App {

@@ -1,0 +1,20 @@
+.error-header {
+  h4 {
+    font-size: 1.4rem;
+    margin-top: 12px;
+    margin-bottom: 8px;
+  }
+
+  svg {
+    font-size: 3rem;
+    margin: 0;
+
+    .App.dark & {
+      color: rgba(255, 128, 128, 0.5);
+    }
+
+    .App.light & {
+      color: rgba(128, 0, 0, 0.5);
+    }
+  }
+}

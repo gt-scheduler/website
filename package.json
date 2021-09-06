@@ -15,6 +15,8 @@
     "cheerio": "^1.0.0-rc.3",
     "copy-to-clipboard": "^3.3.1",
     "dom-to-image": "^2.6.0",
+    "exponential-backoff": "^3.1.0",
+    "fast-safe-stringify": "^2.1.0",
     "file-saver": "^2.0.2",
     "js-cookie": "^2.2.1",
     "mapbox-gl": "^2.4.1",

@@ -4,6 +4,7 @@ import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 import { classes } from '../../utils';
 import { Button } from '..';
+import Spinner from '../Spinner';
 
 import './stylesheet.scss';
 
@@ -53,6 +54,24 @@ export default function Select<V extends string | number>({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+export type LoadingSelectProps = {
+  className?: string;
+  label?: string;
+};
+
+export function LoadingSelect({
+  className,
+  label = 'Loading',
+}: LoadingSelectProps): React.ReactElement {
+  return (
+    <div className={classes('Button', 'Select', className, 'disabled')}>
+      <Spinner size="small" style={{ marginRight: 12 }} />
+      <div className="text">{label}</div>
+      <FontAwesomeIcon fixedWidth icon={faCaretDown} />
     </div>
   );
 }

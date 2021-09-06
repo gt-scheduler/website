@@ -1,0 +1,40 @@
+@import '../../variables';
+
+.error-display-outer {
+  font-size: 0.9rem;
+  margin: 0;
+  text-align: left;
+  line-height: 1.1rem;
+
+  .App.dark & {
+    color: rgba($theme-dark-foreground, 0.75);
+  }
+
+  .App.light & {
+    color: rgba($theme-light-foreground, 0.75);
+  }
+
+  & :not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  a {
+    .App.dark & {
+      color: #70a8ff;
+    }
+
+    .App.light & {
+      color: #1b61d1;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  pre {
+    width: 100%;
+    overflow-x: auto;
+    font-size: 0.8rem;
+  }
+}
