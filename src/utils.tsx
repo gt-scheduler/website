@@ -7,7 +7,7 @@ import { Period, PrerequisiteClause } from './types';
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
   if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = (regexResult as unknown) as [
+  const [, hour, minute, ampm] = regexResult as unknown as [
     string,
     string,
     string,

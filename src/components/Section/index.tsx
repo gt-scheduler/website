@@ -30,9 +30,8 @@ export default function Section({
   pinned,
   color,
 }: SectionProps): React.ReactElement {
-  const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] = useContext(
-    TermContext
-  );
+  const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] =
+    useContext(TermContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
   const [seating, setSeating] = useState<Seating>([[], 0]);
 
