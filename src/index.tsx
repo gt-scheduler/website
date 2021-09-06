@@ -18,9 +18,6 @@ if (process.env.NODE_ENV === 'production') {
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 0.2,
     ignoreErrors: ['ResizeObserver loop limit exceeded'],
-    // TypeScript wants this to use square-brackets
-    // since it's an index signature
-    // eslint-disable-next-line dot-notation
     release: process.env['REACT_SENTRY_VERSION'],
   });
 }

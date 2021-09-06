@@ -74,6 +74,10 @@
     "jsx-a11y/href-no-hash": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-static-element-interactions": "off",
+    // Disable the normal `dot-notation` in favor of the one in `@typescript-eslint`.
+    // From https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/dot-notation.md
+    "dot-notation": "off",
+    "@typescript-eslint/dot-notation": ["error"],
     // Disable the normal `no-use-before-define` in favor of the one in `@typescript-eslint`.
     // From https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md#how-to-use
     "no-use-before-define": "off",
