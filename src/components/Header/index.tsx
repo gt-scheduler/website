@@ -44,7 +44,7 @@ export default function Header({
   tabs,
 }: HeaderProps): React.ReactElement {
   const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
-  const [terms] = useContext(TermsContext);
+  const terms = useContext(TermsContext);
   const [theme, setTheme] = useContext(ThemeContext);
   const captureRef = useRef<HTMLDivElement>(null);
 

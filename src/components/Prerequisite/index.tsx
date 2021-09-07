@@ -80,6 +80,7 @@ export default function Prerequisite({
             fields: {
               courseId: course.id,
               operator: op,
+              term: course.term,
             },
           })
         );

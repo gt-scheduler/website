@@ -53,6 +53,7 @@ export default function Course({
               source: err,
               fields: {
                 courseId,
+                term: course.term,
               },
             })
           );

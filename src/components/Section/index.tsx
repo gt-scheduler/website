@@ -50,7 +50,7 @@ export default function Section({
               new ErrorWithFields({
                 message: 'error while fetching seating',
                 source: err,
-                fields: { crn: section.crn },
+                fields: { crn: section.crn, term: section.term },
               })
             )
           );
