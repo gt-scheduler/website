@@ -3,6 +3,7 @@
     "airbnb",
     "plugin:prettier/recommended",
     "prettier/react",
+    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
@@ -59,6 +60,8 @@
         "ignoreRegExpLiterals": true
       }
     ],
+    "react/require-default-props": "off",
+    "no-await-in-loop": "off",
     "camelcase": "off",
     "import/no-cycle": "off",
     "class-methods-use-this": "off",
