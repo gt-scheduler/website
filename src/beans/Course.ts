@@ -52,7 +52,10 @@ export default class Course {
 
   sectionGroups: Record<string, SectionGroup> | undefined;
 
+  term: string;
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
+    this.term = oscar.term;
     const [title, sections, prereqs] = data;
 
     this.id = courseId;
@@ -64,6 +67,7 @@ export default class Course {
           id: this.id,
           subject,
           number,
+          term: this.term,
         },
       });
     }
@@ -83,6 +87,7 @@ export default class Course {
               source: err,
               fields: {
                 courseId,
+                term: this.term,
               },
             })
           );
@@ -183,6 +188,7 @@ export default class Course {
               baseId: this.id,
               cleanedId: id,
               url,
+              term: this.term,
             },
           })
         );
@@ -206,6 +212,7 @@ export default class Course {
           message: `data at ".header[0].avg_gpa" was not a number`,
           fields: {
             actual: rawAverageGpa,
+            term: this.term,
           },
         });
       gpaMap.averageGpa = rawAverageGpa;
@@ -220,6 +227,7 @@ export default class Course {
             fields: {
               idx: i,
               actual: rawInstructor,
+              term: this.term,
             },
           });
 
@@ -231,6 +239,7 @@ export default class Course {
             fields: {
               idx: i,
               actual: instructorGpa,
+              term: this.term,
             },
           });
 
@@ -256,6 +265,7 @@ export default class Course {
             baseId: this.id,
             cleanedId: id,
             url,
+            term: this.term,
           },
         })
       );

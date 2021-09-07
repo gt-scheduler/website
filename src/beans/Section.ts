@@ -60,12 +60,15 @@ export default class Section {
   // This field is initialized after construction inside `Course.constructor`
   associatedLectures: Section[];
 
+  term: string;
+
   constructor(
     oscar: Oscar,
     course: Course,
     sectionId: string,
     data: SectionConstructionData
   ) {
+    this.term = oscar.term;
     const [
       crn,
       meetings,

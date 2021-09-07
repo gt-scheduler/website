@@ -16,7 +16,6 @@ import {
   TermContext,
   TermContextValue,
   TermsContext,
-  TermsContextValue,
   ThemeContext,
   ThemeContextValue,
 } from '../../contexts';
@@ -70,19 +69,15 @@ export default function App(): React.ReactElement {
   }, [oscar, termData]);
 
   // Memoize context values so that their references are stable
-  const termsContextValue = useMemo<TermsContextValue>(
-    () => [terms, setTerms],
-    [terms, setTerms]
-  );
   const termContextValue = useMemo<TermContextValue>(
     () => [
       // We ensure that oscar is non-null when we give this to the context
       // provider, so while this is an unsafe cast we ensure the safety
       // manually.
       { term, oscar: oscar as Oscar, ...filteredTermData },
-      { setTerm, setOscar, patchTermData },
+      { setTerm, patchTermData },
     ],
-    [term, oscar, filteredTermData, setTerm, setOscar, patchTermData]
+    [term, oscar, filteredTermData, setTerm, patchTermData]
   );
 
   // Fetch the current term's scraper information
@@ -93,7 +88,7 @@ export default function App(): React.ReactElement {
       axios
         .get(url)
         .then((res) => {
-          const newOscar = new Oscar(res.data);
+          const newOscar = new Oscar(res.data, term);
           setOscar(newOscar);
         })
         .catch((err) => {
@@ -200,7 +195,7 @@ export default function App(): React.ReactElement {
   return (
     <ThemeLoader>
       <AppCSSRoot>
-        <TermsContext.Provider value={termsContextValue}>
+        <TermsContext.Provider value={terms}>
           <TermContext.Provider value={termContextValue}>
             <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
               {/* On mobile, show the nav drawer + overlay */}

@@ -39,7 +39,7 @@ export default class Oscar {
 
   sortingOptions: SortingOption[];
 
-  constructor(data: OscarConstructionDate) {
+  constructor(data: OscarConstructionDate, public term: string) {
     const { courses, caches, updatedAt, version } = data;
 
     this.periods = caches.periods.map((period, i) => {
@@ -55,6 +55,7 @@ export default class Oscar {
             fields: {
               period,
               cacheIndex: i,
+              term: this.term,
             },
           })
         );
@@ -77,6 +78,7 @@ export default class Oscar {
             fields: {
               dateRange,
               cacheIndex: i,
+              term: this.term,
             },
           })
         );
@@ -108,6 +110,7 @@ export default class Oscar {
             fields: {
               courseId,
               source,
+              term: this.term,
             },
           })
         );
@@ -264,6 +267,7 @@ export default class Oscar {
         fields: {
           sortingOptionIndex,
           actualSortingOptionsLength: this.sortingOptions.length,
+          term: this.term,
         },
       });
     }
@@ -299,17 +303,20 @@ export default class Oscar {
  * Create an empty instance of the Oscar bean
  * to use as the default context value
  */
-export const EMPTY_OSCAR = new Oscar({
-  courses: {},
-  caches: {
-    periods: [],
-    dateRanges: [],
-    scheduleTypes: [],
-    campuses: [],
-    attributes: [],
-    gradeBases: [],
-    locations: [],
+export const EMPTY_OSCAR = new Oscar(
+  {
+    courses: {},
+    caches: {
+      periods: [],
+      dateRanges: [],
+      scheduleTypes: [],
+      campuses: [],
+      attributes: [],
+      gradeBases: [],
+      locations: [],
+    },
+    updatedAt: new Date(),
+    version: 1,
   },
-  updatedAt: new Date(),
-  version: 1,
-});
+  '197008'
+);
