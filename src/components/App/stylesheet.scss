@@ -43,19 +43,19 @@
   }
 }
 
-.App.dark {
+body.dark .App {
   background-color: $theme-dark-background;
   color: $theme-dark-foreground;
   --theme-bg: #{$theme-dark-background};
-  --theme-card-bg: #434343;
+  --theme-card-bg: #{$theme-dark-card-background};
   --dark-overlay: rgba(0, 0, 0, 0.2);
 }
 
-.App.light {
+body.light .App {
   background-color: $theme-light-background;
   color: $theme-light-foreground;
   --theme-bg: #{$theme-light-background};
-  --theme-card-bg: #e5e5e5;
+  --theme-card-bg: #{$theme-light-card-background};
   --dark-overlay: rgba(0, 0, 0, 0.1);
 }
 
@@ -87,38 +87,4 @@
       }
     }
   }
-}
-
-.swal-overlay {
-  background-color: #00000099;
-}
-
-.swal-modal {
-  border-radius: 10px;
-  padding: 25px 10px;
-
-  h1 { color: #444444; font-weight: 800; }
-  p  { color: #555555; text-align: left; }
-  a {
-    &:hover { color: #ffaa5a; }
-    transition: all 0.33s ease;
-    color: #f37f6a;
-    font-weight: 700;
-  }
-}
-
-.swal-button {
-  &:hover { background-color: #ffaa5a !important; }
-  box-shadow: 0px 0px 20px #00000033;
-  transition: all 0.33s ease;
-  background-color: #f37f6a;
-  border-radius: 15px;
-  margin-top: 0.67em;
-  padding: 10px 60px;
-  font-size: 12px;
-}
-
-.swal-footer {
-  padding: 0 20px;
-  text-align: center;
 }
