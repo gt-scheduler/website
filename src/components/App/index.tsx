@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import swal from '@sweetalert/with-react';
 import * as Sentry from '@sentry/react';
-import Cookies from 'js-cookie';
 
 import { classes, isAxiosNetworkError } from '../../utils';
 import { Header, Scheduler, Map, NavDrawer, NavMenu, Attribution } from '..';
 import Feedback from '../Feedback';
 import { Oscar } from '../../beans';
-import { useCookieWithDefault, useJsonCookie, useMobile } from '../../hooks';
+import {
+  useCookieWithDefault,
+  useJsonCookie,
+  useMobile,
+  useBodyClass,
+} from '../../hooks';
 import {
   TermContext,
   TermContextValue,
@@ -19,6 +22,7 @@ import {
 } from '../../contexts';
 import { defaultTermData, isTheme } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import { useInformationModal } from '../InformationModal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -39,11 +43,13 @@ function isValidTerm(term: unknown): boolean {
 }
 
 export default function App(): React.ReactElement {
+  // Display a popup when first visiting the site
+  useInformationModal();
+
   const [terms, setTerms] = useState<string[]>([]);
   const [oscar, setOscar] = useState<Oscar | null>(null);
 
-  // Persist the theme, term, and some term data as cookies
-  const [theme, setTheme] = useCookieWithDefault('theme', 'dark');
+  // Persist the term and term data as cookies
   const [term, setTerm] = useCookieWithDefault('term', '');
   const [termData, patchTermData] = useJsonCookie(term, defaultTermData);
 
@@ -64,10 +70,6 @@ export default function App(): React.ReactElement {
   }, [oscar, termData]);
 
   // Memoize context values so that their references are stable
-  const themeContextValue = useMemo<ThemeContextValue>(
-    () => [isTheme(theme) ? theme : 'dark', setTheme],
-    [theme, setTheme]
-  );
   const termsContextValue = useMemo<TermsContextValue>(
     () => [terms, setTerms],
     [terms, setTerms]
@@ -82,56 +84,6 @@ export default function App(): React.ReactElement {
     ],
     [term, oscar, filteredTermData, setTerm, setOscar, patchTermData]
   );
-
-  // display popup when first visiting the site
-  useEffect(() => {
-    const cookieKey = 'visited-merge-notice';
-    if (!Cookies.get(cookieKey)) {
-      swal({
-        button: 'Got It!',
-        content: (
-          <div>
-            <img
-              style={{ width: '175px' }}
-              alt="GT Scheduler Logo"
-              src="/mascot.png"
-            />
-            <h1>GT Scheduler</h1>
-            <p>
-              Hey there, yellow jackets!{' '}
-              <a href="https://github.com/gt-scheduler">GT Scheduler</a> is a
-              new collaboration between{' '}
-              <a href="https://bitsofgood.org/">Bits of Good</a> and{' '}
-              <a href="https://jasonpark.me/">Jason (Jinseo) Park</a> aimed at
-              making class registration easier for everybody! Now, you can
-              access course prerequisites, instructor GPAs, live seating
-              information, and more all in one location.
-            </p>
-            <p>
-              If you enjoy our work and are interested in contributing, feel
-              free to{' '}
-              <a href="https://github.com/gt-scheduler/website/pulls">
-                open a pull request
-              </a>{' '}
-              with your improvements. Thank you and enjoy!
-            </p>
-          </div>
-        ),
-      }).catch((err) => {
-        softError(
-          new ErrorWithFields({
-            message: 'error with swal call',
-            source: err,
-            fields: {
-              cookieKey,
-            },
-          })
-        );
-      });
-
-      Cookies.set(cookieKey, 'true', { expires: 365 });
-    }
-  }, []);
 
   // Fetch the current term's scraper information
   useEffect(() => {
@@ -220,7 +172,6 @@ export default function App(): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
   const mobile = useMobile();
-  const className = classes('App', mobile && 'mobile', theme);
 
   // Allow top-level tab-based navigation
   const [currentTabIndex, setTabIndex] = useState(0);
@@ -239,14 +190,18 @@ export default function App(): React.ReactElement {
   // If the scraped JSON hasn't been loaded,
   // then show an empty div as a loading intermediate
   if (!oscar) {
-    return <div className={className} />;
+    return (
+      <ThemeLoader>
+        <AppCSSRoot />
+      </ThemeLoader>
+    );
   }
 
   return (
-    <ThemeContext.Provider value={themeContextValue}>
-      <TermsContext.Provider value={termsContextValue}>
-        <TermContext.Provider value={termContextValue}>
-          <div className={classes('App', className)}>
+    <ThemeLoader>
+      <AppCSSRoot>
+        <TermsContext.Provider value={termsContextValue}>
+          <TermContext.Provider value={termContextValue}>
             <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
               {/* On mobile, show the nav drawer + overlay */}
               {mobile && (
@@ -259,7 +214,7 @@ export default function App(): React.ReactElement {
                 </NavDrawer>
               )}
               {/* The header controls top-level navigation
-              and is always present */}
+                  and is always present */}
               <Header
                 currentTab={currentTabIndex}
                 onChangeTab={setTabIndex}
@@ -271,9 +226,60 @@ export default function App(): React.ReactElement {
               <Feedback />
             </Sentry.ErrorBoundary>
             <Attribution />
-          </div>
-        </TermContext.Provider>
-      </TermsContext.Provider>
+          </TermContext.Provider>
+        </TermsContext.Provider>
+      </AppCSSRoot>
+    </ThemeLoader>
+  );
+}
+// Private sub-components
+
+type ThemeLoaderProps = {
+  children: React.ReactNode;
+};
+
+/**
+ * Provides the current UI theme to all children (via context),
+ * ensuring that it is one of the valid values in `Theme`.
+ */
+function ThemeLoader({ children }: ThemeLoaderProps): React.ReactElement {
+  const [theme, setTheme] = useCookieWithDefault('theme', 'dark');
+  const correctedTheme = isTheme(theme) ? theme : 'dark';
+
+  // Ensure that the stored theme is valid; otherwise reset it
+  useEffect(() => {
+    if (theme !== correctedTheme) {
+      setTheme(correctedTheme);
+    }
+  }, [theme, correctedTheme, setTheme]);
+
+  const themeContextValue = useMemo<ThemeContextValue>(
+    () => [correctedTheme, setTheme],
+    [correctedTheme, setTheme]
+  );
+
+  // Add the current theme as a class on the body element
+  useBodyClass(theme);
+
+  return (
+    <ThemeContext.Provider value={themeContextValue}>
+      {children}
     </ThemeContext.Provider>
   );
+}
+
+type AppCSSRootProps = {
+  children?: React.ReactNode;
+};
+
+/**
+ * Mounts the outer `div.App` that is used to control global CSS selectors
+ * such as `.App.mobile`.
+ */
+function AppCSSRoot({ children }: AppCSSRootProps): React.ReactElement {
+  // Re-render when the page is re-sized to become mobile/desktop
+  // (desktop is >= 1024 px wide)
+  const mobile = useMobile();
+
+  return <div className={classes('App', mobile && 'mobile')}>{children}</div>;
 }
