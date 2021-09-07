@@ -30,7 +30,7 @@ export default function useJsonCookie<T extends Record<string, unknown>>(
       }
     }
     return defaultValue;
-  }, [rawValue, defaultValue]);
+  }, [key, rawValue, defaultValue]);
 
   const patchValue = useCallback(
     (patch) => {
