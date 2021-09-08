@@ -27,7 +27,7 @@ export type LoadTermsProps = {
 export function LoadTerms({ children }: LoadTermsProps): React.ReactElement {
   const loadingState = useDownloadTerms();
 
-  if (loadingState.type === 'loading' || loadingState.type === 'error') {
+  if (loadingState.type !== 'loaded') {
     return (
       <AppSkeletonWithLoadingTerms>
         <SkeletonContent>
@@ -58,7 +58,7 @@ export function EnsureValidTerm({
 }: EnsureValidTermProps): React.ReactElement {
   const loadingState = useTermFromCookies(terms);
 
-  if (loadingState.type === 'loading' || loadingState.type === 'error') {
+  if (loadingState.type !== 'loaded') {
     return (
       <AppSkeletonWithLoadingTerms>
         <SkeletonContent>
@@ -97,7 +97,7 @@ export function LoadOscarData({
 }: LoadOscarDataProps): React.ReactElement {
   const loadingState = useDownloadOscarData(term);
 
-  if (loadingState.type === 'loading' || loadingState.type === 'error') {
+  if (loadingState.type !== 'loaded') {
     return (
       <AppSkeletonWithSwitchableTerms
         terms={terms}
@@ -145,7 +145,7 @@ export function EnsureValidTermData({
   // which causes this component to not be rendered until it is loaded again.
   const loadingState = useTermDataFromCookies(term, oscar);
 
-  if (loadingState.type === 'loading' || loadingState.type === 'error') {
+  if (loadingState.type !== 'loaded') {
     return (
       <AppSkeletonWithSwitchableTerms
         terms={terms}

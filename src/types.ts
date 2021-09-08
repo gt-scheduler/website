@@ -15,7 +15,8 @@ export function isTheme(theme: string): theme is Theme {
 export type LoadingState<T> =
   | LoadingStateLoaded<T>
   | LoadingStateLoading
-  | LoadingStateError;
+  | LoadingStateError
+  | LoadingStateCustom;
 export type LoadingStateLoaded<T> = { type: 'loaded'; result: T };
 export type LoadingStateLoading = { type: 'loading' };
 export type LoadingStateError = {
@@ -24,6 +25,12 @@ export type LoadingStateError = {
   error: Error;
   stillLoading: boolean;
 };
+export type LoadingStateCustom = {
+  type: 'custom';
+  contents: React.ReactNode;
+};
+
+export type NonEmptyArray<T> = [T, ...T[]];
 
 export type TermData = {
   desiredCourses: string[];

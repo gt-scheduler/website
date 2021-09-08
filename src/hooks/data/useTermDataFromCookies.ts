@@ -8,7 +8,11 @@ import {
   LoadingState,
   defaultTermDataRaw,
   defaultTermData,
+  LoadingStateError,
+  LoadingStateCustom,
+  NonEmptyArray,
 } from '../../types';
+import { renderTermDataFallbackNotification } from '../../components/TermDataFallbackNotification';
 
 /**
  * Gets the current term data from the user's cookies,
@@ -24,26 +28,42 @@ export default function useTermDataFromCookies(
 ): LoadingState<[TermData, (patch: Partial<TermData>) => void]> {
   // Persist the term data as a cookie
   const [termDataRaw, setTermDataRaw] = useCookie(term, defaultTermDataRaw);
-  const [unrecoverableError, setUnrecoverableError] = useState<Error | null>(
-    null
-  );
+  const [persistentErrorState, setPersistentErrorState] = useState<
+    LoadingStateError | LoadingStateCustom | null
+  >(null);
 
-  // Parse the term data
-  const parseResult = useMemo(() => parseTermData(termDataRaw), [termDataRaw]);
+  // Parse & validate the term data
+  const parseResult = useMemo<TermDataValidationResult>(() => {
+    const parsed = parseTermData(termDataRaw);
+    if (parsed.type === 'error') {
+      return {
+        type: 'error',
+        errors: [parsed.error],
+        // Fall back to the default value here
+        fallback: defaultTermData,
+      };
+    }
 
-  // If the term data is not valid, fix it
+    return validateTermData(parsed.parsed, termDataRaw);
+  }, [termDataRaw]);
+
+  // If the term data is not valid, store the invalid data
+  // & present the user with the option of fixing it
   useEffect(() => {
     if (parseResult.type === 'error') {
-      softError(
-        new ErrorWithFields({
-          message: 'parsing error for term data',
-          source: parseResult.error,
-          fields: {
-            term,
-            termDataRaw,
-          },
-        })
-      );
+      parseResult.errors.forEach((err) => {
+        softError(
+          new ErrorWithFields({
+            message: 'parsing error for term data',
+            source: err,
+            fields: {
+              term,
+              termDataRaw,
+              fallback: parseResult.fallback,
+            },
+          })
+        );
+      });
 
       // Try storing the invalid data in local storage
       // just in case it wasn't invalid & we're losing valid data:
@@ -60,24 +80,51 @@ export default function useTermDataFromCookies(
       }
       /* eslint-enable no-console */
 
-      // Store the default value, ensuring that it is also valid
-      // and won't cause an infinite set-state loop
-      const parseResultOnDefault = parseTermData(defaultTermDataRaw);
-      if (parseResultOnDefault.type === 'error') {
+      // Stringify the fallback value
+      let fallbackTermDataRaw: string;
+      try {
+        fallbackTermDataRaw = JSON.stringify(parseResult.fallback);
+      } catch (error) {
         const err = new ErrorWithFields({
-          message: 'default term data is not valid; can not fallback',
-          source: parseResultOnDefault.error,
+          message: 'error serializing fallback term data to JSON',
+          source: error,
           fields: {
-            defaultTermDataRaw,
             term,
+            termDataRaw,
+            fallback: parseResult.fallback,
           },
         });
-
-        setUnrecoverableError(err);
+        setPersistentErrorState({
+          type: 'error',
+          overview: 'could not prepare fallback term data to save',
+          error: err,
+          stillLoading: false,
+        });
         softError(err);
-      } else {
-        setTermDataRaw(defaultTermDataRaw);
+        return;
       }
+
+      // Some fallback scenarios present an easy choice
+      if (termDataRaw === '' || termDataRaw === 'undefined') {
+        setTermDataRaw(fallbackTermDataRaw);
+        return;
+      }
+
+      // Show an alert to the user, allowing them to choose whether to fall back
+      setPersistentErrorState({
+        type: 'custom',
+        contents: renderTermDataFallbackNotification({
+          originalRaw: termDataRaw,
+          fallbackRaw: fallbackTermDataRaw,
+          errors: parseResult.errors,
+          term,
+          onAccept: (): void => {
+            // The user accepted the fallback, set the state
+            setTermDataRaw(fallbackTermDataRaw);
+            setPersistentErrorState(null);
+          },
+        }),
+      });
     }
   }, [term, oscar, parseResult, setTermDataRaw, termDataRaw]);
 
@@ -100,26 +147,48 @@ export default function useTermDataFromCookies(
         });
       }
 
-      const updated = JSON.stringify({ ...parseResult.termData, ...patch });
-
       // Ensure the new term data is valid before committing it
-      const updatedParseResult = parseTermData(updated);
-      if (updatedParseResult.type === 'error') {
+      const updated = { ...parseResult.termData, ...patch };
+      const validationResult = validateTermData(updated);
+      if (validationResult.type === 'error') {
+        validationResult.errors.forEach((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'patched term data is not valid; ignoring update',
+              source: err,
+              fields: {
+                patch,
+                term,
+                termData: parseResult.termData,
+                updated,
+              },
+            })
+          );
+        });
+        return;
+      }
+
+      // Serialize the updated term data to a string
+      let updatedRawTermData: string;
+      try {
+        updatedRawTermData = JSON.stringify(updated);
+      } catch (error) {
         softError(
           new ErrorWithFields({
-            message: 'patched term data is not valid; ignoring update',
-            source: updatedParseResult.error,
+            message: 'error serializing patched term data to JSON',
+            source: error,
             fields: {
               patch,
               term,
+              termDataRaw,
               termData: parseResult.termData,
-              updated,
             },
           })
         );
-      } else {
-        setTermDataRaw(updated);
+        return;
       }
+
+      setTermDataRaw(updatedRawTermData);
     },
     [parseResult, term, setTermDataRaw, termDataRaw]
   );
@@ -147,13 +216,8 @@ export default function useTermDataFromCookies(
     return { ...termData, desiredCourses, pinnedCrns, excludedCrns };
   }, [oscar, parseResult]);
 
-  if (unrecoverableError !== null) {
-    return {
-      type: 'error',
-      error: unrecoverableError,
-      stillLoading: false,
-      overview: 'an internal assertion failed when attempting to fall back',
-    };
+  if (persistentErrorState !== null) {
+    return persistentErrorState;
   }
 
   if (parseResult.type === 'error') {
@@ -184,6 +248,42 @@ export default function useTermDataFromCookies(
 
 type TermDataParseResult =
   | { type: 'error'; error: Error }
+  | { type: 'parsed'; parsed: unknown };
+
+/**
+ * Parses raw term data from its string representation to the parsed JSON
+ */
+function parseTermData(rawTermData: string): TermDataParseResult {
+  if (rawTermData === '' || rawTermData === 'undefined') {
+    return {
+      type: 'error',
+      error: new ErrorWithFields({
+        message: 'raw term data was empty or "undefined"',
+        fields: {
+          rawTermData,
+        },
+      }),
+    };
+  }
+
+  try {
+    return { type: 'parsed', parsed: JSON.parse(rawTermData) };
+  } catch (err) {
+    return {
+      type: 'error',
+      error: new ErrorWithFields({
+        message: 'raw term data was not valid JSON data',
+        source: err,
+        fields: {
+          rawTermData,
+        },
+      }),
+    };
+  }
+}
+
+type TermDataValidationResult =
+  | { type: 'error'; errors: NonEmptyArray<Error>; fallback: TermData }
   | { type: 'valid'; termData: TermData };
 
 const isStringArray = (field: unknown): field is string[] =>
@@ -197,84 +297,166 @@ const isStringStringMap = (field: unknown): field is Record<string, string> =>
   Object.keys(field).every((elem) => typeof elem === 'string') &&
   Object.values(field).every((elem) => typeof elem === 'string');
 
-function parseTermData(rawTermData: string): TermDataParseResult {
+/**
+ * Validates parsed term data, ensuring that it is of the expected shape
+ */
+function validateTermData(
+  termData: unknown,
+  rawTermData?: string
+): TermDataValidationResult {
   try {
-    if (rawTermData === '' || rawTermData === 'undefined') {
-      throw new ErrorWithFields({
-        message: 'raw term data was empty or "undefined"',
-        fields: {
-          rawTermData,
-        },
-      });
+    if (
+      termData == null ||
+      typeof termData !== 'object' ||
+      Array.isArray(termData)
+    ) {
+      return {
+        type: 'error',
+        fallback: defaultTermData,
+        errors: [
+          new ErrorWithFields({
+            message: 'term data is the wrong type',
+            fields: {
+              rawTermData,
+              termDataType: typeof termData,
+              termData,
+            },
+          }),
+        ],
+      };
     }
 
-    const parsed = JSON.parse(rawTermData) as unknown;
-    if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      throw new ErrorWithFields({
-        message: 'term data is the wrong type',
-        fields: {
-          rawTermData,
-          termDataType: typeof parsed,
-          termData: parsed,
-        },
-      });
-    }
+    const validTermData = { ...defaultTermData };
 
-    // Ensure there are valid fields
-    const parsedAsRecord = parsed as Record<string, unknown>;
-    parsedAsRecord['desiredCourses'] = parsedAsRecord['desiredCourses'] ?? [];
-    parsedAsRecord['pinnedCrns'] = parsedAsRecord['pinnedCrns'] ?? [];
-    parsedAsRecord['excludedCrns'] = parsedAsRecord['excludedCrns'] ?? [];
-    parsedAsRecord['colorMap'] = parsedAsRecord['colorMap'] ?? {};
-    parsedAsRecord['sortingOptionIndex'] =
-      parsedAsRecord['sortingOptionIndex'] ?? 0;
+    // Ensure each field is valid, copying them as we go
+    const termDataAsRecord = termData as Record<string, unknown>;
+    const fieldValidationErrors: Error[] = [];
+    const {
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      colorMap,
+      sortingOptionIndex,
+    } = termDataAsRecord;
 
-    const assert = (condition: boolean, message: string): void => {
-      if (!condition) {
-        throw new ErrorWithFields({
-          message: 'assertion failed when validating termData',
+    if (isStringArray(desiredCourses)) {
+      validTermData.desiredCourses = desiredCourses;
+    } else {
+      fieldValidationErrors.push(
+        new ErrorWithFields({
+          message: 'termData.desiredCourses was not a string array',
           fields: {
-            message,
             rawTermData,
-            termData: parsed,
+            termData,
+            desiredCourses,
+            fallback: validTermData.desiredCourses,
           },
-        });
-      }
-    };
+        })
+      );
+    }
 
-    assert(
-      isStringArray(parsedAsRecord['desiredCourses']),
-      'termData.desiredCourses was not string array'
-    );
-    assert(
-      isStringArray(parsedAsRecord['pinnedCrns']),
-      'termData.pinnedCrns was not string array'
-    );
-    assert(
-      isStringArray(parsedAsRecord['excludedCrns']),
-      'termData.excludedCrns was not string array'
-    );
-    assert(
-      isStringStringMap(parsedAsRecord['colorMap']),
-      'termData.colorMap was not string/string map'
-    );
-    assert(
-      typeof parsedAsRecord['sortingOptionIndex'] === 'number',
-      'termData.sortingOptionIndex was not string array'
-    );
+    if (isStringArray(pinnedCrns)) {
+      validTermData.pinnedCrns = pinnedCrns;
+    } else {
+      fieldValidationErrors.push(
+        new ErrorWithFields({
+          message: 'termData.pinnedCrns was not a string array',
+          fields: {
+            rawTermData,
+            termData,
+            pinnedCrns,
+            fallback: validTermData.pinnedCrns,
+          },
+        })
+      );
+    }
 
-    return { type: 'valid', termData: parsedAsRecord as TermData };
+    if (isStringArray(excludedCrns)) {
+      validTermData.excludedCrns = excludedCrns;
+    } else {
+      fieldValidationErrors.push(
+        new ErrorWithFields({
+          message: 'termData.excludedCrns was not a string array',
+          fields: {
+            rawTermData,
+            termData,
+            excludedCrns,
+            fallback: validTermData.excludedCrns,
+          },
+        })
+      );
+    }
+
+    if (isStringStringMap(colorMap)) {
+      validTermData.colorMap = colorMap;
+    } else {
+      fieldValidationErrors.push(
+        new ErrorWithFields({
+          message: 'termData.colorMap was not a string/string map',
+          fields: {
+            rawTermData,
+            termData,
+            colorMap,
+            fallback: validTermData.colorMap,
+          },
+        })
+      );
+    }
+
+    if (typeof sortingOptionIndex === 'number') {
+      validTermData.sortingOptionIndex = sortingOptionIndex;
+    } else {
+      fieldValidationErrors.push(
+        new ErrorWithFields({
+          message: 'termData.sortingOptionIndex was not a number',
+          fields: {
+            rawTermData,
+            termData,
+            sortingOptionIndex,
+            fallback: validTermData.sortingOptionIndex,
+          },
+        })
+      );
+    }
+
+    if (fieldValidationErrors.length > 0) {
+      return {
+        type: 'error',
+        fallback: validTermData,
+        errors: fieldValidationErrors as NonEmptyArray<Error>,
+      };
+    }
+
+    return { type: 'valid', termData: validTermData };
   } catch (err) {
     if (err instanceof Error) {
       return {
         type: 'error',
-        error: err,
+        fallback: defaultTermData,
+        errors: [
+          new ErrorWithFields({
+            message: 'an unexpected error occurred when parsing term data',
+            source: err,
+            fields: {
+              rawTermData,
+            },
+          }),
+        ],
       };
     }
 
     return {
       type: 'error',
-      error: new Error(err),
+      fallback: defaultTermData,
+      errors: [
+        new ErrorWithFields({
+          message: 'an unexpected error occurred when parsing term data',
+          fields: {
+            rawTermData,
+            originalError: err,
+          },
+        }),
+      ],
     };
   }
 }

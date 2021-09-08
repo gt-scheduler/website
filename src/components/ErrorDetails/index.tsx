@@ -2,12 +2,13 @@ import React from 'react';
 import safeStringify from 'fast-safe-stringify';
 
 import { ErrorWithFields } from '../../log';
-
-import './stylesheet.scss';
+import { classes } from '../../utils';
 
 export type ErrorDetailsFieldProps = {
   name: string;
   children: React.ReactNode;
+  style?: React.CSSProperties;
+  className?: string;
 };
 
 /**
@@ -16,9 +17,11 @@ export type ErrorDetailsFieldProps = {
 export function ErrorDetailsField({
   name,
   children,
+  style,
+  className,
 }: ErrorDetailsFieldProps): React.ReactElement {
   return (
-    <div className="error-details-field">
+    <div className={classes(className, 'error-details-field')} style={style}>
       <strong>{name}</strong>: {children}
     </div>
   );
@@ -67,7 +70,9 @@ export function LoadingErrorDetails({
   return (
     <>
       <BaseErrorDetails error={error} />
-      <ErrorDetailsField name="Operation name">{name}</ErrorDetailsField>
+      <ErrorDetailsField name="Operation name">
+        (loading) {name}
+      </ErrorDetailsField>
       <ErrorDetailsField name="Overview">{overview}</ErrorDetailsField>
     </>
   );

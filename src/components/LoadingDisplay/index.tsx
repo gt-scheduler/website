@@ -1,6 +1,10 @@
 import React from 'react';
 
-import { LoadingStateLoading, LoadingStateError } from '../../types';
+import {
+  LoadingStateLoading,
+  LoadingStateError,
+  LoadingStateCustom,
+} from '../../types';
 import { LoadingErrorDetails } from '../ErrorDetails';
 import ErrorDisplay from '../ErrorDisplay';
 import ErrorHeader from '../ErrorHeader';
@@ -9,7 +13,7 @@ import Spinner from '../Spinner';
 import './stylesheet.scss';
 
 export type LoadingDisplayProps = {
-  state: LoadingStateLoading | LoadingStateError;
+  state: LoadingStateLoading | LoadingStateError | LoadingStateCustom;
   name: string;
 };
 
@@ -31,6 +35,9 @@ export default function LoadingDisplay({
         <div>{name}</div>
       </>
     );
+  } else if (state.type === 'custom') {
+    // Don't wrap custom contents in the outer div
+    return <>{state.contents}</>;
   } else if (state.stillLoading) {
     contents = (
       <>

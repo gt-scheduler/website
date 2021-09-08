@@ -6,11 +6,11 @@
   text-align: left;
   line-height: 1.1rem;
 
-  .App.dark & {
+  @include dark {
     color: rgba($theme-dark-foreground, 0.75);
   }
 
-  .App.light & {
+  @include light {
     color: rgba($theme-light-foreground, 0.75);
   }
 
@@ -19,11 +19,11 @@
   }
 
   a {
-    .App.dark & {
+    @include dark {
       color: #70a8ff;
     }
 
-    .App.light & {
+    @include light {
       color: #1b61d1;
     }
 

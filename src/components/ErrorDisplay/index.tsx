@@ -1,10 +1,10 @@
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React from 'react';
+
+import ExpandableCard from '../ExpandableCard';
 
 import './stylesheet.scss';
 
-const GITHUB_ISSUE_URL =
+export const GITHUB_ISSUE_URL =
   'https://github.com/gt-scheduler/website/issues/new?assignees=&labels=bug&template=bug-report----.md&title=';
 
 export type ErrorDisplayProps = {
@@ -21,8 +21,6 @@ export default function ErrorDisplay({
   errorDetails,
   children,
 }: ErrorDisplayProps): React.ReactElement {
-  const [showErrorDetails, setShowErrorDetails] = useState(false);
-
   return (
     <div className="error-display-outer">
       {children}
@@ -39,24 +37,7 @@ export default function ErrorDisplay({
         more information about what happened and makes it a lot easier for us to
         fix the bug. Thanks ❤
       </div>
-      <div className="error-details">
-        <button
-          className="error-details-expander"
-          onClick={(): void => setShowErrorDetails(!showErrorDetails)}
-          type="button"
-        >
-          <FontAwesomeIcon
-            fixedWidth
-            icon={faCaretDown}
-            style={{
-              transform: showErrorDetails ? 'rotate(-90deg)' : 'none',
-              marginRight: 8,
-            }}
-          />
-          Error Details
-        </button>
-        {showErrorDetails && errorDetails}
-      </div>
+      <ExpandableCard label="Error Details">{errorDetails}</ExpandableCard>
     </div>
   );
 }
