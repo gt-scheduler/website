@@ -315,7 +315,7 @@ export const EMPTY_OSCAR = new Oscar(
       gradeBases: [],
       locations: [],
     },
-    updatedAt: new Date(),
+    updatedAt: JSON.parse(JSON.stringify(new Date())) as string,
     version: 1,
   },
   '197008'

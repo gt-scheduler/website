@@ -1,7 +1,3 @@
-// Disable no-console for the entire file since this is the only location where
-// any logging should be performed.
-/* eslint-disable no-console */
-
 import * as Sentry from '@sentry/react';
 
 export class ErrorWithFields extends Error {
@@ -65,6 +61,7 @@ export class ErrorWithFields extends Error {
   }
 
   logToConsole(): void {
+    /* eslint-disable no-console */
     console.group(this.topMessage);
     console.error(this.getRootError());
 
@@ -74,6 +71,7 @@ export class ErrorWithFields extends Error {
     }
 
     console.groupEnd();
+    /* eslint-enable no-console */
   }
 
   getAllFields(): Record<string, unknown> {
