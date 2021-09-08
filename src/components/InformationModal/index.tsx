@@ -20,7 +20,7 @@ export function InformationModalContent(): React.ReactElement {
   return (
     <div>
       <img
-        style={{ width: '175px' }}
+        style={{ width: '175px', margin: '0 auto', display: 'block' }}
         alt="GT Scheduler Logo"
         src="/mascot.png"
       />

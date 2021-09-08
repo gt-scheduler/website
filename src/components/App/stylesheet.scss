@@ -30,22 +30,36 @@
       }
     }
   }
+
+  .skeleton {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .skeleton-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      width: 100%;
+
+      .skeleton-content-inner {
+        margin: auto auto;
+        max-width: 640px;
+        padding: 2rem;
+        width: 100%;
+      }
+    }
+  }
 }
 
 body.dark .App {
   background-color: $theme-dark-background;
   color: $theme-dark-foreground;
-  --theme-bg: #{$theme-dark-background};
-  --theme-card-bg: #{$theme-dark-card-background};
-  --dark-overlay: rgba(0, 0, 0, 0.2);
 }
 
 body.light .App {
   background-color: $theme-light-background;
   color: $theme-light-foreground;
-  --theme-bg: #{$theme-light-background};
-  --theme-card-bg: #{$theme-light-card-background};
-  --dark-overlay: rgba(0, 0, 0, 0.1);
 }
 
 .App.mobile {

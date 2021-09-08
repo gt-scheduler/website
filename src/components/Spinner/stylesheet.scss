@@ -1,0 +1,23 @@
+.spinner {
+  --stroke: 6px;
+  --color: currentColor;
+  animation: spinner_rotate 0.8s linear infinite;
+
+  width: var(--size);
+  height: var(--size);
+
+  & > circle {
+    fill: none;
+    stroke: var(--color);
+    stroke-linecap: round;
+    stroke-width: var(--stroke);
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+
+  @keyframes spinner_rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}

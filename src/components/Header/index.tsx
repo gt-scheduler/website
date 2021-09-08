@@ -104,9 +104,12 @@ export default function Header({
         enableExportCalendar={pinnedCrns.length > 0}
         onDownloadCalendar={handleDownload}
         enableDownloadCalendar={pinnedCrns.length > 0}
-        terms={terms}
-        currentTerm={term}
-        onChangeTerm={setTerm}
+        termsState={{
+          type: 'loaded',
+          terms,
+          currentTerm: term,
+          onChangeTerm: setTerm,
+        }}
       />
 
       {/* Fake calendar used to capture screenshots */}
