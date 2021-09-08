@@ -1,8 +1,12 @@
 import React from 'react';
+import domtoimage from 'dom-to-image';
+import { saveAs } from 'file-saver';
 
-import { Section } from './beans';
-import { DAYS, PALETTE } from './constants';
-import { Period, PrerequisiteClause } from './types';
+import { Oscar, Section } from './beans';
+import { DAYS, PALETTE, PNG_SCALE_FACTOR } from './constants';
+import { softError, ErrorWithFields } from './log';
+import { ICS, Period, PrerequisiteClause, Theme } from './types';
+import ics from './vendor/ics';
 
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -190,3 +194,98 @@ export const serializePrereqs = (
 export const isAxiosNetworkError = (err: unknown): boolean => {
   return err instanceof Error && err.message.includes('Network Error');
 };
+
+/**
+ * Exports the current schedule to a `.ics` file,
+ * which allows for importing into a third-party calendar application.
+ */
+export function exportCoursesToCalendar(
+  oscar: Oscar,
+  pinnedCrns: string[]
+): void {
+  const cal = ics() as ICS | undefined;
+  if (cal == null) {
+    window.alert('This browser does not support calendar export');
+    softError(
+      new ErrorWithFields({
+        message: 'ics() returned null or undefined',
+      })
+    );
+
+    return;
+  }
+
+  pinnedCrns.forEach((crn) => {
+    const section = oscar.findSection(crn);
+    if (section == null) return;
+
+    section.meetings.forEach((meeting) => {
+      if (!meeting.period || !meeting.days.length) return;
+      const { from, to } = meeting.dateRange;
+      const subject = section.course.id;
+      const description = section.course.title;
+      const location = meeting.where;
+      const begin = new Date(from.getTime());
+      while (
+        !meeting.days.includes(
+          ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
+        )
+      ) {
+        begin.setDate(begin.getDate() + 1);
+      }
+      begin.setHours(meeting.period.start / 60, meeting.period.start % 60);
+      const end = new Date(begin.getTime());
+      end.setHours(meeting.period.end / 60, meeting.period.end % 60);
+      const rrule = {
+        freq: 'WEEKLY',
+        until: to,
+        byday: meeting.days
+          .map(
+            (day) =>
+              ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
+          )
+          .filter((day) => !!day),
+      };
+      cal.addEvent(subject, description, location, begin, end, rrule);
+    });
+  });
+  cal.download('gt-scheduler');
+}
+
+/**
+ * Downloads a screenshot of the "shadow" calendar
+ * that exists invisible in the app
+ * and reflects the current state of the scheduler.
+ * Allows the screenshot to be exported consistently
+ * regardless of screen size or app state.
+ * Requires the theme to style the background before taking the screenshot.
+ */
+export function downloadShadowCalendar(
+  captureElement: HTMLDivElement,
+  theme: Theme
+): void {
+  const computed = window
+    .getComputedStyle(captureElement)
+    .getPropertyValue('left');
+
+  domtoimage
+    .toBlob(captureElement, {
+      width: captureElement.offsetWidth * PNG_SCALE_FACTOR,
+      height: captureElement.offsetHeight * PNG_SCALE_FACTOR,
+      style: {
+        transform: `scale(${PNG_SCALE_FACTOR})`,
+        'transform-origin': `${computed} 0px`,
+        'background-color': theme === 'light' ? '#FFFFFF' : '#333333',
+      },
+    })
+    .then((blob) => saveAs(blob, 'schedule.png'))
+    .catch((err) =>
+      softError(
+        new ErrorWithFields({
+          message:
+            'could not take screenshot of shadow calendar for schedule export',
+          source: err,
+        })
+      )
+    );
+}

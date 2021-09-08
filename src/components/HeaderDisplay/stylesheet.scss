@@ -1,0 +1,77 @@
+@import '../../variables';
+
+.Header {
+  height: $header-height;
+  padding: 0 16px 0 0;
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid $color-border;
+
+  .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    white-space: pre;
+    padding: 0 16px;
+  }
+
+  .tabs {
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .credits {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .menu {
+    display: flex;
+    align-items: stretch;
+
+    .text {
+      margin-left: 4px;
+
+      // Make the text hidden on all buttons
+      // at sufficiently-small screen sizes
+      @media screen and (max-width: 1200px) {
+        display: none;
+      }
+    }
+  }
+}
+
+.mobile .Header {
+  padding: 0 8px;
+
+  .logo {
+    display: none;
+  }
+
+  .credits {
+    display: none;
+  }
+
+  .menu {
+    flex: 1;
+    margin-left: 0;
+
+    .Button {
+      flex: 1;
+      padding: 0;
+    }
+  }
+}
+
+.nav-menu-button {
+  // Increase the tap target size
+  margin-left: -8px;
+  padding: 0 16px;
+
+  // Increase the icon size
+  font-size: 1.7rem;
+}
