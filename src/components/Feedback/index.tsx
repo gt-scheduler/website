@@ -30,7 +30,7 @@ export default function Feedback(): React.ReactElement {
   };
 
   return (
-    <div>
+    <>
       {!expanded && (
         <div className="FeedbackButtonWrapper">
           <Button
@@ -110,6 +110,6 @@ export default function Feedback(): React.ReactElement {
           </form>
         </div>
       )}
-    </div>
+    </>
   );
 }

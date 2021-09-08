@@ -227,6 +227,7 @@ export default function App(): React.ReactElement {
     </ThemeLoader>
   );
 }
+
 // Private sub-components
 
 type ThemeLoaderProps = {

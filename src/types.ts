@@ -292,7 +292,8 @@ export interface CrawlerTermData {
   /**
    * Contains the time this JSON file was retrieved
    */
-  updatedAt: Date;
+  // ! Type changed to `string` since this is what the JSON will be
+  updatedAt: string;
   /**
    * Version number for the term data
    */
