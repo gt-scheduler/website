@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
 import { classes, getContentClassName } from '../../utils';
 import { Period } from '../../types';
+import { ThemeContext } from '../../contexts';
 
 import './stylesheet.scss';
 
@@ -35,12 +36,26 @@ export type DaySelectionProps = {
   setActiveDay: (next: Day | '') => void;
 };
 
+const LIGHT_COLOR_PALETTE = [
+  '#FCB9AA',
+  '#FFDBCC',
+  '#ECEAE4',
+  '#A2E1DB',
+  '#55CBCD',
+];
+const DARK_COLOR_PALETTE = [
+  '#5e3931',
+  '#704737',
+  '#685a30',
+  '#3c6962',
+  '#286061',
+];
+
 export default function DaySelection({
   courseDateMap,
   activeDay,
   setActiveDay,
 }: DaySelectionProps): React.ReactElement {
-  const colorPalette = ['#FCB9AA', '#FFDBCC', '#ECEAE4', '#A2E1DB', '#55CBCD'];
   const daysOfTheWeek = [
     'Monday',
     'Tuesday',
@@ -48,6 +63,11 @@ export default function DaySelection({
     'Thursday',
     'Friday',
   ];
+
+  // Switch the color palette based on the current theme.
+  const [theme] = useContext(ThemeContext);
+  const colorPalette =
+    theme === 'dark' ? DARK_COLOR_PALETTE : LIGHT_COLOR_PALETTE;
 
   const formatTime = (time: number): string => {
     if (Math.floor(time / 60) >= 12) {

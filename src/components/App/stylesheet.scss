@@ -10,7 +10,10 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  transition: color .2s, background-color .2s;
+
+  // Include theme switch transition
+  transition-duration: $theme-switch-transition-duration;
+  transition-property: color, background-color;
 
   .main {
     overflow: hidden;

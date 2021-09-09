@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import ReactMapGL, { Marker, NavigationControl } from 'react-map-gl';
 import { ViewState } from 'react-map-gl/src/mapbox/mapbox';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin } from '@fortawesome/free-solid-svg-icons';
 
 import { Location } from '../../types';
+import { ThemeContext } from '../../contexts';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
@@ -41,13 +42,24 @@ export default function MapView({
     }
   });
 
+  // Switch the map style based on the current theme.
+  // These are custom styles owned by the Mapbox account in the BitWarden.
+  // Public share links:
+  // Dark: https://api.mapbox.com/styles/v1/gt-scheduler/cktc4yzhm018w17ql65xa802o.html?fresh=true&title=copy&access_token=pk.eyJ1IjoiZ3Qtc2NoZWR1bGVyIiwiYSI6ImNrdGM0cXlqMDA0aXYyeHBma290Y2NyOTgifQ.S_A1gOu-FSQ8ywQFf2rr5A
+  // Light: https://api.mapbox.com/styles/v1/gt-scheduler/cktc4y61t018918qjynvngozg.html?fresh=true&title=copy&access_token=pk.eyJ1IjoiZ3Qtc2NoZWR1bGVyIiwiYSI6ImNrdGM0cXlqMDA0aXYyeHBma290Y2NyOTgifQ.S_A1gOu-FSQ8ywQFf2rr5A
+  const [theme] = useContext(ThemeContext);
+  const mapStyle =
+    theme === 'dark'
+      ? 'mapbox://styles/gt-scheduler/cktc4yzhm018w17ql65xa802o' // gt-scheduler-dark
+      : 'mapbox://styles/gt-scheduler/cktc4y61t018918qjynvngozg'; // gt-scheduler-light
+
   return (
     <div className="mapbox">
       <ReactMapGL
         height="100%"
         width="100%"
         viewState={viewState}
-        mapStyle="mapbox://styles/mapbox/outdoors-v9"
+        mapStyle={mapStyle}
         mapboxApiAccessToken={process.env['REACT_APP_MAPBOX_TOKEN'] ?? ''}
         onViewStateChange={({
           viewState: newViewState,
