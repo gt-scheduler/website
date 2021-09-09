@@ -1,3 +1,5 @@
+@import "../../variables";
+
 .mapbox {
   height: 100%;
   width: 100%;
@@ -11,10 +13,7 @@
     padding: 8px;
     margin: 0;
 
-    box-shadow: 0px 0px 3px #00000080;
-    background: #ffffffcc;
-    border-radius: 8px;
-    color: #333333;
+    @extend %floating-box;
   }
 
   .pin {
@@ -43,10 +42,7 @@
     font-size: 14px;
     z-index: 0;
 
-    border-radius: 8px;
-    box-shadow: 0px 0px 3px #00000080;
-    background: white;
-    color: #333333;
+    @extend %floating-box;
 
     @media (max-width: 900px) {
       margin-top: 8px;
@@ -65,5 +61,21 @@
     position: absolute;
     bottom: 30px;
     right: 10px;
+  }
+}
+
+%floating-box {
+  border-radius: 8px;
+  box-shadow: 0px 0px 3px #00000080;
+  background: white;
+  color: #333333;
+
+  // Include theme switch transition
+  transition-duration: $theme-switch-transition-duration;
+  transition-property: color, background-color;
+
+  @include dark {
+    background: #111111;
+    color: #eeeeee;
   }
 }

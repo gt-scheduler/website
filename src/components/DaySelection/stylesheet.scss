@@ -19,6 +19,10 @@
   .date {
     @include card;
 
+    // Include theme switch transition
+    transition-duration: $theme-switch-transition-duration;
+    transition-property: color, background-color;
+
     .day-select {
       box-shadow: 1px 1px 1px gray;
     }
