@@ -52,7 +52,7 @@ export default function useDownloadOscarData(
         // a background refresh from showing an error screen
         // in the middle of a session.
         // `load` will return early if it is cancelled
-        await load({ showErrors: isFirst });
+        await load({ initialLoad: isFirst });
         if (loadOperation.isCancelled) return;
 
         // Sleep for the refresh interval,
@@ -71,13 +71,15 @@ export default function useDownloadOscarData(
     }
 
     async function load({
-      showErrors,
+      initialLoad,
     }: {
-      showErrors: boolean;
+      initialLoad: boolean;
     }): Promise<void> {
-      setState({
-        type: 'loading',
-      });
+      if (initialLoad) {
+        setState({
+          type: 'loading',
+        });
+      }
 
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
@@ -127,7 +129,7 @@ export default function useDownloadOscarData(
             );
           }
 
-          if (showErrors) {
+          if (initialLoad) {
             // Flag that an error has occurred
             setState({
               type: 'error',
