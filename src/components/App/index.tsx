@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
 import { useBodyClass, useCookie, useMobile } from '../../hooks';
 import { ThemeContext, ThemeContextValue } from '../../contexts';

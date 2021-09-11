@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
-import { classes, timeToShortString } from '../../utils';
+import { classes, timeToShortString } from '../../utils/misc';
 import { TimeBlocks } from '..';
 import { TermContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';

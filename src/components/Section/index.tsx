@@ -7,7 +7,7 @@ import {
   faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, periodToString } from '../../utils';
+import { classes, periodToString } from '../../utils/misc';
 import { ActionRow } from '..';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';

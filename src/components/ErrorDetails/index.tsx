@@ -2,7 +2,7 @@ import React from 'react';
 import safeStringify from 'fast-safe-stringify';
 
 import { ErrorWithFields } from '../../log';
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 
 export type ErrorDetailsFieldProps = {
   name: string;

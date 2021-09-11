@@ -11,7 +11,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import Cookies from 'js-cookie';
 import ReactTooltip from 'react-tooltip';
 
-import { getSemesterName } from '../../utils';
+import { getSemesterName } from '../../utils/misc';
 import { Button, Select, Tab } from '..';
 import { useMobile } from '../../hooks';
 import { ThemeContext } from '../../contexts';

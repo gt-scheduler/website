@@ -1,5 +1,5 @@
 import { Course, Section, SortingOption } from '.';
-import { hasConflictBetween, stringToTime } from '../../utils';
+import { hasConflictBetween, stringToTime } from '../../utils/misc';
 import {
   Combination,
   Period,

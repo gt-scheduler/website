@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { isMobile } from '../utils';
+import { isMobile } from '../utils/misc';
 
 /**
  * Subscribes to resize events on the page

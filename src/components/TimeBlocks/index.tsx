@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
 
-import { classes, getContentClassName, periodToString } from '../../utils';
+import { classes, getContentClassName, periodToString } from '../../utils/misc';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import { TermContext } from '../../contexts';
 import { Period } from '../../types';

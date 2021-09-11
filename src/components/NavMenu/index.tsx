@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button } from '..';
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 
 import './stylesheet.scss';
 

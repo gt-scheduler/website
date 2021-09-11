@@ -3,7 +3,7 @@ import React from 'react';
 import ErrorHeader from '../ErrorHeader';
 import { BaseErrorDetails, ErrorDetailsField } from '../ErrorDetails';
 import ExpandableCard from '../ExpandableCard';
-import { getSemesterName } from '../../utils';
+import { getSemesterName } from '../../utils/misc';
 import { NonEmptyArray } from '../../types';
 
 import './stylesheet.scss';

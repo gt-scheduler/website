@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 import Button, { ButtonProps } from '../Button';
 
 import './stylesheet.scss';

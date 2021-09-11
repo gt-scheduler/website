@@ -9,7 +9,7 @@ import {
   exponentialBackoff,
   isAxiosNetworkError,
   sleep,
-} from '../../utils';
+} from '../../utils/misc';
 
 const constructTermDataUrl = (term: string): string =>
   `https://gt-scheduler.github.io/crawler/${term}.json`;

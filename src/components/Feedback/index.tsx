@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { Button } from '..';
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 import { FormSubmit } from '../../data/beans';
 
 import './stylesheet.scss';

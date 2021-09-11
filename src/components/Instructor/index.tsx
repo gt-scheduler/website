@@ -7,7 +7,7 @@ import {
   faGraduationCap,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, simplifyName, unique } from '../../utils';
+import { classes, simplifyName, unique } from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
 import { ActionRow, Section } from '..';
 import { TermContext } from '../../contexts';

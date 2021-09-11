@@ -12,7 +12,7 @@ import {
   isLab,
   isLecture,
   isAxiosNetworkError,
-} from '../../utils';
+} from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 
 interface SectionGroupMeeting {
