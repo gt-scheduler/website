@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 
 import { useCookie } from '..';
-import { Oscar } from '../../beans';
+import { Oscar } from '../../data/beans';
 import { softError, ErrorWithFields } from '../../log';
 import {
   TermData,

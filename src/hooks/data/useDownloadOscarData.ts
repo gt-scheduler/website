@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 
-import { Oscar } from '../../beans';
+import { Oscar } from '../../data/beans';
 import { ErrorWithFields, softError } from '../../log';
 import { CrawlerTermData, LoadingState } from '../../types';
 import {

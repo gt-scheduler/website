@@ -1,13 +1,13 @@
 import { Course, Section, SortingOption } from '.';
-import { hasConflictBetween, stringToTime } from '../utils';
+import { hasConflictBetween, stringToTime } from '../../utils';
 import {
   Combination,
   Period,
   DateRange,
   Location,
   CrawlerTermData,
-} from '../types';
-import { ErrorWithFields, softError } from '../log';
+} from '../../types';
+import { ErrorWithFields, softError } from '../../log';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;

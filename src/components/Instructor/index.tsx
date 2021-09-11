@@ -8,7 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, simplifyName, unique } from '../../utils';
-import { Section as SectionBean } from '../../beans';
+import { Section as SectionBean } from '../../data/beans';
 import { ActionRow, Section } from '..';
 import { TermContext } from '../../contexts';
 

@@ -11,8 +11,8 @@ import { classes, periodToString } from '../../utils';
 import { ActionRow } from '..';
 import { OverlayCrnsContext, TermContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
-import { Section as SectionBean } from '../../beans';
-import { Seating } from '../../beans/Section';
+import { Section as SectionBean } from '../../data/beans';
+import { Seating } from '../../data/beans/Section';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';

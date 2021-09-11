@@ -1,11 +1,11 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { unique } from '../utils';
-import { DELIVERY_MODES, BACKEND_BASE_URL } from '../constants';
+import { unique } from '../../utils';
+import { DELIVERY_MODES, BACKEND_BASE_URL } from '../../constants';
 import Course from './Course';
 import Oscar from './Oscar';
-import { CrawlerMeeting, Meeting } from '../types';
+import { CrawlerMeeting, Meeting } from '../../types';
 
 export type Seating = [
   seating:

@@ -4,7 +4,7 @@ import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { Button } from '..';
 import { classes } from '../../utils';
-import { FormSubmit } from '../../beans';
+import { FormSubmit } from '../../data/beans';
 
 import './stylesheet.scss';
 

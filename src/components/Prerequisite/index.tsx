@@ -8,7 +8,7 @@ import {
 import { TermContext } from '../../contexts';
 import { classes, serializePrereqs } from '../../utils';
 import { ActionRow } from '..';
-import { Course } from '../../beans';
+import { Course } from '../../data/beans';
 import {
   CrawlerPrerequisites,
   PrerequisiteClause,
