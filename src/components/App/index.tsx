@@ -25,6 +25,7 @@ import {
   SkeletonContent,
   AppContent,
 } from './content';
+import useScheduleDataFromStorage from '../../data/hooks/useScheduleDataFromStorage';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -32,6 +33,8 @@ import './stylesheet.scss';
 export default function App(): React.ReactElement {
   // Display a popup when first visiting the site
   useInformationModal();
+
+  console.log(useScheduleDataFromStorage());
 
   return (
     <ThemeLoader>

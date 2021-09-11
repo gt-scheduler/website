@@ -246,14 +246,14 @@ export default function useTermDataFromCookies(
   });
 }
 
-type TermDataParseResult =
+export type TermDataParseResult =
   | { type: 'error'; error: Error }
   | { type: 'parsed'; parsed: unknown };
 
 /**
  * Parses raw term data from its string representation to the parsed JSON
  */
-function parseTermData(rawTermData: string): TermDataParseResult {
+export function parseTermData(rawTermData: string): TermDataParseResult {
   if (rawTermData === '' || rawTermData === 'undefined') {
     return {
       type: 'error',
@@ -282,7 +282,7 @@ function parseTermData(rawTermData: string): TermDataParseResult {
   }
 }
 
-type TermDataValidationResult =
+export type TermDataValidationResult =
   | { type: 'error'; errors: NonEmptyArray<Error>; fallback: TermData }
   | { type: 'valid'; termData: TermData };
 
@@ -300,7 +300,7 @@ const isStringStringMap = (field: unknown): field is Record<string, string> =>
 /**
  * Validates parsed term data, ensuring that it is of the expected shape
  */
-function validateTermData(
+export function validateTermData(
   termData: unknown,
   rawTermData?: string
 ): TermDataValidationResult {
