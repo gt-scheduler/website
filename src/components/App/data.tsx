@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { Oscar } from '../../beans';
+import { Oscar } from '../../data/beans';
 import { TermContextValue, TermsContext, TermContext } from '../../contexts';
 import useDownloadOscarData from '../../hooks/data/useDownloadOscarData';
 import useDownloadTerms from '../../hooks/data/useDownloadTerms';

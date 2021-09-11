@@ -11,10 +11,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { Course, CourseFilter } from '..';
-import { classes, getRandomColor } from '../../utils';
+import { classes, getRandomColor } from '../../utils/misc';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { TermContext } from '../../contexts';
-import { Course as CourseBean, Section } from '../../beans';
+import { Course as CourseBean, Section } from '../../data/beans';
 
 import './stylesheet.scss';
 

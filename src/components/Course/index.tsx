@@ -9,10 +9,10 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, getContentClassName } from '../../utils';
+import { classes, getContentClassName } from '../../utils/misc';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { TermContext } from '../../contexts';
-import { Course as CourseBean, Section } from '../../beans';
+import { Course as CourseBean, Section } from '../../data/beans';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 

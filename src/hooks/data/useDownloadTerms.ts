@@ -7,7 +7,7 @@ import {
   Cancellable,
   exponentialBackoff,
   isAxiosNetworkError,
-} from '../../utils';
+} from '../../utils/misc';
 
 const CRAWLER_REPO = 'gt-scheduler/crawler';
 const CRAWLER_BRANCH = 'gh-pages';

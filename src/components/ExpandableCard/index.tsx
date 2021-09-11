@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 
 import './stylesheet.scss';
 

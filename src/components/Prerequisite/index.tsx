@@ -6,9 +6,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { TermContext } from '../../contexts';
-import { classes, serializePrereqs } from '../../utils';
+import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
-import { Course } from '../../beans';
+import { Course } from '../../data/beans';
 import {
   CrawlerPrerequisites,
   PrerequisiteClause,

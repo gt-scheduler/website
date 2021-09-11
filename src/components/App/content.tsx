@@ -8,7 +8,7 @@ import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
 import { AppNavigationContext, AppMobileNav, NAV_TABS } from './navigation';
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 
 /**
  * Renders the actual content at the root of the app

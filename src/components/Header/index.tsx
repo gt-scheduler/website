@@ -1,7 +1,10 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import copy from 'copy-to-clipboard';
 
-import { downloadShadowCalendar, exportCoursesToCalendar } from '../../utils';
+import {
+  downloadShadowCalendar,
+  exportCoursesToCalendar,
+} from '../../utils/misc';
 import { Calendar } from '..';
 import { TermContext, TermsContext, ThemeContext } from '../../contexts';
 import { ErrorWithFields, softError } from '../../log';

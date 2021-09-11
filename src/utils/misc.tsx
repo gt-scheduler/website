@@ -5,11 +5,11 @@ import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 
-import { Oscar, Section } from './beans';
-import { DAYS, PALETTE, PNG_SCALE_FACTOR } from './constants';
-import { ErrorWithFields, softError } from './log';
-import { ICS, Period, PrerequisiteClause, Theme } from './types';
-import ics from './vendor/ics';
+import { Oscar, Section } from '../data/beans';
+import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
+import { ErrorWithFields, softError } from '../log';
+import { ICS, Period, PrerequisiteClause, Theme } from '../types';
+import ics from '../vendor/ics';
 
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);

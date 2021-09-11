@@ -6,14 +6,14 @@ import {
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
-} from '../types';
+} from '../../types';
 import {
   hasConflictBetween,
   isLab,
   isLecture,
   isAxiosNetworkError,
-} from '../utils';
-import { ErrorWithFields, softError } from '../log';
+} from '../../utils/misc';
+import { ErrorWithFields, softError } from '../../log';
 
 interface SectionGroupMeeting {
   days: string[];

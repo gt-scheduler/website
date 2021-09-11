@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Theme, defaultTermData, TermData } from '../types';
-import Oscar, { EMPTY_OSCAR } from '../beans/Oscar';
+import Oscar, { EMPTY_OSCAR } from '../data/beans/Oscar';
 import { ErrorWithFields } from '../log';
 
 type Setter<T> = (next: T) => void;

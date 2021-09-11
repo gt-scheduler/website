@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
-import { classes, getContentClassName } from '../../utils';
+import { classes, getContentClassName } from '../../utils/misc';
 import { Period } from '../../types';
 import { ThemeContext } from '../../contexts';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 import { Button } from '..';
 
 import './stylesheet.scss';

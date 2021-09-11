@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 
-import { Oscar } from '../../beans';
+import { Oscar } from '../../data/beans';
 import { ErrorWithFields, softError } from '../../log';
 import { CrawlerTermData, LoadingState } from '../../types';
 import {
@@ -9,7 +9,7 @@ import {
   exponentialBackoff,
   isAxiosNetworkError,
   sleep,
-} from '../../utils';
+} from '../../utils/misc';
 
 const constructTermDataUrl = (term: string): string =>
   `https://gt-scheduler.github.io/crawler/${term}.json`;

@@ -1,4 +1,4 @@
-import { Combination } from '../types';
+import { Combination } from '../../types';
 
 export default class SortingOption {
   label: string;

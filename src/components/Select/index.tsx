@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
-import { classes } from '../../utils';
+import { classes } from '../../utils/misc';
 import { Button } from '..';
 import Spinner from '../Spinner';
 
