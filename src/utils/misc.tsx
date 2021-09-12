@@ -98,28 +98,6 @@ export const isLab = (section: Section): boolean =>
 export const isLecture = (section: Section): boolean =>
   section.scheduleType.includes('Lecture');
 
-export const getSemesterName = (term: string): string => {
-  const year = term.substring(0, 4);
-  const semester = ((): string => {
-    switch (Number.parseInt(term.substring(4), 10)) {
-      case 1:
-        return 'Winter';
-      case 2:
-      case 3:
-        return 'Spring';
-      case 5:
-      case 6:
-        return 'Summer';
-      case 8:
-      case 9:
-        return 'Fall';
-      default:
-        return 'Unknown';
-    }
-  })();
-  return `${semester} ${year}`;
-};
-
 export function humanizeArray<T>(array: T[], conjunction = 'and'): string {
   if (array.length <= 2) {
     return array.join(` ${conjunction} `);

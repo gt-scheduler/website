@@ -122,6 +122,24 @@
       "rules": {
         "@typescript-eslint/explicit-function-return-type": ["error"]
       }
+    },
+    {
+      "files": ["*.test.tsx", "*.test.ts"],
+      "plugins": ["jest"],
+      "rules": {
+        // Disable unbound-method & replace with jest version
+        // https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/unbound-method.md
+        "@typescript-eslint/unbound-method": "off",
+        "jest/unbound-method": "error",
+        // Disable import/no-extraneous-dependencies for dev dependencies in test files
+        // -- some test dependencies are be dev dependencies
+        "import/no-extraneous-dependencies": [
+          "error",
+          {
+            "devDependencies": true
+          }
+        ]
+      }
     }
   ]
 }

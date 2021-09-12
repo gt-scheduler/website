@@ -1,0 +1,226 @@
+import { getSemesterName, isTerm } from './semesters';
+
+describe('isTerm', () => {
+  // Tests that a list of all terms that Oscar serves (as of 2021-09-10)
+  // are all correctly identified as terms
+  it('returns true with real terms', () => {
+    const pastTerms = [
+      '202108',
+      '202105',
+      '202102',
+      '202008',
+      '202005',
+      '202002',
+      '201908',
+      '201905',
+      '201902',
+      '201808',
+      '201805',
+      '201802',
+      '201708',
+      '201705',
+      '201702',
+      '201608',
+      '201605',
+      '201602',
+      '201508',
+      '201505',
+      '201502',
+      '201408',
+      '201405',
+      '201402',
+      '201308',
+      '201305',
+      '201302',
+      '201208',
+      '201205',
+      '201202',
+      '201108',
+      '201105',
+      '201102',
+      '201008',
+      '201005',
+      '201002',
+      '200908',
+      '200905',
+      '200902',
+      '200808',
+      '200805',
+      '200802',
+      '200708',
+      '200705',
+      '200702',
+      '200608',
+      '200605',
+      '200602',
+      '200508',
+      '200505',
+      '200502',
+      '200408',
+      '200405',
+      '200402',
+      '200308',
+      '200305',
+      '200302',
+      '200208',
+      '200205',
+      '200202',
+      '200108',
+      '200105',
+      '200102',
+      '200008',
+      '200005',
+      '200002',
+      '199908',
+      '199906',
+      '199903',
+      '199901',
+      '199809',
+      '199806',
+      '199803',
+      '199801',
+      '199709',
+      '199706',
+      '199703',
+      '199701',
+      '199609',
+      '199606',
+    ];
+    pastTerms.forEach((term) => expect(isTerm(term)).toEqual(true));
+  });
+
+  // Tests that an assortment of non-term strings don't get considered terms
+  it('returns false with non-terms', () => {
+    const nonTerms = [
+      'undefined',
+      '',
+      'term',
+      'terms',
+      'visited-notice',
+      '341423',
+      '123566',
+      '000000',
+      '0',
+      '20201',
+      '2020110',
+    ];
+    nonTerms.forEach((term) => expect(isTerm(term)).toEqual(false));
+  });
+});
+
+describe('getSemesterName', () => {
+  // Tests that a list of all terms that Oscar serves (as of 2021-09-10)
+  // are all correctly formatted into the semester names
+  it('converts real terms to expected values', () => {
+    const expectedValues = {
+      '199606': 'Summer 1996',
+      '199609': 'Fall 1996',
+      '199701': 'Winter 1997',
+      '199703': 'Spring 1997',
+      '199706': 'Summer 1997',
+      '199709': 'Fall 1997',
+      '199801': 'Winter 1998',
+      '199803': 'Spring 1998',
+      '199806': 'Summer 1998',
+      '199809': 'Fall 1998',
+      '199901': 'Winter 1999',
+      '199903': 'Spring 1999',
+      '199906': 'Summer 1999',
+      // Trivia: August 1999 is when Georgia Tech switched
+      // from a quarter system to a semester system.
+      // Source: https://registrar.gatech.edu/info/semester-system
+      '199908': 'Fall 1999',
+      '200002': 'Spring 2000',
+      '200005': 'Summer 2000',
+      '200008': 'Fall 2000',
+      '200102': 'Spring 2001',
+      '200105': 'Summer 2001',
+      '200108': 'Fall 2001',
+      '200202': 'Spring 2002',
+      '200205': 'Summer 2002',
+      '200208': 'Fall 2002',
+      '200302': 'Spring 2003',
+      '200305': 'Summer 2003',
+      '200308': 'Fall 2003',
+      '200402': 'Spring 2004',
+      '200405': 'Summer 2004',
+      '200408': 'Fall 2004',
+      '200502': 'Spring 2005',
+      '200505': 'Summer 2005',
+      '200508': 'Fall 2005',
+      '200602': 'Spring 2006',
+      '200605': 'Summer 2006',
+      '200608': 'Fall 2006',
+      '200702': 'Spring 2007',
+      '200705': 'Summer 2007',
+      '200708': 'Fall 2007',
+      '200802': 'Spring 2008',
+      '200805': 'Summer 2008',
+      '200808': 'Fall 2008',
+      '200902': 'Spring 2009',
+      '200905': 'Summer 2009',
+      '200908': 'Fall 2009',
+      '201002': 'Spring 2010',
+      '201005': 'Summer 2010',
+      '201008': 'Fall 2010',
+      '201102': 'Spring 2011',
+      '201105': 'Summer 2011',
+      '201108': 'Fall 2011',
+      '201202': 'Spring 2012',
+      '201205': 'Summer 2012',
+      '201208': 'Fall 2012',
+      '201302': 'Spring 2013',
+      '201305': 'Summer 2013',
+      '201308': 'Fall 2013',
+      '201402': 'Spring 2014',
+      '201405': 'Summer 2014',
+      '201408': 'Fall 2014',
+      '201502': 'Spring 2015',
+      '201505': 'Summer 2015',
+      '201508': 'Fall 2015',
+      '201602': 'Spring 2016',
+      '201605': 'Summer 2016',
+      '201608': 'Fall 2016',
+      '201702': 'Spring 2017',
+      '201705': 'Summer 2017',
+      '201708': 'Fall 2017',
+      '201802': 'Spring 2018',
+      '201805': 'Summer 2018',
+      '201808': 'Fall 2018',
+      '201902': 'Spring 2019',
+      '201905': 'Summer 2019',
+      '201908': 'Fall 2019',
+      '202002': 'Spring 2020',
+      '202005': 'Summer 2020',
+      '202008': 'Fall 2020',
+      '202102': 'Spring 2021',
+      '202105': 'Summer 2021',
+      '202108': 'Fall 2021',
+    };
+
+    Object.entries(expectedValues).forEach(([term, semesterName]) =>
+      expect(getSemesterName(term)).toEqual(semesterName)
+    );
+  });
+
+  // Tests that an assortment of non-term strings
+  // get turned into a fallback "semester name"
+  it('converts non-terms to "Unknown"', () => {
+    const nonTerms = [
+      'undefined',
+      '',
+      'term',
+      'terms',
+      'visited-notice',
+      '341423',
+      '123566',
+      '000000',
+      '0',
+      '20201',
+      '2020110',
+    ];
+    nonTerms.forEach((term) =>
+      expect(getSemesterName(term)).toEqual('Unknown')
+    );
+  });
+});

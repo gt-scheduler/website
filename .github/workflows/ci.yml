@@ -1,0 +1,54 @@
+name: Continuous Integration
+on: [pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+        id: install
+
+      - name: Run prettier
+        run: yarn run format:check
+
+      - name: Run ESLint
+        run: yarn run lint
+        # Always run the linter, even if prettier failed
+        if: ${{ steps.install.outcome == 'success' }}
+
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn run build
+        env:
+          CI: "true"
+
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Test
+        run: yarn run test
+        env:
+          CI: "true"
