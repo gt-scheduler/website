@@ -199,32 +199,6 @@ export const isAxiosNetworkError = (err: unknown): boolean => {
 };
 
 /**
- * Gives an awaitable class (via `promise`) that can be cancelled at any time.
- * Useful when combined with `Promise.race` to cancel background tasks.
- */
-export class Cancellable {
-  isCancelled: boolean;
-
-  cancel: () => void;
-
-  cancelledSymbol: symbol;
-
-  promise: Promise<symbol>;
-
-  constructor() {
-    this.isCancelled = false;
-    this.cancel = (): void => undefined;
-    this.cancelledSymbol = Symbol('__#Cancellable-cancelled-symbol');
-    this.promise = new Promise<symbol>((resolve) => {
-      this.cancel = (): void => {
-        this.isCancelled = true;
-        resolve(this.cancelledSymbol);
-      };
-    });
-  }
-}
-
-/**
  * Sleeps for a delay controlled by an exponential backoff function with jitter.
  * Acts as a thin wrapper around `exponential-backoff`
  * that provides a lower-level API

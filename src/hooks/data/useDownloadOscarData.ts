@@ -5,11 +5,11 @@ import { Oscar } from '../../data/beans';
 import { ErrorWithFields, softError } from '../../log';
 import { CrawlerTermData, LoadingState } from '../../types';
 import {
-  Cancellable,
   exponentialBackoff,
   isAxiosNetworkError,
   sleep,
 } from '../../utils/misc';
+import Cancellable from '../../utils/cancellable';
 
 const constructTermDataUrl = (term: string): string =>
   `https://gt-scheduler.github.io/crawler/${term}.json`;
@@ -57,12 +57,9 @@ export default function useDownloadOscarData(
 
         // Sleep for the refresh interval,
         // exiting early if cancelled
-        const result = await Promise.race([
-          loadOperation.promise,
-          sleep({ amount_ms: REFRESH_INTERVAL_MIN * 60 * 1000 }),
-        ]);
-
-        if (result === loadOperation.cancelledSymbol) {
+        const promise = sleep({ amount_ms: REFRESH_INTERVAL_MIN * 60 * 1000 });
+        const result = await loadOperation.perform(promise);
+        if (result.cancelled) {
           return;
         }
 
@@ -84,16 +81,13 @@ export default function useDownloadOscarData(
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const result = await Promise.race([
-            loadOperation.promise,
-            axios.get<CrawlerTermData>(url),
-          ]);
-
-          if (result === loadOperation.cancelledSymbol) {
+          const promise = axios.get<CrawlerTermData>(url);
+          const result = await loadOperation.perform(promise);
+          if (result.cancelled) {
             return;
           }
 
-          const json = (result as Exclude<typeof result, symbol>).data;
+          const json = result.value.data;
 
           // If the data is the same as the currently loaded data,
           // skip loading it

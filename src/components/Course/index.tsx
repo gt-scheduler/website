@@ -10,6 +10,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, getContentClassName } from '../../utils/misc';
+import Cancellable from '../../utils/cancellable';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
@@ -40,25 +41,38 @@ export default function Course({
   ] = useContext(ScheduleContext);
 
   useEffect(() => {
-    if (!isSearching) {
-      const course = oscar.findCourse(courseId);
+    const course = oscar.findCourse(courseId);
+    if (course == null) return;
+    if (isSearching) return;
+
+    // Allow the operation to be cancelled early (if the component unmounts)
+    const loadOperation = new Cancellable();
+    async function loadCourseGpa(): Promise<void> {
       if (course == null) return;
-      course
-        .fetchGpa()
-        .then(setGpaMap)
-        .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'error fetching course GPA',
-              source: err,
-              fields: {
-                courseId,
-                term: course.term,
-              },
-            })
-          );
-        });
+
+      const promise = course.fetchGpa();
+      const result = await loadOperation.perform(promise);
+      if (!result.cancelled) {
+        setGpaMap(result.value);
+      }
     }
+
+    loadCourseGpa().catch((err) => {
+      softError(
+        new ErrorWithFields({
+          message: 'error fetching course GPA',
+          source: err,
+          fields: {
+            courseId,
+            term: course.term,
+          },
+        })
+      );
+    });
+
+    return (): void => {
+      loadOperation.cancel();
+    };
   }, [isSearching, oscar, courseId]);
 
   const handleRemoveCourse = useCallback(
