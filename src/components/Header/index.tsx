@@ -6,7 +6,7 @@ import {
   exportCoursesToCalendar,
 } from '../../utils/misc';
 import { Calendar } from '..';
-import { TermContext, TermsContext, ThemeContext } from '../../contexts';
+import { ScheduleContext, TermsContext, ThemeContext } from '../../contexts';
 import { ErrorWithFields, softError } from '../../log';
 import HeaderDisplay from '../HeaderDisplay';
 
@@ -30,7 +30,8 @@ export default function Header({
   onToggleMenu,
   tabs,
 }: HeaderProps): React.ReactElement {
-  const [{ term, oscar, pinnedCrns }, { setTerm }] = useContext(TermContext);
+  const [{ term, oscar, pinnedCrns }, { setTerm }] =
+    useContext(ScheduleContext);
   const terms = useContext(TermsContext);
   const [theme] = useContext(ThemeContext);
   const captureRef = useRef<HTMLDivElement>(null);

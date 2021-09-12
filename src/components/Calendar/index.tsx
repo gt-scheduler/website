@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { TimeBlocks } from '..';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
 import { Period } from '../../types';
 
@@ -24,7 +24,7 @@ export default function Calendar({
   capture = false,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar }] = useContext(TermContext);
+  const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex

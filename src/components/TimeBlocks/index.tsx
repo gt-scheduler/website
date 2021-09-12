@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { classes, getContentClassName, periodToString } from '../../utils/misc';
 import { CLOSE, OPEN, DAYS } from '../../constants';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import { Period } from '../../types';
 
 import './stylesheet.scss';
@@ -40,7 +40,7 @@ export default function TimeBlocks({
   isAutosized,
   sizeInfo,
 }: TimeBlocksProps): React.ReactElement | null {
-  const [{ oscar, colorMap }] = useContext(TermContext);
+  const [{ oscar, colorMap }] = useContext(ScheduleContext);
 
   const section = oscar.findSection(crn);
   if (section == null) return null;

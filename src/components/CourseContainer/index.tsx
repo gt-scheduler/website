@@ -2,13 +2,13 @@ import React, { useContext } from 'react';
 import ago from 's-ago';
 
 import { Button, Course, CourseAdd } from '..';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 export default function CourseContainer(): React.ReactElement {
-  const [{ oscar, desiredCourses }] = useContext(TermContext);
+  const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
 
   return (
     <div className="CourseContainer">

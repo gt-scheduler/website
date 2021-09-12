@@ -11,7 +11,7 @@ import {
 
 import { classes, getContentClassName } from '../../utils/misc';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
@@ -36,8 +36,8 @@ export default function Course({
   const isSearching = Boolean(onAddCourse);
   const [
     { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
-    { patchTermData },
-  ] = useContext(TermContext);
+    { patchSchedule },
+  ] = useContext(ScheduleContext);
 
   useEffect(() => {
     if (!isSearching) {
@@ -66,7 +66,7 @@ export default function Course({
       const newColorMap = { ...colorMap };
       delete newColorMap[course.id];
 
-      patchTermData({
+      patchSchedule({
         desiredCourses: desiredCourses.filter((id) => id !== course.id),
         pinnedCrns: pinnedCrns.filter(
           (crn) => !course.sections.some((section) => section.crn === crn)
@@ -77,17 +77,17 @@ export default function Course({
         colorMap: newColorMap,
       });
     },
-    [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchTermData]
+    [desiredCourses, pinnedCrns, excludedCrns, colorMap, patchSchedule]
   );
 
   const handleIncludeSections = useCallback(
     (sections: Section[]) => {
       const crns = sections.map((section) => section.crn);
-      patchTermData({
+      patchSchedule({
         excludedCrns: excludedCrns.filter((crn) => !crns.includes(crn)),
       });
     },
-    [excludedCrns, patchTermData]
+    [excludedCrns, patchSchedule]
   );
 
   const course = oscar.findCourse(courseId);
@@ -211,7 +211,7 @@ export default function Course({
           <Palette
             className="palette"
             onSelectColor={(col): void =>
-              patchTermData({ colorMap: { ...colorMap, [courseId]: col } })
+              patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
             }
             color={color ?? null}
             onMouseLeave={(): void => setPaletteShown(false)}

@@ -46,7 +46,8 @@ export type HeaderDisplayProps = {
  * Renders the top header component as a simple display component,
  * letting any substantive state be passed in as props.
  * See `<Header>` for the full implementation that owns the header state.
- * This is safe to render without `TermContext` or `TermsContext` being present.
+ * This is safe to render without `ScheduleContext` or `TermsContext`
+ * being present.
  */
 export default function HeaderDisplay({
   totalCredits = null,
