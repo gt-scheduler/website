@@ -3,6 +3,7 @@ import { render, getByTestId } from '@testing-library/react';
 import Cookies from 'js-cookie';
 import * as useLocalStorageState from 'use-local-storage-state';
 import { Draft } from 'immer';
+import fastSafeStringify from 'fast-safe-stringify';
 
 import useScheduleDataFromStorage, {
   SCHEDULE_DATA_LOCAL_STORAGE_KEY,
@@ -44,7 +45,7 @@ describe('useScheduleDataFromStorage', () => {
   function TestComponent(): React.ReactElement {
     const result = useScheduleDataFromStorage();
     const allResults = useAllResults(result);
-    return <div data-testid="result">{JSON.stringify(allResults)}</div>;
+    return <div data-testid="result">{fastSafeStringify(allResults)}</div>;
   }
 
   // Tests that, with empty cookies and local storage,
@@ -186,9 +187,6 @@ describe('useScheduleDataFromStorage', () => {
 
     expect(getResult()).toEqual([
       {
-        type: 'loading',
-      },
-      {
         type: 'loaded',
         result: {
           scheduleData: expectedScheduleData,
@@ -235,10 +233,9 @@ describe('useScheduleDataFromStorage', () => {
       version: 1,
     };
 
+    // If actual migrations are performed (at some point in the future),
+    // then this might need to have a 'loading' stage
     expect(getResult()).toEqual([
-      {
-        type: 'loading',
-      },
       {
         type: 'loaded',
         result: {
@@ -297,6 +294,7 @@ describe('useScheduleDataFromStorage', () => {
       },
       expect.objectContaining({
         type: 'error',
+        stillLoading: false,
         // Other fields ignored
       }),
     ]);
@@ -322,7 +320,7 @@ describe('useScheduleDataFromStorage', () => {
       }, [madeUpdate, result, applyUpdate]);
 
       const allResults = useAllResults(result);
-      return <div data-testid="result">{JSON.stringify(allResults)}</div>;
+      return <div data-testid="result">{fastSafeStringify(allResults)}</div>;
     }
 
     // Tests that calling `updateScheduleData` causes a re-render

@@ -1,7 +1,8 @@
 import produce, { Draft, Immutable } from 'immer';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useLocalStorageState } from 'use-local-storage-state';
 
+import { renderDataNotPersistentNotification } from '../../components/DataNotPersistentNotification';
 import { ErrorWithFields } from '../../log';
 import { LoadingState } from '../../types';
 import { ScheduleData, AnyScheduleData } from '../types';
@@ -37,6 +38,9 @@ export default function useScheduleDataFromStorage(): LoadingState<HookResult> {
     isPersistent,
   });
 
+  const [userAcceptedNonPersistence, setUserAcceptedNonPersistence] =
+    useState(false);
+
   // updateScheduleData is a referentially stable callback function
   // that can be used to update the schedule data using an immer draft:
   // https://immerjs.github.io/immer/produce/
@@ -67,10 +71,17 @@ export default function useScheduleDataFromStorage(): LoadingState<HookResult> {
     [setScheduleData, migrationResult.type]
   );
 
-  // If the state isn't persistent, then return an error to alert the user:
-  if (!isPersistent) {
-    // TODO add better contents
-    return { type: 'custom', contents: null };
+  // If the state isn't persistent, then return an error to alert the user
+  // requiring them to acknowledge this before continuing
+  if (!isPersistent && !userAcceptedNonPersistence) {
+    return {
+      type: 'custom',
+      contents: renderDataNotPersistentNotification({
+        onAccept: (): void => {
+          setUserAcceptedNonPersistence(true);
+        },
+      }),
+    };
   }
 
   // The data is still "loading" -- it is waiting for the migration

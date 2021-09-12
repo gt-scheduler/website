@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import swal from '@sweetalert/with-react';
+import useLocalStorageState from 'use-local-storage-state';
 
 import { softError, ErrorWithFields } from '../../log';
 
@@ -8,13 +9,13 @@ import { softError, ErrorWithFields } from '../../log';
 // Update this when updating the contents of the modal.
 // In the future, prefix all keys with `YYYY-MM-DD-`
 // to ensure that they remain globally unique.
-const MODAL_COOKIE_KEY = 'visited-merge-notice';
+const MODAL_LOCAL_STORAGE_KEY = 'visited-merge-notice';
 
 /**
  * Inner content of the information modal.
  * Change this to update the announcement that is shown when visiting the site.
- * Additionally, make sure to change `MODAL_COOKIE_KEY` with another unique
- * value that has never been used before.
+ * Additionally, make sure to change `MODAL_LOCAL_STORAGE_KEY`
+ * with another unique value that has never been used before.
  */
 export function InformationModalContent(): React.ReactElement {
   return (
@@ -50,8 +51,18 @@ export function InformationModalContent(): React.ReactElement {
  * when they haven't seen this version of the information modal before.
  */
 export function useInformationModal(): void {
+  const [hasSeen, setHasSeen] = useLocalStorageState(
+    MODAL_LOCAL_STORAGE_KEY,
+    () => {
+      const cookieValue = Cookies.get(MODAL_LOCAL_STORAGE_KEY);
+      if (cookieValue === 'true') return true;
+      return false;
+    }
+  );
+
   useEffect(() => {
-    if (!Cookies.get(MODAL_COOKIE_KEY)) {
+    if (!hasSeen) {
+      setHasSeen(true);
       swal({
         button: 'Got It!',
         content: <InformationModalContent />,
@@ -61,13 +72,11 @@ export function useInformationModal(): void {
             message: 'error with swal call',
             source: err,
             fields: {
-              cookieKey: MODAL_COOKIE_KEY,
+              localStorageKey: MODAL_LOCAL_STORAGE_KEY,
             },
           })
         );
       });
-
-      Cookies.set(MODAL_COOKIE_KEY, 'true', { expires: 365 });
     }
-  }, []);
+  }, [hasSeen, setHasSeen]);
 }

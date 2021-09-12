@@ -1,31 +1,23 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
 import useBodyClass from '../../hooks/useBodyClass';
-import useCookie from '../../hooks/useCookie';
 import useMobile from '../../hooks/useMobile';
-import { ThemeContext, ThemeContextValue } from '../../contexts';
-import { isTheme } from '../../types';
+import { ThemeContext } from '../../contexts';
 import { useInformationModal } from '../InformationModal';
 import ErrorBoundary from '../ErrorBoundary';
 import { ReactErrorDetails } from '../ErrorDetails';
 import ErrorDisplay from '../ErrorDisplay';
 import ErrorHeader from '../ErrorHeader';
 import { AppNavigation } from './navigation';
-import {
-  LoadTerms,
-  EnsureValidTerm,
-  LoadOscarData,
-  EnsureValidTermData,
-  AppContextProvider,
-} from './data';
+import AppDataLoader from '../AppDataLoader';
 import {
   AppSkeletonWithLoadingTerms,
   SkeletonContent,
   AppContent,
 } from './content';
-import useScheduleDataFromStorage from '../../data/hooks/useScheduleDataFromStorage';
+import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -34,10 +26,15 @@ export default function App(): React.ReactElement {
   // Display a popup when first visiting the site
   useInformationModal();
 
-  console.log(useScheduleDataFromStorage());
+  // Grab the current theme (light/dark) from local storage.
+  // This hook returns the memoized context value.
+  const themeContextValue = useThemeFromStorage();
+
+  // Add the current theme as a class on the body element
+  useBodyClass(themeContextValue[0]);
 
   return (
-    <ThemeLoader>
+    <ThemeContext.Provider value={themeContextValue}>
       <AppCSSRoot>
         <ErrorBoundary
           fallback={(error, errorInfo): React.ReactElement => (
@@ -62,85 +59,24 @@ export default function App(): React.ReactElement {
           )}
         >
           <AppNavigation>
-            {/* LoadTerms is the start in a chain of components that handles
-                loading all data for the app and controlling state
-                (some of which is persisted in cookies).
-                It allows for more explicit data flows and dependencies,
-                and promotes better loading and error states/handling. */}
-            <LoadTerms>
-              {({ terms }): React.ReactNode => (
-                <EnsureValidTerm terms={terms}>
-                  {({ term, setTerm }): React.ReactNode => (
-                    <LoadOscarData terms={terms} term={term} setTerm={setTerm}>
-                      {({ oscar }): React.ReactNode => (
-                        <EnsureValidTermData
-                          terms={terms}
-                          term={term}
-                          setTerm={setTerm}
-                          oscar={oscar}
-                        >
-                          {({ termData, patchSchedule }): React.ReactNode => (
-                            <AppContextProvider
-                              terms={terms}
-                              term={term}
-                              setTerm={setTerm}
-                              oscar={oscar}
-                              termData={termData}
-                              patchSchedule={patchSchedule}
-                            >
-                              <AppContent />
-                            </AppContextProvider>
-                          )}
-                        </EnsureValidTermData>
-                      )}
-                    </LoadOscarData>
-                  )}
-                </EnsureValidTerm>
-              )}
-            </LoadTerms>
+            {/* AppDataLoader is in charge of ensuring that there are valid values
+                for the Terms and Term contexts before rendering its children.
+                If any data is still loading,
+                then it displays an "app skeleton" with a spinner.
+                If there was an error while loading
+                then it displays an error screen. */}
+            <AppDataLoader>
+              <AppContent />
+            </AppDataLoader>
           </AppNavigation>
           <Feedback />
         </ErrorBoundary>
       </AppCSSRoot>
-    </ThemeLoader>
+    </ThemeContext.Provider>
   );
 }
 
 // Private sub-components
-
-type ThemeLoaderProps = {
-  children: React.ReactNode;
-};
-
-/**
- * Provides the current UI theme to all children (via context),
- * ensuring that it is one of the valid values in `Theme`.
- */
-function ThemeLoader({ children }: ThemeLoaderProps): React.ReactElement {
-  const [theme, setTheme] = useCookie('theme', 'dark');
-  const correctedTheme = isTheme(theme) ? theme : 'dark';
-
-  // Ensure that the stored theme is valid; otherwise reset it
-  useEffect(() => {
-    if (theme !== correctedTheme) {
-      setTheme(correctedTheme);
-    }
-  }, [theme, correctedTheme, setTheme]);
-
-  const themeContextValue = useMemo<ThemeContextValue>(
-    () => [correctedTheme, setTheme],
-    [correctedTheme, setTheme]
-  );
-
-  // Add the current theme as a class on the body element
-  useBodyClass(theme);
-
-  return (
-    <ThemeContext.Provider value={themeContextValue}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
 
 type AppCSSRootProps = {
   children?: React.ReactNode;

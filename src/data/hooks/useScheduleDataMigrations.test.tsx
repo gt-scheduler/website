@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { render, getByTestId } from '@testing-library/react';
 import Cookies from 'js-cookie';
+import fastSafeStringify from 'fast-safe-stringify';
 
 import {
   asMockFunction,
@@ -53,7 +54,7 @@ describe('useScheduleDataMigrations', () => {
       isPersistent,
     });
     const allResults = useAllResults(result);
-    return <div data-testid="result">{JSON.stringify(allResults)}</div>;
+    return <div data-testid="result">{fastSafeStringify(allResults)}</div>;
   }
 
   // Tests that the hook pulls data from cookies and applies migrations,
@@ -117,9 +118,8 @@ describe('useScheduleDataMigrations', () => {
     expect(setScheduleDataMock).toBeCalledWith(expectedScheduleData);
   });
 
-  // Tests that the hook applies migrations as expected,
-  // moving the return value from pending to done
-  it('migrates data given initial data', () => {
+  // Tests that the hook skips migrations if not needed
+  it('skips migration if not needed', () => {
     const setScheduleDataMock = jest.fn();
     const { container } = render(
       <TestComponent
@@ -184,16 +184,12 @@ describe('useScheduleDataMigrations', () => {
     expect(expectedScheduleData.version).toEqual(LATEST_SCHEDULE_DATA_VERSION);
     expect(getResult()).toEqual([
       {
-        type: 'pending',
-      },
-      {
         type: 'done',
         result: expectedScheduleData,
       },
     ]);
 
-    expect(setScheduleDataMock).toBeCalledTimes(1);
-    expect(setScheduleDataMock).toBeCalledWith(expectedScheduleData);
+    expect(setScheduleDataMock).toBeCalledTimes(0);
   });
 
   // Tests that not having persistent local storage in the browser
@@ -249,6 +245,13 @@ describe('useScheduleDataMigrations', () => {
       },
       expect.objectContaining({
         type: 'error',
+        // The matcher returns `any`, so we have to suppress the lint here:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        error: expect.objectContaining({
+          type: 'error',
+          stillLoading: false,
+          // Other fields ignored
+        }),
         // Other fields ignored
       }),
     ]);

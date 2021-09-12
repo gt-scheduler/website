@@ -1,6 +1,6 @@
 @import '../../variables';
 
-.term-data-fallback-notification {
+.data-not-persistent-notification{
   font-size: 0.9rem;
   margin: 0;
   text-align: left;
@@ -46,7 +46,7 @@
     font-size: 0.8rem;
   }
 
-  & &-button {
+  & &--button {
     border: none;
     outline: none;
     padding: 10px 18px;
@@ -55,7 +55,7 @@
     transition: all 0.33s ease;
     border-radius: 8px;
     font-weight: 500;
-    margin: 0 auto 8px;
+    margin: 20px auto 8px;
     display: block;
   
     &:not(&--cancel) {

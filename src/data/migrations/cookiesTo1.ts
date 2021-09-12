@@ -1,7 +1,4 @@
-import {
-  parseTermData,
-  validateTermData,
-} from '../../hooks/data/useTermDataFromCookies';
+import { parseTermData, validateTermData } from '../legacy/validation';
 import { softError, ErrorWithFields } from '../../log';
 import { isTerm } from '../../utils/semesters';
 import { Version1ScheduleData, Version1TermScheduleData } from '../types';

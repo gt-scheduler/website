@@ -1,3 +1,5 @@
+import { Immutable } from 'immer';
+
 // These should always be the latest version of schedule data
 export const LATEST_SCHEDULE_DATA_VERSION: ScheduleData['version'] = 1;
 export type ScheduleData = Version1ScheduleData;
@@ -14,6 +16,19 @@ export type Version1ScheduleDataOrNewer = Version1ScheduleData;
 
 // This type should automatically accept any schedule data
 export type AnyScheduleData = Version1ScheduleDataOrNewer;
+
+export const defaultTermScheduleData: Immutable<TermScheduleData> = {
+  versions: {},
+  currentVersion: '',
+};
+
+export const defaultSchedule: Immutable<Schedule> = {
+  desiredCourses: [],
+  pinnedCrns: [],
+  excludedCrns: [],
+  colorMap: {},
+  sortingOptionIndex: 0,
+};
 
 // Version 1 schedule data (2021-09-10)
 // ===================================

@@ -31,16 +31,21 @@ export default function useScheduleDataMigrations({
   setScheduleData: (next: ScheduleData) => void;
   isPersistent: boolean;
 }): MigrationResult {
-  const [done, setDone] = useState<boolean>(false);
   const [error, setError] = useState<MigrationErrorState | null>(null);
 
   useEffect(() => {
-    if (done || !isPersistent) return;
+    if (!isPersistent) return;
+
+    // Make sure the data needs migrating
+    if (
+      rawScheduleData !== null &&
+      rawScheduleData.version === LATEST_SCHEDULE_DATA_VERSION
+    )
+      return;
 
     try {
       const updatedScheduleData = migrateScheduleData(rawScheduleData);
       setScheduleData(updatedScheduleData);
-      setDone(true);
     } catch (err) {
       // An error occurred: the safe thing to do is report to the user & stop
       const newError = new ErrorWithFields({
@@ -56,32 +61,17 @@ export default function useScheduleDataMigrations({
         overview: 'could not convert stored schedule data to latest version',
       });
     }
-  }, [done, isPersistent, rawScheduleData, setScheduleData]);
+  }, [isPersistent, rawScheduleData, setScheduleData]);
 
   if (error !== null) {
     return { type: 'error', error };
-  }
-
-  if (!done) {
-    return { type: 'pending' };
   }
 
   if (
     rawScheduleData === null ||
     rawScheduleData.version !== LATEST_SCHEDULE_DATA_VERSION
   ) {
-    return {
-      type: 'error',
-      error: {
-        type: 'error',
-        overview: 'an internal assertion failed; could not load schedule data',
-        stillLoading: false,
-        error: new ErrorWithFields({
-          message:
-            'rawScheduleData was not of latest version even after migrations were marked as done',
-        }),
-      },
-    };
+    return { type: 'pending' };
   }
 
   return { type: 'done', result: rawScheduleData };
