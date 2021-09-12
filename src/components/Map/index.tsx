@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 import { Meeting } from '../../types';
 
@@ -12,7 +12,7 @@ import './stylesheet.scss';
 type CombinedCourseData = CourseDateItem & MapLocation;
 
 export default function Map(): React.ReactElement {
-  const [{ oscar, pinnedCrns }] = useContext(TermContext);
+  const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('M');
   const courseDateMap: Record<Day, CombinedCourseData[]> = {
     M: [],

@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useMemo } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 
 import { Button, Calendar, Select } from '..';
-import { OverlayCrnsContext, TermContext } from '../../contexts';
+import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
 import { Combination } from '../../types';
 
 import 'react-virtualized/styles.css';
@@ -11,17 +11,17 @@ import './stylesheet.scss';
 export default function CombinationContainer(): React.ReactElement {
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
-    { patchTermData },
-  ] = useContext(TermContext);
+    { patchSchedule },
+  ] = useContext(ScheduleContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
 
   const handleResetPinnedCrns = useCallback(() => {
     if (window.confirm('Are you sure to reset sections you selected?')) {
-      patchTermData({
+      patchSchedule({
         pinnedCrns: [],
       });
     }
-  }, [patchTermData]);
+  }, [patchSchedule]);
 
   const combinations = useMemo(
     () => oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns),
@@ -36,7 +36,7 @@ export default function CombinationContainer(): React.ReactElement {
     <div className="CombinationContainer">
       <Select
         onChange={(newSortingOptionIndex): void =>
-          patchTermData({ sortingOptionIndex: newSortingOptionIndex })
+          patchSchedule({ sortingOptionIndex: newSortingOptionIndex })
         }
         value={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({
@@ -69,7 +69,7 @@ export default function CombinationContainer(): React.ReactElement {
                       onMouseEnter={(): void => setOverlayCrns(crns)}
                       onMouseLeave={(): void => setOverlayCrns([])}
                       onClick={(): void =>
-                        patchTermData({
+                        patchSchedule({
                           pinnedCrns: [...pinnedCrns, ...crns],
                         })
                       }

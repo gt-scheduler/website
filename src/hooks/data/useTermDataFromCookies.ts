@@ -131,13 +131,13 @@ export default function useTermDataFromCookies(
   // Create the callback to patch term data.
   // This isn't actually used if the parse didn't succeed,
   // but we have to create it unconditionally since it is a hook.
-  const patchTermData = useCallback(
+  const patchSchedule = useCallback(
     (patch: Partial<TermData>) => {
       if (parseResult.type === 'error') {
         // This shouldn't be possible to call if the parse didn't succeed,
         // as we don't return this callback from the function.
         throw new ErrorWithFields({
-          message: 'patchTermData called when term data is not valid',
+          message: 'patchSchedule called when term data is not valid',
           fields: {
             patch,
             term,
@@ -226,12 +226,12 @@ export default function useTermDataFromCookies(
     };
   }
 
-  // Only return `filteredTermData` and `patchTermData`
+  // Only return `filteredTermData` and `patchSchedule`
   // if `parseResult.type` is `valid`
   if (parseResult.type === 'valid') {
     return {
       type: 'loaded',
-      result: [filteredTermData, patchTermData],
+      result: [filteredTermData, patchSchedule],
     };
   }
 

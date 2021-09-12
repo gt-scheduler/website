@@ -5,7 +5,7 @@ import {
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
 import { Course } from '../../data/beans';
@@ -110,7 +110,7 @@ type PrerequisiteHeaderProps = {
 function PrerequisiteHeader({
   course,
 }: PrerequisiteHeaderProps): React.ReactElement {
-  const [{ term }] = useContext(TermContext);
+  const [{ term }] = useContext(ScheduleContext);
 
   return (
     <ActionRow

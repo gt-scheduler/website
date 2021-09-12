@@ -60,6 +60,7 @@
         "ignoreRegExpLiterals": true
       }
     ],
+    "prettier/prettier": "warn",
     "react/require-default-props": "off",
     "no-await-in-loop": "off",
     "camelcase": "off",

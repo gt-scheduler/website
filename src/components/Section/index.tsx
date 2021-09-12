@@ -9,7 +9,7 @@ import {
 
 import { classes, periodToString } from '../../utils/misc';
 import { ActionRow } from '..';
-import { OverlayCrnsContext, TermContext } from '../../contexts';
+import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
 import { Section as SectionBean } from '../../data/beans';
 import { Seating } from '../../data/beans/Section';
@@ -30,8 +30,8 @@ export default function Section({
   pinned,
   color,
 }: SectionProps): React.ReactElement {
-  const [{ term, pinnedCrns, excludedCrns }, { patchTermData }] =
-    useContext(TermContext);
+  const [{ term, pinnedCrns, excludedCrns }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
   const [seating, setSeating] = useState<Seating>([[], 0]);
 
@@ -60,28 +60,28 @@ export default function Section({
 
   const excludeSection = useCallback(
     (sect: SectionBean) => {
-      patchTermData({
+      patchSchedule({
         excludedCrns: [...excludedCrns, sect.crn],
         pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn),
       });
     },
-    [pinnedCrns, excludedCrns, patchTermData]
+    [pinnedCrns, excludedCrns, patchSchedule]
   );
 
   const pinSection = useCallback(
     (sect: SectionBean) => {
       if (pinnedCrns.includes(sect.crn)) {
-        patchTermData({
+        patchSchedule({
           pinnedCrns: pinnedCrns.filter((crn) => crn !== sect.crn),
         });
       } else {
-        patchTermData({
+        patchSchedule({
           pinnedCrns: [...pinnedCrns, sect.crn],
           excludedCrns: excludedCrns.filter((crn) => crn !== sect.crn),
         });
       }
     },
-    [pinnedCrns, excludedCrns, patchTermData]
+    [pinnedCrns, excludedCrns, patchSchedule]
   );
 
   const excludeTooltipId = `section-exclude-${section.id}`;

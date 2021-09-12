@@ -1,7 +1,11 @@
 import React, { useMemo } from 'react';
 
 import { Oscar } from '../../data/beans';
-import { TermContextValue, TermsContext, TermContext } from '../../contexts';
+import {
+  ScheduleContextValue,
+  TermsContext,
+  ScheduleContext,
+} from '../../contexts';
 import useDownloadOscarData from '../../hooks/data/useDownloadOscarData';
 import useDownloadTerms from '../../hooks/data/useDownloadTerms';
 import useTermDataFromCookies from '../../hooks/data/useTermDataFromCookies';
@@ -124,7 +128,7 @@ export type EnsureValidTermDataProps = {
   oscar: Oscar;
   children: (props: {
     termData: TermData;
-    patchTermData: (patch: Partial<TermData>) => void;
+    patchSchedule: (patch: Partial<TermData>) => void;
   }) => React.ReactNode;
 };
 
@@ -162,8 +166,8 @@ export function EnsureValidTermData({
     );
   }
 
-  const [termData, patchTermData] = loadingState.result;
-  return <>{children({ termData, patchTermData })}</>;
+  const [termData, patchSchedule] = loadingState.result;
+  return <>{children({ termData, patchSchedule })}</>;
 }
 
 export type AppContextProviderProps = {
@@ -172,13 +176,13 @@ export type AppContextProviderProps = {
   setTerm: (next: string) => void;
   oscar: Oscar;
   termData: TermData;
-  patchTermData: (patch: Partial<TermData>) => void;
+  patchSchedule: (patch: Partial<TermData>) => void;
   children: React.ReactNode;
 };
 
 /**
  * Handles making all loaded data available to the rest of the app
- * via the contexts `TermsContext` and `TermContext`.
+ * via the contexts `TermsContext` and `ScheduleContext`.
  */
 export function AppContextProvider({
   terms,
@@ -186,23 +190,23 @@ export function AppContextProvider({
   setTerm,
   oscar,
   termData,
-  patchTermData,
+  patchSchedule,
   children,
 }: AppContextProviderProps): React.ReactElement {
   // Memoize context values so that their references are stable
-  const termContextValue = useMemo<TermContextValue>(
+  const scheduleContextValue = useMemo<ScheduleContextValue>(
     () => [
       { term, oscar, ...termData },
-      { setTerm, patchTermData },
+      { setTerm, patchSchedule },
     ],
-    [term, oscar, termData, setTerm, patchTermData]
+    [term, oscar, termData, setTerm, patchSchedule]
   );
 
   return (
     <TermsContext.Provider value={terms}>
-      <TermContext.Provider value={termContextValue}>
+      <ScheduleContext.Provider value={scheduleContextValue}>
         {children}
-      </TermContext.Provider>
+      </ScheduleContext.Provider>
     </TermsContext.Provider>
   );
 }

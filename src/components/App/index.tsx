@@ -74,14 +74,14 @@ export default function App(): React.ReactElement {
                           setTerm={setTerm}
                           oscar={oscar}
                         >
-                          {({ termData, patchTermData }): React.ReactNode => (
+                          {({ termData, patchSchedule }): React.ReactNode => (
                             <AppContextProvider
                               terms={terms}
                               term={term}
                               setTerm={setTerm}
                               oscar={oscar}
                               termData={termData}
-                              patchTermData={patchTermData}
+                              patchSchedule={patchSchedule}
                             >
                               <AppContent />
                             </AppContextProvider>

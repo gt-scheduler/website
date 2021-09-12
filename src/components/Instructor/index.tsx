@@ -10,7 +10,7 @@ import {
 import { classes, simplifyName, unique } from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
 import { ActionRow, Section } from '..';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 
 import './stylesheet.scss';
 
@@ -29,28 +29,28 @@ export default function Instructor({
   sections,
   gpa,
 }: InstructorProps): React.ReactElement {
-  const [{ pinnedCrns, excludedCrns }, { patchTermData }] =
-    useContext(TermContext);
+  const [{ pinnedCrns, excludedCrns }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [expanded, setExpanded] = useState(true);
 
   const includeSection = useCallback(
     (section: SectionBean) => {
-      patchTermData({
+      patchSchedule({
         excludedCrns: excludedCrns.filter((crn) => crn !== section.crn),
       });
     },
-    [excludedCrns, patchTermData]
+    [excludedCrns, patchSchedule]
   );
 
   const excludeSections = useCallback(
     (sectionList: SectionBean[]) => {
       const crns = sectionList.map((section) => section.crn);
-      patchTermData({
+      patchSchedule({
         excludedCrns: unique([...excludedCrns, ...crns]),
         pinnedCrns: pinnedCrns.filter((crn) => !crns.includes(crn)),
       });
     },
-    [excludedCrns, pinnedCrns, patchTermData]
+    [excludedCrns, pinnedCrns, patchSchedule]
   );
 
   const instructorPinned = sections.some((section) =>

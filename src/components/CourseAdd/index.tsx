@@ -13,7 +13,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Course, CourseFilter } from '..';
 import { classes, getRandomColor } from '../../utils/misc';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
-import { TermContext } from '../../contexts';
+import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
 
 import './stylesheet.scss';
@@ -72,8 +72,8 @@ function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
 export default function CourseAdd({
   className,
 }: CourseAddProps): React.ReactElement {
-  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchTermData }] =
-    useContext(TermContext);
+  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
@@ -133,7 +133,7 @@ export default function CourseAdd({
           return !timeDecided || !filterMatch;
         })
         .map((section) => section.crn);
-      patchTermData({
+      patchSchedule({
         desiredCourses: [...desiredCourses, course.id],
         excludedCrns: [...excludedCrns, ...toBeExcludedCrns],
         colorMap: { ...colorMap, [course.id]: getRandomColor() },
@@ -141,7 +141,7 @@ export default function CourseAdd({
       setKeyword('');
       inputRef.current?.focus();
     },
-    [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchTermData]
+    [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchSchedule]
   );
 
   const handleKeyDown = useCallback(
