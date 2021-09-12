@@ -12,10 +12,6 @@ import { ErrorWithFields } from '../../log';
 
 export const NAV_TABS = ['Scheduler', 'Map'];
 
-export type AppNavigationProps = {
-  children: React.ReactNode;
-};
-
 export type AppNavigationContextValue = {
   currentTabIndex: number;
   setTabIndex: (next: number) => void;
@@ -44,6 +40,10 @@ export const AppNavigationContext =
       });
     },
   });
+
+export type AppNavigationProps = {
+  children: React.ReactNode;
+};
 
 /**
  * Handles controlling the state of app navigation,

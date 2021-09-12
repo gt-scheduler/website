@@ -315,6 +315,8 @@ export const EMPTY_OSCAR = new Oscar(
       gradeBases: [],
       locations: [],
     },
+    // This converts the Date to the expected string
+    // that it serializes to in the crawler
     updatedAt: JSON.parse(JSON.stringify(new Date())) as string,
     version: 1,
   },
