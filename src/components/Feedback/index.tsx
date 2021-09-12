@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { Button } from '..';
 import { classes } from '../../utils/misc';
-import { FormSubmit } from '../../data/beans';
+import { BACKEND_BASE_URL } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -18,7 +19,7 @@ export default function Feedback(): React.ReactElement {
   const onSubmit = (): void => {
     setLoading(true);
     // Add 1 to the rating to move it from [0,4] to [1,5]
-    FormSubmit({ rating: (rating ?? 0) + 1, feedback })
+    submitFeedback({ rating: (rating ?? 0) + 1, feedback })
       .then(() => {
         setSubmit(true);
         setLoading(false);
@@ -112,4 +113,25 @@ export default function Feedback(): React.ReactElement {
       )}
     </>
   );
+}
+
+async function submitFeedback({
+  rating,
+  feedback,
+}: {
+  rating: number;
+  feedback: string;
+}): Promise<void> {
+  const url = `${BACKEND_BASE_URL}/feedback`;
+  await axios({
+    method: 'post',
+    url,
+    data: {
+      rating,
+      feedback,
+    },
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8',
+    },
+  });
 }

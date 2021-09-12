@@ -3,11 +3,8 @@ import axios from 'axios';
 
 import { softError, ErrorWithFields } from '../../log';
 import { LoadingState } from '../../types';
-import {
-  Cancellable,
-  exponentialBackoff,
-  isAxiosNetworkError,
-} from '../../utils/misc';
+import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
+import Cancellable from '../../utils/cancellable';
 
 const CRAWLER_REPO = 'gt-scheduler/crawler';
 const CRAWLER_BRANCH = 'gh-pages';
@@ -30,16 +27,13 @@ export default function useDownloadTerms(): LoadingState<string[]> {
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const result = await Promise.race([
-            loadOperation.promise,
-            axios.get<{ name: string }[]>(GITHUB_API_URL),
-          ]);
-
-          if (result === loadOperation.cancelledSymbol) {
+          const promise = axios.get<{ name: string }[]>(GITHUB_API_URL);
+          const result = await loadOperation.perform(promise);
+          if (result.cancelled) {
             return;
           }
 
-          const newTerms = (result as Exclude<typeof result, symbol>).data
+          const newTerms = result.value.data
             .map((content) => content.name)
             .filter((name) => /\d{6}\.json/.test(name))
             .map((name) => name.replace(/\.json$/, ''))
