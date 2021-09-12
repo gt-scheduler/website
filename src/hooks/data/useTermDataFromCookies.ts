@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 
-import { useCookie } from '..';
+import useCookie from '../useCookie';
 import { Oscar } from '../../data/beans';
 import { softError, ErrorWithFields } from '../../log';
 import {

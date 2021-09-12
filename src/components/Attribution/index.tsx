@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { classes } from '../../utils/misc';
-import { useMobile } from '../../hooks';
+import useMobile from '../../hooks/useMobile';
 
 import './stylesheet.scss';
 

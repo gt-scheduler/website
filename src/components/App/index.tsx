@@ -2,7 +2,9 @@ import React, { useEffect, useMemo } from 'react';
 
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
-import { useBodyClass, useCookie, useMobile } from '../../hooks';
+import useBodyClass from '../../hooks/useBodyClass';
+import useCookie from '../../hooks/useCookie';
+import useMobile from '../../hooks/useMobile';
 import { ThemeContext, ThemeContextValue } from '../../contexts';
 import { isTheme } from '../../types';
 import { useInformationModal } from '../InformationModal';

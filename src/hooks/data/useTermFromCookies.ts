@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { useCookie } from '..';
+import useCookie from '../useCookie';
 import { ErrorWithFields, softError } from '../../log';
 import { LoadingState } from '../../types';
 
