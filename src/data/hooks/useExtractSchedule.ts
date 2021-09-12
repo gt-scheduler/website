@@ -5,6 +5,14 @@ import { ErrorWithFields } from '../../log';
 import { LoadingState } from '../../types';
 import { TermScheduleData, Schedule, defaultSchedule } from '../types';
 
+/**
+ * Gets the current schedule version from the term schedule data,
+ * ensuring that there is a valid current version selected.
+ * If the current version isn't valid,
+ * then this hook switches to a random existing version.
+ * If there are no versions, then this hook automatically creates
+ * an empty schedule version called 'Primary' and sets it as the current one.
+ */
 export default function useExtractSchedule(
   termScheduleData: Immutable<TermScheduleData>,
   updateTermScheduleData: (
@@ -15,6 +23,12 @@ export default function useExtractSchedule(
 ): LoadingState<{
   currentVersion: string;
   schedule: Immutable<Schedule>;
+  // This function allows the schedule to be edited in 1 of 2 ways:
+  // 1. the draft parameter is mutated, and the function returns nothing/void
+  // 2. the draft parameter is not mutated
+  //    (it can still be used, just not mutated)
+  //    and the function returns the new state to use.
+  //    This is similar to a traditional setState callback
   updateSchedule: (
     applyDraft: (draft: Draft<Schedule>) => void | Immutable<Schedule>
   ) => void;

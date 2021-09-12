@@ -9,6 +9,14 @@ import {
   defaultTermScheduleData,
 } from '../types';
 
+/**
+ * Gets the current term schedule data based on the current term,
+ * ensuring that there is a valid current term selected.
+ * If the current term isn't valid (i.e. empty or not in the `terms` array),
+ * then it is set to the most recent term (which is the first item in `terms`).
+ * If the term schedule data for the current term doesn't exist,
+ * then this hook also initializes it to an empty value.
+ */
 export default function useExtractTermScheduleData(
   terms: NonEmptyArray<string>,
   scheduleData: Immutable<ScheduleData>,
@@ -18,6 +26,12 @@ export default function useExtractTermScheduleData(
 ): LoadingState<{
   currentTerm: string;
   termScheduleData: Immutable<TermScheduleData>;
+  // This function allows the term schedule data to be edited in 1 of 2 ways:
+  // 1. the draft parameter is mutated, and the function returns nothing/void
+  // 2. the draft parameter is not mutated
+  //    (it can still be used, just not mutated)
+  //    and the function returns the new state to use.
+  //    This is similar to a traditional setState callback
   updateTermScheduleData: (
     applyDraft: (
       draft: Draft<TermScheduleData>

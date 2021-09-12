@@ -1,5 +1,6 @@
 import { ErrorWithFields } from '../../log';
-import { NonEmptyArray, TermData, defaultTermData } from '../../types';
+import { NonEmptyArray } from '../../types';
+import { TermData, defaultTermData } from './types';
 
 export type TermDataParseResult =
   | { type: 'error'; error: Error }

@@ -133,11 +133,10 @@ function ContextProvider({
   // Memoize the context value so that it is stable
   const scheduleContextValue = useMemo<ScheduleContextValue>(
     () => [
-      // TODO make state immutable
       { term, oscar, ...castDraft(schedule) },
-      { setTerm, patchSchedule },
+      { setTerm, patchSchedule, updateSchedule },
     ],
-    [term, oscar, schedule, setTerm, patchSchedule]
+    [term, oscar, schedule, setTerm, patchSchedule, updateSchedule]
   );
 
   return (
