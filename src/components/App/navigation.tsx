@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 import { NavDrawer, NavMenu } from '..';
-import { useMobile } from '../../hooks';
+import useMobile from '../../hooks/useMobile';
 import { ErrorWithFields } from '../../log';
 
 export const NAV_TABS = ['Scheduler', 'Map'];

@@ -13,7 +13,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { getSemesterName } from '../../utils/misc';
 import { Button, Select, Tab } from '..';
-import { useMobile } from '../../hooks';
+import useMobile from '../../hooks/useMobile';
 import { ThemeContext } from '../../contexts';
 import { LoadingSelect } from '../Select';
 import Spinner from '../Spinner';

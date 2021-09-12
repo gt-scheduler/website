@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { classes } from '../../utils/misc';
 import { Button, Calendar, CombinationContainer, CourseContainer } from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
-import { useMobile } from '../../hooks';
+import useMobile from '../../hooks/useMobile';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
