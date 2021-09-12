@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import fastSafeStringify from 'fast-safe-stringify';
 
 export class ErrorWithFields extends Error {
   fields: Record<string, unknown>;
@@ -41,12 +42,7 @@ export class ErrorWithFields extends Error {
         // The source was non-null but was not an Error:
         // add a naive string serialization as a context
         this.fields['__non_error_source'] = 'true';
-        try {
-          this.fields['__source'] = JSON.stringify(source);
-        } catch (_) {
-          // Ignore errors here
-          this.fields['__failed_to_stringify_source'] = 'true';
-        }
+        this.fields['__source'] = fastSafeStringify(source);
       }
     }
 
