@@ -12,7 +12,6 @@
   @media (max-width: 500px) {
     width: 100%;
     height: 180px;
-    overflow-y: auto;
     border-bottom: 4px solid var(--theme-bg);
   }
 
@@ -23,11 +22,17 @@
     transition-duration: $theme-switch-transition-duration;
     transition-property: color, background-color;
 
-    .day-select {
-      box-shadow: 1px 1px 1px gray;
-    }
-
     .dropdown-content {
+      border-top: 1px solid rgba(black, 0.2);
+
+      // Include theme switch transition
+      transition-duration: $theme-switch-transition-duration;
+      transition-property: border-top-color;
+
+      @include dark {
+        border-top-color: rgba(white, 0.2);
+      }
+
       .course-content {
         position: relative;
         display: flex;

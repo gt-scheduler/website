@@ -127,7 +127,13 @@ export default function useDownloadOscarData(
             // Flag that an error has occurred
             setState({
               type: 'error',
-              error: err instanceof Error ? err : new Error(err),
+              error:
+                err instanceof Error
+                  ? err
+                  : new ErrorWithFields({
+                      message: 'an error occurred while fetching crawler data',
+                      source: err,
+                    }),
               stillLoading: true,
               overview: String(err),
             });

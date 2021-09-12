@@ -215,7 +215,6 @@ type PrerequisiteItemProps = {
  * Includes the ability to display a higher-level operator between different
  * `PrerequisiteItem`'s as long as `isLast` is false, which is used by
  * `PrerequisiteClauseDisplay` when it needs to render a prerequisite set.
- `
  */
 function PrerequisiteItem({
   clause,

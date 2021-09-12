@@ -70,7 +70,13 @@ export default function useDownloadTerms(): LoadingState<string[]> {
           // Flag that an error has occurred
           setState({
             type: 'error',
-            error: err instanceof Error ? err : new Error(err),
+            error:
+              err instanceof Error
+                ? err
+                : new ErrorWithFields({
+                    message: 'an error occurred while fetching terms',
+                    source: err,
+                  }),
             stillLoading: true,
             overview: String(err),
           });
