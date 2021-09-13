@@ -11,10 +11,14 @@ import {
   SkeletonContent,
   AppSkeletonWithSwitchableTerms,
 } from '../App/content';
-import { Schedule, ScheduleData, TermScheduleData } from '../../data/types';
+import {
+  ScheduleData,
+  ScheduleVersion,
+  TermScheduleData,
+} from '../../data/types';
 import useScheduleDataFromStorage from '../../data/hooks/useScheduleDataFromStorage';
 import { ErrorWithFields } from '../../log';
-import useExtractSchedule from '../../data/hooks/useExtractSchedule';
+import useExtractSchedule from '../../data/hooks/useExtractScheduleVersion';
 import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleData';
 
 // Each of the components in this file is a "stage" --
@@ -227,7 +231,7 @@ export function StageLoadOscarData({
   return <>{children({ oscar: loadingState.result })}</>;
 }
 
-export type StageExtractScheduleProps = {
+export type StageExtractScheduleVersionProps = {
   terms: NonEmptyArray<string>;
   currentTerm: string;
   setTerm: (next: string) => void;
@@ -238,32 +242,34 @@ export type StageExtractScheduleProps = {
     ) => void | Immutable<TermScheduleData>
   ) => void;
   children: (props: {
-    currentVersion: string;
-    schedule: Immutable<Schedule>;
-    // This function allows the schedule to be edited in 1 of 2 ways:
+    currentIndex: number;
+    scheduleVersion: Immutable<ScheduleVersion>;
+    // This function allows the schedule version to be edited in 1 of 2 ways:
     // 1. the draft parameter is mutated, and the function returns nothing/void
     // 2. the draft parameter is not mutated
     //    (it can still be used, just not mutated)
     //    and the function returns the new state to use.
     //    This is similar to a traditional setState callback
-    updateSchedule: (
-      applyDraft: (draft: Draft<Schedule>) => void | Immutable<Schedule>
+    updateScheduleVersion: (
+      applyDraft: (
+        draft: Draft<ScheduleVersion>
+      ) => void | Immutable<ScheduleVersion>
     ) => void;
   }) => React.ReactNode;
 };
 
 /**
- * Handles extracting the schedule from the parent tern schedule data,
- * ensuring that the version is valid before rendering its children.
+ * Handles extracting the schedule version from the parent tern schedule data,
+ * ensuring that it is valid before rendering its children.
  */
-export function StageExtractSchedule({
+export function StageExtractScheduleVersion({
   terms,
   currentTerm,
   setTerm,
   termScheduleData,
   updateTermScheduleData,
   children,
-}: StageExtractScheduleProps): React.ReactElement {
+}: StageExtractScheduleVersionProps): React.ReactElement {
   const loadingState = useExtractSchedule(
     termScheduleData,
     updateTermScheduleData

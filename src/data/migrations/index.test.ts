@@ -26,48 +26,10 @@ describe('migrateScheduleData', () => {
       currentTerm: '202108',
       terms: {
         '202108': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1100', 'CS 1331'],
-              pinnedCrns: [
-                '87695',
-                '82294',
-                '88999',
-                '90769',
-                '89255',
-                '94424',
-              ],
-              excludedCrns: ['95199'],
-              colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
-              sortingOptionIndex: 0,
-            },
-          },
-          currentVersion: 'Primary',
-        },
-      },
-      version: 1,
-    });
-  });
-
-  it('migrates data given schedule version 1', () => {
-    expect(
-      migrateScheduleData({
-        terms: {
-          '202105': {
-            versions: {
-              Primary: {
-                desiredCourses: [],
-                pinnedCrns: [],
-                excludedCrns: [],
-                colorMap: {},
-                sortingOptionIndex: 0,
-              },
-            },
-            currentVersion: 'Primary',
-          },
-          '202108': {
-            versions: {
-              Primary: {
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
                 desiredCourses: ['CS 1100', 'CS 1331'],
                 pinnedCrns: [
                   '87695',
@@ -82,7 +44,54 @@ describe('migrateScheduleData', () => {
                 sortingOptionIndex: 0,
               },
             },
-            currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
+        },
+      },
+      version: 1,
+    });
+  });
+
+  it('migrates data given schedule version 1', () => {
+    expect(
+      migrateScheduleData({
+        terms: {
+          '202105': {
+            versions: [
+              {
+                name: 'Primary',
+                schedule: {
+                  desiredCourses: [],
+                  pinnedCrns: [],
+                  excludedCrns: [],
+                  colorMap: {},
+                  sortingOptionIndex: 0,
+                },
+              },
+            ],
+            currentIndex: 0,
+          },
+          '202108': {
+            versions: [
+              {
+                name: 'Primary',
+                schedule: {
+                  desiredCourses: ['CS 1100', 'CS 1331'],
+                  pinnedCrns: [
+                    '87695',
+                    '82294',
+                    '88999',
+                    '90769',
+                    '89255',
+                    '94424',
+                  ],
+                  excludedCrns: ['95199'],
+                  colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+                  sortingOptionIndex: 0,
+                },
+              },
+            ],
+            currentIndex: 0,
           },
         },
         currentTerm: '202108',
@@ -91,35 +100,41 @@ describe('migrateScheduleData', () => {
     ).toEqual({
       terms: {
         '202105': {
-          versions: {
-            Primary: {
-              desiredCourses: [],
-              pinnedCrns: [],
-              excludedCrns: [],
-              colorMap: {},
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: [],
+                pinnedCrns: [],
+                excludedCrns: [],
+                colorMap: {},
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
         '202108': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1100', 'CS 1331'],
-              pinnedCrns: [
-                '87695',
-                '82294',
-                '88999',
-                '90769',
-                '89255',
-                '94424',
-              ],
-              excludedCrns: ['95199'],
-              colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: ['CS 1100', 'CS 1331'],
+                pinnedCrns: [
+                  '87695',
+                  '82294',
+                  '88999',
+                  '90769',
+                  '89255',
+                  '94424',
+                ],
+                excludedCrns: ['95199'],
+                colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
       },
       currentTerm: '202108',

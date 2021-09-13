@@ -4,6 +4,7 @@ import { Immutable } from 'immer';
 export const LATEST_SCHEDULE_DATA_VERSION: ScheduleData['version'] = 1;
 export type ScheduleData = Version1ScheduleData;
 export type TermScheduleData = Version1TermScheduleData;
+export type ScheduleVersion = Version1ScheduleVersion;
 export type Schedule = Version1Schedule;
 
 // Add additional types here named like "___OrNewer" for each version,
@@ -18,8 +19,8 @@ export type Version1ScheduleDataOrNewer = Version1ScheduleData;
 export type AnyScheduleData = Version1ScheduleDataOrNewer;
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
-  versions: {},
-  currentVersion: '',
+  versions: [],
+  currentIndex: 0,
 };
 
 export const defaultSchedule: Immutable<Schedule> = {
@@ -42,8 +43,13 @@ export interface Version1ScheduleData {
 }
 
 export interface Version1TermScheduleData {
-  versions: Record<string, Version1Schedule>;
-  currentVersion: string;
+  versions: Version1ScheduleVersion[];
+  currentIndex: number;
+}
+
+export interface Version1ScheduleVersion {
+  name: string;
+  schedule: Version1Schedule;
 }
 
 export interface Version1Schedule {

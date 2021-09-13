@@ -1,4 +1,4 @@
-import { Immutable, Draft, original, castDraft } from 'immer';
+import produce, { Immutable, Draft, original, castDraft } from 'immer';
 import React, { useCallback, useMemo } from 'react';
 
 import {
@@ -7,13 +7,13 @@ import {
   ScheduleContext,
 } from '../../contexts';
 import { Oscar } from '../../data/beans';
-import { Schedule, defaultSchedule } from '../../data/types';
+import { Schedule, defaultSchedule, ScheduleVersion } from '../../data/types';
 import {
   StageLoadScheduleData,
   StageLoadTerms,
   StageExtractTermScheduleData,
   StageLoadOscarData,
-  StageExtractSchedule,
+  StageExtractScheduleVersion,
 } from './stages';
 
 export type DataLoaderProps = {
@@ -53,7 +53,7 @@ export default function DataLoader({
                   setTerm={setTerm}
                 >
                   {({ oscar }): React.ReactElement => (
-                    <StageExtractSchedule
+                    <StageExtractScheduleVersion
                       terms={terms}
                       currentTerm={currentTerm}
                       setTerm={setTerm}
@@ -61,22 +61,22 @@ export default function DataLoader({
                       updateTermScheduleData={updateTermScheduleData}
                     >
                       {({
-                        // currentVersion,
-                        schedule,
-                        updateSchedule,
+                        // currentIndex,
+                        scheduleVersion,
+                        updateScheduleVersion,
                       }): React.ReactElement => (
                         <ContextProvider
                           terms={terms}
                           term={currentTerm}
                           setTerm={setTerm}
                           oscar={oscar}
-                          schedule={schedule}
-                          updateSchedule={updateSchedule}
+                          scheduleVersion={scheduleVersion}
+                          updateScheduleVersion={updateScheduleVersion}
                         >
                           {children}
                         </ContextProvider>
                       )}
-                    </StageExtractSchedule>
+                    </StageExtractScheduleVersion>
                   )}
                 </StageLoadOscarData>
               )}
@@ -95,9 +95,11 @@ type ContextProviderProps = {
   term: string;
   setTerm: (next: string) => void;
   oscar: Oscar;
-  schedule: Immutable<Schedule>;
-  updateSchedule: (
-    applyDraft: (draft: Draft<Schedule>) => void | Immutable<Schedule>
+  scheduleVersion: Immutable<ScheduleVersion>;
+  updateScheduleVersion: (
+    applyDraft: (
+      draft: Draft<ScheduleVersion>
+    ) => void | Immutable<ScheduleVersion>
   ) => void;
   children: React.ReactNode;
 };
@@ -113,19 +115,31 @@ function ContextProvider({
   term,
   setTerm,
   oscar,
-  schedule,
-  updateSchedule,
+  scheduleVersion,
+  updateScheduleVersion,
   children,
 }: ContextProviderProps): React.ReactElement {
+  // Create a `updateSchedule` function
+  const updateSchedule = useCallback(
+    (
+      applyDraft: (draft: Draft<Schedule>) => void | Immutable<Schedule>
+    ): void => {
+      updateScheduleVersion((draft) => {
+        draft.schedule = produce(draft.schedule, (subDraft) =>
+          castDraft(applyDraft(subDraft))
+        );
+      });
+    },
+    [updateScheduleVersion]
+  );
+
   // Create a `patchSchedule` function
   const patchSchedule = useCallback(
     (patch: Partial<Schedule>): void => {
-      updateSchedule((draft): Immutable<Schedule> => {
-        return {
-          ...(original(draft) ?? defaultSchedule),
-          ...patch,
-        };
-      });
+      updateSchedule((draft) => ({
+        ...(original(draft) ?? defaultSchedule),
+        ...patch,
+      }));
     },
     [updateSchedule]
   );
@@ -133,10 +147,10 @@ function ContextProvider({
   // Memoize the context value so that it is stable
   const scheduleContextValue = useMemo<ScheduleContextValue>(
     () => [
-      { term, oscar, ...castDraft(schedule) },
+      { term, oscar, ...castDraft(scheduleVersion.schedule) },
       { setTerm, patchSchedule, updateSchedule },
     ],
-    [term, oscar, schedule, setTerm, patchSchedule, updateSchedule]
+    [term, oscar, scheduleVersion, setTerm, patchSchedule, updateSchedule]
   );
 
   return (

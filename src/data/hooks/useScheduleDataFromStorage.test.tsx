@@ -97,23 +97,26 @@ describe('useScheduleDataFromStorage', () => {
       currentTerm: '202108',
       terms: {
         '202108': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1100', 'CS 1331'],
-              pinnedCrns: [
-                '87695',
-                '82294',
-                '88999',
-                '90769',
-                '89255',
-                '94424',
-              ],
-              excludedCrns: ['95199'],
-              colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: ['CS 1100', 'CS 1331'],
+                pinnedCrns: [
+                  '87695',
+                  '82294',
+                  '88999',
+                  '90769',
+                  '89255',
+                  '94424',
+                ],
+                excludedCrns: ['95199'],
+                colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
       },
       version: 1,
@@ -146,7 +149,7 @@ describe('useScheduleDataFromStorage', () => {
   it('loads data from local storage', () => {
     window.localStorage.setItem(
       SCHEDULE_DATA_LOCAL_STORAGE_KEY,
-      '{"currentTerm":"202108","terms":{"202108":{"versions":{"Primary":{"desiredCourses":["CS 1100","CS 1331"],"pinnedCrns":["87695","82294","88999","90769","89255","94424"],"excludedCrns":["95199"],"colorMap":{"CS 1100":"#0062B1","CS 1331":"#194D33"},"sortingOptionIndex":0}},"currentVersion":"Primary"}},"version":1}'
+      '{"currentTerm":"202108","terms":{"202108":{"versions":[{"name":"Primary","schedule":{"desiredCourses":["CS 1100","CS 1331"],"pinnedCrns":["87695","82294","88999","90769","89255","94424"],"excludedCrns":["95199"],"colorMap":{"CS 1100":"#0062B1","CS 1331":"#194D33"},"sortingOptionIndex":0}}],"currentIndex":0}},"version":1}'
     );
 
     const { result } = renderHook(() => useScheduleDataFromStorage());
@@ -159,23 +162,26 @@ describe('useScheduleDataFromStorage', () => {
             currentTerm: '202108',
             terms: {
               '202108': {
-                versions: {
-                  Primary: {
-                    desiredCourses: ['CS 1100', 'CS 1331'],
-                    pinnedCrns: [
-                      '87695',
-                      '82294',
-                      '88999',
-                      '90769',
-                      '89255',
-                      '94424',
-                    ],
-                    excludedCrns: ['95199'],
-                    colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
-                    sortingOptionIndex: 0,
+                versions: [
+                  {
+                    name: 'Primary',
+                    schedule: {
+                      desiredCourses: ['CS 1100', 'CS 1331'],
+                      pinnedCrns: [
+                        '87695',
+                        '82294',
+                        '88999',
+                        '90769',
+                        '89255',
+                        '94424',
+                      ],
+                      excludedCrns: ['95199'],
+                      colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+                      sortingOptionIndex: 0,
+                    },
                   },
-                },
-                currentVersion: 'Primary',
+                ],
+                currentIndex: 0,
               },
             },
             version: 1,
@@ -196,7 +202,7 @@ describe('useScheduleDataFromStorage', () => {
     });
     window.localStorage.setItem(
       SCHEDULE_DATA_LOCAL_STORAGE_KEY,
-      '{"currentTerm":"202108","terms":{"202108":{"versions":{"Primary":{"desiredCourses":["CS 1100"],"pinnedCrns":[],"excludedCrns":[],"colorMap":{"CS 1100":"#0062B1"},"sortingOptionIndex":0}},"currentVersion":"Primary"}},"version":1}'
+      '{"currentTerm":"202108","terms":{"202108":{"versions":[{"name":"Primary","schedule":{"desiredCourses":["CS 1100"],"pinnedCrns":[],"excludedCrns":[],"colorMap":{"CS 1100":"#0062B1"},"sortingOptionIndex":0}}],"currentIndex":0}},"version":1}'
     );
 
     const { result } = renderHook(() => useScheduleDataFromStorage());
@@ -212,16 +218,19 @@ describe('useScheduleDataFromStorage', () => {
             terms: {
               // This would be `200005` if it was loaded from cookies
               '202108': {
-                versions: {
-                  Primary: {
-                    desiredCourses: ['CS 1100'],
-                    pinnedCrns: [],
-                    excludedCrns: [],
-                    colorMap: { 'CS 1100': '#0062B1' },
-                    sortingOptionIndex: 0,
+                versions: [
+                  {
+                    name: 'Primary',
+                    schedule: {
+                      desiredCourses: ['CS 1100'],
+                      pinnedCrns: [],
+                      excludedCrns: [],
+                      colorMap: { 'CS 1100': '#0062B1' },
+                      sortingOptionIndex: 0,
+                    },
                   },
-                },
-                currentVersion: 'Primary',
+                ],
+                currentIndex: 0,
               },
             },
             version: 1,
@@ -371,8 +380,8 @@ describe('useScheduleDataFromStorage', () => {
         current.result.updateScheduleData((draft): void => {
           draft.currentTerm = '201808';
           draft.terms['201808'] = {
-            versions: {},
-            currentVersion: '',
+            versions: [],
+            currentIndex: 0,
           };
         });
       });
@@ -400,8 +409,8 @@ describe('useScheduleDataFromStorage', () => {
               currentTerm: '201808',
               terms: {
                 '201808': {
-                  versions: {},
-                  currentVersion: '',
+                  versions: [],
+                  currentIndex: 0,
                 },
               },
               version: 1,
@@ -423,8 +432,8 @@ describe('useScheduleDataFromStorage', () => {
         current.result.updateScheduleData((draft): void => {
           draft.currentTerm = '201808';
           draft.terms['201808'] = {
-            versions: {},
-            currentVersion: '',
+            versions: [],
+            currentIndex: 0,
           };
         });
       });
@@ -438,8 +447,8 @@ describe('useScheduleDataFromStorage', () => {
         currentTerm: '201808',
         terms: {
           '201808': {
-            versions: {},
-            currentVersion: '',
+            versions: [],
+            currentIndex: 0,
           },
         },
         version: 1,

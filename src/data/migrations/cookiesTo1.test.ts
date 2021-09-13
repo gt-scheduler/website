@@ -38,59 +38,71 @@ describe('trySourceScheduleDataFromCookies', () => {
     ).toEqual({
       terms: {
         '202008': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1331'],
-              pinnedCrns: ['87086'],
-              excludedCrns: [],
-              colorMap: { 'CS 1331': '#808080' },
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: ['CS 1331'],
+                pinnedCrns: ['87086'],
+                excludedCrns: [],
+                colorMap: { 'CS 1331': '#808080' },
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
         '202102': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1332', 'CS 2050'],
-              pinnedCrns: ['24144', '22787'],
-              excludedCrns: [],
-              colorMap: { 'CS 1332': '#653294', 'CS 2050': '#009CE0' },
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: ['CS 1332', 'CS 2050'],
+                pinnedCrns: ['24144', '22787'],
+                excludedCrns: [],
+                colorMap: { 'CS 1332': '#653294', 'CS 2050': '#009CE0' },
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
         '202105': {
-          versions: {
-            Primary: {
-              desiredCourses: [],
-              pinnedCrns: [],
-              excludedCrns: [],
-              colorMap: {},
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: [],
+                pinnedCrns: [],
+                excludedCrns: [],
+                colorMap: {},
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
         '202108': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1100', 'CS 1331'],
-              pinnedCrns: [
-                '87695',
-                '82294',
-                '88999',
-                '90769',
-                '89255',
-                '94424',
-              ],
-              excludedCrns: ['95199'],
-              colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: ['CS 1100', 'CS 1331'],
+                pinnedCrns: [
+                  '87695',
+                  '82294',
+                  '88999',
+                  '90769',
+                  '89255',
+                  '94424',
+                ],
+                excludedCrns: ['95199'],
+                colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
       },
       currentTerm: '202108',
@@ -118,28 +130,34 @@ describe('trySourceScheduleDataFromCookies', () => {
     ).toEqual({
       terms: {
         '202102': {
-          versions: {
-            Primary: {
-              desiredCourses: [],
-              pinnedCrns: [],
-              excludedCrns: [],
-              colorMap: {},
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: [],
+                pinnedCrns: [],
+                excludedCrns: [],
+                colorMap: {},
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
         '199905': {
-          versions: {
-            Primary: {
-              desiredCourses: ['CS 1100', 'CS 1331'],
-              pinnedCrns: [],
-              excludedCrns: [],
-              colorMap: {},
-              sortingOptionIndex: 0,
+          versions: [
+            {
+              name: 'Primary',
+              schedule: {
+                desiredCourses: ['CS 1100', 'CS 1331'],
+                pinnedCrns: [],
+                excludedCrns: [],
+                colorMap: {},
+                sortingOptionIndex: 0,
+              },
             },
-          },
-          currentVersion: 'Primary',
+          ],
+          currentIndex: 0,
         },
       },
       currentTerm: '202008',

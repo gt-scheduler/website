@@ -1,7 +1,7 @@
 import produce, { Immutable, Draft, castDraft } from 'immer';
 import { useEffect, useCallback } from 'react';
 
-import { ErrorWithFields } from '../../log';
+import { ErrorWithFields, softError } from '../../log';
 import { NonEmptyArray, LoadingState } from '../../types';
 import {
   ScheduleData,
@@ -75,34 +75,22 @@ export default function useExtractTermScheduleData(
         draft: Draft<TermScheduleData>
       ) => void | Immutable<TermScheduleData>
     ): void => {
-      if (
-        !isValidTerm(currentTerm, terms) ||
-        currentTermScheduleData === undefined
-      ) {
-        throw new ErrorWithFields({
-          message:
-            'updateTermScheduleData called with invalid current term schedule data',
-          fields: {
-            currentTerm,
-            currentTermScheduleData,
-            terms,
-          },
-        });
-      }
-
       updateScheduleData((draft) => {
         const currentTermScheduleDataDraft = draft.terms[currentTerm];
         if (currentTermScheduleDataDraft === undefined) {
-          throw new ErrorWithFields({
-            message:
-              'updateTermScheduleData called on term that does not exist',
-            fields: {
-              currentTerm,
-              currentTermScheduleData,
-              terms,
-              allTermsInData: Object.keys(draft.terms),
-            },
-          });
+          softError(
+            new ErrorWithFields({
+              message:
+                'updateTermScheduleData called on term that does not exist',
+              fields: {
+                currentTerm,
+                currentTermScheduleData,
+                terms,
+                allTermsInData: Object.keys(draft.terms),
+              },
+            })
+          );
+          return;
         }
 
         draft.terms[currentTerm] = produce(

@@ -63,17 +63,13 @@ export default function migrateCookiesTo1(
         });
 
         terms[cookieKey] = {
-          versions: {
-            Primary: validateResult.fallback,
-          },
-          currentVersion: 'Primary',
+          versions: [{ name: 'Primary', schedule: validateResult.fallback }],
+          currentIndex: 0,
         };
       } else {
         terms[cookieKey] = {
-          versions: {
-            Primary: validateResult.termData,
-          },
-          currentVersion: 'Primary',
+          versions: [{ name: 'Primary', schedule: validateResult.termData }],
+          currentIndex: 0,
         };
       }
     }
