@@ -1,19 +1,9 @@
-import React, { useCallback, useState } from 'react';
-import { render, getByTestId } from '@testing-library/react';
 import Cookies from 'js-cookie';
-import fastSafeStringify from 'fast-safe-stringify';
+import { renderHook } from '@testing-library/react-hooks';
 
-import {
-  asMockFunction,
-  disableLogging,
-  useAllResults,
-} from '../../utils/tests';
+import { asMockFunction, disableLogging } from '../../utils/tests';
 import useScheduleDataMigrations from './useScheduleDataMigrations';
-import {
-  AnyScheduleData,
-  LATEST_SCHEDULE_DATA_VERSION,
-  ScheduleData,
-} from '../types';
+import { AnyScheduleData, LATEST_SCHEDULE_DATA_VERSION } from '../types';
 import * as migrations from '../migrations';
 
 // Mock the `Cookies` object so we can set values
@@ -27,36 +17,6 @@ describe('useScheduleDataMigrations', () => {
     window.localStorage.clear();
   });
 
-  type TestComponentProps = {
-    initialScheduleData: AnyScheduleData | null;
-    onSetScheduleData: (next: ScheduleData) => void;
-    isPersistent: boolean;
-  };
-
-  // This component stores the schedule data state,
-  // and gets the result of the hook to expose its result
-  function TestComponent({
-    initialScheduleData,
-    onSetScheduleData,
-    isPersistent,
-  }: TestComponentProps): React.ReactElement {
-    const [scheduleData, setScheduleDataState] = useState(initialScheduleData);
-    const setScheduleData = useCallback(
-      (next: ScheduleData) => {
-        setScheduleDataState(next);
-        onSetScheduleData(next);
-      },
-      [onSetScheduleData]
-    );
-    const result = useScheduleDataMigrations({
-      rawScheduleData: scheduleData,
-      setScheduleData,
-      isPersistent,
-    });
-    const allResults = useAllResults(result);
-    return <div data-testid="result">{fastSafeStringify(allResults)}</div>;
-  }
-
   // Tests that the hook pulls data from cookies and applies migrations,
   // moving the return value from pending to done
   it('migrates data from cookies', () => {
@@ -67,18 +27,24 @@ describe('useScheduleDataMigrations', () => {
       term: '202108',
     });
 
+    type HookProps = {
+      rawScheduleData: AnyScheduleData | null;
+    };
     const setScheduleDataMock = jest.fn();
-    const { container } = render(
-      <TestComponent
-        initialScheduleData={null}
-        onSetScheduleData={setScheduleDataMock}
-        isPersistent
-      />
+    const { result, rerender } = renderHook<HookProps, unknown>(
+      ({ rawScheduleData }) =>
+        useScheduleDataMigrations({
+          setScheduleData: setScheduleDataMock,
+          rawScheduleData,
+        }),
+      {
+        initialProps: {
+          rawScheduleData: null,
+        },
+      }
     );
-    const resultDiv = getByTestId(container, 'result');
-    const getResult = (): unknown => JSON.parse(resultDiv?.textContent ?? '');
 
-    const expectedScheduleData = {
+    const expectedScheduleData: AnyScheduleData = {
       currentTerm: '202108',
       terms: {
         '202108': {
@@ -104,7 +70,15 @@ describe('useScheduleDataMigrations', () => {
       version: 1,
     };
 
-    expect(getResult()).toEqual([
+    // The migrated data should have been passed to `setScheduleData`
+    expect(setScheduleDataMock).toBeCalledTimes(1);
+    expect(setScheduleDataMock).toBeCalledWith(expectedScheduleData);
+
+    // Running the hook with the updated schedule data
+    // (simulating the results of setting the state)
+    // should result in it returning 'done'.
+    rerender({ rawScheduleData: expectedScheduleData });
+    expect(result.all).toEqual([
       {
         type: 'pending',
       },
@@ -113,17 +87,16 @@ describe('useScheduleDataMigrations', () => {
         result: expectedScheduleData,
       },
     ]);
-
-    expect(setScheduleDataMock).toBeCalledTimes(1);
-    expect(setScheduleDataMock).toBeCalledWith(expectedScheduleData);
   });
 
-  // Tests that the hook skips migrations if not needed
+  // Tests that the hook skips migrations if not needed.
+  // This test will need to be updated whenever adding migrations.
   it('skips migration if not needed', () => {
     const setScheduleDataMock = jest.fn();
-    const { container } = render(
-      <TestComponent
-        initialScheduleData={{
+    const { result } = renderHook(() =>
+      useScheduleDataMigrations({
+        setScheduleData: setScheduleDataMock,
+        rawScheduleData: {
           currentTerm: '202108',
           terms: {
             '202108': {
@@ -147,13 +120,9 @@ describe('useScheduleDataMigrations', () => {
             },
           },
           version: 1,
-        }}
-        onSetScheduleData={setScheduleDataMock}
-        isPersistent
-      />
+        },
+      })
     );
-    const resultDiv = getByTestId(container, 'result');
-    const getResult = (): unknown => JSON.parse(resultDiv?.textContent ?? '');
 
     const expectedScheduleData = {
       currentTerm: '202108',
@@ -181,38 +150,16 @@ describe('useScheduleDataMigrations', () => {
       version: 1,
     };
 
+    // The callback shouldn't have been invoked,
+    // but the data returned should still be the latest version
+    expect(setScheduleDataMock).toBeCalledTimes(0);
     expect(expectedScheduleData.version).toEqual(LATEST_SCHEDULE_DATA_VERSION);
-    expect(getResult()).toEqual([
+    expect(result.all).toEqual([
       {
         type: 'done',
         result: expectedScheduleData,
       },
     ]);
-
-    expect(setScheduleDataMock).toBeCalledTimes(0);
-  });
-
-  // Tests that not having persistent local storage in the browser
-  // causes migrations not to occur, and have the hook always return pending
-  it("does not migrate if storage isn't persistent", () => {
-    const setScheduleDataMock = jest.fn();
-    const { container } = render(
-      <TestComponent
-        initialScheduleData={null}
-        onSetScheduleData={setScheduleDataMock}
-        isPersistent={false}
-      />
-    );
-    const resultDiv = getByTestId(container, 'result');
-    const getResult = (): unknown => JSON.parse(resultDiv?.textContent ?? '');
-
-    expect(getResult()).toEqual([
-      {
-        type: 'pending',
-      },
-    ]);
-
-    expect(setScheduleDataMock).toBeCalledTimes(0);
   });
 
   // Tests that an error during migration causes an error return value
@@ -228,18 +175,25 @@ describe('useScheduleDataMigrations', () => {
     // since it purposefully causes errors
     disableLogging();
 
+    type HookProps = {
+      rawScheduleData: AnyScheduleData | null;
+    };
     const setScheduleDataMock = jest.fn();
-    const { container } = render(
-      <TestComponent
-        initialScheduleData={null}
-        onSetScheduleData={setScheduleDataMock}
-        isPersistent
-      />
+    const { result } = renderHook<HookProps, unknown>(
+      ({ rawScheduleData }) =>
+        useScheduleDataMigrations({
+          setScheduleData: setScheduleDataMock,
+          rawScheduleData,
+        }),
+      {
+        initialProps: {
+          rawScheduleData: null,
+        },
+      }
     );
-    const resultDiv = getByTestId(container, 'result');
-    const getResult = (): unknown => JSON.parse(resultDiv?.textContent ?? '');
 
-    expect(getResult()).toEqual([
+    expect(setScheduleDataMock).toBeCalledTimes(0);
+    expect(result.all).toEqual([
       {
         type: 'pending',
       },
@@ -255,7 +209,5 @@ describe('useScheduleDataMigrations', () => {
         // Other fields ignored
       }),
     ]);
-
-    expect(setScheduleDataMock).toBeCalledTimes(0);
   });
 });

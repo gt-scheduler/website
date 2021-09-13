@@ -19,23 +19,17 @@ export type MigrationResult =
  * Performs an asynchronous migration of the schedule data,
  * ensuring that it is of the latest version's shape
  * using the migrations defined in `src/data/migrations.
- * If `isPersistent` is true, then this function always returns `loading`
- * and doesn't do anything
  */
 export default function useScheduleDataMigrations({
   rawScheduleData,
   setScheduleData,
-  isPersistent,
 }: {
   rawScheduleData: AnyScheduleData | null;
   setScheduleData: (next: ScheduleData) => void;
-  isPersistent: boolean;
 }): MigrationResult {
   const [error, setError] = useState<MigrationErrorState | null>(null);
 
   useEffect(() => {
-    if (!isPersistent) return;
-
     // Make sure the data needs migrating
     if (
       rawScheduleData !== null &&
@@ -61,7 +55,7 @@ export default function useScheduleDataMigrations({
         overview: 'could not convert stored schedule data to latest version',
       });
     }
-  }, [isPersistent, rawScheduleData, setScheduleData]);
+  }, [rawScheduleData, setScheduleData]);
 
   if (error !== null) {
     return { type: 'error', error };

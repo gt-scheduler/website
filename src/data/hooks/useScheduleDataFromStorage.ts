@@ -1,6 +1,6 @@
 import produce, { Draft, Immutable } from 'immer';
 import { useCallback, useState } from 'react';
-import { useLocalStorageState } from 'use-local-storage-state';
+import useLocalStorageState from 'use-local-storage-state';
 
 import { renderDataNotPersistentNotification } from '../../components/DataNotPersistentNotification';
 import { ErrorWithFields } from '../../log';
@@ -35,7 +35,6 @@ export default function useScheduleDataFromStorage(): LoadingState<HookResult> {
   const migrationResult = useScheduleDataMigrations({
     rawScheduleData: scheduleData,
     setScheduleData,
-    isPersistent,
   });
 
   const [userAcceptedNonPersistence, setUserAcceptedNonPersistence] =
