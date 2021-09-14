@@ -1,5 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 
+import { ErrorWithFields, softError } from '../log';
+
 /**
  * Gets whether the given CSS media query is matched or not.
  * Runs a layout effect to synchronously update the media match state
@@ -12,14 +14,67 @@ export default function useMedia(query: string): boolean {
   const [matches, setMatches] = useState(false);
 
   useLayoutEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
+    try {
+      const media = window.matchMedia(query);
+      if (media.matches !== matches) {
+        setMatches(media.matches);
+      }
 
-    const listener = (): void => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return (): void => media.removeEventListener('change', listener);
+      const listener = (): void => setMatches(media.matches);
+      let apiUsed: 'addEventListener' | 'addListener' | null = null;
+      if (media.addEventListener != null) {
+        media.addEventListener('change', listener);
+        apiUsed = 'addEventListener';
+      } else if (media.addListener != null) {
+        // In Safari <14, we have to use `addListener`:
+        // https://caniuse.com/mdn-api_mediaquerylist_addlistener
+        media.addListener(listener);
+        apiUsed = 'addListener';
+      } else {
+        apiUsed = null;
+      }
+
+      return (): void => {
+        try {
+          // Use the corresponding cleanup API
+          // based on the API used to attach the listener
+          switch (apiUsed) {
+            case 'addEventListener':
+              media.removeEventListener('change', listener);
+              break;
+            case 'addListener':
+              media.removeListener(listener);
+              break;
+            default:
+              break;
+          }
+        } catch (err) {
+          softError(
+            new ErrorWithFields({
+              message:
+                'could not run useMedia query cleanup in layout effect cleanup',
+              source: err,
+              fields: {
+                previousQuery: query,
+                previousMatches: matches,
+              },
+            })
+          );
+        }
+      };
+    } catch (err) {
+      softError(
+        new ErrorWithFields({
+          message: 'could not run useMedia query in layout effect',
+          source: err,
+          fields: {
+            query,
+            matches,
+          },
+        })
+      );
+      return (): void => undefined;
+    }
   }, [matches, query]);
 
   return matches;
