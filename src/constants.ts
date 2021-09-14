@@ -70,6 +70,9 @@ const CAMPUSES: Record<string, string> = {
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 
+const DESKTOP_BREAKPOINT = 1024;
+const LARGE_MOBILE_BREAKPOINT = 600;
+
 export {
   OPEN,
   CLOSE,
@@ -80,4 +83,6 @@ export {
   DELIVERY_MODES,
   CAMPUSES,
   BACKEND_BASE_URL,
+  DESKTOP_BREAKPOINT,
+  LARGE_MOBILE_BREAKPOINT,
 };

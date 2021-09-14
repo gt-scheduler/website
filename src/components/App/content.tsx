@@ -9,6 +9,7 @@ import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
 import { AppNavigationContext, AppMobileNav, NAV_TABS } from './navigation';
 import { classes } from '../../utils/misc';
+import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 
 /**
  * Renders the actual content at the root of the app
@@ -20,9 +21,11 @@ function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
 
+  const headerActionBarProps = useHeaderActionBarProps();
+
   return (
     <>
-      <AppMobileNav />
+      <AppMobileNav {...headerActionBarProps} />
       <Header
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}

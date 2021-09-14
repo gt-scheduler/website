@@ -3,7 +3,6 @@ import React from 'react';
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
 import useBodyClass from '../../hooks/useBodyClass';
-import useMobile from '../../hooks/useMobile';
 import { ThemeContext } from '../../contexts';
 import { useInformationModal } from '../InformationModal';
 import ErrorBoundary from '../ErrorBoundary';
@@ -18,6 +17,8 @@ import {
   AppContent,
 } from './content';
 import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
+import { DESKTOP_BREAKPOINT } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -89,7 +90,7 @@ type AppCSSRootProps = {
 function AppCSSRoot({ children }: AppCSSRootProps): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
-  const mobile = useMobile();
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   return <div className={classes('App', mobile && 'mobile')}>{children}</div>;
 }

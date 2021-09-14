@@ -1,12 +1,13 @@
 import React from 'react';
 
 import { classes } from '../../utils/misc';
-import useMobile from '../../hooks/useMobile';
+import { DESKTOP_BREAKPOINT } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
 export default function Attribution(): React.ReactElement {
-  const mobile = useMobile();
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   return (
     <div className={classes('Attribution')}>
       <p>

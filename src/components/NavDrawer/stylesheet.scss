@@ -13,6 +13,10 @@
   transition: opacity 0.15s linear;
   z-index: 100;
 
+  // Include theme switch transition
+  transition-duration: $theme-switch-transition-duration;
+  transition-property: color, background-color;
+
   &.open {
     pointer-events: all;
     opacity: 1;
@@ -31,7 +35,10 @@
   box-shadow: 0px 0px 8px 10px rgba(0, 0, 0, 0.08);
 
   transform: translateX(-105%);
-  transition: transform 0.15s ease;
+  // Include theme switch transition in addition to the `transform` transition
+  transition: transform 0.15s ease,
+    color $theme-switch-transition-duration linear,
+    background-color $theme-switch-transition-duration linear;
 
   &.open {
     transform: none;

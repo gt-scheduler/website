@@ -1,14 +1,9 @@
-import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import copy from 'copy-to-clipboard';
+import React, { useContext, useMemo, useRef } from 'react';
 
-import {
-  downloadShadowCalendar,
-  exportCoursesToCalendar,
-} from '../../utils/misc';
 import { Calendar } from '..';
-import { ScheduleContext, TermsContext, ThemeContext } from '../../contexts';
-import { ErrorWithFields, softError } from '../../log';
+import { ScheduleContext, TermsContext } from '../../contexts';
 import HeaderDisplay from '../HeaderDisplay';
+import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 
 import './stylesheet.scss';
 
@@ -33,7 +28,6 @@ export default function Header({
   const [{ term, oscar, pinnedCrns }, { setTerm }] =
     useContext(ScheduleContext);
   const terms = useContext(TermsContext);
-  const [theme] = useContext(ThemeContext);
   const captureRef = useRef<HTMLDivElement>(null);
 
   const totalCredits = useMemo(() => {
@@ -43,56 +37,7 @@ export default function Header({
     }, 0);
   }, [pinnedCrns, oscar]);
 
-  const handleExport = useCallback(() => {
-    try {
-      exportCoursesToCalendar(oscar, pinnedCrns);
-    } catch (err) {
-      softError(
-        new ErrorWithFields({
-          message: 'exporting courses to calendar failed',
-          fields: {
-            pinnedCrns,
-            term: oscar.term,
-          },
-        })
-      );
-    }
-  }, [oscar, pinnedCrns]);
-
-  const handleDownload = useCallback(() => {
-    const captureElement = captureRef.current;
-    if (captureElement == null) return;
-    try {
-      downloadShadowCalendar(captureElement, theme);
-    } catch (err) {
-      softError(
-        new ErrorWithFields({
-          message: 'downloading shadow calendar as PNG failed',
-          fields: {
-            pinnedCrns,
-            theme,
-            term: oscar.term,
-          },
-        })
-      );
-    }
-  }, [captureRef, theme, pinnedCrns, oscar.term]);
-
-  const handleCopyCrns = useCallback(() => {
-    try {
-      copy(pinnedCrns.join(', '));
-    } catch (err) {
-      softError(
-        new ErrorWithFields({
-          message: 'copying CRNs to clipboard failed',
-          fields: {
-            pinnedCrns,
-            term: oscar.term,
-          },
-        })
-      );
-    }
-  }, [pinnedCrns, oscar.term]);
+  const headerActionBarProps = useHeaderActionBarProps();
 
   return (
     <>
@@ -102,12 +47,7 @@ export default function Header({
         onChangeTab={onChangeTab}
         onToggleMenu={onToggleMenu}
         tabs={tabs}
-        onCopyCrns={handleCopyCrns}
-        enableCopyCrns={pinnedCrns.length > 0}
-        onExportCalendar={handleExport}
-        enableExportCalendar={pinnedCrns.length > 0}
-        onDownloadCalendar={handleDownload}
-        enableDownloadCalendar={pinnedCrns.length > 0}
+        {...headerActionBarProps}
         termsState={{
           type: 'loaded',
           terms,
