@@ -217,7 +217,7 @@ export async function sleep({
  */
 export function exportCoursesToCalendar(
   oscar: Oscar,
-  pinnedCrns: string[]
+  pinnedCrns: readonly string[]
 ): void {
   const cal = ics() as ICS | undefined;
   if (cal == null) {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { softError, ErrorWithFields } from '../../log';
-import { LoadingState } from '../../types';
+import { LoadingState, NonEmptyArray } from '../../types';
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
@@ -15,8 +15,10 @@ const GITHUB_API_URL = `https://api.github.com/repos/${CRAWLER_REPO}/contents?re
  * Repeatedly attempts to load in the case of errors,
  * and cancels itself once the parent context is unmounted.
  */
-export default function useDownloadTerms(): LoadingState<string[]> {
-  const [state, setState] = useState<LoadingState<string[]>>({
+export default function useDownloadTerms(): LoadingState<
+  NonEmptyArray<string>
+> {
+  const [state, setState] = useState<LoadingState<NonEmptyArray<string>>>({
     type: 'loading',
   });
 
@@ -49,7 +51,7 @@ export default function useDownloadTerms(): LoadingState<string[]> {
 
           setState({
             type: 'loaded',
-            result: newTerms,
+            result: newTerms as NonEmptyArray<string>,
           });
 
           return;

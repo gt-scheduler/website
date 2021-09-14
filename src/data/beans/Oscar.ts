@@ -165,9 +165,9 @@ export default class Oscar {
   }
 
   getCombinations(
-    desiredCourses: string[],
-    pinnedCrns: string[],
-    excludedCrns: string[]
+    desiredCourses: readonly string[],
+    pinnedCrns: readonly string[],
+    excludedCrns: readonly string[]
   ): Combination[] {
     const crnsList: string[][] = [];
     const dfs = (courseIndex = 0, crns: string[] = []): void => {

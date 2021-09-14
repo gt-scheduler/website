@@ -14,8 +14,9 @@ import { classes } from '../../utils/misc';
  * Renders the actual content at the root of the app
  * once it has completely loaded state,
  * including headers & footers.
+ * This component is memoized, so it only re-renders when its context changes.
  */
-export function AppContent(): React.ReactElement {
+function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
 
@@ -54,6 +55,14 @@ export function AppContent(): React.ReactElement {
     </>
   );
 }
+
+/**
+ * Renders the actual content at the root of the app
+ * once it has completely loaded state,
+ * including headers & footers.
+ * This component is memoized, so it only re-renders when its context changes.
+ */
+export const AppContent = React.memo(AppContentBase);
 
 export type AppSkeletonWithLoadingTermsProps = {
   children: React.ReactNode;

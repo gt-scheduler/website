@@ -32,24 +32,6 @@ export type LoadingStateCustom = {
 
 export type NonEmptyArray<T> = [T, ...T[]];
 
-export type TermData = {
-  desiredCourses: string[];
-  pinnedCrns: string[];
-  excludedCrns: string[];
-  colorMap: Record<string, string>;
-  sortingOptionIndex: number;
-};
-
-export const defaultTermData: TermData = {
-  desiredCourses: [],
-  pinnedCrns: [],
-  excludedCrns: [],
-  colorMap: {},
-  sortingOptionIndex: 0,
-};
-
-export const defaultTermDataRaw: string = JSON.stringify(defaultTermData);
-
 // Declare (better) types for the ICS library
 export type ICS = {
   download(filename: string, ext?: string): string | false;
