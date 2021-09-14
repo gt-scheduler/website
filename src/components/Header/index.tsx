@@ -25,8 +25,10 @@ export default function Header({
   onToggleMenu,
   tabs,
 }: HeaderProps): React.ReactElement {
-  const [{ term, oscar, pinnedCrns }, { setTerm }] =
-    useContext(ScheduleContext);
+  const [
+    { term, oscar, pinnedCrns, allVersionNames, currentVersionIndex },
+    { setTerm, setCurrentVersion, addNewVersion, deleteVersion, renameVersion },
+  ] = useContext(ScheduleContext);
   const terms = useContext(TermsContext);
   const captureRef = useRef<HTMLDivElement>(null);
 
@@ -53,6 +55,15 @@ export default function Header({
           terms,
           currentTerm: term,
           onChangeTerm: setTerm,
+        }}
+        versionsState={{
+          type: 'loaded',
+          allVersionNames,
+          currentVersionIndex,
+          setCurrentVersion,
+          addNewVersion,
+          deleteVersion,
+          renameVersion,
         }}
       />
 

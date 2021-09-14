@@ -6,10 +6,16 @@ import { EMPTY_OSCAR } from '../data/beans/Oscar';
 import { defaultSchedule, Schedule } from '../data/types';
 import { ErrorWithFields } from '../log';
 
-export type ScheduleContextData = Immutable<Schedule> & {
-  readonly term: string;
-  readonly oscar: Oscar;
+type ExtraData = {
+  term: string;
+  currentVersionIndex: number;
+  allVersionNames: string[];
+  // `oscar` is included below as a separate type
 };
+
+export type ScheduleContextData = Immutable<Schedule> &
+  // `Oscar` can't go into `Immutable`, so we place it separately
+  Immutable<ExtraData> & { readonly oscar: Oscar };
 
 export type ScheduleContextSetters = {
   setTerm: (next: string) => void;
@@ -17,6 +23,10 @@ export type ScheduleContextSetters = {
   updateSchedule: (
     applyDraft: (draft: Draft<Schedule>) => void | Immutable<Schedule>
   ) => void;
+  setCurrentVersion: (nextIndex: number) => void;
+  addNewVersion: (name: string, select?: boolean) => void;
+  deleteVersion: (index: number) => void;
+  renameVersion: (index: number, newName: string) => void;
 };
 export type ScheduleContextValue = [
   ScheduleContextData,
@@ -25,6 +35,8 @@ export type ScheduleContextValue = [
 export const ScheduleContext = React.createContext<ScheduleContextValue>([
   {
     term: '',
+    currentVersionIndex: 0,
+    allVersionNames: [],
     oscar: EMPTY_OSCAR,
     ...defaultSchedule,
   },
@@ -48,6 +60,40 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
     updateSchedule: (): void => {
       throw new ErrorWithFields({
         message: 'empty ScheduleContext.updateSchedule value being used',
+      });
+    },
+    setCurrentVersion: (nextIndex: number): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.setCurrentVersion value being used',
+        fields: {
+          nextIndex,
+        },
+      });
+    },
+    addNewVersion: (name: string, select?: boolean): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.addNewVersion value being used',
+        fields: {
+          name,
+          select,
+        },
+      });
+    },
+    deleteVersion: (index: number): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.deleteVersion value being used',
+        fields: {
+          index,
+        },
+      });
+    },
+    renameVersion: (index: number, newName: string): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.renameVersion value being used',
+        fields: {
+          index,
+          newName,
+        },
       });
     },
   },

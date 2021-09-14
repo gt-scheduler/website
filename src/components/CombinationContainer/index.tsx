@@ -38,9 +38,9 @@ export default function CombinationContainer(): React.ReactElement {
         onChange={(newSortingOptionIndex): void =>
           patchSchedule({ sortingOptionIndex: newSortingOptionIndex })
         }
-        value={sortingOptionIndex}
+        current={sortingOptionIndex}
         options={oscar.sortingOptions.map((sortingOption, i) => ({
-          value: i,
+          id: i,
           label: sortingOption.label,
         }))}
       />

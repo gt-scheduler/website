@@ -1,11 +1,20 @@
 @import '../../variables';
 
+$max-item-width: 320px;
+
 .Select {
   position: relative;
   justify-content: space-between;
+  max-width: $max-item-width;
 
   .text {
     margin-right: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    flex-grow: 1;
   }
 
   .intercept {
@@ -29,6 +38,7 @@
     top: 100%;
     max-height: 240px;
     overflow-y: auto;
+    max-width: $max-item-width;
 
     @include dark {
       background-color: $theme-dark-card-background;
@@ -39,8 +49,73 @@
     }
 
     .option {
-      justify-content: flex-start;
+      justify-content: center;
+      align-items: stretch;
       white-space: nowrap;
+      padding: 0;
+      display: flex;
+
+      // Include a highlight-hover style on the outer option
+      // so that when hovering over an option with actions,
+      // the (un)mounting of the action buttons
+      // don't cause visible changes in the bounds of the hover highlight.
+      transition: background-color .2s;
+      &:hover {
+        background-color: $color-border;
+      }
+
+      .Button {
+        flex-shrink: 0;
+        flex-grow: 0;
+      }
+
+      .option-text {
+        min-width: 87px;
+        white-space: nowrap;
+        overflow: hidden;
+        display: block;
+        text-overflow: ellipsis;
+        flex-shrink: 1;
+        flex-grow: 1;
+
+        // Disable the highlight-on-hover styles for the main button
+        background-color: transparent;
+      }
+
+      .option-button {
+        padding: 4px;
+        display: none;
+        width: 36px;
+      }
+
+      .option-input {
+        padding: 8px;
+        margin: 4px;
+        flex-shrink: 1;
+        flex-grow: 1;
+        width: 0;
+
+        .dark & {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .light & {
+          background-color: rgba(0, 0, 0, 0.075);
+        }
+      }
+
+      &:hover,
+      &.option-inputting {
+        .option-button {
+          display: flex;
+        }
+      }
+
+      @media (hover: none), (max-width: 900px) {
+        .option-button {
+          display: flex;
+        }
+      }
     }
   }
 

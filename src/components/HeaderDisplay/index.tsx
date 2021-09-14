@@ -1,16 +1,36 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faPencilAlt,
+  faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons';
+import swal from '@sweetalert/with-react';
 
 import { getSemesterName } from '../../utils/semesters';
 import { Button, Select, Tab } from '..';
-import { LoadingSelect } from '../Select';
+import { LoadingSelect, SelectAction } from '../Select';
 import Spinner from '../Spinner';
+import { getNextVersionName } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
+import { softError, ErrorWithFields } from '../../log';
+import useFeatureFlag from '../../hooks/useFeatureFlag';
 
 import './stylesheet.scss';
+
+type VersionState =
+  | { type: 'loading' }
+  | {
+      type: 'loaded';
+      currentVersionIndex: number;
+      allVersionNames: readonly string[];
+      setCurrentVersion: (nextIndex: number) => void;
+      addNewVersion: (name: string, select?: boolean) => void;
+      deleteVersion: (index: number) => void;
+      renameVersion: (index: number, newName: string) => void;
+    };
 
 export type HeaderDisplayProps = {
   totalCredits?: number | null;
@@ -32,6 +52,7 @@ export type HeaderDisplayProps = {
         currentTerm: string;
         onChangeTerm: (next: string) => void;
       };
+  versionsState: VersionState;
 };
 
 /**
@@ -54,6 +75,7 @@ export default function HeaderDisplay({
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
   termsState,
+  versionsState,
 }: HeaderDisplayProps): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
@@ -81,9 +103,9 @@ export default function HeaderDisplay({
       {termsState.type === 'loaded' ? (
         <Select
           onChange={termsState.onChangeTerm}
-          value={termsState.currentTerm}
+          current={termsState.currentTerm}
           options={termsState.terms.map((currentTerm) => ({
-            value: currentTerm,
+            id: currentTerm,
             label: getSemesterName(currentTerm),
           }))}
           className="semester"
@@ -91,6 +113,9 @@ export default function HeaderDisplay({
       ) : (
         <LoadingSelect />
       )}
+
+      {/* Version selector */}
+      <VersionSelector state={versionsState} />
 
       <span className="credits">
         {totalCredits === null ? (
@@ -127,5 +152,108 @@ export default function HeaderDisplay({
         />
       )}
     </div>
+  );
+}
+
+// Private sub-components
+
+type VersionSelectorProps = {
+  state: VersionState;
+};
+
+/**
+ * Allows users to:
+ * - switch between existing schedule versions
+ * - add new blank versions with default (Primary, Secondary, etc.) names
+ * - delete and rename existing versions.
+ * Note that this functionality is currently hidden behind a feature flag
+ * (pending a future feature release closer to schedules releasing):
+ * Run the following command in the browser console and then refresh:
+ *
+ * ```
+ * window.localStorage.setItem('ff-2021-09-14-schedule-versions', 'true')
+ * ```
+ */
+function VersionSelector({
+  state,
+}: VersionSelectorProps): React.ReactElement | null {
+  const isEnabled = useFeatureFlag('2021-09-14', 'schedule-versions');
+  if (!isEnabled) return null;
+
+  if (state.type === 'loading') {
+    return <LoadingSelect />;
+  }
+
+  return (
+    <Select
+      className="version-switch"
+      desiredItemWidth={260}
+      newLabel="New Schedule"
+      onChange={state.setCurrentVersion}
+      current={state.currentVersionIndex}
+      options={state.allVersionNames.map((version, i) => {
+        const actions: SelectAction<number>[] = [];
+
+        // Add the edit (rename) action
+        actions.push({
+          type: 'edit',
+          icon: faPencilAlt,
+          onCommit: (newName: string) => {
+            state.renameVersion(i, newName);
+            return true;
+          },
+        });
+
+        // Add the delete action
+        if (state.allVersionNames.length >= 2) {
+          actions.push({
+            type: 'button',
+            icon: faTrashAlt,
+            onClick: () => {
+              // Display a confirmation dialog before deleting the version
+              swal({
+                buttons: ['Cancel', 'Delete'],
+                content: (
+                  <div style={{ textAlign: 'center' }}>
+                    <h2>Delete confirmation</h2>
+                    <p>
+                      Are you sure you want to delete schedule &ldquo;
+                      {version}&rdquo;?
+                    </p>
+                  </div>
+                ),
+              })
+                .then((val: unknown): void => {
+                  if (val) {
+                    state.deleteVersion(i);
+                  }
+                })
+                .catch((err) => {
+                  softError(
+                    new ErrorWithFields({
+                      message: 'error with swal call for delete confirmation',
+                      source: err,
+                      fields: {
+                        deletedVersionIndex: i,
+                      },
+                    })
+                  );
+                });
+            },
+          });
+        }
+
+        return {
+          id: i,
+          label: version,
+          actions,
+        };
+      })}
+      onClickNew={(): void => {
+        // Handle creating a new version with the auto-generated name
+        // (like 'Primary' or 'Secondary')
+        state.addNewVersion(getNextVersionName(state.allVersionNames), true);
+      }}
+    />
   );
 }

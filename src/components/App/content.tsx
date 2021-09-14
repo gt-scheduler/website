@@ -91,6 +91,7 @@ export function AppSkeletonWithLoadingTerms({
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
         termsState={{ type: 'loading' }}
+        versionsState={{ type: 'loading' }}
       />
       {children}
       <Attribution />
@@ -128,6 +129,7 @@ export function AppSkeletonWithSwitchableTerms({
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
         termsState={{ type: 'loaded', terms, currentTerm, onChangeTerm }}
+        versionsState={{ type: 'loading' }}
       />
       {children}
       <Attribution />

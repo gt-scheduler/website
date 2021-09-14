@@ -305,3 +305,40 @@ export function downloadShadowCalendar(
       )
     );
 }
+
+export const PRIMARY_VERSION_NAME = 'Primary';
+const OTHER_VERSIONS_NAMES = [
+  'Secondary',
+  'Tertiary',
+  'Quaternary',
+  'Quinary',
+  'Senary',
+  'Septenary',
+  'Octonary',
+  'Nonary',
+  'Denary',
+];
+
+/**
+ * Gets the next auto-generated version name in the sequence of
+ * Primary, Secondary, Tertiary, ...
+ * all the way up to the name for the 10th item (Denary)
+ * before returning "New version".
+ * If the array is empty, then it always returns 'Primary'.
+ * Otherwise, it will return the first item in the sequence,
+ * starting with 'Secondary' (meaning that it will always skip 'Primary',
+ * even if it's not an element in the given list)
+ */
+export function getNextVersionName(allVersionNames: readonly string[]): string {
+  const allNamesSet: Set<string> = new Set(allVersionNames);
+  if (allNamesSet.size === 0) return PRIMARY_VERSION_NAME;
+
+  for (const version of OTHER_VERSIONS_NAMES) {
+    if (!allNamesSet.has(version)) {
+      return version;
+    }
+  }
+
+  // Fall back to the default with over 10 versions
+  return 'New version';
+}
