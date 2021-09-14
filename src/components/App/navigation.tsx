@@ -7,8 +7,10 @@ import React, {
 } from 'react';
 
 import { NavDrawer, NavMenu } from '..';
-import useMobile from '../../hooks/useMobile';
+import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
+import HeaderActionBar from '../HeaderActionBar';
 
 export const NAV_TABS = ['Scheduler', 'Map'];
 
@@ -52,7 +54,7 @@ export type AppNavigationProps = {
 export function AppNavigation({
   children,
 }: AppNavigationProps): React.ReactElement {
-  const mobile = useMobile();
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   // Allow top-level tab-based navigation
   const [currentTabIndex, setTabIndex] = useState(0);
@@ -87,12 +89,29 @@ export function AppNavigation({
   );
 }
 
+type AppMobileNavProps = {
+  onCopyCrns?: () => void;
+  enableCopyCrns?: boolean;
+  onExportCalendar?: () => void;
+  enableExportCalendar?: boolean;
+  onDownloadCalendar?: () => void;
+  enableDownloadCalendar?: boolean;
+};
+
 /**
  * Adds the nav drawer that is conditionally open depending on navigation state
  * when the app is running on a mobile device
  */
-export function AppMobileNav(): React.ReactElement | null {
-  const mobile = useMobile();
+export function AppMobileNav({
+  onCopyCrns = (): void => undefined,
+  enableCopyCrns = false,
+  onExportCalendar = (): void => undefined,
+  enableExportCalendar = false,
+  onDownloadCalendar = (): void => undefined,
+  enableDownloadCalendar = false,
+}: AppMobileNavProps): React.ReactElement | null {
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
+  const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
   const { currentTabIndex, setTabIndex, isDrawerOpen, closeDrawer } =
     useContext(AppNavigationContext);
 
@@ -100,6 +119,18 @@ export function AppMobileNav(): React.ReactElement | null {
 
   return (
     <NavDrawer open={isDrawerOpen} onClose={closeDrawer}>
+      {/* On small mobile devices, show the header action row */}
+      {!largeMobile && (
+        <HeaderActionBar
+          onCopyCrns={onCopyCrns}
+          enableCopyCrns={enableCopyCrns}
+          onExportCalendar={onExportCalendar}
+          enableExportCalendar={enableExportCalendar}
+          onDownloadCalendar={onDownloadCalendar}
+          enableDownloadCalendar={enableDownloadCalendar}
+        />
+      )}
+
       <NavMenu
         items={NAV_TABS}
         currentItem={currentTabIndex}

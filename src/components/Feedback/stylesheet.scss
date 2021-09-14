@@ -3,7 +3,6 @@
 // Create a wrapper with a solid background color
 // so that hover states properly lighten the button
 .FeedbackButtonWrapper {
-  background-color: var(--theme-card-bg);
   border-radius: 5px;
   position: absolute;
   bottom: 24px;
@@ -11,16 +10,21 @@
   width: 60px;
   height: 60px;
 
+  @include popup;
+  @extend %common;
+}
+
+%common {
   // Include theme switch transition
   transition-duration: $theme-switch-transition-duration;
   transition-property: background-color;
-}
-
-%floating-shadow {
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
 
   @include dark {
-    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+    background-color: $theme-dark-card-background;
+  }
+
+  @include light {
+    background-color: $theme-light-background;
   }
 }
 
@@ -28,26 +32,19 @@
   width: 60px;
   height: 60px;
   border-radius: 5px;
-
-  @extend %floating-shadow;
 }
 
 .FeedbackForm {
   position: absolute;
   bottom: 24px;
   right: 24px;
-  background-color: var(--theme-card-bg);
   width: 300px;
   min-height: 350px;
-  border-radius: 5px;
   display: flex;
   flex-direction: column;
 
-  @extend %floating-shadow;
-
-  // Include theme switch transition
-  transition-duration: $theme-switch-transition-duration;
-  transition-property: background-color;
+  @include popup;
+  @extend %common;
 
   .container {
     margin: 20px;

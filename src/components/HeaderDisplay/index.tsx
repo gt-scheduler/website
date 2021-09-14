@@ -1,22 +1,14 @@
-import React, { useCallback, useContext, useRef } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faAdjust,
-  faBars,
-  faCalendarAlt,
-  faDownload,
-  faPaste,
-} from '@fortawesome/free-solid-svg-icons';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import Cookies from 'js-cookie';
-import ReactTooltip from 'react-tooltip';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 import { getSemesterName } from '../../utils/semesters';
 import { Button, Select, Tab } from '..';
-import useMobile from '../../hooks/useMobile';
-import { ThemeContext } from '../../contexts';
 import { LoadingSelect } from '../Select';
 import Spinner from '../Spinner';
+import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
+import HeaderActionBar from '../HeaderActionBar';
 
 import './stylesheet.scss';
 
@@ -63,20 +55,13 @@ export default function HeaderDisplay({
   enableDownloadCalendar = false,
   termsState,
 }: HeaderDisplayProps): React.ReactElement {
-  const [theme, setTheme] = useContext(ThemeContext);
-
-  const handleThemeChange = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    Cookies.set('theme', newTheme, { expires: 1460 });
-    setTheme(newTheme);
-  }, [theme, setTheme]);
-
-  // Obtain a ref to the copy button to only close its tooltip
-  const crnButton = useRef<HTMLDivElement>(null);
-
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
-  const mobile = useMobile();
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
+
+  // Re-render when the page is re-sized to be small mobile vs. greater
+  // (small mobile is < 600 px wide)
+  const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
   return (
     <div className="Header">
       {/* Menu button, only displayed on mobile */}
@@ -130,60 +115,17 @@ export default function HeaderDisplay({
         </div>
       )}
 
-      {/* Action bar */}
-      <div className="menu">
-        <Button onClick={onDownloadCalendar} disabled={!enableDownloadCalendar}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
-          <div className="text">Download</div>
-        </Button>
-        <Button onClick={onExportCalendar} disabled={!enableExportCalendar}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
-          <div className="text">Export</div>
-        </Button>
-
-        {/* Include separate button and tooltip component
-              with manually controlled closing logic */}
-        <div
-          className="menu"
-          data-tip
-          data-for="copy-crn"
-          delay-hide="1000"
-          ref={crnButton}
-        >
-          <Button disabled={!enableCopyCrns}>
-            <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-            <div className="text">CRNs</div>
-          </Button>
-        </div>
-        {enableCopyCrns && (
-          <ReactTooltip
-            id="copy-crn"
-            type="dark"
-            place="bottom"
-            effect="solid"
-            event="click"
-            delayHide={1000}
-            afterShow={(): void => {
-              onCopyCrns();
-              setTimeout(
-                () => ReactTooltip.hide(crnButton.current ?? undefined),
-                1000
-              );
-            }}
-          >
-            Copied to clipboard!
-          </ReactTooltip>
-        )}
-
-        <Button onClick={handleThemeChange}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
-          <div className="text">Theme</div>
-        </Button>
-        <Button href="https://github.com/gt-scheduler/website">
-          <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
-          <div className="text">GitHub</div>
-        </Button>
-      </div>
+      {/* Include action bar on large mobile and higher */}
+      {largeMobile && (
+        <HeaderActionBar
+          onCopyCrns={onCopyCrns}
+          enableCopyCrns={enableCopyCrns}
+          onExportCalendar={onExportCalendar}
+          enableExportCalendar={enableExportCalendar}
+          onDownloadCalendar={onDownloadCalendar}
+          enableDownloadCalendar={enableDownloadCalendar}
+        />
+      )}
     </div>
   );
 }

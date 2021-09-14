@@ -4,6 +4,9 @@ $time-width: 48px;
 $day-height: 40px;
 $header-height: 64px;
 
+$desktop-breakpoint: 1024px;
+$large-mobile-breakpoint: 600px;
+
 $color-neutral: #808080;
 $color-border: rgba($color-neutral, 0.2);
 $theme-light-background: #ffffff;
@@ -21,11 +24,23 @@ $opacity-divider: 0.4;
 $theme-switch-transition-duration: 0.2s;
 
 @mixin card {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.2),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14),
     0 2px 1px -1px rgba(0, 0, 0, 0.12);
   margin: 4px;
   border-radius: 4px;
   overflow: hidden;
+}
+
+@mixin popup {
+  border-radius: 5px;
+
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2), 4px 4px 20px rgba(0, 0, 0, 0.15);
+
+  @include dark {
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.25), 4px 4px 20px rgba(0, 0, 0, 0.2);
+  }
 }
 
 @mixin light($property: null, $value: null) {

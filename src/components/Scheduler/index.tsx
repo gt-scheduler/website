@@ -3,13 +3,14 @@ import React, { useMemo, useState } from 'react';
 import { classes } from '../../utils/misc';
 import { Button, Calendar, CombinationContainer, CourseContainer } from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
-import useMobile from '../../hooks/useMobile';
+import { DESKTOP_BREAKPOINT } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
  */
 export default function Scheduler(): React.ReactElement {
-  const mobile = useMobile();
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   // Store the current set of CRNs that are shown on the Calendar overlay
   const [overlayCrns, setOverlayCrns] = useState<string[]>([]);
