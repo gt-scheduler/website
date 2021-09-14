@@ -15,10 +15,12 @@
     bottom: 0;
     left: 0;
     right: 0;
+    cursor: default;
   }
 
   .option-container {
-    @include card;
+    @include popup;
+
     margin: 0;
     z-index: 1;
     position: absolute;
@@ -28,21 +30,21 @@
     max-height: 240px;
     overflow-y: auto;
 
+    @include dark {
+      background-color: $theme-dark-card-background;
+    }
+
+    @include light {
+      background-color: $theme-light-background;
+    }
+
     .option {
       justify-content: flex-start;
       white-space: nowrap;
     }
   }
-}
 
-.dark .Select {
-  .option-container {
-    background-color: $theme-dark-background;
-  }
-}
-
-.light .Select {
-  .option-container {
-    background-color: $theme-light-background;
+  *::-webkit-scrollbar {
+    display: none;
   }
 }

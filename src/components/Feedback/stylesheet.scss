@@ -15,17 +15,21 @@
 }
 
 %common {
-  // Include theme switch transition
-  transition-duration: $theme-switch-transition-duration;
-  transition-property: background-color;
-
   @include dark {
-    background-color: $theme-dark-card-background;
+    --feedback-outer-color: #{$theme-dark-card-background};
+    --feedback-inner-color: #{$theme-dark-background};
   }
 
   @include light {
-    background-color: $theme-light-background;
+    --feedback-outer-color: #{$theme-light-background};
+    --feedback-inner-color: #{$theme-light-card-background};
   }
+  
+  background-color: var(--feedback-outer-color);
+
+  // Include theme switch transition
+  transition-duration: $theme-switch-transition-duration;
+  transition-property: background-color;
 }
 
 .FeedbackButton {
@@ -75,8 +79,12 @@
     & div {
       display: inline-block;
       justify-content: space-around;
-      background-color: var(--theme-bg);
+      background-color: var(--feedback-inner-color);
       text-align: center;
+
+      // Include theme switch transition
+      transition-duration: $theme-switch-transition-duration;
+      transition-property: background-color;
     }
   }
   
@@ -87,6 +95,7 @@
     border-radius: 5px;
     &.active {
       background-color: #429bda;
+      color: white;
     }
   }
 
@@ -113,7 +122,7 @@
     font-size: 16px;
     resize: none;
     border-radius: 5px;
-    background-color: var(--theme-bg);
+    background-color: var(--feedback-inner-color);
     color: currentColor;
     padding: 8px;
 
@@ -137,6 +146,7 @@
     border-radius: 5px;
     margin-left: auto;
     margin-right: auto;
+    color: white;
   }
   
   .CloseIcon {
