@@ -8,7 +8,7 @@ export type ButtonProps = {
   className?: string;
   disabled?: boolean;
   href?: string;
-  onClick?: () => void;
+  onClick?: (e: React.SyntheticEvent<HTMLDivElement>) => void;
   children?: React.ReactNode;
 };
 
@@ -43,7 +43,7 @@ export default function Button({
       tabIndex={0}
       onKeyDown={(event): void => {
         // Intercept enter presses
-        if (event.key === 'Enter' && onClick != null) onClick();
+        if (event.key === 'Enter' && onClick != null) onClick(event);
       }}
       role="button"
     >

@@ -7,7 +7,13 @@ import {
   ScheduleContext,
 } from '../../contexts';
 import { Oscar } from '../../data/beans';
-import { Schedule, defaultSchedule, ScheduleVersion } from '../../data/types';
+import useVersionActions from '../../data/hooks/useVersionActions';
+import {
+  Schedule,
+  defaultSchedule,
+  TermScheduleData,
+  ScheduleVersion,
+} from '../../data/types';
 import {
   StageLoadScheduleData,
   StageLoadTerms,
@@ -72,6 +78,8 @@ export default function DataLoader({
                           oscar={oscar}
                           scheduleVersion={scheduleVersion}
                           updateScheduleVersion={updateScheduleVersion}
+                          termScheduleData={termScheduleData}
+                          updateTermScheduleData={updateTermScheduleData}
                         >
                           {children}
                         </ContextProvider>
@@ -101,6 +109,12 @@ type ContextProviderProps = {
       draft: Draft<ScheduleVersion>
     ) => void | Immutable<ScheduleVersion>
   ) => void;
+  termScheduleData: Immutable<TermScheduleData>;
+  updateTermScheduleData: (
+    applyDraft: (
+      draft: Draft<TermScheduleData>
+    ) => void | Immutable<TermScheduleData>
+  ) => void;
   children: React.ReactNode;
 };
 
@@ -117,6 +131,8 @@ function ContextProvider({
   oscar,
   scheduleVersion,
   updateScheduleVersion,
+  termScheduleData,
+  updateTermScheduleData,
   children,
 }: ContextProviderProps): React.ReactElement {
   // Create a `updateSchedule` function
@@ -144,13 +160,51 @@ function ContextProvider({
     [updateSchedule]
   );
 
+  // Derive the list of all version names
+  const allVersionNames = useMemo<string[]>(
+    () => termScheduleData.versions.map(({ name }) => name),
+    [termScheduleData.versions]
+  );
+
+  // Get all version-related actions
+  const { setCurrentVersion, addNewVersion, deleteVersion, renameVersion } =
+    useVersionActions({ updateTermScheduleData });
+
   // Memoize the context value so that it is stable
+  const { currentIndex: currentVersionIndex } = termScheduleData;
   const scheduleContextValue = useMemo<ScheduleContextValue>(
     () => [
-      { term, oscar, ...castDraft(scheduleVersion.schedule) },
-      { setTerm, patchSchedule, updateSchedule },
+      {
+        term,
+        oscar,
+        currentVersionIndex,
+        allVersionNames,
+        ...castDraft(scheduleVersion.schedule),
+      },
+      {
+        setTerm,
+        patchSchedule,
+        updateSchedule,
+        setCurrentVersion,
+        addNewVersion,
+        deleteVersion,
+        renameVersion,
+      },
     ],
-    [term, oscar, scheduleVersion, setTerm, patchSchedule, updateSchedule]
+    [
+      term,
+      oscar,
+      currentVersionIndex,
+      allVersionNames,
+      scheduleVersion.schedule,
+      setTerm,
+      patchSchedule,
+      updateSchedule,
+      setCurrentVersion,
+      addNewVersion,
+      deleteVersion,
+      renameVersion,
+    ]
   );
 
   return (

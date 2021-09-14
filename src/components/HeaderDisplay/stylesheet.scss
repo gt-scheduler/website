@@ -50,3 +50,8 @@
   // Increase the icon size
   font-size: 1.7rem;
 }
+
+.version-switch {
+  flex-shrink: 1;
+  min-width: 0;
+}
