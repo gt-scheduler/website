@@ -28,7 +28,7 @@ export type HeaderDisplayProps = {
     | { type: 'loading' }
     | {
         type: 'loaded';
-        terms: string[];
+        terms: readonly string[];
         currentTerm: string;
         onChangeTerm: (next: string) => void;
       };
