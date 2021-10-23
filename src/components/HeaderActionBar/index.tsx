@@ -5,6 +5,7 @@ import {
   faPaste,
   faAdjust,
   faCaretDown,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useContext } from 'react';
@@ -129,6 +130,94 @@ export default function HeaderActionBar({
         />
         <div className="header-action-bar__button-text">GitHub</div>
       </Button>
+
+      <DropdownMenu items={[]}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              height: 40,
+              width: 40,
+              borderRadius: '10000px',
+              backgroundColor: '#0C797D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 4,
+            }}
+          >
+            {/* <span
+              style={{
+                fontSize: 19,
+                fontWeight: 400,
+                textShadow: '0 0 6px rgba(0,0,0,0.5)',
+                color: 'white',
+              }}
+            >
+              JA
+            </span> */}
+            <FontAwesomeIcon
+              fixedWidth
+              icon={faUser}
+              style={{
+                fontSize: '1.2rem',
+                filter: 'drop-shadow(0 0 6px rgb(0,0,0,0.5))',
+                color: 'white',
+              }}
+            />
+            {/* <span style={{ fontSize: 20, fontWeight: 300 }}>JA</span> */}
+          </div>
+          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+        </div>
+      </DropdownMenu>
     </div>
   );
 }
+
+// <Button onClick={onDownloadCalendar} disabled={!enableDownloadCalendar}>
+//         <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
+//         <div className="text">Download</div>
+//       </Button>
+//       <Button onClick={onExportCalendar} disabled={!enableExportCalendar}>
+//         <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
+//         <div className="text">Export</div>
+//       </Button>
+
+//       {/* Include separate button and tooltip component
+//           with manually controlled closing logic */}
+//       <div
+//         className="menu"
+//         data-tip
+//         data-for="copy-crn"
+//         delay-hide="1000"
+//         ref={crnButton}
+//       >
+//         <Button disabled={!enableCopyCrns}>
+//           <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
+//           <div className="text">CRNs</div>
+//         </Button>
+//       </div>
+//       {enableCopyCrns && (
+//         <ReactTooltip
+//           id="copy-crn"
+//           type="dark"
+//           place="bottom"
+//           effect="solid"
+//           event="click"
+//           delayHide={1000}
+//           afterShow={(): void => {
+//             onCopyCrns();
+//             setTimeout(
+//               () => ReactTooltip.hide(crnButton?.current ?? undefined),
+//               1000
+//             );
+//           }}
+//         >
+//           Copied to clipboard!
+//         </ReactTooltip>
+//       )}
