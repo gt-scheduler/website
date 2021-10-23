@@ -26,3 +26,10 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
 });
 
 export { firebase };
+
+// Configure the enabled auth providers that firebase UI displays as options
+export const authProviders = [
+  firebase.auth.EmailAuthProvider.PROVIDER_ID,
+  firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+  firebase.auth.GithubAuthProvider.PROVIDER_ID,
+];

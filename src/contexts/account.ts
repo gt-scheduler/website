@@ -6,8 +6,11 @@ export type SignedOut = {
 
 export type SignedIn = {
   type: 'signedIn';
-  displayName: string;
   signOut: () => void;
+  name: string | null;
+  provider: string | null;
+  email: string | null;
+  id: string;
 };
 
 export type AccountContextValue = SignedOut | SignedIn;

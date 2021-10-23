@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -16,7 +16,7 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
 import Modal from '../Modal';
-import { AccountContext } from '../../contexts/account';
+import { AccountContextValue } from '../../contexts/account';
 
 import './stylesheet.scss';
 
@@ -53,6 +53,7 @@ export type HeaderDisplayProps = {
         onChangeTerm: (next: string) => void;
       };
   versionsState: VersionState;
+  accountState: AccountContextValue | { type: 'loading' };
 };
 
 /**
@@ -76,9 +77,8 @@ export default function HeaderDisplay({
   enableDownloadCalendar = false,
   termsState,
   versionsState,
+  accountState,
 }: HeaderDisplayProps): React.ReactElement {
-  const accountState = useContext(AccountContext);
-
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);

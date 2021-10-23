@@ -3,6 +3,7 @@ import React, { useContext, useCallback } from 'react';
 
 import { HeaderActionBarProps } from '../components/HeaderActionBar';
 import { ScheduleContext, ThemeContext } from '../contexts';
+import { AccountContext } from '../contexts/account';
 import { softError, ErrorWithFields } from '../log';
 import { exportCoursesToCalendar, downloadShadowCalendar } from '../utils/misc';
 
@@ -14,17 +15,20 @@ export type HookResult = Pick<
   | 'enableExportCalendar'
   | 'onDownloadCalendar'
   | 'enableDownloadCalendar'
+  | 'accountState'
 >;
 
 /**
  * Custom hook to prepare a majority of the `<HeaderActionBar>` props.
- * Requires a valid value for `ScheduleContext` and `ThemeContext`.
+ * Requires a valid value for `ScheduleContext`, `ThemeContext`,
+ * and `AccountContext`.
  */
 export default function useHeaderActionBarProps(
   captureRef: React.RefObject<HTMLDivElement>
 ): HookResult {
   const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
+  const accountState = useContext(AccountContext);
 
   const handleExport = useCallback(() => {
     try {
@@ -84,5 +88,6 @@ export default function useHeaderActionBarProps(
     enableDownloadCalendar: pinnedCrns.length > 0,
     onDownloadCalendar: handleDownload,
     enableExportCalendar: pinnedCrns.length > 0,
+    accountState,
   };
 }

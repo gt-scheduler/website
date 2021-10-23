@@ -9,7 +9,7 @@ import React, {
 import { NavDrawer, NavMenu } from '..';
 import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
 import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
-import { AccountContext } from '../../contexts/account';
+import { AccountContextValue } from '../../contexts/account';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
@@ -115,6 +115,7 @@ type AppMobileNavDisplayProps = {
   enableExportCalendar?: boolean;
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
+  accountState?: AccountContextValue | { type: 'loading' };
 };
 
 /**
@@ -130,12 +131,12 @@ export function AppMobileNavDisplay({
   enableExportCalendar = false,
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
+  accountState = { type: 'loading' },
 }: AppMobileNavDisplayProps): React.ReactElement | null {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
   const { currentTabIndex, setTabIndex, isDrawerOpen, closeDrawer } =
     useContext(AppNavigationContext);
-  const accountState = useContext(AccountContext);
 
   if (!mobile) return null;
 

@@ -10,7 +10,7 @@ import {
   faSignInAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
 import { Button } from '..';
 import {
@@ -19,10 +19,11 @@ import {
 } from '../../constants';
 import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
-import { AccountContextValue } from '../../contexts/account';
+import { AccountContextValue, SignedIn } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
-import { useLoginModal } from '../LoginModal';
+import LoginModal from '../LoginModal';
+import Spinner from '../Spinner';
 
 import './stylesheet.scss';
 
@@ -150,80 +151,155 @@ type AccountDropDownProps = {
 };
 
 function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
-  const showLoginModal = useLoginModal();
-  if ((state as { loading: true }.loading)
+  const [loginOpen, setLoginOpen] = useState(false);
+  const hideLogin = useCallback(() => setLoginOpen(false), []);
 
-  // TODO clean up code
-  const initials = state.signedIn ? getInitials(state.displayName) : '';
-  return (
-    <DropdownMenu
-      menuAnchor="right"
-      items={
-        state.signedIn
-          ? [
-              {
-                label: 'Sign out',
-                icon: faSignOutAlt,
-                onClick: (): void => state.signOut(),
-              },
-            ]
-          : [
-              {
-                label: 'Sign in',
-                icon: faSignInAlt,
-                onClick: (): void => {
-                  showLoginModal();
+  let content;
+  if (state.type === 'loading') {
+    content = (
+      <DropdownMenu disabled menuAnchor="right" items={[]}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              height: 40,
+              width: 40,
+              borderRadius: '10000px',
+              backgroundColor: '#0C797D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 4,
+            }}
+          >
+            <Spinner size={24} />
+          </div>
+          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+        </div>
+      </DropdownMenu>
+    );
+  } else {
+    // TODO clean up code
+    const initials =
+      state.type === 'signedIn'
+        ? getInitials(state.name ?? state.email ?? state.id)
+        : '';
+    content = (
+      <DropdownMenu
+        menuAnchor="right"
+        items={
+          state.type === 'signedIn'
+            ? [
+                {
+                  label: <SignedInLabel state={state} />,
                 },
-              },
-            ]
-      }
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
+                {
+                  label: 'Sign out',
+                  icon: faSignOutAlt,
+                  onClick: (): void => state.signOut(),
+                },
+              ]
+            : [
+                {
+                  label: 'Sign in',
+                  icon: faSignInAlt,
+                  onClick: (): void => {
+                    setLoginOpen(true);
+                  },
+                },
+              ]
+        }
       >
         <div
           style={{
-            height: 40,
-            width: 40,
-            borderRadius: '10000px',
-            backgroundColor: '#0C797D',
             display: 'flex',
+            flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 4,
           }}
         >
-          {state.signedIn ? (
-            <span
-              style={{
-                fontSize:
-                  initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
-                fontWeight: 400,
-                textShadow: '0 0 6px rgba(0,0,0,0.5)',
-                color: 'white',
-              }}
-            >
-              {initials.slice(0, 3)}
-            </span>
-          ) : (
-            <FontAwesomeIcon
-              fixedWidth
-              icon={faUser}
-              style={{
-                fontSize: '1.2rem',
-                filter: 'drop-shadow(0 0 6px rgb(0,0,0,0.5))',
-                color: 'white',
-              }}
-            />
-          )}
+          <div
+            style={{
+              height: 40,
+              width: 40,
+              borderRadius: '10000px',
+              backgroundColor: '#0C797D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 4,
+            }}
+          >
+            {state.type === 'signedIn' ? (
+              <span
+                style={{
+                  fontSize:
+                    initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
+                  fontWeight: 400,
+                  textShadow: '0 0 6px rgba(0,0,0,0.5)',
+                  color: 'white',
+                }}
+              >
+                {initials.slice(0, 3)}
+              </span>
+            ) : (
+              <FontAwesomeIcon
+                fixedWidth
+                icon={faUser}
+                style={{
+                  fontSize: '1.2rem',
+                  filter: 'drop-shadow(0 0 6px rgb(0,0,0,0.5))',
+                  color: 'white',
+                }}
+              />
+            )}
+          </div>
+          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
         </div>
-        <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-      </div>
-    </DropdownMenu>
+      </DropdownMenu>
+    );
+  }
+
+  return (
+    <>
+      {content} <LoginModal show={loginOpen} onHide={hideLogin} />
+    </>
+  );
+}
+
+type SignedInLabelProps = {
+  state: SignedIn;
+};
+
+function SignedInLabel({ state }: SignedInLabelProps): React.ReactElement {
+  let signedInAs: React.ReactNode;
+  if (state.name !== null && state.email !== null) {
+    signedInAs = (
+      <>
+        <strong>{state.name}</strong> ({state.email})
+      </>
+    );
+  } else if (state.name !== null || state.email !== null) {
+    signedInAs = `${state.name ?? state.email ?? ''}`;
+  } else {
+    signedInAs = state.id;
+  }
+  let providerText = '';
+  if (state.provider !== null) {
+    providerText = ` via ${state.provider}`;
+  }
+  return (
+    <div style={{ lineHeight: 1.25 }}>
+      <span style={{ opacity: 0.6 }}>Signed in as:</span>
+      <br />
+      {signedInAs}
+      <br />
+      <span style={{ opacity: 0.6 }}>{providerText}</span>
+    </div>
   );
 }
 

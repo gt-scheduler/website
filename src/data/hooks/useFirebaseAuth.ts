@@ -16,11 +16,21 @@ export default function useFirebaseAuth(): LoadingState<AccountContextValue> {
       .auth()
       .onAuthStateChanged((user) => {
         if (user === null) {
-          setAccountState({ signedIn: false });
+          setAccountState({ type: 'signedOut' });
         } else {
+          let provider: string | null = null;
+          if (user.providerData != null) {
+            const firstProviderData = user.providerData[0];
+            if (firstProviderData != null) {
+              provider = firstProviderData.providerId;
+            }
+          }
           setAccountState({
-            signedIn: true,
-            displayName: user.displayName ?? user.email ?? user.uid,
+            type: 'signedIn',
+            name: user.displayName,
+            email: user.email,
+            id: user.uid,
+            provider,
             signOut: () => {
               firebase
                 .auth()

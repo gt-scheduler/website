@@ -81,13 +81,15 @@ export default function DataLoader({
                 return (
                   <StageLoadAccount skeletonProps={{ termsState }}>
                     {({ accountState }): React.ReactElement => (
-                      <GroupLoadScheduleData skeletonProps={{ termsState }}>
+                      <GroupLoadScheduleData
+                        skeletonProps={{ termsState, accountState }}
+                      >
                         {({
                           scheduleData,
                           updateScheduleData,
                         }): React.ReactElement => (
                           <StageExtractTermScheduleData
-                            skeletonProps={{ termsState }}
+                            skeletonProps={{ termsState, accountState }}
                             currentTerm={currentTerm}
                             scheduleData={scheduleData}
                             updateScheduleData={updateScheduleData}
@@ -97,12 +99,12 @@ export default function DataLoader({
                               updateTermScheduleData,
                             }): React.ReactElement => (
                               <StageLoadOscarData
-                                skeletonProps={{ termsState }}
+                                skeletonProps={{ termsState, accountState }}
                                 term={currentTerm}
                               >
                                 {({ oscar }): React.ReactElement => (
                                   <StageExtractScheduleVersion
-                                    skeletonProps={{ termsState }}
+                                    skeletonProps={{ termsState, accountState }}
                                     currentVersionRaw={currentVersionRaw}
                                     setVersion={setVersion}
                                     termScheduleData={termScheduleData}
