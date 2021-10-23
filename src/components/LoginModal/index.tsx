@@ -1,4 +1,9 @@
-import React, { useCallback, useImperativeHandle, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import swal from '@sweetalert/with-react';
 import firebase from 'firebase';
 import firebaseui from 'firebaseui';
@@ -47,8 +52,23 @@ export const LoginModalContent = React.forwardRef<LoginModalContentHandle>(
       return handle;
     });
 
+    // Focus the invisible input upon first render
+    // This is to remove focus from the cancel button on the modal.
+    const invisibleInputRef = useRef<HTMLInputElement | null>(null);
+    useEffect(() => {
+      setImmediate(() => {
+        invisibleInputRef.current?.focus();
+      });
+    }, []);
+
     return (
       <div className="login-modal-content">
+        <input
+          className="invisible-input"
+          aria-hidden="true"
+          ref={invisibleInputRef}
+          type="checkbox"
+        />
         <h1>Sign in</h1>
         <p style={{ textAlign: 'center', marginBottom: 28 }}>
           Sign in using one of the below identity providers to start syncing

@@ -8,4 +8,10 @@
             background-color: #505050 !important;
         }
     }
+
+    .invisible-input {
+        // opacity: 0;
+        // pointer-events: none;
+        position: absolute;
+    }
 }

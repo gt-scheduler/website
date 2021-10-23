@@ -29,7 +29,7 @@ import './stylesheet.scss';
 export type HeaderActionBarProps = {
   className?: string;
   style?: React.CSSProperties;
-  accountState: AccountContextValue;
+  accountState: AccountContextValue | { type: 'loading' };
   onCopyCrns?: () => void;
   enableCopyCrns?: boolean;
   onExportCalendar?: () => void;
@@ -146,13 +146,15 @@ export default function HeaderActionBar({
 // Private sub-components
 
 type AccountDropDownProps = {
-  state: AccountContextValue;
+  state: AccountContextValue | { type: 'loading' };
 };
 
 function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
+  const showLoginModal = useLoginModal();
+  if ((state as { loading: true }.loading)
+
   // TODO clean up code
   const initials = state.signedIn ? getInitials(state.displayName) : '';
-  const showLoginModal = useLoginModal();
   return (
     <DropdownMenu
       menuAnchor="right"

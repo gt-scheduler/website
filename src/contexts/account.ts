@@ -1,16 +1,16 @@
 import React from 'react';
 
 export type SignedOut = {
-  signedIn: false;
+  type: 'signedOut';
 };
 
 export type SignedIn = {
-  signedIn: true;
+  type: 'signedIn';
   displayName: string;
   signOut: () => void;
 };
 
 export type AccountContextValue = SignedOut | SignedIn;
 export const AccountContext = React.createContext<AccountContextValue>({
-  signedIn: false,
+  type: 'signedOut',
 });

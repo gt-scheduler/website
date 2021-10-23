@@ -20,6 +20,8 @@ import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 import useScheduleDataProducer from '../../data/hooks/useScheduleDataProducer';
 import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
+import { AccountContextValue } from '../../contexts/account';
+import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -214,6 +216,35 @@ export type StageCreateScheduleDataProducerProps = {
     ) => void;
   }) => React.ReactNode;
 };
+
+export type StageLoadAccountProps = {
+  skeletonProps?: StageSkeletonProps;
+  children: (props: { accountState: AccountContextValue }) => React.ReactNode;
+};
+
+/**
+ * Handles loading the user login state
+ * (account state from Firebase Authentication).
+ * Renders a disabled header & attribution footer even when loading.
+ */
+export function StageLoadAccount({
+  skeletonProps,
+  children,
+}: StageLoadAccountProps): React.ReactElement {
+  const accountState = useFirebaseAuth();
+
+  if (accountState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps}>
+        <SkeletonContent>
+          <LoadingDisplay state={accountState} name="account" />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ accountState: accountState.result })}</>;
+}
 
 /**
  * Creates the `updateScheduleData` Immer producer

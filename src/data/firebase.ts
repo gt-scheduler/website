@@ -1,5 +1,7 @@
 import firebase from 'firebase';
 
+import { ErrorWithFields, softError } from '../log';
+
 const firebaseConfig = {
   apiKey: 'AIzaSyDzzT30jbX-KznDKMCVq3URIYPJZz8AOp4',
   authDomain: 'gt-scheduler-jazev-dev.firebaseapp.com',
@@ -13,3 +15,14 @@ const app = firebase.initializeApp(firebaseConfig);
 
 export const auth = app.auth();
 export const db = app.firestore();
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
+  softError(
+    new ErrorWithFields({
+      message: 'error when configuring firebase auth persistence',
+      source: err,
+    })
+  );
+});
+
+export { firebase };
