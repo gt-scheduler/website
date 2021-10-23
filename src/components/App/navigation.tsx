@@ -9,6 +9,7 @@ import React, {
 import { NavDrawer, NavMenu } from '..';
 import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
 import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
+import { AccountContext } from '../../contexts/account';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
@@ -134,6 +135,7 @@ export function AppMobileNavDisplay({
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
   const { currentTabIndex, setTabIndex, isDrawerOpen, closeDrawer } =
     useContext(AppNavigationContext);
+  const accountState = useContext(AccountContext);
 
   if (!mobile) return null;
 
@@ -142,6 +144,7 @@ export function AppMobileNavDisplay({
       {/* On small mobile devices, show the header action row */}
       {!largeMobile && (
         <HeaderActionBar
+          accountState={accountState}
           onCopyCrns={onCopyCrns}
           enableCopyCrns={enableCopyCrns}
           onExportCalendar={onExportCalendar}

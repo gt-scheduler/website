@@ -1,11 +1,12 @@
 import produce, { Immutable, Draft, original, castDraft } from 'immer';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import {
   ScheduleContextValue,
   TermsContext,
   ScheduleContext,
 } from '../../contexts';
+import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { Oscar } from '../../data/beans';
 import useVersionActions from '../../data/hooks/useVersionActions';
 import {
@@ -210,7 +211,7 @@ type ContextProviderProps = {
 
 /**
  * Handles making all loaded data available to the rest of the app
- * via the contexts `TermsContext` and `ScheduleContext`.
+ * via the contexts `TermsContext`, `ScheduleContext`, and `AccountContext`.
  * Additionally, this function memoizes the context values
  * as well as any derived values that go into them.
  */
@@ -309,10 +310,28 @@ function ContextProvider({
     ]
   );
 
+  // TODO fix up eventually
+  const [signedIn, setSignedIn] = useState(true);
+  const accountContextValue = useMemo<AccountContextValue>(
+    () =>
+      signedIn
+        ? {
+            signedIn: true,
+            displayName: 'John Doe',
+            signOut: (): void => setSignedIn(false),
+          }
+        : {
+            signedIn: false,
+          },
+    [signedIn]
+  );
+
   return (
     <TermsContext.Provider value={terms}>
       <ScheduleContext.Provider value={scheduleContextValue}>
-        {children}
+        <AccountContext.Provider value={accountContextValue}>
+          {children}
+        </AccountContext.Provider>
       </ScheduleContext.Provider>
     </TermsContext.Provider>
   );

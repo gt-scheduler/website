@@ -6,6 +6,7 @@ import {
   faAdjust,
   faCaretDown,
   faUser,
+  faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useContext } from 'react';
@@ -17,6 +18,7 @@ import {
 } from '../../constants';
 import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
+import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 
@@ -25,6 +27,7 @@ import './stylesheet.scss';
 export type HeaderActionBarProps = {
   className?: string;
   style?: React.CSSProperties;
+  accountState: AccountContextValue;
   onCopyCrns?: () => void;
   enableCopyCrns?: boolean;
   onExportCalendar?: () => void;
@@ -44,6 +47,7 @@ export type HeaderActionBarProps = {
 export default function HeaderActionBar({
   className,
   style,
+  accountState,
   onCopyCrns = (): void => undefined,
   enableCopyCrns = false,
   onExportCalendar = (): void => undefined,
@@ -75,6 +79,7 @@ export default function HeaderActionBar({
       onClick: onExportCalendar,
     });
   }
+  // TODO add the tooltip back to this button
   if (enableCopyCrns) {
     exportActions.push({
       label: 'Copy CRNs to clipboard',
@@ -131,36 +136,67 @@ export default function HeaderActionBar({
         <div className="header-action-bar__button-text">GitHub</div>
       </Button>
 
-      <DropdownMenu items={[]}>
+      <AccountDropDown state={accountState} />
+    </div>
+  );
+}
+
+// Private sub-components
+
+type AccountDropDownProps = {
+  state: AccountContextValue;
+};
+
+function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
+  // TODO clean up code
+  const initials = state.signedIn ? getInitials(state.displayName) : '';
+  return (
+    <DropdownMenu
+      menuAnchor="right"
+      items={
+        state.signedIn
+          ? [
+              {
+                label: 'Sign out',
+                icon: faSignOutAlt,
+                onClick: (): void => state.signOut(),
+              },
+            ]
+          : []
+      }
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+      >
         <div
           style={{
+            height: 40,
+            width: 40,
+            borderRadius: '10000px',
+            backgroundColor: '#0C797D',
             display: 'flex',
-            flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 4,
           }}
         >
-          <div
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: '10000px',
-              backgroundColor: '#0C797D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 4,
-            }}
-          >
-            {/* <span
+          {state.signedIn ? (
+            <span
               style={{
-                fontSize: 19,
+                fontSize:
+                  initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
                 fontWeight: 400,
                 textShadow: '0 0 6px rgba(0,0,0,0.5)',
                 color: 'white',
               }}
             >
-              JA
-            </span> */}
+              {initials.slice(0, 3)}
+            </span>
+          ) : (
             <FontAwesomeIcon
               fixedWidth
               icon={faUser}
@@ -170,54 +206,17 @@ export default function HeaderActionBar({
                 color: 'white',
               }}
             />
-            {/* <span style={{ fontSize: 20, fontWeight: 300 }}>JA</span> */}
-          </div>
-          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+          )}
         </div>
-      </DropdownMenu>
-    </div>
+        <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+      </div>
+    </DropdownMenu>
   );
 }
 
-// <Button onClick={onDownloadCalendar} disabled={!enableDownloadCalendar}>
-//         <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
-//         <div className="text">Download</div>
-//       </Button>
-//       <Button onClick={onExportCalendar} disabled={!enableExportCalendar}>
-//         <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
-//         <div className="text">Export</div>
-//       </Button>
-
-//       {/* Include separate button and tooltip component
-//           with manually controlled closing logic */}
-//       <div
-//         className="menu"
-//         data-tip
-//         data-for="copy-crn"
-//         delay-hide="1000"
-//         ref={crnButton}
-//       >
-//         <Button disabled={!enableCopyCrns}>
-//           <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-//           <div className="text">CRNs</div>
-//         </Button>
-//       </div>
-//       {enableCopyCrns && (
-//         <ReactTooltip
-//           id="copy-crn"
-//           type="dark"
-//           place="bottom"
-//           effect="solid"
-//           event="click"
-//           delayHide={1000}
-//           afterShow={(): void => {
-//             onCopyCrns();
-//             setTimeout(
-//               () => ReactTooltip.hide(crnButton?.current ?? undefined),
-//               1000
-//             );
-//           }}
-//         >
-//           Copied to clipboard!
-//         </ReactTooltip>
-//       )}
+function getInitials(displayName: string): string {
+  const regex = /\b\w/g;
+  const matches = displayName.match(regex);
+  if (matches === null) return '';
+  return matches.join('');
+}
