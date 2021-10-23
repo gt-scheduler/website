@@ -29,6 +29,9 @@ import {
   StageExtractScheduleVersion,
   StageSkeletonProps,
 } from './stages';
+// import for side effects
+// TODO make this better
+import '../../data/firebase';
 
 export type DataLoaderProps = {
   children: React.ReactNode;
@@ -311,7 +314,7 @@ function ContextProvider({
   );
 
   // TODO fix up eventually
-  const [signedIn, setSignedIn] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
   const accountContextValue = useMemo<AccountContextValue>(
     () =>
       signedIn

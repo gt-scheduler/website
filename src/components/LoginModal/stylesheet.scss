@@ -1,0 +1,11 @@
+@import "../../variables.scss";
+
+.login-modal-content {
+    .firebaseui-idp-github.firebaseui-id-idp-button {
+        // Fix the GitHub button to not be the same color as the background
+        // when in dark mode.
+        @include dark {
+            background-color: #505050 !important;
+        }
+    }
+}

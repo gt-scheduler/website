@@ -7,6 +7,7 @@ import {
   faCaretDown,
   faUser,
   faSignOutAlt,
+  faSignInAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useContext } from 'react';
@@ -21,6 +22,7 @@ import useMedia from '../../hooks/useMedia';
 import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
+import { useLoginModal } from '../LoginModal';
 
 import './stylesheet.scss';
 
@@ -150,6 +152,7 @@ type AccountDropDownProps = {
 function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
   // TODO clean up code
   const initials = state.signedIn ? getInitials(state.displayName) : '';
+  const showLoginModal = useLoginModal();
   return (
     <DropdownMenu
       menuAnchor="right"
@@ -162,7 +165,15 @@ function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
                 onClick: (): void => state.signOut(),
               },
             ]
-          : []
+          : [
+              {
+                label: 'Sign in',
+                icon: faSignInAlt,
+                onClick: (): void => {
+                  showLoginModal();
+                },
+              },
+            ]
       }
     >
       <div
