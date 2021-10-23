@@ -19,7 +19,7 @@ import {
 import { lexicographicCompare } from '../../utils/misc';
 import {
   StageLoadUIState,
-  StageLoadRawScheduleDataFromStorage,
+  StageLoadRawScheduleDataHybrid,
   StageMigrateScheduleData,
   StageCreateScheduleDataProducer,
   StageLoadTerms,
@@ -82,6 +82,7 @@ export default function DataLoader({
                   <StageLoadAccount skeletonProps={{ termsState }}>
                     {({ accountState }): React.ReactElement => (
                       <GroupLoadScheduleData
+                        accountState={accountState}
                         skeletonProps={{ termsState, accountState }}
                       >
                         {({
@@ -160,6 +161,7 @@ export default function DataLoader({
 
 type GroupLoadScheduleDataProps = {
   skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
   children: (props: {
     scheduleData: Immutable<ScheduleData>;
     updateScheduleData: (
@@ -174,10 +176,14 @@ type GroupLoadScheduleDataProps = {
  */
 function GroupLoadScheduleData({
   skeletonProps,
+  accountState,
   children,
 }: GroupLoadScheduleDataProps): React.ReactElement {
   return (
-    <StageLoadRawScheduleDataFromStorage skeletonProps={skeletonProps}>
+    <StageLoadRawScheduleDataHybrid
+      skeletonProps={skeletonProps}
+      accountState={accountState}
+    >
       {({ rawScheduleData, setRawScheduleData }): React.ReactElement => (
         <StageMigrateScheduleData
           skeletonProps={skeletonProps}
@@ -193,7 +199,7 @@ function GroupLoadScheduleData({
           )}
         </StageMigrateScheduleData>
       )}
-    </StageLoadRawScheduleDataFromStorage>
+    </StageLoadRawScheduleDataHybrid>
   );
 }
 

@@ -5,9 +5,9 @@ import {
   faPaste,
   faAdjust,
   faCaretDown,
-  faUser,
   faSignOutAlt,
   faSignInAlt,
+  faUserCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useContext, useState } from 'react';
@@ -249,9 +249,9 @@ function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
             ) : (
               <FontAwesomeIcon
                 fixedWidth
-                icon={faUser}
+                icon={faUserCircle}
                 style={{
-                  fontSize: '1.2rem',
+                  fontSize: '1.5rem',
                   filter: 'drop-shadow(0 0 6px rgb(0,0,0,0.5))',
                   color: 'white',
                 }}
