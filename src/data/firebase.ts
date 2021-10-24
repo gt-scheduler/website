@@ -2,6 +2,9 @@ import firebase from 'firebase';
 
 import { ErrorWithFields, softError } from '../log';
 
+// This data is not secret; it is included in the application bundle.
+// Change it when developing locally.
+// TODO figure out better method ^
 const firebaseConfig = {
   apiKey: 'AIzaSyDzzT30jbX-KznDKMCVq3URIYPJZz8AOp4',
   authDomain: 'gt-scheduler-jazev-dev.firebaseapp.com',
@@ -15,6 +18,7 @@ const app = firebase.initializeApp(firebaseConfig);
 
 export const auth = app.auth();
 export const db = app.firestore();
+export const schedulesCollection = db.collection('schedules');
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
   softError(

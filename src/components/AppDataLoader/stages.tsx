@@ -22,7 +22,7 @@ import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
 import { AccountContextValue, SignedIn } from '../../contexts/account';
 import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
-import useScheduleDataFromFirebase from '../../data/hooks/useScheduleDataFromFirebase';
+import useRawScheduleDataFromFirebase from '../../data/hooks/useRawScheduleDataFromFirebase';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -273,8 +273,7 @@ export type StageLoadRawScheduleDataFromFirebaseProps = {
 
 /**
  * Handles loading the schedule data from Firebase,
- * handling migrating it to a newer version as needed
- * as well as uploading initial data if the user has no document.
+ * handling uploading initial data if the user has no document.
  * Renders a disabled header & attribution footer even when loading.
  */
 export function StageLoadRawScheduleDataFromFirebase({
@@ -282,7 +281,7 @@ export function StageLoadRawScheduleDataFromFirebase({
   accountState,
   children,
 }: StageLoadRawScheduleDataFromFirebaseProps): React.ReactElement {
-  const loadingState = useScheduleDataFromFirebase(accountState);
+  const loadingState = useRawScheduleDataFromFirebase(accountState);
 
   if (loadingState.type !== 'loaded') {
     return (
