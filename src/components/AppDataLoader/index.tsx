@@ -37,7 +37,7 @@ export type DataLoaderProps = {
 
 /**
  * Handles loading all relevant data and provide valid values
- * for the Terms & Term contexts before rendering its `children`.
+ * for the Terms, Term, and Account contexts before rendering its `children`.
  * Works by having a series of "stages" implemented as components,
  * where each stage doesn't render its children until its ready.
  * Until then, they won't run the function passed in to their `children` prop
