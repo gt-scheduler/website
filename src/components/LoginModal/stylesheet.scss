@@ -1,17 +1,44 @@
-@import "../../variables.scss";
+@import '../../variables.scss';
 
 .login-modal-content {
-    .firebaseui-idp-github.firebaseui-id-idp-button {
-        // Fix the GitHub button to not be the same color as the background
-        // when in dark mode.
-        @include dark {
-            background-color: #505050 !important;
-        }
+  .firebaseui-idp-github.firebaseui-id-idp-button {
+    // Fix the GitHub button to not be the same color as the background
+    // when in dark mode.
+    @include dark {
+      background-color: #505050 !important;
     }
+  }
 
-    .invisible-input {
-        // opacity: 0;
-        // pointer-events: none;
-        position: absolute;
+  .invisible-input {
+    // opacity: 0;
+    // pointer-events: none;
+    position: absolute;
+  }
+
+  .firebaseui-container {
+    @include dark {
+      color: white;
+      background-color: $theme-dark-background;
+
+      .mdl-button--primary.mdl-button--primary {
+        color: white;
+      }
+
+      .firebaseui-input, .mdl-textfield__label {
+        color: white;
+      }
+
+      .firebaseui-text {
+        color: rgba(white, 0.7);
+      }
     }
+  }
+
+  .mdl-card {
+    @include popup;
+
+    @include dark {
+      background-color: $theme-dark-card-background;
+    }
+  }
 }
