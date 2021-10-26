@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { classes } from '../../utils/misc';
 
@@ -19,6 +19,13 @@ export default function Spinner({
   className,
   size = 'normal',
 }: SpinnerProps): React.ReactElement {
+  // Use approach from this article
+  // to stablize spinner position over time
+  // when it resides at the same place between renders:
+  // https://dev.to/selbekk/how-to-stop-your-spinner-from-jumping-in-react-5cmp
+  const mountTime = useMemo(() => Date.now(), []);
+  // This must be the same as animation duration:
+  const mountDelay = -(mountTime % 800);
   const actualSize =
     typeof size === 'number'
       ? size
@@ -26,6 +33,7 @@ export default function Spinner({
           small: 16,
           normal: 40,
         }[size];
+
   return (
     <svg
       className={classes('spinner', className)}
@@ -33,6 +41,7 @@ export default function Spinner({
         {
           ...style,
           '--size': `${actualSize}px`,
+          '--spinner-delay': `${mountDelay.toFixed(3)}ms`,
         } as React.CSSProperties
       }
       viewBox="0 0 50 50"

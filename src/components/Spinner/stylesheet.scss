@@ -2,6 +2,7 @@
   --stroke: 6px;
   --color: currentColor;
   animation: spinner_rotate 0.8s linear infinite;
+  animation-delay: var(--spinner-delay);
 
   width: var(--size);
   height: var(--size);
