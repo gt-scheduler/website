@@ -2,13 +2,16 @@ import { castDraft, Draft, Immutable } from 'immer';
 import { useCallback } from 'react';
 
 import { softError, ErrorWithFields } from '../../log';
-import { defaultSchedule, TermScheduleData } from '../types';
+import {
+  defaultSchedule,
+  generateScheduleVersionId,
+  TermScheduleData,
+} from '../types';
 
 export type HookResult = {
-  setCurrentVersion: (nextIndex: number) => void;
   addNewVersion: (name: string, select?: boolean) => void;
-  deleteVersion: (index: number) => void;
-  renameVersion: (index: number, newName: string) => void;
+  deleteVersion: (id: string) => void;
+  renameVersion: (id: string, newName: string) => void;
 };
 
 /**
@@ -17,115 +20,124 @@ export type HookResult = {
  */
 export default function useVersionActions({
   updateTermScheduleData,
+  setVersion,
+  currentVersion,
 }: {
   updateTermScheduleData: (
     applyDraft: (
       draft: Draft<TermScheduleData>
     ) => void | Immutable<TermScheduleData>
   ) => void;
+  setVersion: (next: string) => void;
+  currentVersion: string;
 }): HookResult {
-  // Create a `setCurrentVersion` function
-  const setCurrentVersion = useCallback(
-    (nextIndex: number): void => {
-      updateTermScheduleData((draft) => {
-        draft.currentIndex = nextIndex;
-      });
-    },
-    [updateTermScheduleData]
-  );
-
   // Create an `addNewVersion` function
   const addNewVersion = useCallback(
     (name: string, select = false): void => {
+      const id = generateScheduleVersionId();
       updateTermScheduleData((draft) => {
-        draft.versions.push({ name, schedule: castDraft(defaultSchedule) });
-        if (select) {
-          draft.currentIndex = draft.versions.length - 1;
-        }
+        draft.versions[id] = {
+          name,
+          schedule: castDraft(defaultSchedule),
+          createdAt: new Date().toISOString(),
+        };
       });
+      if (select) {
+        setVersion(id);
+      }
     },
-    [updateTermScheduleData]
+    [updateTermScheduleData, setVersion]
   );
 
   // Create a `deleteVersion` function
   const deleteVersion = useCallback(
-    (index: number): void => {
+    (id: string): void => {
       updateTermScheduleData((draft) => {
-        if (index < 0 || index > draft.versions.length - 1) {
+        if (draft.versions[id] == null) {
           softError(
             new ErrorWithFields({
               message:
-                'deleteVersion called with out-of-bounds version index; ignoring',
+                'deleteVersion called with non-existent version id; ignoring',
               fields: {
-                allVersionNames: draft.versions.map(({ name }) => name),
-                versionCount: draft.versions.length,
-                index,
+                allVersionNames: Object.entries(draft.versions).map(
+                  ([versionId, { name }]) => ({ id: versionId, name })
+                ),
+                versionCount: Object.keys(draft.versions).length,
+                id,
               },
             })
           );
           return;
         }
 
-        draft.versions.splice(index, 1);
-
         // Check to see if we also need to assign a new current version.
-        // This is the case if either:
-        // - the current index is after the deleted index,
-        //   in which case everything got shifted to the left
-        //   so we need to change the current version's index to be 1 less
-        // - the current index is the deleted index,
-        //   in which case we want to select the previous item
-        //   (this is arbitrary; it's just our decided behavior)
-        if (draft.currentIndex >= index) {
-          // Select the previous version if we can
-          const newIndex = Math.max(draft.currentIndex - 1, 0);
-          if (draft.versions.length === 0) {
+        // This is the case if the current index is the deleted index,
+        // in which case we want to select the previous item
+        // (this is arbitrary; it's just our decided behavior)
+        if (currentVersion === id) {
+          const entries = Object.entries(draft.versions);
+          delete draft.versions[id];
+
+          if (
+            entries.length === 0 ||
+            Object.keys(draft.versions).length === 0
+          ) {
             // The versions list is empty:
             // create a new version called 'Primary'
-            draft.currentIndex = 0;
-            draft.versions.push({
+            const newId = generateScheduleVersionId();
+            draft.versions[newId] = {
               name: 'Primary',
+              createdAt: new Date().toISOString(),
               schedule: castDraft(defaultSchedule),
-            });
+            };
+            setVersion(newId);
             return;
           }
 
-          // If the versions list isn't empty, then this index must be valid
-          draft.currentIndex = newIndex;
+          // Select the previous version if we can
+          // by sorting all versions by their createdAt date.
+          const sorted = entries.sort(([, a], [, b]) =>
+            a.createdAt > b.createdAt ? 0 : 1
+          );
+          const indexOfDeleting = sorted.findIndex(
+            ([versionId]) => versionId === id
+          );
+          if (indexOfDeleting === -1) return;
+
+          const newIndex = Math.max(indexOfDeleting - 1, 0);
+
+          // If the remaining versions isn't empty,
+          // then this index must be valid
+          setVersion(sorted[newIndex]?.[0] ?? '');
+        } else {
+          // Just delete the version
+          delete draft.versions[id];
         }
       });
     },
-    [updateTermScheduleData]
+    [updateTermScheduleData, setVersion, currentVersion]
   );
 
   // Create a `renameVersion` function
   const renameVersion = useCallback(
-    (index: number, newName: string): void => {
+    (id: string, newName: string): void => {
       updateTermScheduleData((draft) => {
-        const reportNotExists = (): void => {
+        const existingDraft = draft.versions[id];
+        if (existingDraft === undefined) {
           softError(
             new ErrorWithFields({
               message:
                 "renameVersion called with current version name that doesn't exist; ignoring",
               fields: {
-                allVersions: Object.keys(draft.versions),
-                index,
-                allVersionNames: draft.versions.map(({ name }) => name),
-                versionCount: draft.versions.length,
+                allVersionNames: Object.entries(draft.versions).map(
+                  ([versionId, { name }]) => ({ id: versionId, name })
+                ),
+                id,
+                versionCount: Object.keys(draft.versions).length,
                 newName,
               },
             })
           );
-        };
-
-        if (index < 0 || index > draft.versions.length - 1) {
-          reportNotExists();
-          return;
-        }
-
-        const existingDraft = draft.versions[index];
-        if (existingDraft === undefined) {
-          reportNotExists();
           return;
         }
 
@@ -135,5 +147,5 @@ export default function useVersionActions({
     [updateTermScheduleData]
   );
 
-  return { setCurrentVersion, addNewVersion, deleteVersion, renameVersion };
+  return { addNewVersion, deleteVersion, renameVersion };
 }

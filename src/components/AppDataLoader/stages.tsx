@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Immutable, Draft, castDraft } from 'immer';
 
 import { Oscar } from '../../data/beans';
@@ -13,13 +13,13 @@ import {
   ScheduleVersion,
   TermScheduleData,
 } from '../../data/types';
-import useScheduleDataFromStorage from '../../data/hooks/useScheduleDataFromStorage';
-import { ErrorWithFields } from '../../log';
+import useRawScheduleDataFromStorage from '../../data/hooks/useRawScheduleDataFromStorage';
 import useExtractSchedule from '../../data/hooks/useExtractScheduleVersion';
 import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleData';
+import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 import useScheduleDataProducer from '../../data/hooks/useScheduleDataProducer';
-import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
+import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -46,6 +46,32 @@ import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 // while the app is loading
 // (See `<AppSkeleton>` for more info on the possible states).
 export type StageSkeletonProps = Omit<AppSkeletonProps, 'children'>;
+
+export type StageLoadUIStateProps = {
+  children: (props: {
+    currentTerm: string;
+    setTerm: (next: string) => void;
+    currentVersion: string;
+    setVersion: (next: string) => void;
+  }) => React.ReactNode;
+};
+
+/**
+ * Loads in the UI State (current term,
+ * current schedule version for the current term)
+ * from local storage.
+ * Unlike the local storage version of the app data,
+ * this **does not** sync between tabs.
+ * This is deliberate, as it allows opening up multiple tabs
+ * with different schedules if desired,
+ * but still have the app resume to the last viewed schedule when opened again.
+ */
+export function StageLoadUIState({
+  children,
+}: StageLoadUIStateProps): React.ReactElement {
+  const uiState = useUIStateFromStorage();
+  return <>{children({ ...uiState })}</>;
+}
 
 export type StageEnsureValidTermProps = {
   skeletonProps?: StageSkeletonProps;
@@ -82,7 +108,7 @@ export function StageEnsureValidTerm({
   return <>{children({ ...loadingState.result })}</>;
 }
 
-export type StageLoadScheduleDataFromStorageProps = {
+export type StageLoadRawScheduleDataFromStorageProps = {
   skeletonProps?: StageSkeletonProps;
   children: (props: {
     rawScheduleData: Immutable<AnyScheduleData> | null;
@@ -90,47 +116,19 @@ export type StageLoadScheduleDataFromStorageProps = {
       next:
         | ((current: AnyScheduleData | null) => AnyScheduleData | null)
         | AnyScheduleData
-        | null
     ) => void;
-    setTerm: (next: string) => void;
   }) => React.ReactNode;
 };
 
 /**
- * Handles loading the raw schedule data from local storage,
- * handling migrating it to a newer version as needed.
+ * Handles loading the raw local schedule data from local storage.
  * Renders a disabled header & attribution footer even when loading.
  */
-export function StageLoadScheduleDataFromStorage({
+export function StageLoadRawScheduleDataFromStorage({
   skeletonProps,
   children,
-}: StageLoadScheduleDataFromStorageProps): React.ReactElement {
-  const loadingState = useScheduleDataFromStorage();
-
-  // We'll need `setTerm` in a few places, so we just construct here
-  // and send it to the children that we render.
-  const maybeSetRawScheduleData =
-    loadingState.type === 'loaded'
-      ? loadingState.result.setRawScheduleData
-      : null;
-  const setTerm = useCallback(
-    (nextTerm: string): void => {
-      if (maybeSetRawScheduleData === null) {
-        throw new ErrorWithFields({
-          message: 'setTerm called when schedule data was not loaded yet',
-          fields: {
-            nextTerm,
-          },
-        });
-      }
-
-      maybeSetRawScheduleData((current) => {
-        if (current === null) return null;
-        return { ...current, currentTerm: nextTerm };
-      });
-    },
-    [maybeSetRawScheduleData]
-  );
+}: StageLoadRawScheduleDataFromStorageProps): React.ReactElement {
+  const loadingState = useRawScheduleDataFromStorage();
 
   if (loadingState.type !== 'loaded') {
     return (
@@ -142,7 +140,7 @@ export function StageLoadScheduleDataFromStorage({
     );
   }
 
-  return <>{children({ ...loadingState.result, setTerm })}</>;
+  return <>{children({ ...loadingState.result })}</>;
 }
 
 export type StageMigrateScheduleDataProps = {
@@ -351,6 +349,8 @@ export function StageLoadOscarData({
 
 export type StageExtractScheduleVersionProps = {
   skeletonProps?: StageSkeletonProps;
+  currentVersionRaw: string;
+  setVersion: (next: string) => void;
   termScheduleData: Immutable<TermScheduleData>;
   updateTermScheduleData: (
     applyDraft: (
@@ -358,7 +358,7 @@ export type StageExtractScheduleVersionProps = {
     ) => void | Immutable<TermScheduleData>
   ) => void;
   children: (props: {
-    currentIndex: number;
+    currentVersion: string;
     scheduleVersion: Immutable<ScheduleVersion>;
     // This function allows the schedule version to be edited in 1 of 2 ways:
     // 1. the draft parameter is mutated, and the function returns nothing/void
@@ -380,14 +380,18 @@ export type StageExtractScheduleVersionProps = {
  */
 export function StageExtractScheduleVersion({
   skeletonProps,
+  currentVersionRaw,
+  setVersion,
   termScheduleData,
   updateTermScheduleData,
   children,
 }: StageExtractScheduleVersionProps): React.ReactElement {
-  const loadingState = useExtractSchedule(
+  const loadingState = useExtractSchedule({
     termScheduleData,
-    updateTermScheduleData
-  );
+    updateTermScheduleData,
+    currentVersionRaw,
+    setVersion,
+  });
 
   if (loadingState.type !== 'loaded') {
     return (

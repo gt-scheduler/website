@@ -60,6 +60,7 @@
         "ignoreRegExpLiterals": true
       }
     ],
+    "no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
     "prettier/prettier": "warn",
     "react/require-default-props": "off",
     "no-await-in-loop": "off",

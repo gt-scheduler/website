@@ -14,7 +14,6 @@ type HookResult = {
     next:
       | ((current: AnyScheduleData | null) => AnyScheduleData | null)
       | AnyScheduleData
-      | null
   ) => void;
 };
 
