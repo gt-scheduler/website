@@ -23,10 +23,14 @@ $opacity-divider: 0.4;
 
 $theme-switch-transition-duration: 0.2s;
 
+$modal-backdrop-color: #00000099;
+$modal-foreground-color-dark: #cccccc;
+$modal-foreground-color-light: #555555;
+$modal-strong-foreground-color-dark: #dddddd;
+$modal-strong-foreground-color-light: #444444;
+
 @mixin card {
-  box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.2),
-    0 1px 1px 0 rgba(0, 0, 0, 0.14),
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
     0 2px 1px -1px rgba(0, 0, 0, 0.12);
   margin: 4px;
   border-radius: 4px;
@@ -39,7 +43,8 @@ $theme-switch-transition-duration: 0.2s;
   box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2), 4px 4px 20px rgba(0, 0, 0, 0.15);
 
   @include dark {
-    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.25), 4px 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.25),
+      4px 4px 20px rgba(0, 0, 0, 0.2);
   }
 }
 

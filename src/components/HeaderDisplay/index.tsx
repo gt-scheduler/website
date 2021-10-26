@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
   faPencilAlt,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import swal from '@sweetalert/with-react';
 
 import { getSemesterName } from '../../utils/semesters';
 import { Button, Select, Tab } from '..';
@@ -15,8 +14,8 @@ import { getNextVersionName } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
-import { softError, ErrorWithFields } from '../../log';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
+import Modal from '../Modal';
 
 import './stylesheet.scss';
 
@@ -177,6 +176,10 @@ type VersionSelectorProps = {
 function VersionSelector({
   state,
 }: VersionSelectorProps): React.ReactElement | null {
+  // Manage the delete confirmation state,
+  // used to show a modal when it is non-null.
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+
   const isEnabled = useFeatureFlag('2021-09-14', 'schedule-versions');
   if (!isEnabled) return null;
 
@@ -185,75 +188,84 @@ function VersionSelector({
   }
 
   return (
-    <Select
-      className="version-switch"
-      desiredItemWidth={260}
-      newLabel="New Schedule"
-      onChange={state.setCurrentVersion}
-      current={state.currentVersionIndex}
-      options={state.allVersionNames.map((version, i) => {
-        const actions: SelectAction<number>[] = [];
+    <>
+      <Select
+        className="version-switch"
+        desiredItemWidth={260}
+        newLabel="New Schedule"
+        onChange={state.setCurrentVersion}
+        current={state.currentVersionIndex}
+        options={state.allVersionNames.map((version, i) => {
+          const actions: SelectAction<number>[] = [];
 
-        // Add the edit (rename) action
-        actions.push({
-          type: 'edit',
-          icon: faPencilAlt,
-          onCommit: (newName: string) => {
-            state.renameVersion(i, newName);
-            return true;
-          },
-        });
-
-        // Add the delete action
-        if (state.allVersionNames.length >= 2) {
+          // Add the edit (rename) action
           actions.push({
-            type: 'button',
-            icon: faTrashAlt,
-            onClick: () => {
-              // Display a confirmation dialog before deleting the version
-              swal({
-                buttons: ['Cancel', 'Delete'],
-                content: (
-                  <div style={{ textAlign: 'center' }}>
-                    <h2>Delete confirmation</h2>
-                    <p>
-                      Are you sure you want to delete schedule &ldquo;
-                      {version}&rdquo;?
-                    </p>
-                  </div>
-                ),
-              })
-                .then((val: unknown): void => {
-                  if (val) {
-                    state.deleteVersion(i);
-                  }
-                })
-                .catch((err) => {
-                  softError(
-                    new ErrorWithFields({
-                      message: 'error with swal call for delete confirmation',
-                      source: err,
-                      fields: {
-                        deletedVersionIndex: i,
-                      },
-                    })
-                  );
-                });
+            type: 'edit',
+            icon: faPencilAlt,
+            onCommit: (newName: string) => {
+              state.renameVersion(i, newName);
+              return true;
             },
           });
-        }
 
-        return {
-          id: i,
-          label: version,
-          actions,
-        };
-      })}
-      onClickNew={(): void => {
-        // Handle creating a new version with the auto-generated name
-        // (like 'Primary' or 'Secondary')
-        state.addNewVersion(getNextVersionName(state.allVersionNames), true);
-      }}
-    />
+          // Add the delete action
+          if (state.allVersionNames.length >= 2) {
+            actions.push({
+              type: 'button',
+              icon: faTrashAlt,
+              onClick: () => {
+                // Display a confirmation dialog before deleting the version
+                setDeleteConfirm(i);
+              },
+            });
+          }
+
+          return {
+            id: i,
+            label: version,
+            actions,
+          };
+        })}
+        onClickNew={(): void => {
+          // Handle creating a new version with the auto-generated name
+          // (like 'Primary' or 'Secondary')
+          state.addNewVersion(getNextVersionName(state.allVersionNames), true);
+        }}
+      />
+
+      <Modal
+        show={deleteConfirm != null}
+        onHide={(): void => setDeleteConfirm(null)}
+        buttons={[
+          {
+            label: 'Cancel',
+            cancel: true,
+            onClick: (): void => setDeleteConfirm(null),
+          },
+          {
+            label: 'Delete',
+            onClick: (): void => {
+              if (deleteConfirm != null) {
+                state.deleteVersion(deleteConfirm);
+              }
+              setDeleteConfirm(null);
+            },
+          },
+        ]}
+        // Use this because we use the same state as the show prop
+        // to determine the contents of the children.
+        // This prevents the children from flashing
+        // a different value when the modal is disappearing.
+        preserveChildrenWhileHiding
+      >
+        <div style={{ textAlign: 'center' }}>
+          <h2>Delete confirmation</h2>
+          <p>
+            Are you sure you want to delete schedule &ldquo;
+            {state.allVersionNames[deleteConfirm ?? 0] ?? '<unknown>'}&rdquo;?
+          </p>
+        </div>
+      </Modal>
+    </>
   );
 }
