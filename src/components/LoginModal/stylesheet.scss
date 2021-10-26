@@ -24,7 +24,8 @@
         color: white;
       }
 
-      .firebaseui-input, .mdl-textfield__label {
+      .firebaseui-input,
+      .mdl-textfield__label {
         color: white;
       }
 
@@ -32,6 +33,19 @@
         color: rgba(white, 0.7);
       }
     }
+  }
+
+  // Remove the bottom margin on both the last button
+  // and on the outer list element::after
+  .firebaseui-idp-list > .firebaseui-list-item,
+  .firebaseui-tenant-list > .firebaseui-list-item {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .firebaseui-idp-list {
+    margin-bottom: 0;
   }
 
   .mdl-card {

@@ -22,6 +22,16 @@ const uiConfig: firebaseui.auth.Config = {
  * This utilizes Firebase UI to handle the authentication UI components.
  */
 export function LoginModalContent(): React.ReactElement {
+  // Calculate the min height of the FirebaseUI element
+  // so that it does not cause a large layout shift when initially loading.
+  // The height is determined based on the number of auth providers,
+  // which directly determines the number of stacked vertical buttons.
+  // Each button is 40px wide with a 15px gap.
+  let minHeight = authProviders.length * 40;
+  if (authProviders.length >= 2) {
+    minHeight += (authProviders.length - 1) * 15;
+  }
+
   return (
     <div className="login-modal-content">
       <h1>Sign in</h1>
@@ -29,7 +39,9 @@ export function LoginModalContent(): React.ReactElement {
         Sign in using one of the below identity providers to start syncing your
         schedules across devices.
       </p>
-      <FirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+      <div style={{ minHeight }}>
+        <FirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+      </div>
     </div>
   );
 }
