@@ -16,6 +16,7 @@ import useScheduleDataFromStorage from '../../data/hooks/useScheduleDataFromStor
 import { ErrorWithFields } from '../../log';
 import useExtractSchedule from '../../data/hooks/useExtractScheduleVersion';
 import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleData';
+import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -42,6 +43,41 @@ import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleD
 // while the app is loading
 // (See `<AppSkeleton>` for more info on the possible states).
 export type StageSkeletonProps = Omit<AppSkeletonProps, 'children'>;
+
+export type StageEnsureValidTermProps = {
+  skeletonProps?: StageSkeletonProps;
+  terms: NonEmptyArray<string>;
+  currentTermRaw: string;
+  setTerm: (next: string) => void;
+  children: (props: { currentTerm: string }) => React.ReactNode;
+};
+
+/**
+ * Ensures that there is a valid current term selected.
+ * If the current term isn't valid (i.e. empty or not in the `terms` array),
+ * then it is set to the most recent term (which is the first item in `terms`).
+ */
+export function StageEnsureValidTerm({
+  skeletonProps,
+  terms,
+  currentTermRaw,
+  setTerm,
+  children,
+}: StageEnsureValidTermProps): React.ReactElement {
+  const loadingState = useEnsureValidTerm({ terms, currentTermRaw, setTerm });
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps}>
+        <SkeletonContent>
+          <LoadingDisplay state={loadingState} name="current term" />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ ...loadingState.result })}</>;
+}
 
 export type StageLoadScheduleDataProps = {
   skeletonProps?: StageSkeletonProps;
@@ -148,13 +184,12 @@ export function StageLoadTerms({
 
 export type StageExtractTermScheduleDataProps = {
   skeletonProps?: StageSkeletonProps;
-  terms: NonEmptyArray<string>;
+  currentTerm: string;
   scheduleData: Immutable<ScheduleData>;
   updateScheduleData: (
     applyDraft: (draft: Draft<ScheduleData>) => void | Immutable<ScheduleData>
   ) => void;
   children: (props: {
-    currentTerm: string;
     termScheduleData: Immutable<TermScheduleData>;
     // This function allows the term schedule data to be edited in 1 of 2 ways:
     // 1. the draft parameter is mutated, and the function returns nothing/void
@@ -176,16 +211,16 @@ export type StageExtractTermScheduleDataProps = {
  */
 export function StageExtractTermScheduleData({
   skeletonProps,
-  terms,
+  currentTerm,
   scheduleData,
   updateScheduleData,
   children,
 }: StageExtractTermScheduleDataProps): React.ReactElement {
-  const loadingState = useExtractTermScheduleData(
-    terms,
+  const loadingState = useExtractTermScheduleData({
+    currentTerm,
     scheduleData,
-    updateScheduleData
-  );
+    updateScheduleData,
+  });
 
   if (loadingState.type !== 'loaded') {
     return (
