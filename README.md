@@ -25,7 +25,7 @@ To implement its goal of facilitating schedule creation and class exploration, G
 - Seating information for a single section, which is requested on demand and sent through our CORS proxy in the [Backend application](https://api.github.com/repos/gt-scheduler/crawler/) to [Oscar](https://oscar.gatech.edu/) (Georgia Tech's registration management system): https://gt-scheduler.azurewebsites.net/proxy/class_section?term=202008&crn=87086
 - Course/instructor GPA information, which is fetched from [Course Critique](https://critique.gatech.edu/)'s API: https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data/course?courseID=CS%201331
 
-Once features are merged into the `development` branch, they are automatically deployed to the `gh-pages` branch using a [GitHub Action workflow](https://github.com/gt-scheduler/website/blob/development/.github/workflows/deploy.yml). This branch is set up to serve traffic to the public site, https://gt-scheduler.org/, using the [GitHub Pages](https://pages.github.com/) service.
+Once features are merged into the `main` branch, they are automatically deployed to the `gh-pages` branch using a [GitHub Action workflow](https://github.com/gt-scheduler/website/blob/main/.github/workflows/deploy.yml). This branch is set up to serve traffic to the public site, https://gt-scheduler.org/, using the [GitHub Pages](https://pages.github.com/) service.
 
 The website uses [Google Analytics](https://marketingplatform.google.com/about/analytics/) for aggregate analytics and information about how many people are using the app. It also utilizes [Sentry](https://sentry.io/welcome/) for automatic error reporting.
 
