@@ -1,6 +1,12 @@
+@import '../../variables';
+
 .expandable-card {
   background-color: var(--theme-card-bg);
   border-radius: 8px;
   padding: 1rem;
   margin-top: 16px;
+
+  // Include theme switch transition
+  transition-duration: $theme-switch-transition-duration;
+  transition-property: background-color;
 }

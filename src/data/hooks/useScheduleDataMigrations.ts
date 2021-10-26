@@ -34,8 +34,30 @@ export default function useScheduleDataMigrations({
     if (
       rawScheduleData !== null &&
       rawScheduleData.version === LATEST_SCHEDULE_DATA_VERSION
-    )
+    ) {
       return;
+    }
+
+    // Check to see if the version is newer than we can handle
+    if (
+      rawScheduleData !== null &&
+      rawScheduleData.version > LATEST_SCHEDULE_DATA_VERSION
+    ) {
+      const err = new ErrorWithFields({
+        message: 'schedule data version is greater than max supported version',
+        fields: {
+          version: rawScheduleData.version,
+          maxSupportedVersion: LATEST_SCHEDULE_DATA_VERSION,
+        },
+      });
+      softError(err);
+      setError({
+        type: 'error',
+        error: err,
+        stillLoading: false,
+        overview: 'could not load stored schedule data: unknown format',
+      });
+    }
 
     try {
       const updatedScheduleData = migrateScheduleData(rawScheduleData);

@@ -11,11 +11,7 @@ import ErrorDisplay from '../ErrorDisplay';
 import ErrorHeader from '../ErrorHeader';
 import { AppNavigation } from './navigation';
 import AppDataLoader from '../AppDataLoader';
-import {
-  AppSkeletonWithLoadingTerms,
-  SkeletonContent,
-  AppContent,
-} from './content';
+import { AppSkeleton, SkeletonContent, AppContent } from './content';
 import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
@@ -36,7 +32,7 @@ export default function App(): React.ReactElement {
       <AppCSSRoot>
         <ErrorBoundary
           fallback={(error, errorInfo): React.ReactElement => (
-            <AppSkeletonWithLoadingTerms>
+            <AppSkeleton>
               <SkeletonContent>
                 <ErrorHeader />
                 <ErrorDisplay
@@ -53,7 +49,7 @@ export default function App(): React.ReactElement {
                   </div>
                 </ErrorDisplay>
               </SkeletonContent>
-            </AppSkeletonWithLoadingTerms>
+            </AppSkeleton>
           )}
         >
           <AppNavigation>

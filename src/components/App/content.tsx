@@ -67,18 +67,25 @@ function AppContentBase(): React.ReactElement {
  */
 export const AppContent = React.memo(AppContentBase);
 
-export type AppSkeletonWithLoadingTermsProps = {
+type AppSkeletonProps = {
   children: React.ReactNode;
+  termsState?: {
+    terms: string[];
+    currentTerm: string;
+    onChangeTerm: (next: string) => void;
+  };
 };
 
 /**
  * Renders a non-functional "skeleton" of the app
  * that shows as much content as possible without needing valid context values.
- * The term select box is marked as loading and cannot be interacted with.
+ * The optional props can be used
+ * to selectively "enable" various parts of the app while it loads.
  */
-export function AppSkeletonWithLoadingTerms({
+export function AppSkeleton({
   children,
-}: AppSkeletonWithLoadingTermsProps): React.ReactElement {
+  termsState,
+}: AppSkeletonProps): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
 
@@ -90,45 +97,11 @@ export function AppSkeletonWithLoadingTerms({
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
-        termsState={{ type: 'loading' }}
-        versionsState={{ type: 'loading' }}
-      />
-      {children}
-      <Attribution />
-    </>
-  );
-}
-
-export type AppSkeletonWithSwitchableTermsProps = {
-  children: React.ReactNode;
-  terms: string[];
-  currentTerm: string;
-  onChangeTerm: (next: string) => void;
-};
-
-/**
- * Renders a non-functional "skeleton" of the app
- * that shows as much content as possible without needing valid context values.
- * The term select box can be interacted with.
- */
-export function AppSkeletonWithSwitchableTerms({
-  children,
-  terms,
-  currentTerm,
-  onChangeTerm,
-}: AppSkeletonWithSwitchableTermsProps): React.ReactElement {
-  const { currentTabIndex, setTabIndex, openDrawer } =
-    useContext(AppNavigationContext);
-
-  return (
-    <>
-      <AppMobileNav />
-      <HeaderDisplay
-        currentTab={currentTabIndex}
-        onChangeTab={setTabIndex}
-        onToggleMenu={openDrawer}
-        tabs={NAV_TABS}
-        termsState={{ type: 'loaded', terms, currentTerm, onChangeTerm }}
+        termsState={
+          termsState == null
+            ? { type: 'loading' }
+            : { type: 'loaded', ...termsState }
+        }
         versionsState={{ type: 'loading' }}
       />
       {children}

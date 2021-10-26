@@ -6,11 +6,7 @@ import useDownloadOscarData from '../../data/hooks/useDownloadOscarData';
 import useDownloadTerms from '../../data/hooks/useDownloadTerms';
 import { NonEmptyArray } from '../../types';
 import LoadingDisplay from '../LoadingDisplay';
-import {
-  AppSkeletonWithLoadingTerms,
-  SkeletonContent,
-  AppSkeletonWithSwitchableTerms,
-} from '../App/content';
+import { SkeletonContent, AppSkeleton } from '../App/content';
 import {
   ScheduleData,
   ScheduleVersion,
@@ -98,11 +94,11 @@ export function StageLoadScheduleData({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeletonWithLoadingTerms>
+      <AppSkeleton>
         <SkeletonContent>
           <LoadingDisplay state={loadingState} name="local schedule data" />
         </SkeletonContent>
-      </AppSkeletonWithLoadingTerms>
+      </AppSkeleton>
     );
   }
 
@@ -125,11 +121,11 @@ export function StageLoadTerms({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeletonWithLoadingTerms>
+      <AppSkeleton>
         <SkeletonContent>
           <LoadingDisplay state={loadingState} name="list of current terms" />
         </SkeletonContent>
-      </AppSkeletonWithLoadingTerms>
+      </AppSkeleton>
     );
   }
 
@@ -177,14 +173,14 @@ export function StageExtractTermScheduleData({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeletonWithLoadingTerms>
+      <AppSkeleton>
         <SkeletonContent>
           <LoadingDisplay
             state={loadingState}
             name="schedule data for the current term"
           />
         </SkeletonContent>
-      </AppSkeletonWithLoadingTerms>
+      </AppSkeleton>
     );
   }
 
@@ -213,10 +209,8 @@ export function StageLoadOscarData({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeletonWithSwitchableTerms
-        terms={terms}
-        currentTerm={term}
-        onChangeTerm={setTerm}
+      <AppSkeleton
+        termsState={{ terms, currentTerm: term, onChangeTerm: setTerm }}
       >
         <SkeletonContent>
           <LoadingDisplay
@@ -224,7 +218,7 @@ export function StageLoadOscarData({
             name="Oscar course data for the current term"
           />
         </SkeletonContent>
-      </AppSkeletonWithSwitchableTerms>
+      </AppSkeleton>
     );
   }
 
@@ -277,18 +271,14 @@ export function StageExtractScheduleVersion({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeletonWithSwitchableTerms
-        terms={terms}
-        currentTerm={currentTerm}
-        onChangeTerm={setTerm}
-      >
+      <AppSkeleton termsState={{ terms, currentTerm, onChangeTerm: setTerm }}>
         <SkeletonContent>
           <LoadingDisplay
             state={loadingState}
             name="current schedule version"
           />
         </SkeletonContent>
-      </AppSkeletonWithSwitchableTerms>
+      </AppSkeleton>
     );
   }
 
