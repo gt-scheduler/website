@@ -67,7 +67,7 @@ function AppContentBase(): React.ReactElement {
  */
 export const AppContent = React.memo(AppContentBase);
 
-type AppSkeletonProps = {
+export type AppSkeletonProps = {
   children: React.ReactNode;
   termsState?: {
     terms: string[];

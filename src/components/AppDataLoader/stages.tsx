@@ -6,7 +6,7 @@ import useDownloadOscarData from '../../data/hooks/useDownloadOscarData';
 import useDownloadTerms from '../../data/hooks/useDownloadTerms';
 import { NonEmptyArray } from '../../types';
 import LoadingDisplay from '../LoadingDisplay';
-import { SkeletonContent, AppSkeleton } from '../App/content';
+import { SkeletonContent, AppSkeleton, AppSkeletonProps } from '../App/content';
 import {
   ScheduleData,
   ScheduleVersion,
@@ -32,8 +32,19 @@ import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleD
 // For example, ensuring that the current term is valid
 // depends on fetching the list of terms from the GitHub API,
 // so having them be two separate stages naturally encodes this dependency.
+// It also lets us stop rendering the app when data is still loading,
+// and instead show a partially interactive "skeleton".
+
+// Each Stage includes this prop,
+// which passes through props
+// to the underlying `<AppSkeleton>` component.
+// It can be used to show partial interactivity
+// while the app is loading
+// (See `<AppSkeleton>` for more info on the possible states).
+export type StageSkeletonProps = Omit<AppSkeletonProps, 'children'>;
 
 export type StageLoadScheduleDataProps = {
+  skeletonProps?: StageSkeletonProps;
   children: (props: {
     scheduleData: Immutable<ScheduleData>;
     // This is similar to a function like `(next: ScheduleData) => void`
@@ -64,6 +75,7 @@ export type StageLoadScheduleDataProps = {
  * Renders a disabled header & attribution footer even when loading.
  */
 export function StageLoadScheduleData({
+  skeletonProps,
   children,
 }: StageLoadScheduleDataProps): React.ReactElement {
   const loadingState = useScheduleDataFromStorage();
@@ -94,7 +106,7 @@ export function StageLoadScheduleData({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeleton>
+      <AppSkeleton {...skeletonProps}>
         <SkeletonContent>
           <LoadingDisplay state={loadingState} name="local schedule data" />
         </SkeletonContent>
@@ -106,6 +118,7 @@ export function StageLoadScheduleData({
 }
 
 export type StageLoadTermsProps = {
+  skeletonProps?: StageSkeletonProps;
   children: (props: { terms: NonEmptyArray<string> }) => React.ReactNode;
 };
 
@@ -115,13 +128,14 @@ export type StageLoadTermsProps = {
  * Renders a disabled header & attribution footer even when loading.
  */
 export function StageLoadTerms({
+  skeletonProps,
   children,
 }: StageLoadTermsProps): React.ReactElement {
   const loadingState = useDownloadTerms();
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeleton>
+      <AppSkeleton {...skeletonProps}>
         <SkeletonContent>
           <LoadingDisplay state={loadingState} name="list of current terms" />
         </SkeletonContent>
@@ -133,6 +147,7 @@ export function StageLoadTerms({
 }
 
 export type StageExtractTermScheduleDataProps = {
+  skeletonProps?: StageSkeletonProps;
   terms: NonEmptyArray<string>;
   scheduleData: Immutable<ScheduleData>;
   updateScheduleData: (
@@ -160,6 +175,7 @@ export type StageExtractTermScheduleDataProps = {
  * ensuring that the term is valid before rendering its children.
  */
 export function StageExtractTermScheduleData({
+  skeletonProps,
   terms,
   scheduleData,
   updateScheduleData,
@@ -173,7 +189,7 @@ export function StageExtractTermScheduleData({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeleton>
+      <AppSkeleton {...skeletonProps}>
         <SkeletonContent>
           <LoadingDisplay
             state={loadingState}
@@ -193,25 +209,21 @@ export function StageExtractTermScheduleData({
  * Renders a disabled header & attribution footer even when loading.
  */
 export type StageLoadOscarDataProps = {
-  terms: string[];
+  skeletonProps?: StageSkeletonProps;
   term: string;
-  setTerm: (next: string) => void;
   children: (props: { oscar: Oscar }) => React.ReactNode;
 };
 
 export function StageLoadOscarData({
-  terms,
+  skeletonProps,
   term,
-  setTerm,
   children,
 }: StageLoadOscarDataProps): React.ReactElement {
   const loadingState = useDownloadOscarData(term);
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeleton
-        termsState={{ terms, currentTerm: term, onChangeTerm: setTerm }}
-      >
+      <AppSkeleton {...skeletonProps}>
         <SkeletonContent>
           <LoadingDisplay
             state={loadingState}
@@ -226,9 +238,7 @@ export function StageLoadOscarData({
 }
 
 export type StageExtractScheduleVersionProps = {
-  terms: NonEmptyArray<string>;
-  currentTerm: string;
-  setTerm: (next: string) => void;
+  skeletonProps?: StageSkeletonProps;
   termScheduleData: Immutable<TermScheduleData>;
   updateTermScheduleData: (
     applyDraft: (
@@ -257,9 +267,7 @@ export type StageExtractScheduleVersionProps = {
  * ensuring that it is valid before rendering its children.
  */
 export function StageExtractScheduleVersion({
-  terms,
-  currentTerm,
-  setTerm,
+  skeletonProps,
   termScheduleData,
   updateTermScheduleData,
   children,
@@ -271,7 +279,7 @@ export function StageExtractScheduleVersion({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeleton termsState={{ terms, currentTerm, onChangeTerm: setTerm }}>
+      <AppSkeleton {...skeletonProps}>
         <SkeletonContent>
           <LoadingDisplay
             state={loadingState}
