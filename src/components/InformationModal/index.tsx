@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import swal from '@sweetalert/with-react';
 import useLocalStorageState from 'use-local-storage-state';
 
-import { softError, ErrorWithFields } from '../../log';
+import Modal from '../Modal';
 
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
@@ -19,7 +18,7 @@ const MODAL_LOCAL_STORAGE_KEY = 'visited-merge-notice';
  */
 export function InformationModalContent(): React.ReactElement {
   return (
-    <div>
+    <>
       <img
         style={{ width: '175px', margin: '0 auto', display: 'block' }}
         alt="GT Scheduler Logo"
@@ -42,15 +41,17 @@ export function InformationModalContent(): React.ReactElement {
         </a>{' '}
         with your improvements. Thank you and enjoy!
       </p>
-    </div>
+    </>
   );
 }
 
 /**
- * Hook to show the information modal upon the user's first visit to the site
+ * Component that shows the information modal
+ * upon the user's first visit to the site
  * when they haven't seen this version of the information modal before.
  */
-export function useInformationModal(): void {
+export default function InformationModal(): React.ReactElement {
+  const [show, setShow] = useState(false);
   const [hasSeen, setHasSeen] = useLocalStorageState(
     MODAL_LOCAL_STORAGE_KEY,
     () => {
@@ -62,21 +63,18 @@ export function useInformationModal(): void {
 
   useEffect(() => {
     if (!hasSeen) {
+      setShow(true);
       setHasSeen(true);
-      swal({
-        button: 'Got It!',
-        content: <InformationModalContent />,
-      }).catch((err) => {
-        softError(
-          new ErrorWithFields({
-            message: 'error with swal call',
-            source: err,
-            fields: {
-              localStorageKey: MODAL_LOCAL_STORAGE_KEY,
-            },
-          })
-        );
-      });
     }
   }, [hasSeen, setHasSeen]);
+
+  return (
+    <Modal
+      show={show}
+      onHide={(): void => setShow(false)}
+      buttons={[{ label: 'Got it!', onClick: (): void => setShow(false) }]}
+    >
+      <InformationModalContent />
+    </Modal>
+  );
 }

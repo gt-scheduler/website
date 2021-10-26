@@ -4,7 +4,7 @@ import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
 import useBodyClass from '../../hooks/useBodyClass';
 import { ThemeContext } from '../../contexts';
-import { useInformationModal } from '../InformationModal';
+import InformationModal from '../InformationModal';
 import ErrorBoundary from '../ErrorBoundary';
 import { ReactErrorDetails } from '../ErrorDetails';
 import ErrorDisplay from '../ErrorDisplay';
@@ -24,9 +24,6 @@ import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 export default function App(): React.ReactElement {
-  // Display a popup when first visiting the site
-  useInformationModal();
-
   // Grab the current theme (light/dark) from local storage.
   // This hook returns the memoized context value.
   const themeContextValue = useThemeFromStorage();
@@ -71,6 +68,9 @@ export default function App(): React.ReactElement {
             </AppDataLoader>
           </AppNavigation>
           <Feedback />
+
+          {/* Display a popup when first visiting the site */}
+          <InformationModal />
         </ErrorBoundary>
       </AppCSSRoot>
     </ThemeContext.Provider>
