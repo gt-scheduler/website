@@ -2,7 +2,7 @@ name: Deploy
 on:
   push:
     branches:
-      - development
+      - main
 
 jobs:
   build-and-deploy:
@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: yarn build
         env:
-          CI: "true"
+          CI: 'true'
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
           REACT_APP_SENTRY_VERSION: ${{ github.sha }}
 

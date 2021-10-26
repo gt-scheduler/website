@@ -33,10 +33,7 @@ We welcome community contributions to the GT Scheduler project! Please read each
    ```
 
 1. Do whatever the Issue asks in your branch (whether that be implementing a new feature or fixing an existing bug)
-1. Make a PR between your branch and the appropriate primary branch that links to the Issue you want to resolve. The exact branch depends on the repository you are making a PR to:
-   - For the [website repo](https://github.com/gt-scheduler/website), the appropriate branch is `development`
-   - For the [crawler repo](https://github.com/gt-scheduler/crawler), the appropriate branch is `main`
-   - For the [backend repo](https://github.com/gt-scheduler/backend), the appropriate branch is `main`
+1. Make a PR between your branch and the primary branch (`main`) that links to the Issue you want to resolve.
 1. Get at least one other contributor to review your PR and make comments when necessary.
 1. Merge your PR once it has been approved!
 
