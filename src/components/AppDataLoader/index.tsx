@@ -21,6 +21,7 @@ import {
   StageExtractTermScheduleData,
   StageLoadOscarData,
   StageExtractScheduleVersion,
+  StageCreateScheduleDataProducer,
 } from './stages';
 
 export type DataLoaderProps = {
@@ -41,73 +42,81 @@ export default function DataLoader({
 }: DataLoaderProps): React.ReactElement {
   return (
     <StageLoadScheduleData>
-      {({ scheduleData, updateScheduleData, setTerm }): React.ReactElement => (
-        <StageLoadTerms>
-          {({ terms }): React.ReactElement => (
-            <StageEnsureValidTerm
-              terms={terms}
-              setTerm={setTerm}
-              currentTermRaw={scheduleData.currentTerm}
-            >
-              {({ currentTerm }): React.ReactElement => {
-                // From here down, we can pass
-                // the `termsState` value to the `skeletonProps`
-                // prop on each stage to allow the user to switch terms
-                // even as the rest of the app is loading.
-                const termsState = {
-                  terms,
-                  onChangeTerm: setTerm,
-                  currentTerm,
-                };
-                return (
-                  <StageExtractTermScheduleData
-                    skeletonProps={{ termsState }}
-                    currentTerm={currentTerm}
-                    scheduleData={scheduleData}
-                    updateScheduleData={updateScheduleData}
-                  >
-                    {({
-                      termScheduleData,
-                      updateTermScheduleData,
-                    }): React.ReactElement => (
-                      <StageLoadOscarData
+      {({ scheduleData, setScheduleData, setTerm }): React.ReactElement => (
+        <StageCreateScheduleDataProducer setScheduleData={setScheduleData}>
+          {({ updateScheduleData }): React.ReactElement => (
+            <StageLoadTerms>
+              {({ terms }): React.ReactElement => (
+                <StageEnsureValidTerm
+                  terms={terms}
+                  setTerm={setTerm}
+                  currentTermRaw={scheduleData.currentTerm}
+                >
+                  {({ currentTerm }): React.ReactElement => {
+                    // From here down, we can pass
+                    // the `termsState` value to the `skeletonProps`
+                    // prop on each stage to allow the user to switch terms
+                    // even as the rest of the app is loading.
+                    const termsState = {
+                      terms,
+                      onChangeTerm: setTerm,
+                      currentTerm,
+                    };
+                    return (
+                      <StageExtractTermScheduleData
                         skeletonProps={{ termsState }}
-                        term={currentTerm}
+                        currentTerm={currentTerm}
+                        scheduleData={scheduleData}
+                        updateScheduleData={updateScheduleData}
                       >
-                        {({ oscar }): React.ReactElement => (
-                          <StageExtractScheduleVersion
+                        {({
+                          termScheduleData,
+                          updateTermScheduleData,
+                        }): React.ReactElement => (
+                          <StageLoadOscarData
                             skeletonProps={{ termsState }}
-                            termScheduleData={termScheduleData}
-                            updateTermScheduleData={updateTermScheduleData}
+                            term={currentTerm}
                           >
-                            {({
-                              // currentIndex,
-                              scheduleVersion,
-                              updateScheduleVersion,
-                            }): React.ReactElement => (
-                              <ContextProvider
-                                terms={terms}
-                                term={currentTerm}
-                                setTerm={setTerm}
-                                oscar={oscar}
-                                scheduleVersion={scheduleVersion}
-                                updateScheduleVersion={updateScheduleVersion}
+                            {({ oscar }): React.ReactElement => (
+                              <StageExtractScheduleVersion
+                                skeletonProps={{ termsState }}
                                 termScheduleData={termScheduleData}
                                 updateTermScheduleData={updateTermScheduleData}
                               >
-                                {children}
-                              </ContextProvider>
+                                {({
+                                  // currentIndex,
+                                  scheduleVersion,
+                                  updateScheduleVersion,
+                                }): React.ReactElement => (
+                                  <ContextProvider
+                                    terms={terms}
+                                    term={currentTerm}
+                                    setTerm={setTerm}
+                                    oscar={oscar}
+                                    scheduleVersion={scheduleVersion}
+                                    updateScheduleVersion={
+                                      updateScheduleVersion
+                                    }
+                                    termScheduleData={termScheduleData}
+                                    updateTermScheduleData={
+                                      updateTermScheduleData
+                                    }
+                                  >
+                                    {children}
+                                  </ContextProvider>
+                                )}
+                              </StageExtractScheduleVersion>
                             )}
-                          </StageExtractScheduleVersion>
+                          </StageLoadOscarData>
                         )}
-                      </StageLoadOscarData>
-                    )}
-                  </StageExtractTermScheduleData>
-                );
-              }}
-            </StageEnsureValidTerm>
+                      </StageExtractTermScheduleData>
+                    );
+                  }}
+                </StageEnsureValidTerm>
+              )}
+            </StageLoadTerms>
           )}
-        </StageLoadTerms>
+        </StageCreateScheduleDataProducer>
       )}
     </StageLoadScheduleData>
   );
