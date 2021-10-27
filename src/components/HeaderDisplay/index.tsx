@@ -14,7 +14,6 @@ import { getNextVersionName } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
-import useFeatureFlag from '../../hooks/useFeatureFlag';
 import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 
@@ -169,26 +168,14 @@ type VersionSelectorProps = {
  * - switch between existing schedule versions
  * - add new blank versions with default (Primary, Secondary, etc.) names
  * - delete and rename existing versions.
- * Note that this functionality is currently hidden behind a feature flag
- * (pending a future feature release closer to schedules releasing):
- * Run the following command in the browser console and then refresh:
- *
- * ```
- * window.localStorage.setItem('ff-2021-09-14-schedule-versions', 'true')
- * ```
  */
-function VersionSelector({
-  state,
-}: VersionSelectorProps): React.ReactElement | null {
+function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
   // Manage the delete confirmation state,
   // used to show a modal when it is non-null.
   const [deleteConfirm, setDeleteConfirm] = useState<{
     id: string;
     name: string;
   } | null>(null);
-
-  const isEnabled = useFeatureFlag('2021-09-14', 'schedule-versions');
-  if (!isEnabled) return null;
 
   if (state.type === 'loading') {
     return <LoadingSelect />;

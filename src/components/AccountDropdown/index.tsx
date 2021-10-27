@@ -12,7 +12,6 @@ import LoginModal from '../LoginModal';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import Spinner from '../Spinner';
 import { classes } from '../../utils/misc';
-import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { isAuthEnabled } from '../../data/firebase';
 
 import './stylesheet.scss';
@@ -32,14 +31,6 @@ export type AccountDropdownProps = {
  * Additionally, it shows the initials of the user
  * in a circle when they are logged in
  * (similar to Google account "icons").
- *
- * Note that this functionality is currently hidden behind a feature flag
- * (pending a future feature release closer to schedules releasing):
- * Run the following command in the browser console and then refresh:
- *
- * ```
- * window.localStorage.setItem('ff-2021-10-26-account-sync', 'true')
- * ```
  */
 export default function AccountDropdown({
   state,
@@ -49,8 +40,6 @@ export default function AccountDropdown({
   const [loginOpen, setLoginOpen] = useState(false);
   const hideLogin = useCallback(() => setLoginOpen(false), []);
 
-  const isEnabled = useFeatureFlag('2021-10-26', 'account-sync');
-  if (!isEnabled) return null;
   if (!isAuthEnabled) return null;
 
   let items: DropdownMenuAction[];
