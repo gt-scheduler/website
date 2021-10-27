@@ -22,8 +22,13 @@ describe('useMigrateScheduleData', () => {
   it('migrates data from cookies', () => {
     // The data in this case from cookies, so use the mocked cookiesGet
     asMockFunction(cookiesGet).mockReturnValue({
-      '202108':
-        '{"desiredCourses":["CS 1100","CS 1331"],"pinnedCrns":["87695","82294","88999","90769","89255","94424"],"excludedCrns":["95199"],"colorMap":{"CS 1100":"#0062B1","CS 1331":"#194D33"},"sortingOptionIndex":0}',
+      '202108': JSON.stringify({
+        desiredCourses: ['CS 1100', 'CS 1331'],
+        pinnedCrns: ['87695', '82294', '88999', '90769', '89255', '94424'],
+        excludedCrns: ['95199'],
+        colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+        sortingOptionIndex: 0,
+      }),
       term: '202108',
     });
 
