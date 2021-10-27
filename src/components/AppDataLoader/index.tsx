@@ -19,12 +19,12 @@ import {
 import { lexicographicCompare } from '../../utils/misc';
 import {
   StageLoadUIState,
+  StageLoadTerms,
+  StageEnsureValidTerm,
+  StageLoadAccount,
   StageLoadRawScheduleDataHybrid,
   StageMigrateScheduleData,
   StageCreateScheduleDataProducer,
-  StageLoadTerms,
-  StageLoadAccount,
-  StageEnsureValidTerm,
   StageExtractTermScheduleData,
   StageLoadOscarData,
   StageExtractScheduleVersion,

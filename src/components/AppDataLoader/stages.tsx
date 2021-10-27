@@ -192,32 +192,6 @@ export function StageMigrateScheduleData({
   return <>{children({ ...loadingState.result })}</>;
 }
 
-export type StageCreateScheduleDataProducerProps = {
-  setScheduleData: (
-    next: ((current: ScheduleData) => ScheduleData) | ScheduleData
-  ) => void;
-  children: (props: {
-    // This is similar to a function like `(next: ScheduleData) => void`
-    // in that it lets callers update the schedule data, but it uses Immer.js
-    // to provide a mutable "draft" that allows callers to treat
-    // the parameter given in the callback as if it can be directly mutated.
-    // This saves verbose code that is normally used to deeply clone objects
-    // before changing them whenever immutable state updates are needed
-    // (which is common in React apps).
-    // Read more about it here: https://immerjs.github.io/immer/
-    //
-    // This function allows the schedule data to be edited in 1 of 2 ways:
-    // 1. the draft parameter is mutated, and the function returns nothing/void
-    // 2. the draft parameter is not mutated
-    //    (it can still be used, just not mutated)
-    //    and the function returns the new state to use.
-    //    This is similar to a traditional setState callback
-    updateScheduleData: (
-      applyDraft: (draft: Draft<ScheduleData>) => void | Immutable<ScheduleData>
-    ) => void;
-  }) => React.ReactNode;
-};
-
 export type StageLoadRawScheduleDataHybridProps = {
   skeletonProps?: StageSkeletonProps;
   accountState: AccountContextValue;
@@ -327,6 +301,32 @@ export function StageLoadAccount({
 
   return <>{children({ accountState: accountState.result })}</>;
 }
+
+export type StageCreateScheduleDataProducerProps = {
+  setScheduleData: (
+    next: ((current: ScheduleData) => ScheduleData) | ScheduleData
+  ) => void;
+  children: (props: {
+    // This is similar to a function like `(next: ScheduleData) => void`
+    // in that it lets callers update the schedule data, but it uses Immer.js
+    // to provide a mutable "draft" that allows callers to treat
+    // the parameter given in the callback as if it can be directly mutated.
+    // This saves verbose code that is normally used to deeply clone objects
+    // before changing them whenever immutable state updates are needed
+    // (which is common in React apps).
+    // Read more about it here: https://immerjs.github.io/immer/
+    //
+    // This function allows the schedule data to be edited in 1 of 2 ways:
+    // 1. the draft parameter is mutated, and the function returns nothing/void
+    // 2. the draft parameter is not mutated
+    //    (it can still be used, just not mutated)
+    //    and the function returns the new state to use.
+    //    This is similar to a traditional setState callback
+    updateScheduleData: (
+      applyDraft: (draft: Draft<ScheduleData>) => void | Immutable<ScheduleData>
+    ) => void;
+  }) => React.ReactNode;
+};
 
 /**
  * Creates the `updateScheduleData` Immer producer
