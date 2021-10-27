@@ -61,7 +61,7 @@ describe('useScheduleDataFromStorage', () => {
       {
         type: 'loaded',
         result: {
-          updateScheduleData: expect.any(Function) as unknown,
+          setScheduleData: expect.any(Function) as unknown,
           scheduleData: {
             currentTerm: '',
             terms: {},
@@ -130,7 +130,7 @@ describe('useScheduleDataFromStorage', () => {
       {
         type: 'loaded',
         result: {
-          updateScheduleData: expect.any(Function) as unknown,
+          setScheduleData: expect.any(Function) as unknown,
           scheduleData: expectedScheduleData,
         },
       },
@@ -157,7 +157,7 @@ describe('useScheduleDataFromStorage', () => {
       {
         type: 'loaded',
         result: {
-          updateScheduleData: expect.any(Function) as unknown,
+          setScheduleData: expect.any(Function) as unknown,
           scheduleData: {
             currentTerm: '202108',
             terms: {
@@ -212,7 +212,7 @@ describe('useScheduleDataFromStorage', () => {
       {
         type: 'loaded',
         result: {
-          updateScheduleData: expect.any(Function) as unknown,
+          setScheduleData: expect.any(Function) as unknown,
           scheduleData: {
             currentTerm: '202108',
             terms: {
@@ -313,7 +313,7 @@ describe('useScheduleDataFromStorage', () => {
       {
         type: 'loaded',
         result: {
-          updateScheduleData: expect.any(Function) as unknown,
+          setScheduleData: expect.any(Function) as unknown,
           scheduleData: {
             currentTerm: '',
             terms: {},
@@ -351,8 +351,8 @@ describe('useScheduleDataFromStorage', () => {
     ]);
   });
 
-  describe('updateScheduleData', () => {
-    // Tests that calling `updateScheduleData` causes a re-render
+  describe('setScheduleData', () => {
+    // Tests that calling `setScheduleData` causes a re-render
     // with the new state as expected.
     it('allows for modifying the schedule data', () => {
       const { result } = renderHook(() => useScheduleDataFromStorage());
@@ -363,7 +363,7 @@ describe('useScheduleDataFromStorage', () => {
         {
           type: 'loaded',
           result: {
-            updateScheduleData: expect.any(Function) as unknown,
+            setScheduleData: expect.any(Function) as unknown,
             scheduleData: {
               currentTerm: '',
               terms: {},
@@ -377,12 +377,15 @@ describe('useScheduleDataFromStorage', () => {
       const { current } = result;
       if (current.type !== 'loaded') fail("result hasn't yet loaded");
       act(() => {
-        current.result.updateScheduleData((draft): void => {
-          draft.currentTerm = '201808';
-          draft.terms['201808'] = {
-            versions: [],
-            currentIndex: 0,
-          };
+        current.result.setScheduleData({
+          currentTerm: '201808',
+          terms: {
+            '201808': {
+              versions: [],
+              currentIndex: 0,
+            },
+          },
+          version: 1,
         });
       });
 
@@ -393,7 +396,7 @@ describe('useScheduleDataFromStorage', () => {
         {
           type: 'loaded',
           result: {
-            updateScheduleData: expect.any(Function) as unknown,
+            setScheduleData: expect.any(Function) as unknown,
             scheduleData: {
               currentTerm: '',
               terms: {},
@@ -404,7 +407,7 @@ describe('useScheduleDataFromStorage', () => {
         {
           type: 'loaded',
           result: {
-            updateScheduleData: expect.any(Function) as unknown,
+            setScheduleData: expect.any(Function) as unknown,
             scheduleData: {
               currentTerm: '201808',
               terms: {
@@ -429,12 +432,15 @@ describe('useScheduleDataFromStorage', () => {
       const { current } = result;
       if (current.type !== 'loaded') fail("result hasn't yet loaded");
       act(() => {
-        current.result.updateScheduleData((draft): void => {
-          draft.currentTerm = '201808';
-          draft.terms['201808'] = {
-            versions: [],
-            currentIndex: 0,
-          };
+        current.result.setScheduleData({
+          currentTerm: '201808',
+          terms: {
+            '201808': {
+              versions: [],
+              currentIndex: 0,
+            },
+          },
+          version: 1,
         });
       });
 

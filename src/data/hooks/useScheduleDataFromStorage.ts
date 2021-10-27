@@ -1,19 +1,23 @@
-import produce, { Draft, Immutable } from 'immer';
+import { Immutable } from 'immer';
 import { useCallback, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 
 import { renderDataNotPersistentNotification } from '../../components/DataNotPersistentNotification';
 import { ErrorWithFields } from '../../log';
 import { LoadingState } from '../../types';
-import { ScheduleData, AnyScheduleData } from '../types';
+import {
+  ScheduleData,
+  AnyScheduleData,
+  LATEST_SCHEDULE_DATA_VERSION,
+} from '../types';
 import useScheduleDataMigrations from './useScheduleDataMigrations';
 
 export const SCHEDULE_DATA_LOCAL_STORAGE_KEY = 'schedule-data';
 
 type HookResult = {
   scheduleData: Immutable<ScheduleData>;
-  updateScheduleData: (
-    applyDraft: (draft: Draft<ScheduleData>) => void
+  setScheduleData: (
+    next: ((current: ScheduleData) => ScheduleData) | ScheduleData
   ) => void;
 };
 
@@ -23,7 +27,7 @@ type HookResult = {
  * it should only be called once in a root component (i.e. <App>).
  */
 export default function useScheduleDataFromStorage(): LoadingState<HookResult> {
-  const [scheduleData, setScheduleData, { isPersistent }] =
+  const [rawScheduleData, setRawScheduleData, { isPersistent }] =
     useLocalStorageState<AnyScheduleData | null>(
       SCHEDULE_DATA_LOCAL_STORAGE_KEY,
       null
@@ -33,41 +37,46 @@ export default function useScheduleDataFromStorage(): LoadingState<HookResult> {
   // in an effect hook, and as such, requires us to return a "loading" state
   // until migrations have been applied
   const migrationResult = useScheduleDataMigrations({
-    rawScheduleData: scheduleData,
-    setScheduleData,
+    rawScheduleData,
+    setScheduleData: setRawScheduleData,
   });
 
   const [userAcceptedNonPersistence, setUserAcceptedNonPersistence] =
     useState(false);
 
   // updateScheduleData is a referentially stable callback function
-  // that can be used to update the schedule data using an immer draft:
-  // https://immerjs.github.io/immer/produce/
-  const updateScheduleData = useCallback(
-    (applyDraft: (draft: Draft<ScheduleData>) => void): void =>
-      // Here, we use the callback API for the setter function
-      // returned by `useState` so that we don't have to re-generate
-      // the callback when the state changes
-      setScheduleData((current: ScheduleData | null) => {
-        if (migrationResult.type !== 'done') {
-          // This should not be possible:
-          // we return early from the outer hook before we return this callback.
-          // The stacktrace will be useful for debugging this.
-          throw new ErrorWithFields({
-            message:
-              'updateScheduleData called when schedule data is not valid',
-            fields: {
-              migrationResultType: migrationResult.type,
-            },
-          });
-        }
+  // that can be used to update the schedule data .
+  const setScheduleData = useCallback(
+    (next: ((current: ScheduleData) => ScheduleData) | ScheduleData): void => {
+      setRawScheduleData(
+        (current: AnyScheduleData | null): AnyScheduleData | null => {
+          if (
+            current === null ||
+            current.version !== LATEST_SCHEDULE_DATA_VERSION
+          ) {
+            // This should not be possible:
+            // we return early from the outer hook
+            // before we return this callback.
+            // The stacktrace will be useful for debugging this.
+            throw new ErrorWithFields({
+              message:
+                'updateScheduleData called when schedule data is not valid',
+              fields: {
+                currentVersionOrNull: current?.version,
+              },
+            });
+          }
 
-        // Use `produce` from Immer to combine the current state
-        // & caller-supplied callback that modifies the current state
-        // to produce the next state
-        return produce(current, applyDraft);
-      }),
-    [setScheduleData, migrationResult.type]
+          if (typeof next === 'function') {
+            return next(current);
+          }
+
+          return next;
+        }
+      );
+    },
+
+    [setRawScheduleData]
   );
 
   // If the state isn't persistent, then return an error to alert the user
@@ -98,7 +107,7 @@ export default function useScheduleDataFromStorage(): LoadingState<HookResult> {
     type: 'loaded',
     result: {
       scheduleData: migrationResult.result,
-      updateScheduleData,
+      setScheduleData,
     },
   };
 }

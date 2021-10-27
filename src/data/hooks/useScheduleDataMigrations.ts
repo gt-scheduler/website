@@ -57,6 +57,7 @@ export default function useScheduleDataMigrations({
         stillLoading: false,
         overview: 'could not load stored schedule data: unknown format',
       });
+      return;
     }
 
     try {
