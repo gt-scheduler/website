@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import { renderHook } from '@testing-library/react-hooks';
 
 import { asMockFunction, disableLogging } from '../../utils/tests';
-import useScheduleDataMigrations from './useScheduleDataMigrations';
+import useMigrateScheduleData from './useMigrateScheduleData';
 import { AnyScheduleData, LATEST_SCHEDULE_DATA_VERSION } from '../types';
 import * as migrations from '../migrations';
 
@@ -11,14 +11,14 @@ jest.mock('js-cookie');
 // eslint-disable-next-line jest/unbound-method
 const cookiesGet = Cookies.get;
 
-describe('useScheduleDataMigrations', () => {
+describe('useMigrateScheduleData', () => {
   afterEach(() => {
     // Ensure we reset the local storage mock after each test
     window.localStorage.clear();
   });
 
   // Tests that the hook pulls data from cookies and applies migrations,
-  // moving the return value from pending to done
+  // moving the return value from loading to loaded
   it('migrates data from cookies', () => {
     // The data in this case from cookies, so use the mocked cookiesGet
     asMockFunction(cookiesGet).mockReturnValue({
@@ -30,11 +30,11 @@ describe('useScheduleDataMigrations', () => {
     type HookProps = {
       rawScheduleData: AnyScheduleData | null;
     };
-    const setScheduleDataMock = jest.fn();
+    const setRawScheduleDataMock = jest.fn();
     const { result, rerender } = renderHook<HookProps, unknown>(
       ({ rawScheduleData }) =>
-        useScheduleDataMigrations({
-          setScheduleData: setScheduleDataMock,
+        useMigrateScheduleData({
+          setRawScheduleData: setRawScheduleDataMock,
           rawScheduleData,
         }),
       {
@@ -73,9 +73,9 @@ describe('useScheduleDataMigrations', () => {
       version: 1,
     };
 
-    // The migrated data should have been passed to `setScheduleData`
-    expect(setScheduleDataMock).toBeCalledTimes(1);
-    expect(setScheduleDataMock).toBeCalledWith(expectedScheduleData);
+    // The migrated data should have been passed to `setRawScheduleData`
+    expect(setRawScheduleDataMock).toBeCalledTimes(1);
+    expect(setRawScheduleDataMock).toBeCalledWith(expectedScheduleData);
 
     // Running the hook with the updated schedule data
     // (simulating the results of setting the state)
@@ -83,11 +83,14 @@ describe('useScheduleDataMigrations', () => {
     rerender({ rawScheduleData: expectedScheduleData });
     expect(result.all).toEqual([
       {
-        type: 'pending',
+        type: 'loading',
       },
       {
-        type: 'done',
-        result: expectedScheduleData,
+        type: 'loaded',
+        result: {
+          scheduleData: expectedScheduleData,
+          setScheduleData: expect.any(Function) as unknown,
+        },
       },
     ]);
   });
@@ -95,10 +98,10 @@ describe('useScheduleDataMigrations', () => {
   // Tests that the hook skips migrations if not needed.
   // This test will need to be updated whenever adding migrations.
   it('skips migration if not needed', () => {
-    const setScheduleDataMock = jest.fn();
+    const setRawScheduleDataMock = jest.fn();
     const { result } = renderHook(() =>
-      useScheduleDataMigrations({
-        setScheduleData: setScheduleDataMock,
+      useMigrateScheduleData({
+        setRawScheduleData: setRawScheduleDataMock,
         rawScheduleData: {
           currentTerm: '202108',
           terms: {
@@ -161,12 +164,15 @@ describe('useScheduleDataMigrations', () => {
 
     // The callback shouldn't have been invoked,
     // but the data returned should still be the latest version
-    expect(setScheduleDataMock).toBeCalledTimes(0);
+    expect(setRawScheduleDataMock).toBeCalledTimes(0);
     expect(expectedScheduleData.version).toEqual(LATEST_SCHEDULE_DATA_VERSION);
     expect(result.all).toEqual([
       {
-        type: 'done',
-        result: expectedScheduleData,
+        type: 'loaded',
+        result: {
+          scheduleData: expectedScheduleData,
+          setScheduleData: expect.any(Function) as unknown,
+        },
       },
     ]);
   });
@@ -187,11 +193,11 @@ describe('useScheduleDataMigrations', () => {
     type HookProps = {
       rawScheduleData: AnyScheduleData | null;
     };
-    const setScheduleDataMock = jest.fn();
+    const setRawScheduleDataMock = jest.fn();
     const { result } = renderHook<HookProps, unknown>(
       ({ rawScheduleData }) =>
-        useScheduleDataMigrations({
-          setScheduleData: setScheduleDataMock,
+        useMigrateScheduleData({
+          setRawScheduleData: setRawScheduleDataMock,
           rawScheduleData,
         }),
       {
@@ -201,20 +207,14 @@ describe('useScheduleDataMigrations', () => {
       }
     );
 
-    expect(setScheduleDataMock).toBeCalledTimes(0);
+    expect(setRawScheduleDataMock).toBeCalledTimes(0);
     expect(result.all).toEqual([
       {
-        type: 'pending',
+        type: 'loading',
       },
       expect.objectContaining({
         type: 'error',
-        // The matcher returns `any`, so we have to suppress the lint here:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        error: expect.objectContaining({
-          type: 'error',
-          stillLoading: false,
-          // Other fields ignored
-        }),
+        stillLoading: false,
         // Other fields ignored
       }),
     ]);
