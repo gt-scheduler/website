@@ -109,7 +109,7 @@ export default class Section {
         where,
         location: oscar.locations[locationIndex] ?? null,
         instructors: instructors.map((instructor) =>
-          instructor.replace(/ \(P\)$/, '')
+          instructor.replace(/ \(P\)$/, '').trim()
         ),
         // We need some fallback here
         dateRange: oscar.dateRanges[dateRangeIndex] ?? {
