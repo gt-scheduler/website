@@ -3,34 +3,53 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { ErrorWithFields, softError } from '../log';
+import { AnyScheduleData } from './types';
 
 // This data is not secret; it is included in the application bundle.
-// Change it when developing locally.
-// TODO figure out better method ^
+// Supply these environment variables when developing locally.
 const firebaseConfig = {
-  apiKey: 'AIzaSyDzzT30jbX-KznDKMCVq3URIYPJZz8AOp4',
-  authDomain: 'gt-scheduler-jazev-dev.firebaseapp.com',
-  projectId: 'gt-scheduler-jazev-dev',
-  storageBucket: 'gt-scheduler-jazev-dev.appspot.com',
-  messagingSenderId: '165974928508',
-  appId: '1:165974928508:web:ef36ee3bdc3be2c323adf9',
+  apiKey: process.env['REACT_APP_FIREBASE_API_KEY'],
+  authDomain: process.env['REACT_APP_FIREBASE_AUTH_DOMAIN'],
+  projectId: process.env['REACT_APP_FIREBASE_PROJECT_ID'],
+  storageBucket: process.env['REACT_APP_FIREBASE_STORAGE_BUCKET'],
+  messagingSenderId: process.env['REACT_APP_FIREBASE_MESSAGING_SENDER_ID'],
+  appId: process.env['REACT_APP_FIREBASE_APP_ID'],
 };
 
-const app = firebase.initializeApp(firebaseConfig);
+/**
+ * Whether Firebase authentication is enabled in this environment.
+ * To enable, supply the 5 Firebase config environment variables.
+ */
+export const isAuthEnabled =
+  firebaseConfig.apiKey != null && firebaseConfig.apiKey !== '';
 
-export const auth = app.auth();
-export const db = app.firestore();
-export const schedulesCollection = db.collection('schedules');
+/* eslint-disable import/no-mutable-exports */
+let auth: firebase.auth.Auth = null as unknown as firebase.auth.Auth;
+let db: firebase.firestore.Firestore =
+  null as unknown as firebase.firestore.Firestore;
+type SchedulesCollection =
+  firebase.firestore.CollectionReference<AnyScheduleData>;
+let schedulesCollection: SchedulesCollection =
+  null as unknown as SchedulesCollection;
+/* eslint-enable import/no-mutable-exports */
+if (isAuthEnabled) {
+  const app = firebase.initializeApp(firebaseConfig);
 
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
-  softError(
-    new ErrorWithFields({
-      message: 'error when configuring firebase auth persistence',
-      source: err,
-    })
-  );
-});
+  auth = app.auth();
+  db = app.firestore();
+  schedulesCollection = db.collection('schedules') as SchedulesCollection;
 
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
+    softError(
+      new ErrorWithFields({
+        message: 'error when configuring firebase auth persistence',
+        source: err,
+      })
+    );
+  });
+}
+
+export { auth, db, schedulesCollection };
 export { firebase };
 
 // Configure the enabled auth providers that firebase UI displays as options

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { AccountContextValue } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
 import { LoadingState } from '../../types';
-import { firebase } from '../firebase';
+import { firebase, isAuthEnabled } from '../firebase';
 
 export default function useFirebaseAuth(): LoadingState<AccountContextValue> {
   const [accountState, setAccountState] = useState<AccountContextValue | null>(
@@ -12,6 +12,8 @@ export default function useFirebaseAuth(): LoadingState<AccountContextValue> {
 
   // Listen to the Firebase Auth state and set the local state.
   useEffect(() => {
+    if (!isAuthEnabled) return undefined;
+
     const unregisterAuthObserver = firebase
       .auth()
       .onAuthStateChanged((user) => {
@@ -49,6 +51,15 @@ export default function useFirebaseAuth(): LoadingState<AccountContextValue> {
       });
     return (): void => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
   }, []);
+
+  if (!isAuthEnabled) {
+    return {
+      type: 'loaded',
+      result: {
+        type: 'signedOut',
+      },
+    };
+  }
 
   if (accountState === null) {
     return { type: 'loading' };

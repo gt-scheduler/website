@@ -1,4 +1,4 @@
-import { Immutable, castImmutable } from 'immer';
+import { Immutable, castImmutable, castDraft } from 'immer';
 import { useCallback, useEffect, useState } from 'react';
 
 import { SignedIn } from '../../contexts/account';
@@ -8,7 +8,7 @@ import {
   LoadingStateCustom,
   LoadingStateError,
 } from '../../types';
-import { db, schedulesCollection } from '../firebase';
+import { db, isAuthEnabled, schedulesCollection } from '../firebase';
 import migrateScheduleData from '../migrations';
 import { AnyScheduleData, defaultScheduleData, ScheduleData } from '../types';
 import { getCurrentRawScheduleFromStorage } from './useRawScheduleDataFromStorage';
@@ -49,6 +49,8 @@ export default function useRawScheduleDataFromFirebase(
     LoadingStateError | LoadingStateCustom | null
   >(null);
   useEffect(() => {
+    if (!isAuthEnabled) return undefined;
+
     const removeSnapshotListener = schedulesCollection
       .doc(account.id)
       .onSnapshot(
@@ -121,6 +123,8 @@ export default function useRawScheduleDataFromFirebase(
   // and storing it in Firebase.
   // This serves to provide the initial account data.
   useEffect(() => {
+    if (!isAuthEnabled) return;
+
     if (scheduleData.type === 'nonExistant') {
       // Imperatively get the latest migrated data
       let currentScheduleData: Immutable<ScheduleData>;
@@ -148,7 +152,7 @@ export default function useRawScheduleDataFromFirebase(
         if (currentDoc.exists) return;
         transaction.set(
           schedulesCollection.doc(account.id),
-          currentScheduleData
+          castDraft(currentScheduleData)
         );
       }).catch((err) => {
         // Send the error to Sentry
@@ -171,6 +175,20 @@ export default function useRawScheduleDataFromFirebase(
       });
     }
   }, [account.id, scheduleData.type]);
+
+  // If this hook is running and auth is not enabled,
+  // then something is wrong with the state.
+  // Show an error.
+  if (!isAuthEnabled) {
+    return {
+      type: 'error',
+      error: new ErrorWithFields({
+        message: 'cannot obtain data from firebase: authentication is disabled',
+      }),
+      stillLoading: false,
+      overview: 'authentication is not enabled',
+    };
+  }
 
   if (permanentError !== null) {
     return permanentError;
