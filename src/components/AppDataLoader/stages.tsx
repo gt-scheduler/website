@@ -146,6 +146,7 @@ export function StageLoadScheduleDataFromStorage({
 }
 
 export type StageMigrateScheduleDataProps = {
+  skeletonProps?: StageSkeletonProps;
   rawScheduleData: Immutable<AnyScheduleData> | null;
   setRawScheduleData: (
     next:
@@ -164,6 +165,7 @@ export type StageMigrateScheduleDataProps = {
  * Handles migrating the raw schedule data as needed to the latest version.
  */
 export function StageMigrateScheduleData({
+  skeletonProps,
   rawScheduleData,
   setRawScheduleData,
   children,
@@ -175,7 +177,7 @@ export function StageMigrateScheduleData({
 
   if (loadingState.type !== 'loaded') {
     return (
-      <AppSkeleton>
+      <AppSkeleton {...skeletonProps}>
         <SkeletonContent>
           <LoadingDisplay
             state={loadingState}
