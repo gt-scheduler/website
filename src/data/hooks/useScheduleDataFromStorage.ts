@@ -10,7 +10,7 @@ import {
   AnyScheduleData,
   LATEST_SCHEDULE_DATA_VERSION,
 } from '../types';
-import useScheduleDataMigrations from './useScheduleDataMigrations';
+import useScheduleDataMigrations from './useMigrateScheduleData';
 
 export const SCHEDULE_DATA_LOCAL_STORAGE_KEY = 'schedule-data';
 

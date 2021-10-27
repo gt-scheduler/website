@@ -20,7 +20,7 @@ export type MigrationResult =
  * ensuring that it is of the latest version's shape
  * using the migrations defined in `src/data/migrations.
  */
-export default function useScheduleDataMigrations({
+export default function useMigrateScheduleData({
   rawScheduleData,
   setScheduleData,
 }: {

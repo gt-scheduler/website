@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import { renderHook } from '@testing-library/react-hooks';
 
 import { asMockFunction, disableLogging } from '../../utils/tests';
-import useScheduleDataMigrations from './useScheduleDataMigrations';
+import useMigrateScheduleData from './useMigrateScheduleData';
 import { AnyScheduleData, LATEST_SCHEDULE_DATA_VERSION } from '../types';
 import * as migrations from '../migrations';
 
@@ -11,7 +11,7 @@ jest.mock('js-cookie');
 // eslint-disable-next-line jest/unbound-method
 const cookiesGet = Cookies.get;
 
-describe('useScheduleDataMigrations', () => {
+describe('useMigrateScheduleData', () => {
   afterEach(() => {
     // Ensure we reset the local storage mock after each test
     window.localStorage.clear();
@@ -33,7 +33,7 @@ describe('useScheduleDataMigrations', () => {
     const setScheduleDataMock = jest.fn();
     const { result, rerender } = renderHook<HookProps, unknown>(
       ({ rawScheduleData }) =>
-        useScheduleDataMigrations({
+        useMigrateScheduleData({
           setScheduleData: setScheduleDataMock,
           rawScheduleData,
         }),
@@ -97,7 +97,7 @@ describe('useScheduleDataMigrations', () => {
   it('skips migration if not needed', () => {
     const setScheduleDataMock = jest.fn();
     const { result } = renderHook(() =>
-      useScheduleDataMigrations({
+      useMigrateScheduleData({
         setScheduleData: setScheduleDataMock,
         rawScheduleData: {
           currentTerm: '202108',
@@ -190,7 +190,7 @@ describe('useScheduleDataMigrations', () => {
     const setScheduleDataMock = jest.fn();
     const { result } = renderHook<HookProps, unknown>(
       ({ rawScheduleData }) =>
-        useScheduleDataMigrations({
+        useMigrateScheduleData({
           setScheduleData: setScheduleDataMock,
           rawScheduleData,
         }),
