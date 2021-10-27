@@ -117,7 +117,7 @@ type UserInitialsProps = {
 /**
  * Shows the initials of the user's name, email, or id where available,
  * changing the size of each letter depending on the number of initials.
- * Supports up to 4 initials.
+ * Supports up to 3 initials.
  */
 function UserInitials({ state }: UserInitialsProps): React.ReactElement {
   const initials = getInitials(state.name ?? state.email ?? state.id);
@@ -125,7 +125,7 @@ function UserInitials({ state }: UserInitialsProps): React.ReactElement {
     <span
       className="account-dropdown__user-initials"
       style={{
-        fontSize: initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
+        fontSize: initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 15,
       }}
     >
       {initials.slice(0, 3)}
@@ -137,8 +137,15 @@ function UserInitials({ state }: UserInitialsProps): React.ReactElement {
  * Extracts the initials from the given name
  */
 function getInitials(displayName: string): string {
+  // Decode the escaped HTML in the name here so we can extract its initials.
+  // Use the DOMParser API to avoid XSS while un-escaping:
+  // https://stackoverflow.com/a/34064434
+  // (the dangerousDisplayName variable can contain XSS; be careful)
+  const doc = new DOMParser().parseFromString(displayName, 'text/html');
+  const dangerousDisplayName = doc.documentElement.textContent ?? '';
+
   const regex = /\b\w/g;
-  const matches = displayName.match(regex);
+  const matches = dangerousDisplayName.match(regex);
   if (matches === null) return '';
   return matches.join('');
 }
@@ -153,21 +160,36 @@ type SignedInLabelProps = {
  */
 function SignedInLabel({ state }: SignedInLabelProps): React.ReactElement {
   let signedInAs: React.ReactNode;
-  if (state.name !== null && state.email !== null) {
-    signedInAs = (
-      <>
-        <strong>{state.name}</strong> ({state.email})
-      </>
-    );
-  } else if (state.name !== null || state.email !== null) {
-    signedInAs = `${state.name ?? state.email ?? ''}`;
+  if (state.name !== null) {
+    // Un-escape HTML entities and then pass them
+    // to React's default child sanitizer so that they are not escaped twice.
+    // Use the DOMParser API to avoid XSS while un-escaping:
+    // https://stackoverflow.com/a/34064434
+    // (the dangerousName variable can contain XSS; be careful)
+    const doc = new DOMParser().parseFromString(state.name, 'text/html');
+    const dangerousName = doc.documentElement.textContent ?? '';
+    const nameElement = <strong>{dangerousName}</strong>;
+
+    if (state.email !== null) {
+      signedInAs = (
+        <>
+          {nameElement} ({state.email})
+        </>
+      );
+    } else {
+      signedInAs = nameElement;
+    }
+  } else if (state.email !== null) {
+    signedInAs = state.email;
   } else {
     signedInAs = state.id;
   }
+
   let providerText = '';
   if (state.provider !== null) {
     providerText = ` via ${state.provider}`;
   }
+
   return (
     <div>
       <span className="account-dropdown__signed-in-label-faded">
