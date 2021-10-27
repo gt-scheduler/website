@@ -91,6 +91,12 @@ export default function useRawScheduleDataFromFirebase(
       }
       if (nextScheduleData === null) return;
 
+      // Eagerly set the schedule data here as well.
+      // It would be okay to wait until Firebase updates the state for us,
+      // (which it will do, even before the network calls are made),
+      // but this allows a window where state can react based on stale state.
+      setScheduleData({ type: 'exists', data: nextScheduleData });
+
       schedulesCollection
         .doc(account.id)
         .set(nextScheduleData)
