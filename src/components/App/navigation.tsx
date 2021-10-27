@@ -8,6 +8,7 @@ import React, {
 
 import { NavDrawer, NavMenu } from '..';
 import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
+import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
@@ -90,6 +91,23 @@ export function AppNavigation({
 }
 
 type AppMobileNavProps = {
+  captureRef: React.RefObject<HTMLDivElement>;
+};
+
+/**
+ * Adds the nav drawer that is conditionally open depending on navigation state
+ * when the app is running on a mobile device.
+ * Use over the "dumb" display AppMobileNavDisplay component
+ * when the app data contexts are available.
+ */
+export function AppMobileNav({
+  captureRef,
+}: AppMobileNavProps): React.ReactElement {
+  const headerActionBarProps = useHeaderActionBarProps(captureRef);
+  return <AppMobileNavDisplay {...headerActionBarProps} />;
+}
+
+type AppMobileNavDisplayProps = {
   onCopyCrns?: () => void;
   enableCopyCrns?: boolean;
   onExportCalendar?: () => void;
@@ -100,16 +118,18 @@ type AppMobileNavProps = {
 
 /**
  * Adds the nav drawer that is conditionally open depending on navigation state
- * when the app is running on a mobile device
+ * when the app is running on a mobile device.
+ * Runs as a "dumb" display component,
+ * not needing valid values for the app data contexts.
  */
-export function AppMobileNav({
+export function AppMobileNavDisplay({
   onCopyCrns = (): void => undefined,
   enableCopyCrns = false,
   onExportCalendar = (): void => undefined,
   enableExportCalendar = false,
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
-}: AppMobileNavProps): React.ReactElement | null {
+}: AppMobileNavDisplayProps): React.ReactElement | null {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
   const { currentTabIndex, setTabIndex, isDrawerOpen, closeDrawer } =

@@ -7,9 +7,13 @@ import ErrorHeader from '../ErrorHeader';
 import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
-import { AppNavigationContext, AppMobileNav, NAV_TABS } from './navigation';
+import {
+  AppNavigationContext,
+  AppMobileNav,
+  NAV_TABS,
+  AppMobileNavDisplay,
+} from './navigation';
 import { classes } from '../../utils/misc';
-import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 
 /**
  * Renders the actual content at the root of the app
@@ -20,13 +24,11 @@ import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
-
   const captureRef = useRef<HTMLDivElement>(null);
-  const headerActionBarProps = useHeaderActionBarProps(captureRef);
 
   return (
     <>
-      <AppMobileNav {...headerActionBarProps} />
+      <AppMobileNav captureRef={captureRef} />
       <Header
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}
@@ -98,7 +100,7 @@ export function AppSkeleton({
 
   return (
     <>
-      <AppMobileNav />
+      <AppMobileNavDisplay />
       <HeaderDisplay
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}
