@@ -21,7 +21,7 @@ export type HookResult = Pick<
  * Requires a valid value for `ScheduleContext` and `ThemeContext`.
  */
 export default function useHeaderActionBarProps(
-  captureRef: React.MutableRefObject<HTMLDivElement | null>
+  captureRef: React.RefObject<HTMLDivElement>
 ): HookResult {
   const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);

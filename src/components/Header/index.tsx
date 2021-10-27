@@ -11,7 +11,7 @@ export type HeaderProps = {
   onChangeTab: (newTab: number) => void;
   onToggleMenu: () => void;
   tabs: string[];
-  captureRef: React.MutableRefObject<HTMLDivElement | null>;
+  captureRef: React.RefObject<HTMLDivElement>;
 };
 
 /**
