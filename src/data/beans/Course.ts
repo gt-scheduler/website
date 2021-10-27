@@ -105,15 +105,42 @@ export default class Course {
     );
     this.hasLab = !!onlyLectures.length && !!onlyLabs.length;
     if (this.hasLab) {
+      const matchLabFromId = (lab: Section, lecture: Section): boolean =>
+        // note: checking both ways because GT registrar
+        // reversed studio and lecture sections for MATH 1553
+        lecture.id.startsWith(lab.id) || lab.id.startsWith(lecture.id);
+      const matchLabFromInstructors = (
+        lab: Section,
+        lecture: Section
+      ): boolean =>
+        // match lecture and lab sections
+        // if there are *any* matching instructors
+        // fixes issue with PHYS 2211 and 2212
+        // no longer matching section id letters
+        lab.instructors.filter((instructor) =>
+          lecture.instructors.includes(instructor)
+        ).length > 0;
+
       for (const lecture of onlyLectures) {
         lecture.associatedLabs = onlyLabs.filter((lab) =>
-          lab.id.startsWith(lecture.id)
+          matchLabFromId(lab, lecture)
         );
+        // if no matching section id letters found, match by profs
+        if (!lecture.associatedLabs.length) {
+          lecture.associatedLabs = onlyLabs.filter((lab) =>
+            matchLabFromInstructors(lab, lecture)
+          );
+        }
       }
       for (const lab of onlyLabs) {
         lab.associatedLectures = onlyLectures.filter((lecture) =>
-          lab.id.startsWith(lecture.id)
+          matchLabFromId(lab, lecture)
         );
+        if (!lab.associatedLectures.length) {
+          lab.associatedLectures = onlyLectures.filter((lecture) =>
+            matchLabFromInstructors(lab, lecture)
+          );
+        }
       }
       const lonelyLectures = onlyLectures.filter(
         (lecture) => !lecture.associatedLabs.length
