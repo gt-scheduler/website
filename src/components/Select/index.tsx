@@ -17,6 +17,7 @@ import './stylesheet.scss';
 export type SelectProps<Id extends string | number> = {
   className?: string;
   style?: React.CSSProperties;
+  menuAnchor?: 'left' | 'right';
   current: Id;
   onChange: (newId: Id) => void;
   options: SelectOption<Id>[];
@@ -80,6 +81,7 @@ export interface ButtonAction<Id extends string | number> {
 export default function Select<Id extends string | number>({
   className,
   style,
+  menuAnchor = 'left',
   current,
   onChange,
   options,
@@ -159,7 +161,7 @@ export default function Select<Id extends string | number>({
 
   return (
     <div
-      className={classes('Button', 'Select', className)}
+      className={classes('Button', 'Select', className, `anchor-${menuAnchor}`)}
       onClick={(): void => trySetOpened(!opened)}
       style={style}
     >
@@ -178,12 +180,12 @@ export default function Select<Id extends string | number>({
               key={String(optionId)}
               className={classes(
                 'option',
-                optionId === inputId && 'option-inputting'
+                optionId === inputId && 'option--inputting'
               )}
             >
               {inputId === optionId ? (
                 <AutoFocusInput
-                  className="option-input"
+                  className="option__input"
                   value={inputValue}
                   onChange={(e): void => setInputValue(e.target.value)}
                   placeholder={optionLabel}
@@ -191,7 +193,7 @@ export default function Select<Id extends string | number>({
                 />
               ) : (
                 <Button
-                  className="option-text"
+                  className="option__button"
                   key={optionId}
                   onClick={(): void => onChange(optionId)}
                 >
@@ -202,7 +204,7 @@ export default function Select<Id extends string | number>({
                 <React.Fragment key={i}>
                   {action.type === 'button' ? (
                     <Button
-                      className="option-button"
+                      className="option__action-button"
                       onClick={(e): void => {
                         e.stopPropagation();
 
@@ -219,7 +221,7 @@ export default function Select<Id extends string | number>({
                       {optionId === inputId ? (
                         <>
                           <Button
-                            className="option-button"
+                            className="option__action-button"
                             onClick={(e): void => {
                               e.stopPropagation();
                               tryCommit();
@@ -228,7 +230,7 @@ export default function Select<Id extends string | number>({
                             <FontAwesomeIcon fixedWidth icon={faCheck} />
                           </Button>
                           <Button
-                            className="option-button"
+                            className="option__action-button"
                             onClick={(e): void => {
                               e.stopPropagation();
                               abandonEdit();
@@ -239,7 +241,7 @@ export default function Select<Id extends string | number>({
                         </>
                       ) : (
                         <Button
-                          className="option-button"
+                          className="option__action-button"
                           onClick={(e): void => {
                             e.stopPropagation();
                             // Start a new edit (ignore any in-progress edits)
@@ -259,8 +261,12 @@ export default function Select<Id extends string | number>({
           ))}
           {onClickNew !== undefined && (
             <div className="option">
-              <Button className="option-text" onClick={onClickNew}>
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} />{' '}
+              <Button className="option__button" onClick={onClickNew}>
+                <FontAwesomeIcon
+                  fixedWidth
+                  icon={faPlus}
+                  style={{ marginRight: 8 }}
+                />
                 {newLabel}
               </Button>
             </div>
@@ -290,6 +296,98 @@ export function LoadingSelect({
       <Spinner size="small" style={{ marginRight: 12 }} />
       <div className="text">{label}</div>
       <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+    </div>
+  );
+}
+
+export type DropdownMenuProps = {
+  className?: string;
+  style?: React.CSSProperties;
+  menuAnchor?: 'left' | 'right';
+  children: React.ReactNode;
+  items: DropdownMenuAction[];
+  disabled?: boolean;
+};
+
+export interface DropdownMenuAction {
+  label: React.ReactNode;
+  icon?: IconDefinition;
+  onClick?: () => void;
+}
+
+/**
+ * A `<DropdownMenu>` is similar to a `<Select>` except
+ * it can be used in scenarios where there is no item to select,
+ * but you still want to display a dropdown with buttons.
+ */
+export function DropdownMenu({
+  className,
+  style,
+  menuAnchor = 'left',
+  children,
+  items,
+  disabled = false,
+}: DropdownMenuProps): React.ReactElement {
+  const [opened, setOpened] = useState(false);
+  return (
+    <div
+      className={classes(
+        'Button',
+        'Select',
+        disabled && 'disabled',
+        className,
+        `anchor-${menuAnchor}`
+      )}
+      onClick={(): void => {
+        if (!disabled) setOpened(!opened);
+      }}
+      style={style}
+    >
+      {children}
+      {opened && (
+        <div className="intercept" onClick={(): void => setOpened(false)} />
+      )}
+      {opened && (
+        <div className="option-container">
+          {items.map(({ label, icon, onClick }, i) => (
+            <div
+              className={classes('option', onClick == null && 'option--text')}
+              key={i}
+            >
+              {onClick != null ? (
+                <Button className="option__button" onClick={onClick}>
+                  {icon != null && (
+                    <FontAwesomeIcon
+                      fixedWidth
+                      icon={icon}
+                      style={{ marginRight: 8 }}
+                    />
+                  )}
+                  {label}
+                </Button>
+              ) : (
+                <div
+                  className="option__text"
+                  // Prevent clicking on the text from closing the dropdown
+                  onClick={(e): void => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  {icon != null && (
+                    <FontAwesomeIcon
+                      fixedWidth
+                      icon={icon}
+                      style={{ marginRight: 8 }}
+                    />
+                  )}
+                  {label}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

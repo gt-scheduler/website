@@ -1,15 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 
-import { Header, Scheduler, Attribution } from '..';
+import { Header, Scheduler, Attribution, Calendar } from '..';
 import { ReactErrorDetails } from '../ErrorDetails';
 import ErrorDisplay from '../ErrorDisplay';
 import ErrorHeader from '../ErrorHeader';
 import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
-import { AppNavigationContext, AppMobileNav, NAV_TABS } from './navigation';
+import {
+  AppNavigationContext,
+  AppMobileNav,
+  NAV_TABS,
+  AppMobileNavDisplay,
+} from './navigation';
 import { classes } from '../../utils/misc';
-import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 
 /**
  * Renders the actual content at the root of the app
@@ -20,17 +24,17 @@ import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
-
-  const headerActionBarProps = useHeaderActionBarProps();
+  const captureRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
-      <AppMobileNav {...headerActionBarProps} />
+      <AppMobileNav captureRef={captureRef} />
       <Header
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
+        captureRef={captureRef}
       />
       <ErrorBoundary
         fallback={(error, errorInfo): React.ReactElement => (
@@ -53,6 +57,11 @@ function AppContentBase(): React.ReactElement {
       >
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
+
+        {/* Fake calendar used to capture screenshots */}
+        <div className="capture-container" ref={captureRef}>
+          <Calendar className="fake-calendar" capture overlayCrns={[]} />
+        </div>
       </ErrorBoundary>
       <Attribution />
     </>
@@ -91,7 +100,7 @@ export function AppSkeleton({
 
   return (
     <>
-      <AppMobileNav />
+      <AppMobileNavDisplay />
       <HeaderDisplay
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}

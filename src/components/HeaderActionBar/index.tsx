@@ -4,14 +4,20 @@ import {
   faCalendarAlt,
   faPaste,
   faAdjust,
+  faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext, useRef } from 'react';
-import ReactTooltip from 'react-tooltip';
+import React, { useCallback, useContext } from 'react';
 
 import { Button } from '..';
+import {
+  LARGE_MOBILE_BREAKPOINT,
+  LARGE_DESKTOP_BREAKPOINT,
+} from '../../constants';
 import { ThemeContext } from '../../contexts';
+import useMedia from '../../hooks/useMedia';
 import { classes } from '../../utils/misc';
+import { DropdownMenu, DropdownMenuAction } from '../Select';
 
 import './stylesheet.scss';
 
@@ -50,61 +56,78 @@ export default function HeaderActionBar({
     setTheme(newTheme);
   }, [theme, setTheme]);
 
-  // Obtain a ref to the copy button to only close its tooltip
-  const crnButton = useRef<HTMLDivElement>(null);
+  // Coalesce the export options into the props for a single <DropdownMenu>
+  const enableExport =
+    enableCopyCrns || enableDownloadCalendar || enableExportCalendar;
+  const exportActions: DropdownMenuAction[] = [];
+  if (enableDownloadCalendar) {
+    exportActions.push({
+      label: 'Download image',
+      icon: faDownload,
+      onClick: onDownloadCalendar,
+    });
+  }
+  if (enableExportCalendar) {
+    exportActions.push({
+      label: 'ICS (Calendar) file',
+      icon: faCalendarAlt,
+      onClick: onExportCalendar,
+    });
+  }
+  if (enableCopyCrns) {
+    exportActions.push({
+      label: 'Copy CRNs to clipboard',
+      icon: faPaste,
+      onClick: onCopyCrns,
+    });
+  }
+
+  // On small mobile screens and on large desktop,
+  // left-anchor the "Export" dropdown.
+  // Otherwise, anchor it to the right.
+  const lowerBound = LARGE_MOBILE_BREAKPOINT;
+  const upperBound = LARGE_DESKTOP_BREAKPOINT;
+  const shouldRightAnchorExportDropdown = useMedia(
+    `(min-width: ${lowerBound}px) and (max-width: ${upperBound}px)`
+  );
 
   return (
     <div className={classes('header-action-bar', className)} style={style}>
-      <Button onClick={onDownloadCalendar} disabled={!enableDownloadCalendar}>
-        <FontAwesomeIcon className="icon" fixedWidth icon={faDownload} />
-        <div className="text">Download</div>
-      </Button>
-      <Button onClick={onExportCalendar} disabled={!enableExportCalendar}>
-        <FontAwesomeIcon className="icon" fixedWidth icon={faCalendarAlt} />
-        <div className="text">Export</div>
-      </Button>
-
-      {/* Include separate button and tooltip component
-          with manually controlled closing logic */}
-      <div
-        className="menu"
-        data-tip
-        data-for="copy-crn"
-        delay-hide="1000"
-        ref={crnButton}
+      <DropdownMenu
+        disabled={!enableExport}
+        items={exportActions}
+        menuAnchor={shouldRightAnchorExportDropdown ? 'right' : 'left'}
+        className="header-action-bar__button"
       >
-        <Button disabled={!enableCopyCrns}>
-          <FontAwesomeIcon className="icon" fixedWidth icon={faPaste} />
-          <div className="text">CRNs</div>
-        </Button>
-      </div>
-      {enableCopyCrns && (
-        <ReactTooltip
-          id="copy-crn"
-          type="dark"
-          place="bottom"
-          effect="solid"
-          event="click"
-          delayHide={1000}
-          afterShow={(): void => {
-            onCopyCrns();
-            setTimeout(
-              () => ReactTooltip.hide(crnButton?.current ?? undefined),
-              1000
-            );
-          }}
-        >
-          Copied to clipboard!
-        </ReactTooltip>
-      )}
+        <div className="header-action-bar__export-dropdown-content">
+          <FontAwesomeIcon
+            className="header-action-bar__button-icon"
+            fixedWidth
+            icon={faDownload}
+          />
+          <div className="header-action-bar__button-text">Export</div>
+          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+        </div>
+      </DropdownMenu>
 
-      <Button onClick={handleThemeChange}>
-        <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
-        <div className="text">Theme</div>
+      <Button onClick={handleThemeChange} className="header-action-bar__button">
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faAdjust}
+        />
+        <div className="header-action-bar__button-text">Theme</div>
       </Button>
-      <Button href="https://github.com/gt-scheduler/website">
-        <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
-        <div className="text">GitHub</div>
+      <Button
+        href="https://github.com/gt-scheduler/website"
+        className="header-action-bar__button"
+      >
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faGithub}
+        />
+        <div className="header-action-bar__button-text">GitHub</div>
       </Button>
     </div>
   );
