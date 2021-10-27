@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Immutable, Draft } from 'immer';
+import { Immutable, Draft, castDraft } from 'immer';
 
 import { Oscar } from '../../data/beans';
 import useDownloadOscarData from '../../data/hooks/useDownloadOscarData';
@@ -8,6 +8,7 @@ import { NonEmptyArray } from '../../types';
 import LoadingDisplay from '../LoadingDisplay';
 import { SkeletonContent, AppSkeleton, AppSkeletonProps } from '../App/content';
 import {
+  AnyScheduleData,
   ScheduleData,
   ScheduleVersion,
   TermScheduleData,
@@ -18,6 +19,7 @@ import useExtractSchedule from '../../data/hooks/useExtractScheduleVersion';
 import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleData';
 import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 import useScheduleDataProducer from '../../data/hooks/useScheduleDataProducer';
+import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -80,35 +82,40 @@ export function StageEnsureValidTerm({
   return <>{children({ ...loadingState.result })}</>;
 }
 
-export type StageLoadScheduleDataProps = {
+export type StageLoadScheduleDataFromStorageProps = {
   skeletonProps?: StageSkeletonProps;
   children: (props: {
-    scheduleData: Immutable<ScheduleData>;
-    setScheduleData: (
-      next: ((current: ScheduleData) => ScheduleData) | ScheduleData
+    rawScheduleData: Immutable<AnyScheduleData> | null;
+    setRawScheduleData: (
+      next:
+        | ((current: AnyScheduleData | null) => AnyScheduleData | null)
+        | AnyScheduleData
+        | null
     ) => void;
     setTerm: (next: string) => void;
   }) => React.ReactNode;
 };
 
 /**
- * Handles loading the local schedule data from local storage,
+ * Handles loading the raw schedule data from local storage,
  * handling migrating it to a newer version as needed.
  * Renders a disabled header & attribution footer even when loading.
  */
-export function StageLoadScheduleData({
+export function StageLoadScheduleDataFromStorage({
   skeletonProps,
   children,
-}: StageLoadScheduleDataProps): React.ReactElement {
+}: StageLoadScheduleDataFromStorageProps): React.ReactElement {
   const loadingState = useScheduleDataFromStorage();
 
   // We'll need `setTerm` in a few places, so we just construct here
   // and send it to the children that we render.
-  const maybeSetScheduleData =
-    loadingState.type === 'loaded' ? loadingState.result.setScheduleData : null;
+  const maybeSetRawScheduleData =
+    loadingState.type === 'loaded'
+      ? loadingState.result.setRawScheduleData
+      : null;
   const setTerm = useCallback(
     (nextTerm: string): void => {
-      if (maybeSetScheduleData === null) {
+      if (maybeSetRawScheduleData === null) {
         throw new ErrorWithFields({
           message: 'setTerm called when schedule data was not loaded yet',
           fields: {
@@ -117,11 +124,12 @@ export function StageLoadScheduleData({
         });
       }
 
-      maybeSetScheduleData((current) => {
+      maybeSetRawScheduleData((current) => {
+        if (current === null) return null;
         return { ...current, currentTerm: nextTerm };
       });
     },
-    [maybeSetScheduleData]
+    [maybeSetRawScheduleData]
   );
 
   if (loadingState.type !== 'loaded') {
@@ -135,6 +143,47 @@ export function StageLoadScheduleData({
   }
 
   return <>{children({ ...loadingState.result, setTerm })}</>;
+}
+
+export type StageMigrateScheduleDataProps = {
+  rawScheduleData: Immutable<AnyScheduleData> | null;
+  setRawScheduleData: (
+    next:
+      | ((current: AnyScheduleData | null) => AnyScheduleData | null)
+      | AnyScheduleData
+  ) => void;
+  children: (props: {
+    scheduleData: Immutable<ScheduleData>;
+    setScheduleData: (
+      next: ((current: ScheduleData) => ScheduleData) | ScheduleData
+    ) => void;
+  }) => React.ReactNode;
+};
+
+/**
+ * Handles migrating the raw schedule data as needed to the latest version.
+ */
+export function StageMigrateScheduleData({
+  rawScheduleData,
+  setRawScheduleData,
+  children,
+}: StageMigrateScheduleDataProps): React.ReactElement {
+  const loadingState = useMigrateScheduleData({
+    rawScheduleData: castDraft(rawScheduleData),
+    setRawScheduleData,
+  });
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton>
+        <SkeletonContent>
+          <LoadingDisplay state={loadingState} name="list of current terms" />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ ...loadingState.result })}</>;
 }
 
 export type StageCreateScheduleDataProducerProps = {

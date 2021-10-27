@@ -138,7 +138,10 @@
           {
             "devDependencies": true
           }
-        ]
+        ],
+        // This rule adds too much noise when using `expect.*` matchers in an object field
+        // (since they return `any`), so just disable it
+        "@typescript-eslint/no-unsafe-assignment": "off"
       }
     }
   ]
