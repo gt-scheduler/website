@@ -26,7 +26,7 @@ export default function Header({
   tabs,
 }: HeaderProps): React.ReactElement {
   const [
-    { term, oscar, pinnedCrns, allVersionNames, currentVersionIndex },
+    { term, oscar, pinnedCrns, allVersionNames, currentVersion },
     { setTerm, setCurrentVersion, addNewVersion, deleteVersion, renameVersion },
   ] = useContext(ScheduleContext);
   const terms = useContext(TermsContext);
@@ -59,7 +59,7 @@ export default function Header({
         versionsState={{
           type: 'loaded',
           allVersionNames,
-          currentVersionIndex,
+          currentVersion,
           setCurrentVersion,
           addNewVersion,
           deleteVersion,

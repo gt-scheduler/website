@@ -6,7 +6,7 @@ import { act } from 'react-dom/test-utils';
 
 import useScheduleDataFromStorage, {
   SCHEDULE_DATA_LOCAL_STORAGE_KEY,
-} from './useScheduleDataFromStorage';
+} from './useRawScheduleDataFromStorage';
 import { asMockFunction } from '../../utils/tests';
 import LoadingDisplay from '../../components/LoadingDisplay';
 
@@ -58,12 +58,12 @@ describe('useRawScheduleDataFromStorage', () => {
     window.localStorage.setItem(
       SCHEDULE_DATA_LOCAL_STORAGE_KEY,
       JSON.stringify({
-        currentTerm: '202108',
         terms: {
           '202108': {
-            versions: [
-              {
+            versions: {
+              sv_48RC7kqO7YDiBK66qXOd: {
                 name: 'Primary',
+                createdAt: '2021-09-16T00:00:46.191Z',
                 schedule: {
                   desiredCourses: ['CS 1100', 'CS 1331'],
                   pinnedCrns: [
@@ -79,11 +79,10 @@ describe('useRawScheduleDataFromStorage', () => {
                   sortingOptionIndex: 0,
                 },
               },
-            ],
-            currentIndex: 0,
+            },
           },
         },
-        version: 1,
+        version: 2,
       })
     );
 
@@ -94,12 +93,12 @@ describe('useRawScheduleDataFromStorage', () => {
         result: {
           setRawScheduleData: expect.any(Function) as unknown,
           rawScheduleData: {
-            currentTerm: '202108',
             terms: {
               '202108': {
-                versions: [
-                  {
+                versions: {
+                  sv_48RC7kqO7YDiBK66qXOd: {
                     name: 'Primary',
+                    createdAt: '2021-09-16T00:00:46.191Z',
                     schedule: {
                       desiredCourses: ['CS 1100', 'CS 1331'],
                       pinnedCrns: [
@@ -115,11 +114,10 @@ describe('useRawScheduleDataFromStorage', () => {
                       sortingOptionIndex: 0,
                     },
                   },
-                ],
-                currentIndex: 0,
+                },
               },
             },
-            version: 1,
+            version: 2,
           },
         },
       },
@@ -222,14 +220,12 @@ describe('useRawScheduleDataFromStorage', () => {
       if (current.type !== 'loaded') fail("result hasn't yet loaded");
       act(() => {
         current.result.setRawScheduleData({
-          currentTerm: '201808',
           terms: {
             '201808': {
-              versions: [],
-              currentIndex: 0,
+              versions: {},
             },
           },
-          version: 1,
+          version: 2,
         });
       });
 
@@ -246,14 +242,12 @@ describe('useRawScheduleDataFromStorage', () => {
           result: {
             setRawScheduleData: expect.any(Function) as unknown,
             rawScheduleData: {
-              currentTerm: '201808',
               terms: {
                 '201808': {
-                  versions: [],
-                  currentIndex: 0,
+                  versions: {},
                 },
               },
-              version: 1,
+              version: 2,
             },
           },
         },
@@ -270,14 +264,12 @@ describe('useRawScheduleDataFromStorage', () => {
       if (current.type !== 'loaded') fail("result hasn't yet loaded");
       act(() => {
         current.result.setRawScheduleData({
-          currentTerm: '201808',
           terms: {
             '201808': {
-              versions: [],
-              currentIndex: 0,
+              versions: {},
             },
           },
-          version: 1,
+          version: 2,
         });
       });
 
@@ -287,14 +279,12 @@ describe('useRawScheduleDataFromStorage', () => {
           window.localStorage.getItem(SCHEDULE_DATA_LOCAL_STORAGE_KEY) ?? ''
         )
       ).toEqual({
-        currentTerm: '201808',
         terms: {
           '201808': {
-            versions: [],
-            currentIndex: 0,
+            versions: {},
           },
         },
-        version: 1,
+        version: 2,
       });
     });
   });

@@ -3,7 +3,13 @@ import { useEffect, useCallback } from 'react';
 
 import { ErrorWithFields, softError } from '../../log';
 import { LoadingState } from '../../types';
-import { TermScheduleData, defaultSchedule, ScheduleVersion } from '../types';
+import { lexicographicCompare } from '../../utils/misc';
+import {
+  TermScheduleData,
+  defaultSchedule,
+  ScheduleVersion,
+  generateScheduleVersionId,
+} from '../types';
 
 /**
  * Gets the current schedule version from the term schedule data,
@@ -13,15 +19,22 @@ import { TermScheduleData, defaultSchedule, ScheduleVersion } from '../types';
  * If there are no versions, then this hook automatically creates
  * an empty schedule version called 'Primary' and sets it as the current one.
  */
-export default function useExtractScheduleVersion(
-  termScheduleData: Immutable<TermScheduleData>,
+export default function useExtractScheduleVersion({
+  termScheduleData,
+  updateTermScheduleData,
+  currentVersionRaw,
+  setVersion,
+}: {
+  termScheduleData: Immutable<TermScheduleData>;
   updateTermScheduleData: (
     applyDraft: (
       draft: Draft<TermScheduleData>
     ) => void | Immutable<TermScheduleData>
-  ) => void
-): LoadingState<{
-  currentIndex: number;
+  ) => void;
+  currentVersionRaw: string;
+  setVersion: (next: string) => void;
+}): LoadingState<{
+  currentVersion: string;
   scheduleVersion: Immutable<ScheduleVersion>;
   // This function allows the schedule version to be edited in 1 of 2 ways:
   // 1. the draft parameter is mutated, and the function returns nothing/void
@@ -35,37 +48,41 @@ export default function useExtractScheduleVersion(
     ) => void | Immutable<ScheduleVersion>
   ) => void;
 }> {
-  function tryGet<T>(arr: readonly T[], index: number): T | null {
-    if (index < 0 || index > arr.length - 1) return null;
-    return arr[index] ?? null;
-  }
-
   // Switch the version to any other version if the current one is invalid.
   // If there are no versions, then create a new one called 'Primary'
-  const maybeCurrentScheduleVersion = tryGet(
-    termScheduleData.versions,
-    termScheduleData.currentIndex
-  );
+  const maybeCurrentScheduleVersion =
+    termScheduleData.versions[currentVersionRaw] ?? null;
   useEffect(() => {
     if (maybeCurrentScheduleVersion === null) {
       updateTermScheduleData((draft) => {
         // Make sure the schedule isn't on the draft either
-        if (tryGet(draft.versions, draft.currentIndex) === null) {
-          if (draft.versions.length === 0) {
+        if (draft.versions[currentVersionRaw] == null) {
+          if (Object.keys(draft.versions).length === 0) {
             // Create a new version called 'Primary'
-            draft.versions.push({
+            const id = generateScheduleVersionId();
+            draft.versions[id] = {
               name: 'Primary',
+              createdAt: new Date().toISOString(),
               schedule: castDraft(defaultSchedule),
-            });
-            draft.currentIndex = 0;
+            };
+            setVersion(id);
           } else {
-            // Set the current version to the first one
-            draft.currentIndex = 0;
+            // Set the current version to the first one,
+            // sorted by their createdAt time
+            const allVersions = Object.entries(draft.versions).sort(
+              ([, a], [, b]) => lexicographicCompare(a.createdAt, b.createdAt)
+            );
+            setVersion(allVersions[0]?.[0] as string);
           }
         }
       });
     }
-  }, [maybeCurrentScheduleVersion, updateTermScheduleData]);
+  }, [
+    currentVersionRaw,
+    maybeCurrentScheduleVersion,
+    updateTermScheduleData,
+    setVersion,
+  ]);
 
   // Create a nested update callback for just the schedule version.
   // This should only escape this function
@@ -77,17 +94,15 @@ export default function useExtractScheduleVersion(
       ) => void | Immutable<ScheduleVersion>
     ): void => {
       updateTermScheduleData((draft) => {
-        const currentScheduleVersionDraft = tryGet(
-          draft.versions,
-          draft.currentIndex
-        );
+        const currentScheduleVersionDraft =
+          draft.versions[currentVersionRaw] ?? null;
         if (currentScheduleVersionDraft === null) {
           softError(
             new ErrorWithFields({
               message:
                 'updateScheduleVersion called with invalid current schedule version; ignoring',
               fields: {
-                currentIndex: draft.currentIndex,
+                currentVersionRaw,
                 currentScheduleVersion: null,
               },
             })
@@ -95,13 +110,13 @@ export default function useExtractScheduleVersion(
           return;
         }
 
-        draft.versions[draft.currentIndex] = produce(
+        draft.versions[currentVersionRaw] = produce(
           currentScheduleVersionDraft,
           (subDraft) => castDraft(applyDraft(subDraft))
         );
       });
     },
-    [updateTermScheduleData]
+    [updateTermScheduleData, currentVersionRaw]
   );
 
   if (maybeCurrentScheduleVersion === null) {
@@ -113,7 +128,7 @@ export default function useExtractScheduleVersion(
   return {
     type: 'loaded',
     result: {
-      currentIndex: termScheduleData.currentIndex,
+      currentVersion: currentVersionRaw,
       scheduleVersion: maybeCurrentScheduleVersion,
       updateScheduleVersion,
     },

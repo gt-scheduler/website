@@ -3,7 +3,12 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import { asMockFunction, disableLogging } from '../../utils/tests';
 import useMigrateScheduleData from './useMigrateScheduleData';
-import { AnyScheduleData, LATEST_SCHEDULE_DATA_VERSION } from '../types';
+import {
+  AnyScheduleData,
+  LATEST_SCHEDULE_DATA_VERSION,
+  ScheduleData,
+} from '../types';
+import * as dataTypes from '../types';
 import * as migrations from '../migrations';
 
 // Mock the `Cookies` object so we can set values
@@ -12,8 +17,26 @@ jest.mock('js-cookie');
 const cookiesGet = Cookies.get;
 
 describe('useMigrateScheduleData', () => {
+  beforeEach(() => {
+    // Mock the current time to January 1, 1970
+    jest
+      .useFakeTimers('modern')
+      .setSystemTime(new Date('1970-01-01').getTime());
+
+    // Mock the ID generation to be deterministic
+    let current_id = 0;
+    jest.spyOn(dataTypes, 'generateScheduleVersionId');
+    asMockFunction(dataTypes.generateScheduleVersionId).mockImplementation(
+      () => {
+        const id = `sv_${String(current_id).padStart(20, '0')}`;
+        current_id += 1;
+        return id;
+      }
+    );
+  });
+
   afterEach(() => {
-    // Ensure we reset the local storage mock after each test
+    // Ensure we reset the local storage after each test
     window.localStorage.clear();
   });
 
@@ -49,13 +72,14 @@ describe('useMigrateScheduleData', () => {
       }
     );
 
-    const expectedScheduleData: AnyScheduleData = {
-      currentTerm: '202108',
+    const expectedScheduleData: ScheduleData = {
       terms: {
         '202108': {
-          versions: [
-            {
+          versions: {
+            sv_00000000000000000000: {
               name: 'Primary',
+              // January 1, 1970 at 0 seconds
+              createdAt: '1970-01-01T00:00:00.000Z',
               schedule: {
                 desiredCourses: ['CS 1100', 'CS 1331'],
                 pinnedCrns: [
@@ -71,11 +95,10 @@ describe('useMigrateScheduleData', () => {
                 sortingOptionIndex: 0,
               },
             },
-          ],
-          currentIndex: 0,
+          },
         },
       },
-      version: 1,
+      version: 2,
     };
 
     // The migrated data should have been passed to `setRawScheduleData`
@@ -108,12 +131,12 @@ describe('useMigrateScheduleData', () => {
       useMigrateScheduleData({
         setRawScheduleData: setRawScheduleDataMock,
         rawScheduleData: {
-          currentTerm: '202108',
           terms: {
             '202108': {
-              versions: [
-                {
+              versions: {
+                sv_48RC7kqO7YDiBK66qXOd: {
                   name: 'Primary',
+                  createdAt: '2021-09-16T00:00:46.191Z',
                   schedule: {
                     desiredCourses: ['CS 1100', 'CS 1331'],
                     pinnedCrns: [
@@ -129,22 +152,21 @@ describe('useMigrateScheduleData', () => {
                     sortingOptionIndex: 0,
                   },
                 },
-              ],
-              currentIndex: 0,
+              },
             },
           },
-          version: 1,
+          version: 2,
         },
       })
     );
 
     const expectedScheduleData = {
-      currentTerm: '202108',
       terms: {
         '202108': {
-          versions: [
-            {
+          versions: {
+            sv_48RC7kqO7YDiBK66qXOd: {
               name: 'Primary',
+              createdAt: '2021-09-16T00:00:46.191Z',
               schedule: {
                 desiredCourses: ['CS 1100', 'CS 1331'],
                 pinnedCrns: [
@@ -160,11 +182,10 @@ describe('useMigrateScheduleData', () => {
                 sortingOptionIndex: 0,
               },
             },
-          ],
-          currentIndex: 0,
+          },
         },
       },
-      version: 1,
+      version: 2,
     };
 
     // The callback shouldn't have been invoked,

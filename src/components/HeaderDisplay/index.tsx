@@ -23,12 +23,12 @@ type VersionState =
   | { type: 'loading' }
   | {
       type: 'loaded';
-      currentVersionIndex: number;
-      allVersionNames: readonly string[];
-      setCurrentVersion: (nextIndex: number) => void;
+      currentVersion: string;
+      allVersionNames: readonly { id: string; name: string }[];
+      setCurrentVersion: (next: string) => void;
       addNewVersion: (name: string, select?: boolean) => void;
-      deleteVersion: (index: number) => void;
-      renameVersion: (index: number, newName: string) => void;
+      deleteVersion: (id: string) => void;
+      renameVersion: (id: string, newName: string) => void;
     };
 
 export type HeaderDisplayProps = {
@@ -178,7 +178,10 @@ function VersionSelector({
 }: VersionSelectorProps): React.ReactElement | null {
   // Manage the delete confirmation state,
   // used to show a modal when it is non-null.
-  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const isEnabled = useFeatureFlag('2021-09-14', 'schedule-versions');
   if (!isEnabled) return null;
@@ -194,16 +197,16 @@ function VersionSelector({
         desiredItemWidth={260}
         newLabel="New Schedule"
         onChange={state.setCurrentVersion}
-        current={state.currentVersionIndex}
-        options={state.allVersionNames.map((version, i) => {
-          const actions: SelectAction<number>[] = [];
+        current={state.currentVersion}
+        options={state.allVersionNames.map((version) => {
+          const actions: SelectAction<string>[] = [];
 
           // Add the edit (rename) action
           actions.push({
             type: 'edit',
             icon: faPencilAlt,
             onCommit: (newName: string) => {
-              state.renameVersion(i, newName);
+              state.renameVersion(version.id, newName);
               return true;
             },
           });
@@ -215,21 +218,24 @@ function VersionSelector({
               icon: faTrashAlt,
               onClick: () => {
                 // Display a confirmation dialog before deleting the version
-                setDeleteConfirm(i);
+                setDeleteConfirm(version);
               },
             });
           }
 
           return {
-            id: i,
-            label: version,
+            id: version.id,
+            label: version.name,
             actions,
           };
         })}
         onClickNew={(): void => {
           // Handle creating a new version with the auto-generated name
           // (like 'Primary' or 'Secondary')
-          state.addNewVersion(getNextVersionName(state.allVersionNames), true);
+          state.addNewVersion(
+            getNextVersionName(state.allVersionNames.map(({ name }) => name)),
+            true
+          );
         }}
       />
 
@@ -246,7 +252,7 @@ function VersionSelector({
             label: 'Delete',
             onClick: (): void => {
               if (deleteConfirm != null) {
-                state.deleteVersion(deleteConfirm);
+                state.deleteVersion(deleteConfirm.id);
               }
               setDeleteConfirm(null);
             },
@@ -262,7 +268,7 @@ function VersionSelector({
           <h2>Delete confirmation</h2>
           <p>
             Are you sure you want to delete schedule &ldquo;
-            {state.allVersionNames[deleteConfirm ?? 0] ?? '<unknown>'}&rdquo;?
+            {deleteConfirm?.name ?? '<unknown>'}&rdquo;?
           </p>
         </div>
       </Modal>

@@ -342,3 +342,34 @@ export function getNextVersionName(allVersionNames: readonly string[]): string {
   // Fall back to the default with over 10 versions
   return 'New version';
 }
+
+/**
+ * Generates a random alpha-numeric string of the given length.
+ * Contains the characters A-Z, a-z, and 0-9.
+ */
+export function generateRandomId(length: number): string {
+  const charPool =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += charPool[Math.floor(Math.random() * charPool.length)];
+  }
+  return result;
+}
+
+/**
+ * Lexicographically compares two strings (usable as a comparator function).
+ * Based on:
+ * https://riptutorial.com/javascript/example/5388/comparing-strings-lexicographically
+ */
+export function lexicographicCompare(a: string, b: string): number {
+  if (a === b) {
+    return 0;
+  }
+
+  if (a > b) {
+    return 1;
+  }
+
+  return -1;
+}

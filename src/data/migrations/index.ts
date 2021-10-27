@@ -5,7 +5,9 @@ import {
   AnyScheduleData,
   ScheduleData,
   Version1ScheduleDataOrNewer,
+  Version2ScheduleDataOrNewer,
 } from '../types';
+import migrate1To2 from './1to2';
 import migrateCookiesTo1, { defaultVersion1ScheduleData } from './cookiesTo1';
 
 /**
@@ -39,18 +41,12 @@ export default function migrateScheduleData(
     scheduleDataVersion1OrNewer = rawScheduleData;
   }
 
-  // Apply any other migrations here if the version of the data
-  // is lesser than the current one. For example:
-  // let scheduleDataVersion2OrNewer: Version2ScheduleDataOrNewer;
-  // if (scheduleDataVersion1OrNewer.version === 1) {
-  //   scheduleDataVersion2OrNewer =
-  //     migrateVersion1To2(scheduleDataVersion1OrNewer);
-  //   // scheduleDataVersion2OrNewer.version is now 2
-  // } else {
-  //   scheduleDataVersion2OrNewer = scheduleDataVersion1OrNewer;
-  // }
-  // Note: if a migration fails, we probably can't continue,
-  // so feel free to throw an error that will be caught by the caller.
+  let scheduleDataVersion2OrNewer: Version2ScheduleDataOrNewer;
+  if (scheduleDataVersion1OrNewer.version === 1) {
+    scheduleDataVersion2OrNewer = migrate1To2(scheduleDataVersion1OrNewer);
+  } else {
+    scheduleDataVersion2OrNewer = scheduleDataVersion1OrNewer;
+  }
 
-  return scheduleDataVersion1OrNewer;
+  return scheduleDataVersion2OrNewer;
 }
