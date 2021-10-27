@@ -1,0 +1,44 @@
+@import '../../variables.scss';
+
+.account-dropdown {
+  &__content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    // Add a gap of 4px between the circle and caret
+    & > :not(:last-child) {
+      margin-right: 4px;
+    }
+  }
+
+  &__circle {
+    --size: 40px;
+    height: var(--size);
+    width: var(--size);
+    border-radius: 100000px;
+    background-color: $account-accent;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__signed-out-icon {
+    font-size: 1.5rem;
+    color: white;
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
+  }
+
+  &__user-initials {
+    font-weight: 400;
+    color: white;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  }
+
+  &__signed-in-label-faded {
+    opacity: 0.6;
+  }
+}

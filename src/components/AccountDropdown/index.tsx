@@ -9,142 +9,145 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { AccountContextValue, SignedIn } from '../../contexts/account';
 import LoginModal from '../LoginModal';
-import { DropdownMenu } from '../Select';
+import { DropdownMenu, DropdownMenuAction } from '../Select';
 import Spinner from '../Spinner';
+import { classes } from '../../utils/misc';
+
+import './stylesheet.scss';
 
 export type AccountDropdownProps = {
   state: AccountContextValue | { type: 'loading' };
+  className?: string;
+  style?: React.CSSProperties;
 };
 
+/**
+ * Renders the dropdown menu in the app header
+ * that lets the user either:
+ * - sign in if they aren't logged in,
+ *   by displaying the login modal, or
+ * - view who they are logged in as, and sign out if desired.
+ * Additionally, it shows the initials of the user
+ * in a circle when they are logged in
+ * (similar to Google account "icons").
+ */
 export default function AccountDropdown({
   state,
-}: AccountDropdownProps): React.ReactElement {
+  className,
+  style,
+}: AccountDropdownProps): React.ReactElement | null {
   const [loginOpen, setLoginOpen] = useState(false);
   const hideLogin = useCallback(() => setLoginOpen(false), []);
 
-  let content;
-  if (state.type === 'loading') {
-    content = (
-      <DropdownMenu disabled menuAnchor="right" items={[]}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: '10000px',
-              backgroundColor: '#0C797D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 4,
-            }}
-          >
-            <Spinner size={24} />
-          </div>
-          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-        </div>
-      </DropdownMenu>
-    );
-  } else {
-    // TODO clean up code
-    const initials =
-      state.type === 'signedIn'
-        ? getInitials(state.name ?? state.email ?? state.id)
-        : '';
-    content = (
-      <DropdownMenu
-        menuAnchor="right"
-        items={
-          state.type === 'signedIn'
-            ? [
-                {
-                  label: <SignedInLabel state={state} />,
-                },
-                {
-                  label: 'Sign out',
-                  icon: faSignOutAlt,
-                  onClick: (): void => state.signOut(),
-                },
-              ]
-            : [
-                {
-                  label: 'Sign in',
-                  icon: faSignInAlt,
-                  onClick: (): void => {
-                    setLoginOpen(true);
-                  },
-                },
-              ]
-        }
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: '10000px',
-              backgroundColor: '#0C797D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 4,
-            }}
-          >
-            {state.type === 'signedIn' ? (
-              <span
-                style={{
-                  fontSize:
-                    initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
-                  fontWeight: 400,
-                  textShadow: '0 0 6px rgba(0,0,0,0.5)',
-                  color: 'white',
-                }}
-              >
-                {initials.slice(0, 3)}
-              </span>
-            ) : (
-              <FontAwesomeIcon
-                fixedWidth
-                icon={faUserCircle}
-                style={{
-                  fontSize: '1.5rem',
-                  filter: 'drop-shadow(0 0 6px rgb(0,0,0,0.5))',
-                  color: 'white',
-                }}
-              />
-            )}
-          </div>
-          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-        </div>
-      </DropdownMenu>
-    );
+  let items: DropdownMenuAction[];
+  let circleContent: React.ReactNode;
+  let disabled: boolean;
+  switch (state.type) {
+    case 'loading':
+      items = [];
+      circleContent = <Spinner size={24} />;
+      disabled = true;
+      break;
+    case 'signedIn':
+      items = [
+        {
+          label: <SignedInLabel state={state} />,
+        },
+        {
+          label: 'Sign out',
+          icon: faSignOutAlt,
+          onClick: (): void => state.signOut(),
+        },
+      ];
+      circleContent = <UserInitials state={state} />;
+      disabled = false;
+      break;
+    case 'signedOut':
+      items = [
+        {
+          label: 'Sign in',
+          icon: faSignInAlt,
+          onClick: (): void => {
+            setLoginOpen(true);
+          },
+        },
+      ];
+      circleContent = (
+        <FontAwesomeIcon
+          fixedWidth
+          icon={faUserCircle}
+          className="account-dropdown__signed-out-icon"
+        />
+      );
+      disabled = false;
+      break;
+    default:
+      // unreachable
+      return null;
   }
 
   return (
     <>
-      {content} <LoginModal show={loginOpen} onHide={hideLogin} />
+      <DropdownMenu
+        disabled={disabled}
+        menuAnchor="right"
+        items={items}
+        className={classes('account-dropdown', className)}
+        style={style}
+      >
+        <div className="account-dropdown__content">
+          <div className="account-dropdown__circle">{circleContent}</div>
+          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+        </div>
+      </DropdownMenu>
+      <LoginModal show={loginOpen} onHide={hideLogin} />
     </>
   );
 }
 
 // Private sub-components
 
+type UserInitialsProps = {
+  state: SignedIn;
+};
+
+/**
+ * Shows the initials of the user's name, email, or id where available,
+ * changing the size of each letter depending on the number of initials.
+ * Supports up to 4 initials.
+ */
+function UserInitials({ state }: UserInitialsProps): React.ReactElement {
+  const initials = getInitials(state.name ?? state.email ?? state.id);
+  return (
+    <span
+      className="account-dropdown__user-initials"
+      style={{
+        fontSize: initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
+      }}
+    >
+      {initials.slice(0, 3)}
+    </span>
+  );
+}
+
+/**
+ * Extracts the initials from the given name
+ */
+function getInitials(displayName: string): string {
+  const regex = /\b\w/g;
+  const matches = displayName.match(regex);
+  if (matches === null) return '';
+  return matches.join('');
+}
+
 type SignedInLabelProps = {
   state: SignedIn;
 };
 
+/**
+ * Formats the text shown in the account dropdown when the user is signed in,
+ * telling them their name, email, and provider when available.
+ */
 function SignedInLabel({ state }: SignedInLabelProps): React.ReactElement {
   let signedInAs: React.ReactNode;
   if (state.name !== null && state.email !== null) {
@@ -163,19 +166,16 @@ function SignedInLabel({ state }: SignedInLabelProps): React.ReactElement {
     providerText = ` via ${state.provider}`;
   }
   return (
-    <div style={{ lineHeight: 1.25 }}>
-      <span style={{ opacity: 0.6 }}>Signed in as:</span>
+    <div>
+      <span className="account-dropdown__signed-in-label-faded">
+        Signed in as:
+      </span>
       <br />
       {signedInAs}
       <br />
-      <span style={{ opacity: 0.6 }}>{providerText}</span>
+      <span className="account-dropdown__signed-in-label-faded">
+        {providerText}
+      </span>
     </div>
   );
-}
-
-function getInitials(displayName: string): string {
-  const regex = /\b\w/g;
-  const matches = displayName.match(regex);
-  if (matches === null) return '';
-  return matches.join('');
 }
