@@ -17,7 +17,7 @@ type HookResult = {
   rawScheduleData: Immutable<AnyScheduleData> | null;
   setRawScheduleData: (
     next:
-      | ((current: AnyScheduleData | null) => AnyScheduleData)
+      | ((current: AnyScheduleData | null) => AnyScheduleData | null)
       | AnyScheduleData
   ) => void;
 };
@@ -74,7 +74,7 @@ export default function useRawScheduleDataFromFirebase(
   const setScheduleDataPersistent = useCallback(
     (
       next:
-        | ((current: AnyScheduleData | null) => AnyScheduleData)
+        | ((current: AnyScheduleData | null) => AnyScheduleData | null)
         | AnyScheduleData
     ): void => {
       let nextScheduleData;
@@ -89,6 +89,8 @@ export default function useRawScheduleDataFromFirebase(
       } else {
         nextScheduleData = next;
       }
+      if (nextScheduleData === null) return;
+
       schedulesCollection
         .doc(account.id)
         .set(nextScheduleData)
