@@ -177,7 +177,10 @@ export function StageMigrateScheduleData({
     return (
       <AppSkeleton>
         <SkeletonContent>
-          <LoadingDisplay state={loadingState} name="list of current terms" />
+          <LoadingDisplay
+            state={loadingState}
+            name="schema migrations to schedule data"
+          />
         </SkeletonContent>
       </AppSkeleton>
     );
