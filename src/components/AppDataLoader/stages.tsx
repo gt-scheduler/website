@@ -37,7 +37,7 @@ import useRawScheduleDataFromFirebase from '../../data/hooks/useRawScheduleDataF
 // (like having a valid current term/version),
 // where an operation depends on the results of previous action(s).
 // For example, ensuring that the current term is valid
-// depends on fetching the list of terms from the GitHub API,
+// depends on fetching the list of terms from the crawler's index,
 // so having them be two separate stages naturally encodes this dependency.
 // It also lets us stop rendering the app when data is still loading,
 // and instead show a partially interactive "skeleton".
@@ -347,7 +347,7 @@ export type StageLoadTermsProps = {
 };
 
 /**
- * Handles loading the list of terms from the GitHub API upon first mount,
+ * Handles loading the list of terms from the crawler's index upon first mount,
  * showing loading and error states as needed.
  * Renders a disabled header & attribution footer even when loading.
  */

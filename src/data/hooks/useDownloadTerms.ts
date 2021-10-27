@@ -6,9 +6,7 @@ import { LoadingState, NonEmptyArray } from '../../types';
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
-const CRAWLER_REPO = 'gt-scheduler/crawler';
-const CRAWLER_BRANCH = 'gh-pages';
-const GITHUB_API_URL = `https://api.github.com/repos/${CRAWLER_REPO}/contents?ref=${CRAWLER_BRANCH}`;
+const CRAWLER_INDEX_URL = 'https://gt-scheduler.github.io/crawler/index.json';
 
 /**
  * Downloads the list of terms that the crawler has valid data for.
@@ -22,25 +20,20 @@ export default function useDownloadTerms(): LoadingState<
     type: 'loading',
   });
 
-  // Fetch all terms via the GitHub API
+  // Fetch all terms via the crawler's self-hosted index
   useEffect(() => {
     const loadOperation = new Cancellable();
     async function load(): Promise<void> {
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const promise = axios.get<{ name: string }[]>(GITHUB_API_URL);
+          const promise = axios.get<{ terms: string[] }>(CRAWLER_INDEX_URL);
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;
           }
 
-          const newTerms = result.value.data
-            .map((content) => content.name)
-            .filter((name) => /\d{6}\.json/.test(name))
-            .map((name) => name.replace(/\.json$/, ''))
-            .sort()
-            .reverse();
+          const newTerms = result.value.data.terms.sort().reverse();
 
           // Ensure that there is at least 1 term before continuing
           if (newTerms.length === 0) {
@@ -63,7 +56,7 @@ export default function useDownloadTerms(): LoadingState<
                 message: 'error fetching list of terms',
                 source: err,
                 fields: {
-                  url: GITHUB_API_URL,
+                  url: CRAWLER_INDEX_URL,
                 },
               })
             );
