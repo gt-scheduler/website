@@ -35,12 +35,16 @@ export function LoginModalContent(): React.ReactElement {
   return (
     <div className="login-modal-content">
       <h1>Sign in</h1>
-      <p style={{ textAlign: 'center', marginBottom: 28 }}>
+      <p className="login-modal-content__body">
         Sign in using one of the below identity providers to start syncing your
         schedules across devices.
       </p>
       <div style={{ minHeight }}>
-        <FirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+        <FirebaseAuth
+          className="login-modal-content__firebase-ui"
+          uiConfig={uiConfig}
+          firebaseAuth={firebase.auth()}
+        />
       </div>
     </div>
   );

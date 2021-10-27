@@ -5,12 +5,9 @@ import {
   faPaste,
   faAdjust,
   faCaretDown,
-  faSignOutAlt,
-  faSignInAlt,
-  faUserCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext } from 'react';
 
 import { Button } from '..';
 import {
@@ -19,11 +16,10 @@ import {
 } from '../../constants';
 import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
-import { AccountContextValue, SignedIn } from '../../contexts/account';
+import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
-import LoginModal from '../LoginModal';
-import Spinner from '../Spinner';
+import AccountDropdown from '../AccountDropdown';
 
 import './stylesheet.scss';
 
@@ -82,7 +78,6 @@ export default function HeaderActionBar({
       onClick: onExportCalendar,
     });
   }
-  // TODO add the tooltip back to this button
   if (enableCopyCrns) {
     exportActions.push({
       label: 'Copy CRNs to clipboard',
@@ -139,173 +134,7 @@ export default function HeaderActionBar({
         <div className="header-action-bar__button-text">GitHub</div>
       </Button>
 
-      <AccountDropDown state={accountState} />
+      <AccountDropdown state={accountState} />
     </div>
   );
-}
-
-// Private sub-components
-
-type AccountDropDownProps = {
-  state: AccountContextValue | { type: 'loading' };
-};
-
-function AccountDropDown({ state }: AccountDropDownProps): React.ReactElement {
-  const [loginOpen, setLoginOpen] = useState(false);
-  const hideLogin = useCallback(() => setLoginOpen(false), []);
-
-  let content;
-  if (state.type === 'loading') {
-    content = (
-      <DropdownMenu disabled menuAnchor="right" items={[]}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: '10000px',
-              backgroundColor: '#0C797D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 4,
-            }}
-          >
-            <Spinner size={24} />
-          </div>
-          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-        </div>
-      </DropdownMenu>
-    );
-  } else {
-    // TODO clean up code
-    const initials =
-      state.type === 'signedIn'
-        ? getInitials(state.name ?? state.email ?? state.id)
-        : '';
-    content = (
-      <DropdownMenu
-        menuAnchor="right"
-        items={
-          state.type === 'signedIn'
-            ? [
-                {
-                  label: <SignedInLabel state={state} />,
-                },
-                {
-                  label: 'Sign out',
-                  icon: faSignOutAlt,
-                  onClick: (): void => state.signOut(),
-                },
-              ]
-            : [
-                {
-                  label: 'Sign in',
-                  icon: faSignInAlt,
-                  onClick: (): void => {
-                    setLoginOpen(true);
-                  },
-                },
-              ]
-        }
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: '10000px',
-              backgroundColor: '#0C797D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 4,
-            }}
-          >
-            {state.type === 'signedIn' ? (
-              <span
-                style={{
-                  fontSize:
-                    initials.length <= 1 ? 22 : initials.length === 2 ? 19 : 17,
-                  fontWeight: 400,
-                  textShadow: '0 0 6px rgba(0,0,0,0.5)',
-                  color: 'white',
-                }}
-              >
-                {initials.slice(0, 3)}
-              </span>
-            ) : (
-              <FontAwesomeIcon
-                fixedWidth
-                icon={faUserCircle}
-                style={{
-                  fontSize: '1.5rem',
-                  filter: 'drop-shadow(0 0 6px rgb(0,0,0,0.5))',
-                  color: 'white',
-                }}
-              />
-            )}
-          </div>
-          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
-        </div>
-      </DropdownMenu>
-    );
-  }
-
-  return (
-    <>
-      {content} <LoginModal show={loginOpen} onHide={hideLogin} />
-    </>
-  );
-}
-
-type SignedInLabelProps = {
-  state: SignedIn;
-};
-
-function SignedInLabel({ state }: SignedInLabelProps): React.ReactElement {
-  let signedInAs: React.ReactNode;
-  if (state.name !== null && state.email !== null) {
-    signedInAs = (
-      <>
-        <strong>{state.name}</strong> ({state.email})
-      </>
-    );
-  } else if (state.name !== null || state.email !== null) {
-    signedInAs = `${state.name ?? state.email ?? ''}`;
-  } else {
-    signedInAs = state.id;
-  }
-  let providerText = '';
-  if (state.provider !== null) {
-    providerText = ` via ${state.provider}`;
-  }
-  return (
-    <div style={{ lineHeight: 1.25 }}>
-      <span style={{ opacity: 0.6 }}>Signed in as:</span>
-      <br />
-      {signedInAs}
-      <br />
-      <span style={{ opacity: 0.6 }}>{providerText}</span>
-    </div>
-  );
-}
-
-function getInitials(displayName: string): string {
-  const regex = /\b\w/g;
-  const matches = displayName.match(regex);
-  if (matches === null) return '';
-  return matches.join('');
 }
