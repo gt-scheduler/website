@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 
-import { Header, Scheduler, Attribution } from '..';
+import { Header, Scheduler, Attribution, Calendar } from '..';
 import { ReactErrorDetails } from '../ErrorDetails';
 import ErrorDisplay from '../ErrorDisplay';
 import ErrorHeader from '../ErrorHeader';
@@ -21,7 +21,8 @@ function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
 
-  const headerActionBarProps = useHeaderActionBarProps();
+  const captureRef = useRef<HTMLDivElement>(null);
+  const headerActionBarProps = useHeaderActionBarProps(captureRef);
 
   return (
     <>
@@ -31,6 +32,7 @@ function AppContentBase(): React.ReactElement {
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
+        captureRef={captureRef}
       />
       <ErrorBoundary
         fallback={(error, errorInfo): React.ReactElement => (
@@ -53,6 +55,11 @@ function AppContentBase(): React.ReactElement {
       >
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
+
+        {/* Fake calendar used to capture screenshots */}
+        <div className="capture-container" ref={captureRef}>
+          <Calendar className="fake-calendar" capture overlayCrns={[]} />
+        </div>
       </ErrorBoundary>
       <Attribution />
     </>

@@ -27,13 +27,24 @@ $max-item-width: 320px;
     cursor: default;
   }
 
+  &.anchor-left {
+    .option-container {
+      left: 0;
+    }
+  }
+
+  &.anchor-right {
+    .option-container {
+      right: 0;
+    }
+  }
+
   .option-container {
     @include popup;
 
     margin: 0;
     z-index: 1;
     position: absolute;
-    left: 0;
     min-width: 100%;
     top: 100%;
     max-height: 240px;
@@ -51,17 +62,26 @@ $max-item-width: 320px;
     .option {
       justify-content: center;
       align-items: stretch;
-      white-space: nowrap;
       padding: 0;
       display: flex;
 
-      // Include a highlight-hover style on the outer option
-      // so that when hovering over an option with actions,
-      // the (un)mounting of the action buttons
-      // don't cause visible changes in the bounds of the hover highlight.
-      transition: background-color .2s;
-      &:hover {
-        background-color: $color-border;
+      &:not(.text-option) {
+        user-select: none;
+        white-space: nowrap;
+
+        // Include a highlight-hover style on the outer option
+        // so that when hovering over an option with actions,
+        // the (un)mounting of the action buttons
+        // don't cause visible changes in the bounds of the hover highlight.
+        transition: background-color .2s;
+        &:hover {
+          background-color: $color-border;
+        }
+      }
+
+      &.text-option {
+        cursor: default;
+        user-select: none;
       }
 
       .Button {
@@ -69,7 +89,7 @@ $max-item-width: 320px;
         flex-grow: 0;
       }
 
-      .option-text {
+      .option-button-text {
         min-width: 87px;
         white-space: nowrap;
         overflow: hidden;
@@ -80,6 +100,13 @@ $max-item-width: 320px;
 
         // Disable the highlight-on-hover styles for the main button
         background-color: transparent;
+      }
+
+      .option-text {
+        justify-content: center;
+        align-items: center;
+        padding: 12px;
+        width: 100%;
       }
 
       .option-button {

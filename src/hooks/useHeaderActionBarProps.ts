@@ -1,5 +1,5 @@
 import copy from 'copy-to-clipboard';
-import { useContext, useRef, useCallback } from 'react';
+import React, { useContext, useCallback } from 'react';
 
 import { HeaderActionBarProps } from '../components/HeaderActionBar';
 import { ScheduleContext, ThemeContext } from '../contexts';
@@ -20,10 +20,11 @@ export type HookResult = Pick<
  * Custom hook to prepare a majority of the `<HeaderActionBar>` props.
  * Requires a valid value for `ScheduleContext` and `ThemeContext`.
  */
-export default function useHeaderActionBarProps(): HookResult {
+export default function useHeaderActionBarProps(
+  captureRef: React.MutableRefObject<HTMLDivElement | null>
+): HookResult {
   const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
-  const captureRef = useRef<HTMLDivElement>(null);
 
   const handleExport = useCallback(() => {
     try {

@@ -17,6 +17,7 @@ import './stylesheet.scss';
 export type SelectProps<Id extends string | number> = {
   className?: string;
   style?: React.CSSProperties;
+  menuAnchor?: 'left' | 'right';
   current: Id;
   onChange: (newId: Id) => void;
   options: SelectOption<Id>[];
@@ -80,6 +81,7 @@ export interface ButtonAction<Id extends string | number> {
 export default function Select<Id extends string | number>({
   className,
   style,
+  menuAnchor = 'left',
   current,
   onChange,
   options,
@@ -159,12 +161,12 @@ export default function Select<Id extends string | number>({
 
   return (
     <div
-      className={classes('Button', 'Select', className)}
+      className={classes('Button', 'Select', className, `anchor-${menuAnchor}`)}
       onClick={(): void => trySetOpened(!opened)}
       style={style}
     >
       <div className="text">{label}</div>
-      <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+      <FontAwesomeIcon fixedWidth icon={faCaretDown} className="caret" />
       {opened && (
         <div className="intercept" onClick={(): void => trySetOpened(false)} />
       )}
@@ -191,7 +193,7 @@ export default function Select<Id extends string | number>({
                 />
               ) : (
                 <Button
-                  className="option-text"
+                  className="option-button-text"
                   key={optionId}
                   onClick={(): void => onChange(optionId)}
                 >
@@ -259,8 +261,12 @@ export default function Select<Id extends string | number>({
           ))}
           {onClickNew !== undefined && (
             <div className="option">
-              <Button className="option-text" onClick={onClickNew}>
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} />{' '}
+              <Button className="option-button-text" onClick={onClickNew}>
+                <FontAwesomeIcon
+                  fixedWidth
+                  icon={faPlus}
+                  style={{ marginRight: 8 }}
+                />
                 {newLabel}
               </Button>
             </div>
@@ -289,7 +295,7 @@ export function LoadingSelect({
     <div className={classes('Button', 'Select', className, 'disabled')}>
       <Spinner size="small" style={{ marginRight: 12 }} />
       <div className="text">{label}</div>
-      <FontAwesomeIcon fixedWidth icon={faCaretDown} />
+      <FontAwesomeIcon fixedWidth icon={faCaretDown} className="caret" />
     </div>
   );
 }

@@ -5,6 +5,7 @@
   .menu {
     display: flex;
     align-items: stretch;
+    justify-content: flex-end;
 
     .text {
       margin-left: 4px;
@@ -20,17 +21,31 @@
       flex: 1;
       margin-left: 0;
 
-      @media (max-width: $large-mobile-breakpoint) {
-        height: 64px;
-        
-        svg {
-          transform: scale(1.25);
+      @media (max-width: $desktop-breakpoint) {
+        svg:not(.caret) {
+          transform: scale(1.3);
+
+          @media (max-width: $large-mobile-breakpoint) {
+            transform: scale(1.35);
+          }
+        }
+
+        .option-container {
+          svg:not(.caret) {
+            transform: scale(1);
+          }
         }
       }
 
-      .Button {
-        flex: 1;
-        padding: 0;
+      @media (max-width: $large-mobile-breakpoint) {
+        height: 64px;
+        justify-content: flex-start;
+        padding-left: 4px;
+      }
+
+      .Button:not(.option-button-text) {
+        padding-left: 18px;
+        padding-right: 18px;
       }
     }
   }
