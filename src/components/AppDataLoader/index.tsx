@@ -6,6 +6,7 @@ import {
   TermsContext,
   ScheduleContext,
 } from '../../contexts';
+import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { Oscar } from '../../data/beans';
 import useVersionActions from '../../data/hooks/useVersionActions';
 import {
@@ -18,11 +19,12 @@ import {
 import { lexicographicCompare } from '../../utils/misc';
 import {
   StageLoadUIState,
-  StageLoadRawScheduleDataFromStorage,
-  StageMigrateScheduleData,
-  StageCreateScheduleDataProducer,
   StageLoadTerms,
   StageEnsureValidTerm,
+  StageLoadAccount,
+  StageLoadRawScheduleDataHybrid,
+  StageMigrateScheduleData,
+  StageCreateScheduleDataProducer,
   StageExtractTermScheduleData,
   StageLoadOscarData,
   StageExtractScheduleVersion,
@@ -35,7 +37,7 @@ export type DataLoaderProps = {
 
 /**
  * Handles loading all relevant data and provide valid values
- * for the Terms & Term contexts before rendering its `children`.
+ * for the Terms, Term, and Account contexts before rendering its `children`.
  * Works by having a series of "stages" implemented as components,
  * where each stage doesn't render its children until its ready.
  * Until then, they won't run the function passed in to their `children` prop
@@ -77,64 +79,74 @@ export default function DataLoader({
                   currentTerm,
                 };
                 return (
-                  <GroupLoadScheduleData skeletonProps={{ termsState }}>
-                    {({
-                      scheduleData,
-                      updateScheduleData,
-                    }): React.ReactElement => (
-                      <StageExtractTermScheduleData
-                        skeletonProps={{ termsState }}
-                        currentTerm={currentTerm}
-                        scheduleData={scheduleData}
-                        updateScheduleData={updateScheduleData}
+                  <StageLoadAccount skeletonProps={{ termsState }}>
+                    {({ accountState }): React.ReactElement => (
+                      <GroupLoadScheduleData
+                        accountState={accountState}
+                        skeletonProps={{ termsState, accountState }}
                       >
                         {({
-                          termScheduleData,
-                          updateTermScheduleData,
+                          scheduleData,
+                          updateScheduleData,
                         }): React.ReactElement => (
-                          <StageLoadOscarData
-                            skeletonProps={{ termsState }}
-                            term={currentTerm}
+                          <StageExtractTermScheduleData
+                            skeletonProps={{ termsState, accountState }}
+                            currentTerm={currentTerm}
+                            scheduleData={scheduleData}
+                            updateScheduleData={updateScheduleData}
                           >
-                            {({ oscar }): React.ReactElement => (
-                              <StageExtractScheduleVersion
-                                skeletonProps={{ termsState }}
-                                currentVersionRaw={currentVersionRaw}
-                                setVersion={setVersion}
-                                termScheduleData={termScheduleData}
-                                updateTermScheduleData={updateTermScheduleData}
+                            {({
+                              termScheduleData,
+                              updateTermScheduleData,
+                            }): React.ReactElement => (
+                              <StageLoadOscarData
+                                skeletonProps={{ termsState, accountState }}
+                                term={currentTerm}
                               >
-                                {({
-                                  currentVersion,
-                                  scheduleVersion,
-                                  updateScheduleVersion,
-                                }): React.ReactElement => (
-                                  <ContextProvider
-                                    terms={terms}
-                                    currentTerm={currentTerm}
-                                    setTerm={setTerm}
-                                    currentVersion={currentVersion}
+                                {({ oscar }): React.ReactElement => (
+                                  <StageExtractScheduleVersion
+                                    skeletonProps={{ termsState, accountState }}
+                                    currentVersionRaw={currentVersionRaw}
                                     setVersion={setVersion}
-                                    oscar={oscar}
-                                    scheduleVersion={scheduleVersion}
-                                    updateScheduleVersion={
-                                      updateScheduleVersion
-                                    }
                                     termScheduleData={termScheduleData}
                                     updateTermScheduleData={
                                       updateTermScheduleData
                                     }
                                   >
-                                    {children}
-                                  </ContextProvider>
+                                    {({
+                                      currentVersion,
+                                      scheduleVersion,
+                                      updateScheduleVersion,
+                                    }): React.ReactElement => (
+                                      <ContextProvider
+                                        terms={terms}
+                                        currentTerm={currentTerm}
+                                        setTerm={setTerm}
+                                        currentVersion={currentVersion}
+                                        setVersion={setVersion}
+                                        oscar={oscar}
+                                        scheduleVersion={scheduleVersion}
+                                        updateScheduleVersion={
+                                          updateScheduleVersion
+                                        }
+                                        termScheduleData={termScheduleData}
+                                        updateTermScheduleData={
+                                          updateTermScheduleData
+                                        }
+                                        accountState={accountState}
+                                      >
+                                        {children}
+                                      </ContextProvider>
+                                    )}
+                                  </StageExtractScheduleVersion>
                                 )}
-                              </StageExtractScheduleVersion>
+                              </StageLoadOscarData>
                             )}
-                          </StageLoadOscarData>
+                          </StageExtractTermScheduleData>
                         )}
-                      </StageExtractTermScheduleData>
+                      </GroupLoadScheduleData>
                     )}
-                  </GroupLoadScheduleData>
+                  </StageLoadAccount>
                 );
               }}
             </StageEnsureValidTerm>
@@ -149,6 +161,7 @@ export default function DataLoader({
 
 type GroupLoadScheduleDataProps = {
   skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
   children: (props: {
     scheduleData: Immutable<ScheduleData>;
     updateScheduleData: (
@@ -163,10 +176,14 @@ type GroupLoadScheduleDataProps = {
  */
 function GroupLoadScheduleData({
   skeletonProps,
+  accountState,
   children,
 }: GroupLoadScheduleDataProps): React.ReactElement {
   return (
-    <StageLoadRawScheduleDataFromStorage skeletonProps={skeletonProps}>
+    <StageLoadRawScheduleDataHybrid
+      skeletonProps={skeletonProps}
+      accountState={accountState}
+    >
       {({ rawScheduleData, setRawScheduleData }): React.ReactElement => (
         <StageMigrateScheduleData
           skeletonProps={skeletonProps}
@@ -182,7 +199,7 @@ function GroupLoadScheduleData({
           )}
         </StageMigrateScheduleData>
       )}
-    </StageLoadRawScheduleDataFromStorage>
+    </StageLoadRawScheduleDataHybrid>
   );
 }
 
@@ -205,12 +222,13 @@ type ContextProviderProps = {
       draft: Draft<TermScheduleData>
     ) => void | Immutable<TermScheduleData>
   ) => void;
+  accountState: AccountContextValue;
   children: React.ReactNode;
 };
 
 /**
  * Handles making all loaded data available to the rest of the app
- * via the contexts `TermsContext` and `ScheduleContext`.
+ * via the contexts `TermsContext`, `ScheduleContext`, and `AccountContext`.
  * Additionally, this function memoizes the context values
  * as well as any derived values that go into them.
  */
@@ -225,6 +243,7 @@ function ContextProvider({
   updateScheduleVersion,
   termScheduleData,
   updateTermScheduleData,
+  accountState,
   children,
 }: ContextProviderProps): React.ReactElement {
   // Create a `updateSchedule` function
@@ -312,7 +331,9 @@ function ContextProvider({
   return (
     <TermsContext.Provider value={terms}>
       <ScheduleContext.Provider value={scheduleContextValue}>
-        {children}
+        <AccountContext.Provider value={accountState}>
+          {children}
+        </AccountContext.Provider>
       </ScheduleContext.Provider>
     </TermsContext.Provider>
   );

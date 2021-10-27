@@ -14,6 +14,7 @@ import {
   AppMobileNavDisplay,
 } from './navigation';
 import { classes } from '../../utils/misc';
+import { AccountContextValue } from '../../contexts/account';
 
 /**
  * Renders the actual content at the root of the app
@@ -78,6 +79,7 @@ export const AppContent = React.memo(AppContentBase);
 
 export type AppSkeletonProps = {
   children: React.ReactNode;
+  accountState?: AccountContextValue;
   termsState?: {
     terms: string[];
     currentTerm: string;
@@ -93,6 +95,7 @@ export type AppSkeletonProps = {
  */
 export function AppSkeleton({
   children,
+  accountState,
   termsState,
 }: AppSkeletonProps): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
@@ -106,6 +109,7 @@ export function AppSkeleton({
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
+        accountState={accountState ?? { type: 'loading' }}
         termsState={
           termsState == null
             ? { type: 'loading' }

@@ -16,14 +16,17 @@ import {
 } from '../../constants';
 import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
+import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
+import AccountDropdown from '../AccountDropdown';
 
 import './stylesheet.scss';
 
 export type HeaderActionBarProps = {
   className?: string;
   style?: React.CSSProperties;
+  accountState: AccountContextValue | { type: 'loading' };
   onCopyCrns?: () => void;
   enableCopyCrns?: boolean;
   onExportCalendar?: () => void;
@@ -43,6 +46,7 @@ export type HeaderActionBarProps = {
 export default function HeaderActionBar({
   className,
   style,
+  accountState,
   onCopyCrns = (): void => undefined,
   enableCopyCrns = false,
   onExportCalendar = (): void => undefined,
@@ -129,6 +133,8 @@ export default function HeaderActionBar({
         />
         <div className="header-action-bar__button-text">GitHub</div>
       </Button>
+
+      <AccountDropdown state={accountState} />
     </div>
   );
 }

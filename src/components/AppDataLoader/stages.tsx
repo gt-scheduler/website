@@ -20,6 +20,9 @@ import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 import useScheduleDataProducer from '../../data/hooks/useScheduleDataProducer';
 import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
+import { AccountContextValue, SignedIn } from '../../contexts/account';
+import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
+import useRawScheduleDataFromFirebase from '../../data/hooks/useRawScheduleDataFromFirebase';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -187,6 +190,116 @@ export function StageMigrateScheduleData({
   }
 
   return <>{children({ ...loadingState.result })}</>;
+}
+
+export type StageLoadRawScheduleDataHybridProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
+  children: (props: {
+    rawScheduleData: Immutable<AnyScheduleData> | null;
+    setRawScheduleData: (
+      next:
+        | ((current: AnyScheduleData | null) => AnyScheduleData | null)
+        | AnyScheduleData
+    ) => void;
+  }) => React.ReactNode;
+};
+
+/**
+ * Handles loading the schedule data from either Firebase or local storage
+ * depending on the current account state.
+ */
+export function StageLoadRawScheduleDataHybrid({
+  skeletonProps,
+  accountState,
+  children,
+}: StageLoadRawScheduleDataHybridProps): React.ReactElement {
+  if (accountState.type === 'signedIn') {
+    return (
+      <StageLoadRawScheduleDataFromFirebase
+        skeletonProps={skeletonProps}
+        accountState={accountState}
+      >
+        {children}
+      </StageLoadRawScheduleDataFromFirebase>
+    );
+  }
+
+  return (
+    <StageLoadRawScheduleDataFromStorage skeletonProps={skeletonProps}>
+      {children}
+    </StageLoadRawScheduleDataFromStorage>
+  );
+}
+
+export type StageLoadRawScheduleDataFromFirebaseProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: SignedIn;
+  children: (props: {
+    rawScheduleData: Immutable<AnyScheduleData> | null;
+    setRawScheduleData: (
+      next:
+        | ((current: AnyScheduleData | null) => AnyScheduleData | null)
+        | AnyScheduleData
+    ) => void;
+  }) => React.ReactNode;
+};
+
+/**
+ * Handles loading the schedule data from Firebase,
+ * handling uploading initial data if the user has no document.
+ * Renders a disabled header & attribution footer even when loading.
+ */
+export function StageLoadRawScheduleDataFromFirebase({
+  skeletonProps,
+  accountState,
+  children,
+}: StageLoadRawScheduleDataFromFirebaseProps): React.ReactElement {
+  const loadingState = useRawScheduleDataFromFirebase(accountState);
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps}>
+        <SkeletonContent>
+          <LoadingDisplay
+            state={loadingState}
+            name="schedule data from the cloud"
+          />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ ...loadingState.result })}</>;
+}
+
+export type StageLoadAccountProps = {
+  skeletonProps?: StageSkeletonProps;
+  children: (props: { accountState: AccountContextValue }) => React.ReactNode;
+};
+
+/**
+ * Handles loading the user login state
+ * (account state from Firebase Authentication).
+ * Renders a disabled header & attribution footer even when loading.
+ */
+export function StageLoadAccount({
+  skeletonProps,
+  children,
+}: StageLoadAccountProps): React.ReactElement {
+  const accountState = useFirebaseAuth();
+
+  if (accountState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps}>
+        <SkeletonContent>
+          <LoadingDisplay state={accountState} name="account" />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ accountState: accountState.result })}</>;
 }
 
 export type StageCreateScheduleDataProducerProps = {

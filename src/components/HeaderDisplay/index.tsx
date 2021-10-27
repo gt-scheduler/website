@@ -16,6 +16,7 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
 import Modal from '../Modal';
+import { AccountContextValue } from '../../contexts/account';
 
 import './stylesheet.scss';
 
@@ -52,6 +53,7 @@ export type HeaderDisplayProps = {
         onChangeTerm: (next: string) => void;
       };
   versionsState: VersionState;
+  accountState: AccountContextValue | { type: 'loading' };
 };
 
 /**
@@ -75,6 +77,7 @@ export default function HeaderDisplay({
   enableDownloadCalendar = false,
   termsState,
   versionsState,
+  accountState,
 }: HeaderDisplayProps): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
@@ -142,6 +145,7 @@ export default function HeaderDisplay({
       {/* Include action bar on large mobile and higher */}
       {largeMobile && (
         <HeaderActionBar
+          accountState={accountState}
           onCopyCrns={onCopyCrns}
           enableCopyCrns={enableCopyCrns}
           onExportCalendar={onExportCalendar}

@@ -54,3 +54,13 @@ export default function useRawScheduleDataFromStorage(): LoadingState<HookResult
     },
   };
 }
+
+/**
+ * Imperative version of `useRawScheduleDataFromStorage`;
+ * just gets the current value from local storage.
+ */
+export function getCurrentRawScheduleFromStorage(): AnyScheduleData | null {
+  const rawData = window.localStorage.getItem(SCHEDULE_DATA_LOCAL_STORAGE_KEY);
+  if (rawData === null) return null;
+  return JSON.parse(rawData) as AnyScheduleData;
+}

@@ -106,10 +106,6 @@ $max-item-width: 320px;
   }
 
   &__text {
-    display: flex;
-    justify-content: flex-start;
-    align-items: stretch;
-    flex-direction: row;
     padding: 12px;
     width: 100%;
     line-height: 1.25;
