@@ -17,7 +17,7 @@ import {
 import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
 import { classes } from '../../utils/misc';
-import DropdownMenu, { DropdownMenuAction } from '../DropdownMenu';
+import { DropdownMenu, DropdownMenuAction } from '../Select';
 
 import './stylesheet.scss';
 

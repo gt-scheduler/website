@@ -58,95 +58,100 @@ $max-item-width: 320px;
     @include light {
       background-color: $theme-light-background;
     }
-
-    .option {
-      justify-content: center;
-      align-items: stretch;
-      padding: 0;
-      display: flex;
-
-      &:not(.text-option) {
-        user-select: none;
-        white-space: nowrap;
-
-        // Include a highlight-hover style on the outer option
-        // so that when hovering over an option with actions,
-        // the (un)mounting of the action buttons
-        // don't cause visible changes in the bounds of the hover highlight.
-        transition: background-color .2s;
-        &:hover {
-          background-color: $color-border;
-        }
-      }
-
-      &.text-option {
-        cursor: default;
-        user-select: none;
-      }
-
-      .Button {
-        flex-shrink: 0;
-        flex-grow: 0;
-      }
-
-      .option-button-text {
-        min-width: 87px;
-        white-space: nowrap;
-        overflow: hidden;
-        display: block;
-        text-overflow: ellipsis;
-        flex-shrink: 1;
-        flex-grow: 1;
-
-        // Disable the highlight-on-hover styles for the main button
-        background-color: transparent;
-      }
-
-      .option-text {
-        justify-content: center;
-        align-items: center;
-        padding: 12px;
-        width: 100%;
-      }
-
-      .option-button {
-        padding: 4px;
-        display: none;
-        width: 36px;
-      }
-
-      .option-input {
-        padding: 8px;
-        margin: 4px;
-        flex-shrink: 1;
-        flex-grow: 1;
-        width: 0;
-
-        .dark & {
-          background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .light & {
-          background-color: rgba(0, 0, 0, 0.075);
-        }
-      }
-
-      &:hover,
-      &.option-inputting {
-        .option-button {
-          display: flex;
-        }
-      }
-
-      @media (hover: none), (max-width: 900px) {
-        .option-button {
-          display: flex;
-        }
-      }
-    }
   }
 
   *::-webkit-scrollbar {
     display: none;
+  }
+}
+
+.option {
+  $this: &;
+
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  user-select: none;
+
+  &:not(&--text) {
+    white-space: nowrap;
+
+    // Include a highlight-hover style on the outer option
+    // so that when hovering over an option with actions,
+    // the (un)mounting of the action buttons
+    // don't cause visible changes in the bounds of the hover highlight.
+    transition: background-color 0.2s;
+    &:hover {
+      background-color: $color-border;
+    }
+  }
+
+  &--text {
+    cursor: default;
+  }
+
+  &__button {
+    min-width: 87px;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    flex-grow: 1;
+
+    // Disable the highlight-on-hover styles for the main button
+    background-color: transparent !important;
+  }
+
+  &__text {
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: row;
+    padding: 12px;
+    width: 100%;
+    line-height: 1.25;
+  }
+
+  &__action-button {
+    padding: 4px;
+    display: none;
+    width: 36px;
+  }
+
+  &__input {
+    padding: 8px;
+    margin: 4px;
+    flex-shrink: 1;
+    flex-grow: 1;
+    width: 0;
+
+    @include dark {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    @include light {
+      background-color: rgba(0, 0, 0, 0.075);
+    }
+  }
+
+  // Make the action buttons visible when hovered
+  // or inputting.
+  &:hover,
+  &--inputting {
+    #{$this}__action-button {
+      display: flex;
+    }
+  }
+
+  // Make the action buttons always visible
+  // if the device doesn't have hover
+  // or if the screen is mobile.
+  @media (hover: none), (max-width: 900px) {
+    &__action_button {
+      display: flex;
+    }
   }
 }
