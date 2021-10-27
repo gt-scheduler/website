@@ -16,9 +16,9 @@ import {
 import useRawScheduleDataFromStorage from '../../data/hooks/useRawScheduleDataFromStorage';
 import useExtractSchedule from '../../data/hooks/useExtractScheduleVersion';
 import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleData';
-import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 import useScheduleDataProducer from '../../data/hooks/useScheduleDataProducer';
+import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
 import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
 
 // Each of the components in this file is a "stage" --
