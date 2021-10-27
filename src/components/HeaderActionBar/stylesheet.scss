@@ -1,51 +1,60 @@
 @import '../../variables';
 
 .header-action-bar {
-  &,
-  .menu {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+
+  @media (max-width: $desktop-breakpoint) {
+    flex: 1;
+    margin-left: 0;
+  }
+
+  @media (max-width: $large-mobile-breakpoint) {
+    height: 64px;
+    justify-content: flex-start;
+    padding-left: 4px;
+  }
+
+  &__export-dropdown-content {
     display: flex;
-    align-items: stretch;
-    justify-content: flex-end;
+    flex-direction: row;
+    align-items: center;
 
-    .text {
-      margin-left: 4px;
-
-      // Make the text hidden on all buttons
-      // at sufficiently-small screen sizes
-      @media screen and (max-width: 1200px) {
-        display: none;
-      }
+    // Add a 4px gap between each item (icon, text, caret)
+    & > :not(:last-child) {
+      margin-right: 4px;
     }
+  }
 
-    .mobile & {
-      flex: 1;
-      margin-left: 0;
+  &__button {
+    @media (max-width: $desktop-breakpoint) {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+  }
 
-      @media (max-width: $desktop-breakpoint) {
-        svg:not(.caret) {
-          transform: scale(1.3);
+  // Add a gap when an icon comes before a text label
+  &__button-icon + &__button-text {
+    margin-left: 8px;
+  }
 
-          @media (max-width: $large-mobile-breakpoint) {
-            transform: scale(1.35);
-          }
-        }
+  &__button-text {
+    // Make the text hidden on all buttons
+    // at sufficiently-small screen sizes
+    @media screen and (max-width: 1200px) {
+      display: none;
+    }
+  }
 
-        .option-container {
-          svg:not(.caret) {
-            transform: scale(1);
-          }
-        }
-      }
+  &__button-icon {
+    // Scale up the icons on large mobile (< desktop)
+    // and small mobile (< large mobile).
+    @media (max-width: $desktop-breakpoint) {
+      transform: scale(1.25);
 
       @media (max-width: $large-mobile-breakpoint) {
-        height: 64px;
-        justify-content: flex-start;
-        padding-left: 4px;
-      }
-
-      .Button:not(.option-button-text) {
-        padding-left: 18px;
-        padding-right: 18px;
+        transform: scale(1.3);
       }
     }
   }

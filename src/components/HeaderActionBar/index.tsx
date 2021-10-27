@@ -74,7 +74,6 @@ export default function HeaderActionBar({
       onClick: onExportCalendar,
     });
   }
-  // TODO add the tooltip back to this button
   if (enableCopyCrns) {
     exportActions.push({
       label: 'Copy CRNs to clipboard',
@@ -84,11 +83,11 @@ export default function HeaderActionBar({
   }
 
   // On small mobile screens and on large desktop,
-  // left align the "Export" dropdown.
-  // Otherwise, right align it.
+  // left-anchor the "Export" dropdown.
+  // Otherwise, anchor it to the right.
   const lowerBound = LARGE_MOBILE_BREAKPOINT;
   const upperBound = LARGE_DESKTOP_BREAKPOINT;
-  const shouldRightAlignExportDropdown = useMedia(
+  const shouldRightAnchorExportDropdown = useMedia(
     `(min-width: ${lowerBound}px) and (max-width: ${upperBound}px)`
   );
 
@@ -97,35 +96,38 @@ export default function HeaderActionBar({
       <DropdownMenu
         disabled={!enableExport}
         items={exportActions}
-        menuAnchor={shouldRightAlignExportDropdown ? 'right' : 'left'}
+        menuAnchor={shouldRightAnchorExportDropdown ? 'right' : 'left'}
+        className="header-action-bar__button"
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
+        <div className="header-action-bar__export-dropdown-content">
           <FontAwesomeIcon
-            className="icon"
+            className="header-action-bar__button-icon"
             fixedWidth
             icon={faDownload}
-            style={{ marginRight: 4 }}
           />
-          <div className="text" style={{ marginRight: 4 }}>
-            Export
-          </div>
-          <FontAwesomeIcon fixedWidth icon={faCaretDown} className="caret" />
+          <div className="header-action-bar__button-text">Export</div>
+          <FontAwesomeIcon fixedWidth icon={faCaretDown} />
         </div>
       </DropdownMenu>
 
-      <Button onClick={handleThemeChange}>
-        <FontAwesomeIcon className="icon" fixedWidth icon={faAdjust} />
-        <div className="text">Theme</div>
+      <Button onClick={handleThemeChange} className="header-action-bar__button">
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faAdjust}
+        />
+        <div className="header-action-bar__button-text">Theme</div>
       </Button>
-      <Button href="https://github.com/gt-scheduler/website">
-        <FontAwesomeIcon className="icon" fixedWidth icon={faGithub} />
-        <div className="text">GitHub</div>
+      <Button
+        href="https://github.com/gt-scheduler/website"
+        className="header-action-bar__button"
+      >
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faGithub}
+        />
+        <div className="header-action-bar__button-text">GitHub</div>
       </Button>
     </div>
   );
