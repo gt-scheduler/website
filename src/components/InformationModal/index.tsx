@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 import useLocalStorageState from 'use-local-storage-state';
 
 import Modal from '../Modal';
@@ -110,11 +109,7 @@ export default function InformationModal(): React.ReactElement {
   const [show, setShow] = useState(false);
   const [hasSeen, setHasSeen] = useLocalStorageState(
     MODAL_LOCAL_STORAGE_KEY,
-    () => {
-      const cookieValue = Cookies.get(MODAL_LOCAL_STORAGE_KEY);
-      if (cookieValue === 'true') return true;
-      return false;
-    }
+    false
   );
 
   useEffect(() => {
