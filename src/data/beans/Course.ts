@@ -15,6 +15,12 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 
+const COURSE_CRITIQUE_API_URL =
+  'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
+
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache';
+const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
+
 interface SectionGroupMeeting {
   days: string[];
   period: Period | undefined;
@@ -193,13 +199,80 @@ export default class Course {
   }
 
   async fetchGpa(): Promise<CourseGpa> {
-    const base =
-      'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
+    // Note: if `CourseGpa` ever changes,
+    // the cache needs to be invalidated
+    // (by changing the local storage key).
+    type GpaCache = Record<string, GpaCacheItem>;
+    interface GpaCacheItem {
+      d: CourseGpa;
+      exp: string;
+    }
+
+    // Try to look in the cache for a cached course gpa item
+    // that has not expired.
+    // If it is expired, we don't evict; we just ignore it
+    // (and update it with a fresh expiry once it has been fetched).
+    // The size of the cache may bloat over time, but shouldn't be substantial.
+    try {
+      const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
+      if (rawCache != null) {
+        const cache: GpaCache = JSON.parse(rawCache) as unknown as GpaCache;
+        const cacheItem = cache[this.id];
+        if (cacheItem != null) {
+          const now = new Date().toISOString();
+          // Use lexicographic comparison on date strings
+          // (since they are ISO 8601)
+          if (now < cacheItem.exp) {
+            return cacheItem.d;
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
+    // Fetch the GPA normally
+    const courseGpa = await this.fetchGpaInner();
+    if (courseGpa === null) {
+      // There was a failure; don't store the value in the cache.
+      return {};
+    }
+
+    // Store the GPA in the cache
+    const exp = new Date();
+    exp.setDate(exp.getDate() + GPA_CACHE_EXPIRATION_DURATION_DAYS);
+    try {
+      let cache: GpaCache = {};
+      const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
+      if (rawCache != null) {
+        cache = JSON.parse(rawCache) as unknown as GpaCache;
+      }
+
+      cache[this.id] = { d: courseGpa, exp: exp.toISOString() };
+      const rawUpdatedCache = JSON.stringify(cache);
+      window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
+    } catch (err) {
+      // Ignore
+    }
+
+    return courseGpa;
+  }
+
+  /**
+   * Fetches the course GPA without caching it
+   * @see `fetchGpa` for the persistent-caching version
+   * @returns the course GPA if successfully fetched from course critique,
+   * or `null` if there was a problem.
+   * Note that the empty object `{}` is a valid course GPA value,
+   * but we prefer returning `null` if there was a failure
+   * so we can avoid storing the empty GPA value in the persistent cache.
+   */
+  private async fetchGpaInner(): Promise<CourseGpa | null> {
     // We have to clean up the course ID before sending it to the API,
     // since courses like CHEM 1212K should become CHEM 1212
     const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
-    const url = `${base}/course?courseID=${encodedCourse}`;
+    const url = `${COURSE_CRITIQUE_API_URL}/course?courseID=${encodedCourse}`;
 
     let responseData: CourseDetailsAPIResponse;
     try {
