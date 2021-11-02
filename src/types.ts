@@ -75,6 +75,10 @@ export interface Meeting {
   dateRange: DateRange;
 }
 
+// Note: if this type ever changes,
+// the course gpa cache needs to be invalidated
+// (by changing the local storage key).
+// See `src/data/beans/Course.ts` for the implementation of the cache.
 export interface CourseGpa {
   averageGpa?: number;
   [instructor: string]: number | undefined;
