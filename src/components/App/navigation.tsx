@@ -14,8 +14,6 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
 
-export const NAV_TABS = ['Scheduler', 'Map'];
-
 export type AppNavigationContextValue = {
   currentTabIndex: number;
   setTabIndex: (next: number) => void;
@@ -92,6 +90,7 @@ export function AppNavigation({
 }
 
 type AppMobileNavProps = {
+  tabs: string[];
   captureRef: React.RefObject<HTMLDivElement>;
 };
 
@@ -102,13 +101,15 @@ type AppMobileNavProps = {
  * when the app data contexts are available.
  */
 export function AppMobileNav({
+  tabs,
   captureRef,
 }: AppMobileNavProps): React.ReactElement {
   const headerActionBarProps = useHeaderActionBarProps(captureRef);
-  return <AppMobileNavDisplay {...headerActionBarProps} />;
+  return <AppMobileNavDisplay tabs={tabs} {...headerActionBarProps} />;
 }
 
 type AppMobileNavDisplayProps = {
+  tabs: string[];
   onCopyCrns?: () => void;
   enableCopyCrns?: boolean;
   onExportCalendar?: () => void;
@@ -125,6 +126,7 @@ type AppMobileNavDisplayProps = {
  * not needing valid values for the app data contexts.
  */
 export function AppMobileNavDisplay({
+  tabs,
   onCopyCrns = (): void => undefined,
   enableCopyCrns = false,
   onExportCalendar = (): void => undefined,
@@ -156,7 +158,7 @@ export function AppMobileNavDisplay({
       )}
 
       <NavMenu
-        items={NAV_TABS}
+        items={tabs}
         currentItem={currentTabIndex}
         onChangeItem={setTabIndex}
       />

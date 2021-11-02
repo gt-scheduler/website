@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useMemo, useRef } from 'react';
 
 import { Header, Scheduler, Attribution, Calendar } from '..';
 import { ReactErrorDetails } from '../ErrorDetails';
@@ -6,15 +6,29 @@ import ErrorDisplay from '../ErrorDisplay';
 import ErrorHeader from '../ErrorHeader';
 import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
+import CourseCatalog from '../CourseCatalog';
 import Map from '../Map';
 import {
   AppNavigationContext,
   AppMobileNav,
-  NAV_TABS,
   AppMobileNavDisplay,
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
+import { useCourseCatalogFeatureFlag } from '../../hooks/useFeatureFlag';
+
+export const BASE_NAV_TABS = ['Scheduler', 'Map'];
+
+function useNavTabs(): string[] {
+  // If the course catalog feature flag is enabled, include the additional tab
+  const catalogEnabled = useCourseCatalogFeatureFlag();
+  const tabs = useMemo(
+    () => (catalogEnabled ? [...BASE_NAV_TABS, 'Catalog'] : BASE_NAV_TABS),
+    [catalogEnabled]
+  );
+
+  return tabs;
+}
 
 /**
  * Renders the actual content at the root of the app
@@ -26,15 +40,16 @@ function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
+  const navTabs = useNavTabs();
 
   return (
     <>
-      <AppMobileNav captureRef={captureRef} />
+      <AppMobileNav captureRef={captureRef} tabs={navTabs} />
       <Header
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
-        tabs={NAV_TABS}
+        tabs={navTabs}
         captureRef={captureRef}
       />
       <ErrorBoundary
@@ -48,7 +63,7 @@ function AppContentBase(): React.ReactElement {
             >
               <div>
                 There was en error somewhere somewhere in the{' '}
-                {NAV_TABS[currentTabIndex] ?? '?'} tab and it can&apos;t
+                {navTabs[currentTabIndex] ?? '?'} tab and it can&apos;t
                 continue.
               </div>
               <div>Try refreshing the page to see if it fixes the issue.</div>
@@ -58,6 +73,7 @@ function AppContentBase(): React.ReactElement {
       >
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
+        {currentTabIndex === 2 && <CourseCatalog />}
 
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
@@ -100,15 +116,16 @@ export function AppSkeleton({
 }: AppSkeletonProps): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
+  const navTabs = useNavTabs();
 
   return (
     <>
-      <AppMobileNavDisplay />
+      <AppMobileNavDisplay tabs={navTabs} />
       <HeaderDisplay
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
-        tabs={NAV_TABS}
+        tabs={navTabs}
         accountState={accountState ?? { type: 'loading' }}
         termsState={
           termsState == null
