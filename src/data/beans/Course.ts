@@ -217,13 +217,13 @@ export default class Course {
       const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
       if (rawCache != null) {
         const cache: GpaCache = JSON.parse(rawCache) as unknown as GpaCache;
-        const cache_item = cache[this.id];
-        if (cache_item != null) {
+        const cacheItem = cache[this.id];
+        if (cacheItem != null) {
           const now = new Date().toISOString();
           // Use lexicographic comparison on date strings
           // (since they are ISO 8601)
-          if (now < cache_item.exp) {
-            return cache_item.d;
+          if (now < cacheItem.exp) {
+            return cacheItem.d;
           }
         }
       }
