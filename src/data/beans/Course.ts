@@ -15,6 +15,9 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 
+const COURSE_CRITIQUE_API_URL =
+  'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
+
 interface SectionGroupMeeting {
   days: string[];
   period: Period | undefined;
@@ -211,13 +214,11 @@ export default class Course {
    * so we can avoid storing the empty GPA value in the persistent cache.
    */
   private async fetchGpaInner(): Promise<CourseGpa | null> {
-    const base =
-      'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
     // We have to clean up the course ID before sending it to the API,
     // since courses like CHEM 1212K should become CHEM 1212
     const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
-    const url = `${base}/course?courseID=${encodedCourse}`;
+    const url = `${COURSE_CRITIQUE_API_URL}/course?courseID=${encodedCourse}`;
 
     let responseData: CourseDetailsAPIResponse;
     try {
