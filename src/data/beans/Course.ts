@@ -193,6 +193,24 @@ export default class Course {
   }
 
   async fetchGpa(): Promise<CourseGpa> {
+    const courseGpa = await this.fetchGpaInner();
+    if (courseGpa === null) {
+      return {};
+    }
+
+    return courseGpa;
+  }
+
+  /**
+   * Fetches the course GPA without caching it
+   * @see `fetchGpa` for the persistent-caching version
+   * @returns the course GPA if successfully fetched from course critique,
+   * or `null` if there was a problem.
+   * Note that the empty object `{}` is a valid course GPA value,
+   * but we prefer returning `null` if there was a failure
+   * so we can avoid storing the empty GPA value in the persistent cache.
+   */
+  private async fetchGpaInner(): Promise<CourseGpa | null> {
     const base =
       'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
     // We have to clean up the course ID before sending it to the API,
