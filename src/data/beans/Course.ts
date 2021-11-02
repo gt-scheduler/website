@@ -18,6 +18,9 @@ import { ErrorWithFields, softError } from '../../log';
 const COURSE_CRITIQUE_API_URL =
   'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
 
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache';
+const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
+
 interface SectionGroupMeeting {
   days: string[];
   period: Period | undefined;
@@ -196,9 +199,60 @@ export default class Course {
   }
 
   async fetchGpa(): Promise<CourseGpa> {
+    // Note: if `CourseGpa` ever changes,
+    // the cache needs to be invalidated
+    // (by changing the local storage key).
+    type GpaCache = Record<string, GpaCacheItem>;
+    interface GpaCacheItem {
+      d: CourseGpa;
+      exp: string;
+    }
+
+    // Try to look in the cache for a cached course gpa item
+    // that has not expired.
+    // If it is expired, we don't evict; we just ignore it
+    // (and update it with a fresh expiry once it has been fetched).
+    // The size of the cache may bloat over time, but shouldn't be substantial.
+    try {
+      const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
+      if (rawCache != null) {
+        const cache: GpaCache = JSON.parse(rawCache) as unknown as GpaCache;
+        const cache_item = cache[this.id];
+        if (cache_item != null) {
+          const now = new Date().toISOString();
+          // Use lexicographic comparison on date strings
+          // (since they are ISO 8601)
+          if (now < cache_item.exp) {
+            return cache_item.d;
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
+    // Fetch the GPA normally
     const courseGpa = await this.fetchGpaInner();
     if (courseGpa === null) {
+      // There was a failure; don't store the value in the cache.
       return {};
+    }
+
+    // Store the GPA in the cache
+    const exp = new Date();
+    exp.setDate(exp.getDate() + GPA_CACHE_EXPIRATION_DURATION_DAYS);
+    try {
+      let cache: GpaCache = {};
+      const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
+      if (rawCache != null) {
+        cache = JSON.parse(rawCache) as unknown as GpaCache;
+      }
+
+      cache[this.id] = { d: courseGpa, exp: exp.toISOString() };
+      const rawUpdatedCache = JSON.stringify(cache);
+      window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
+    } catch (err) {
+      // Ignore
     }
 
     return courseGpa;
