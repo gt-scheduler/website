@@ -16,7 +16,7 @@ import {
 import { ErrorWithFields, softError } from '../../log';
 
 const COURSE_CRITIQUE_API_URL =
-  'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data/course';
+  'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
 
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
@@ -272,7 +272,7 @@ export default class Course {
     // since courses like CHEM 1212K should become CHEM 1212
     const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
-    const url = `${COURSE_CRITIQUE_API_URL}?courseID=${encodedCourse}`;
+    const url = `${COURSE_CRITIQUE_API_URL}/course?courseID=${encodedCourse}`;
 
     let responseData: CourseDetailsAPIResponse;
     try {
