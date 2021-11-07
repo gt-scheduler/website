@@ -18,7 +18,7 @@ import { ErrorWithFields, softError } from '../../log';
 const COURSE_CRITIQUE_API_URL =
   'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
 
-const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache';
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 interface SectionGroupMeeting {
@@ -294,7 +294,7 @@ export default class Course {
         );
       }
 
-      return {};
+      return null;
     }
 
     // Extract the relevant fields from the response
@@ -369,7 +369,7 @@ export default class Course {
           },
         })
       );
-      return {};
+      return null;
     }
   }
 }
