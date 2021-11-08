@@ -15,8 +15,13 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 
+// This is actually a transparent read-through cache
+// in front of the Course Critique API's course data endpoint,
+// but it should behave the same as the real API.
+// See the implementation at:
+// https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
 const COURSE_CRITIQUE_API_URL =
-  'https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data';
+  'https://us-central1-gt-scheduler-web-prod.cloudfunctions.net/getCourseDataFromCourseCritique';
 
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
@@ -272,7 +277,7 @@ export default class Course {
     // since courses like CHEM 1212K should become CHEM 1212
     const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
-    const url = `${COURSE_CRITIQUE_API_URL}/course?courseID=${encodedCourse}`;
+    const url = `${COURSE_CRITIQUE_API_URL}?courseID=${encodedCourse}`;
 
     let responseData: CourseDetailsAPIResponse;
     try {
@@ -288,7 +293,6 @@ export default class Course {
               baseId: this.id,
               cleanedId: id,
               url,
-              term: this.term,
             },
           })
         );
@@ -297,63 +301,105 @@ export default class Course {
       return null;
     }
 
-    // Extract the relevant fields from the response
-    // We catch (or even throw) errors here to defensively ensure that
-    // the data coming out of this function is safely typed
+    return this.decodeCourseCritiqueResponse(responseData);
+  }
+
+  private decodeCourseCritiqueResponse(
+    responseData: CourseDetailsAPIResponse
+  ): CourseGpa | null {
+    // Calculate the overall course GPA and instructor-specific GPAs
+    // from the response.
+    // The API response does not actually include these values;
+    // instead, it provides GPA information on a per-historical-section-basis,
+    // so we have to aggregate this here.
+    // As of 2021-11-06, this is also what Course Critique does
+    // to determine overall course GPA and instructor-specific GPAs,
+    // so there doesn't seem to be a better way
+    // (this method is likely inaccurate).
+
+    type IntermediateWeightedAverage = {
+      count: number;
+      sum: number;
+    };
+
     try {
-      const gpaMap: CourseGpa = {};
+      const overall: IntermediateWeightedAverage = { count: 0, sum: 0 };
+      const instructors: Map<string, IntermediateWeightedAverage> = new Map();
 
-      // Extract the course-wide average GPA
-      const rawAverageGpa = responseData.header[0].avg_gpa;
-      // If the field is null, then the course has no GPA information
-      if (rawAverageGpa === null) return {};
-      if (typeof rawAverageGpa !== 'number')
-        throw new ErrorWithFields({
-          message: `data at ".header[0].avg_gpa" was not a number`,
-          fields: {
-            actual: rawAverageGpa,
-            term: this.term,
-          },
-        });
-      gpaMap.averageGpa = rawAverageGpa;
+      responseData.raw.forEach((historicalSectionData) => {
+        const {
+          class_size_group: classSizeGroup,
+          instructor_name: rawInstructorName,
+          GPA: gpa,
+        } = historicalSectionData;
 
-      // Extract the GPA for each instructor
-      responseData.raw.forEach((instructorData, i) => {
-        // Extract the instructor's name
-        const rawInstructor = instructorData.instructor_name;
-        if (typeof rawInstructor !== 'string')
-          throw new ErrorWithFields({
-            message: `data at ".raw[idx].instructor_name" was not a string`,
-            fields: {
-              idx: i,
-              actual: rawInstructor,
-              term: this.term,
-            },
-          });
+        if (typeof classSizeGroup !== 'string') return;
+        if (typeof rawInstructorName !== 'string') return;
+        if (typeof gpa !== 'number') return;
 
-        // Extract the instructor's GPA
-        const instructorGpa = instructorData.GPA;
-        if (typeof instructorGpa !== 'number')
-          throw new ErrorWithFields({
-            message: `data at ".raw[idx].GPA" was not a number`,
-            fields: {
-              idx: i,
-              actual: instructorGpa,
-              term: this.term,
-            },
-          });
-
-        // Normalize the instructor name from "LN, FN" to "FN LN"
-        let instructor = rawInstructor;
-        const nameSegments = instructor.split(', ');
-        if (nameSegments.length === 2) {
-          const [lastName, firstName] = nameSegments as [string, string];
-          instructor = `${firstName} ${lastName}`;
+        // Map the class size group to an estimate
+        // of the number of actual students.
+        // This is used as the weight when the average GPA for this section
+        // is added to the overall course GPA and instructor-specific GPAs,
+        // but it's just a best-estimate and makes the GPAs inaccurate.
+        // As of 2021-11-06, these are the same estimates
+        // that Course Critique uses in their app
+        // (used here since ideally GT Scheduler should report the same GPAs).
+        let classSizeEstimate: number;
+        switch (classSizeGroup.toLowerCase()) {
+          case 'very small (fewer than 10 students)':
+            classSizeEstimate = 5;
+            break;
+          case 'small (10-20 students)':
+            classSizeEstimate = 15;
+            break;
+          case 'mid-size (21-30 students)':
+            classSizeEstimate = 25;
+            break;
+          case 'large (31-49 students)':
+            classSizeEstimate = 40;
+            break;
+          case 'very large (50 students or more)':
+            classSizeEstimate = 50;
+            break;
+          default:
+            // Unknown class size group; skip this section
+            return;
         }
 
-        gpaMap[instructor] = instructorGpa;
+        // Normalize the instructor name from "LN, FN" to "FN LN"
+        let instructorName = rawInstructorName;
+        const nameSegments = instructorName.split(', ');
+        if (nameSegments.length === 2) {
+          const [lastName, firstName] = nameSegments as [string, string];
+          instructorName = `${firstName} ${lastName}`;
+        }
+
+        // Add the section GPA to the overall GPA
+        overall.count += classSizeEstimate;
+        overall.sum += gpa * classSizeEstimate;
+
+        // Add the section GPA to the instructor GPA
+        const instructorGpa = instructors.get(instructorName) ?? {
+          count: 0,
+          sum: 0,
+        };
+        instructorGpa.count += classSizeEstimate;
+        instructorGpa.sum += gpa * classSizeEstimate;
+        instructors.set(instructorName, instructorGpa);
       });
 
+      // Now, finally compute the actual weighted averages
+      // and assemble the `CourseGpa` type:
+      const gpaMap: CourseGpa = {};
+      if (overall.count > 0) {
+        gpaMap.averageGpa = overall.sum / overall.count;
+      }
+      instructors.forEach((instructorGpa, instructorName) => {
+        if (instructorGpa.count > 0) {
+          gpaMap[instructorName] = instructorGpa.sum / instructorGpa.count;
+        }
+      });
       return gpaMap;
     } catch (err) {
       softError(
@@ -362,10 +408,7 @@ export default class Course {
             'error extracting course GPA from Course Critique API response',
           source: err,
           fields: {
-            baseId: this.id,
-            cleanedId: id,
-            url,
-            term: this.term,
+            id: this.id,
           },
         })
       );
@@ -374,7 +417,7 @@ export default class Course {
   }
 }
 
-// Based on response for CS 6035 on 2021-08-28
+// Based on response for CS 6035 on 2021-11-06
 // from the Course Critique API.
 // Each field has `| unknown` added to ensure
 // that we narrow the type before using them.
@@ -382,15 +425,8 @@ interface CourseDetailsAPIResponse {
   header: [
     {
       course_name: string | null | unknown;
-      description: string | null | unknown;
       credits: number | null | unknown;
-      avg_gpa: number | null | unknown;
-      avg_a: number | null | unknown;
-      avg_b: number | null | unknown;
-      avg_c: number | null | unknown;
-      avg_d: number | null | unknown;
-      avg_f: number | null | unknown;
-      avg_w: number | null | unknown;
+      description: string | null | unknown;
       full_name: string | null | unknown;
     }
   ];
@@ -406,6 +442,5 @@ interface CourseDetailsAPIResponse {
     D: number | unknown;
     F: number | unknown;
     W: number | unknown;
-    sections: number | unknown;
   }>;
 }
