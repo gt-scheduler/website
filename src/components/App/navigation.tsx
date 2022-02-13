@@ -14,7 +14,7 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
 
-export const NAV_TABS = ['Scheduler', 'Map'];
+export const NAV_TABS = ['Scheduler', 'Map', 'Course Search'];
 
 export type AppNavigationContextValue = {
   currentTabIndex: number;
