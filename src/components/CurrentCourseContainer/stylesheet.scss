@@ -1,0 +1,62 @@
+@import '../../variables';
+
+.CurrentCourseContainer {
+  display: flex;
+  padding: 10px 12px 10px 12px;
+  flex-direction: column;
+  align-items: stretch;
+  border-right: 1px solid $color-border;
+
+  
+  .scroller {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 320px;
+    flex-shrink: 0;
+
+    .course-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-add {
+      margin: -4px;
+    }
+  }
+
+  .label {
+    margin: 0;
+  }
+
+  .updated-at {
+    color: $color-neutral;
+    font-size: .8em;
+  }
+
+  .default-icon {
+    position: relative;
+    top: 40%;
+    left: calc(50% - 90px);
+    color: #808080;
+    width: 180px;
+    text-align: center;
+    p {
+      margin: 0;
+    }
+    h3 {
+      margin: 0 0 3px 0;
+    }
+  }
+}
+
+.mobile .CurrentCourseContainer {
+  flex: 1;
+  border-right: none;
+
+  .scroller {
+    width: auto;
+  }
+}
