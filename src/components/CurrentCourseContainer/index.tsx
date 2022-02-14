@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './stylesheet.scss';
 
 export default function CurrentCourseContainer(): React.ReactElement {

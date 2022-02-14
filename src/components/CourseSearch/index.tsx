@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import { classes } from '../../utils/misc';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import CurrentCourseContainer from '../CurrentCourseContainer';
 import SearchContainer from '../SearchContainer';
 import SearchResultContainer from '../SearchResultContainer';
-import { Button, Calendar, CombinationContainer, CourseContainer } from '..';
+import { Button } from '..';
 
 export default function CourseSearch(): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
