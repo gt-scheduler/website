@@ -74,6 +74,66 @@ type SectionType = {
   location: string;
 };
 
+type GradeDistribution = {
+  A: number;
+  B: number;
+  C: number;
+  D: number;
+  F: number;
+  W: number;
+};
+
+type Grade = keyof GradeDistribution;
+
+type ProfessorType = {
+  name: string;
+  gpa: number;
+  gradeDistribution: GradeDistribution;
+  sections: SectionType[];
+};
+
+const Professor = ({
+  professor,
+}: {
+  professor: ProfessorType;
+}): JSX.Element => {
+  return (
+    <>
+      <tr>
+        <td colSpan={8}>
+          <div className="professor-header">
+            <div className="professor-header-left">
+              <p className="name">{professor.name}</p>
+              <p className="gpa">{`GPA: ${professor.gpa}`}</p>
+            </div>
+            <div className="grade-distribution-string">
+              {Object.keys(professor.gradeDistribution).map((grade) => {
+                return (
+                  <>
+                    <p className="letter">{`${grade}`}</p>
+                    <p className="grade">
+                      {`${
+                        professor.gradeDistribution[
+                          grade as keyof typeof professor.gradeDistribution
+                        ]
+                      }%`}
+                    </p>
+                  </>
+                );
+              })}
+            </div>
+          </div>
+        </td>
+      </tr>
+      <>
+        {professor.sections.map((section: SectionType) => {
+          return <Section section={section} />;
+        })}
+      </>
+    </>
+  );
+};
+
 const Section = ({
   section: { crn, sectionNumber, days, time, seatsFilled, waitlist, location },
 }: {
@@ -132,7 +192,7 @@ const Section = ({
 };
 
 export default function SearchResultContainer(): React.ReactElement {
-  const [selectedCourse, setSelectedCourse] = useState(exampleCourse);
+  const [selectedCourse] = useState(exampleCourse);
 
   const generatePrereqString = (prereqs: string[]): string => {
     let prereqString = '';
@@ -170,11 +230,7 @@ export default function SearchResultContainer(): React.ReactElement {
                     <>
                       <p className="letter">{`${grade}`}</p>
                       <p className="grade">
-                        {`${
-                          selectedCourse.gradeDistribution[
-                            grade as keyof typeof selectedCourse.gradeDistribution
-                          ]
-                        }%`}
+                        {`${selectedCourse.gradeDistribution[grade as Grade]}%`}
                       </p>
                     </>
                   );
@@ -194,43 +250,7 @@ export default function SearchResultContainer(): React.ReactElement {
               <td>Location</td>
             </tr>
             {selectedCourse.professors.map((professor) => {
-              return (
-                <>
-                  <tr>
-                    <td colSpan={8}>
-                      <div className="professor-header">
-                        <div className="professor-header-left">
-                          <p className="name">{professor.name}</p>
-                          <p className="gpa">{`GPA: ${professor.gpa}`}</p>
-                        </div>
-                        <div className="grade-distribution-string">
-                          {Object.keys(professor.gradeDistribution).map(
-                            (grade) => {
-                              return (
-                                <>
-                                  <p className="letter">{`${grade}`}</p>
-                                  <p className="grade">
-                                    {`${
-                                      professor.gradeDistribution[
-                                        grade as keyof typeof professor.gradeDistribution
-                                      ]
-                                    }%`}
-                                  </p>
-                                </>
-                              );
-                            }
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <>
-                    {professor.sections.map((section: SectionType) => {
-                      return <Section section={section} />;
-                    })}
-                  </>
-                </>
-              );
+              return <Professor professor={professor} />;
             })}
           </table>
         </div>
