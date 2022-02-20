@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  
+
   .scroller {
     flex: 1;
     overflow-y: auto;
@@ -27,6 +27,104 @@
 
     .course-add {
       margin: -4px;
+    }
+  }
+
+  .selected-course {
+    margin-top: -20px;
+
+    .header-title {
+      font-weight: bold;
+      width: 150px;
+    }
+
+    .info-table {
+      text-align: left;
+      border-collapse: collapse;
+
+      tr {
+        height: 15px;
+      }
+
+      .info-table-grade-distribution {
+        display: flex;
+        flex-direction: row;
+        height: 15px;
+
+        .letter {
+          margin-top: 0;
+          margin-right: 5px;
+          color: #8bd6fb;
+        }
+
+        .grade {
+          margin-top: 0;
+          margin-right: 10px;
+        }
+      }
+    }
+
+    .grade-distribution {
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .professor-header {
+      align-items: center;
+      background-color: #393939;
+      width: 100%;
+      height: 40px;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      .professor-header-left {
+        display: flex;
+        margin-left: 15px;
+
+        .name {
+          margin-right: 15px;
+        }
+      }
+    }
+
+    .section-info {
+      font-size: 12px;
+      height: 43px;
+
+      td {
+        border-bottom: 1px solid #505050;
+      }
+
+      .selection-button {
+        background: none;
+        border: none;
+        width: 30px;
+      }
+    }
+
+    .grade-distribution-header {
+      text-align: left;
+      font-size: 11px;
+      font-weight: light;
+      color: #adadad;
+      height: 30px;
+    }
+
+    .grade-distribution-string {
+      display: flex;
+      flex-direction: row;
+
+      .letter {
+        margin-right: 5px;
+        color: #8bd6fb;
+      }
+
+      .grade {
+        margin-right: 10px;
+      }
     }
   }
 
@@ -51,7 +149,7 @@
 
   .updated-at {
     color: $color-neutral;
-    font-size: .8em;
+    font-size: 0.8em;
   }
 }
 
