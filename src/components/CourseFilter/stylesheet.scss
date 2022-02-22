@@ -33,11 +33,22 @@
     }
   }
 
+  
+  
+  
   .tag-container {
     display: flex;
     flex-wrap: wrap;
-    margin-top: -12px;
     padding: 8px;
+    margin-top: 20px;
+
+    .buttonContainer {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    
 
     .tag {
       @include card;
@@ -47,6 +58,7 @@
       transition: opacity .2s;
       font-size: .8em;
       cursor: pointer;
+      
 
       &.active {
         opacity: 1;
@@ -57,5 +69,7 @@
         opacity: 1;
       }
     }
-  }
+    
+  
+}
 }

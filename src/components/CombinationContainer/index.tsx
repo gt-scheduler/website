@@ -1,10 +1,32 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable func-names */
+/* eslint-disable import/no-duplicates */
+import React, {
+  ChangeEvent,
+  useEffect,
+  KeyboardEvent,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AutoSizer, List } from 'react-virtualized';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
+import { Course, CourseFilter } from '..';
 import { Button, Calendar, Select } from '..';
 import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
 import { Combination } from '../../types';
 import Modal from '../Modal';
+import {
+  ASYNC_DELIVERY_MODE,
+  CAMPUSES,
+  DELIVERY_MODES,
+  CREDIT,
+} from '../../constants';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -29,27 +51,65 @@ export default function CombinationContainer(): React.ReactElement {
     () => oscar.sortCombinations(combinations, sortingOptionIndex),
     [oscar, combinations, sortingOptionIndex]
   );
+  const [keyword, setKeyword] = useState('');
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleChangeKeyword = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      let input = e.target.value.trim();
+      const results = /^([A-Z]+)(\d.*)$/i.exec(input);
+      if (results != null) {
+        const [, subject, number] = results as unknown as [
+          string,
+          string,
+          string
+        ];
+        input = `${subject} ${number}`;
+      }
+      setKeyword(input);
+    },
+    []
+  );
+  type SortKey = 'deliveryMode' | 'campus' | 'creditHours';
+
+  type SortFilter = {
+    [sortKey in SortKey]: string[];
+  };
+
+  const [filter, setFilter] = useState<SortFilter>({
+    deliveryMode: [],
+    campus: [],
+    creditHours: [],
+  });
+
+  const handleResetFilter = useCallback(
+    (key) => {
+      setFilter({
+        ...filter,
+        [key]: [],
+      });
+    },
+    [filter]
+  );
+  const handleToggleFilter = useCallback(
+    (key: SortKey, tag: string) => {
+      const tags = filter[key];
+      setFilter({
+        ...filter,
+        [key]: tags.includes(tag)
+          ? tags.filter((v) => v !== tag)
+          : [...tags, tag],
+      });
+    },
+    [filter]
+  );
 
   return (
     <>
       <div className="CombinationContainer">
-        <Select
-          onChange={(newSortingOptionIndex): void =>
-            patchSchedule({ sortingOptionIndex: newSortingOptionIndex })
-          }
-          current={sortingOptionIndex}
-          options={oscar.sortingOptions.map((sortingOption, i) => ({
-            id: i,
-            label: sortingOption.label,
-          }))}
-        />
-        <Button
-          className="reset"
-          onClick={handleResetPinnedCrns}
-          disabled={pinnedCrns.length === 0}
-        >
-          Reset Sections
-        </Button>
+        <title className="title">Search for a course</title>
+
         <div className="scroller">
           <AutoSizer>
             {({ width, height }): React.ReactElement => (
@@ -58,7 +118,7 @@ export default function CombinationContainer(): React.ReactElement {
                 height={height}
                 style={{ outline: 'none' }}
                 rowCount={sortedCombinations.length}
-                rowHeight={108}
+                rowHeight={160}
                 rowRenderer={({ index, key, style }): React.ReactElement => {
                   const { crns } = sortedCombinations[index] as Combination;
                   return (
@@ -73,12 +133,10 @@ export default function CombinationContainer(): React.ReactElement {
                           })
                         }
                       >
-                        <div className="number">{index + 1}</div>
-                        <Calendar
-                          className="calendar-preview"
-                          overlayCrns={crns}
-                          isAutosized
-                          preview
+                        <FontAwesomeIcon
+                          className="icon"
+                          fixedWidth
+                          icon={faSearch}
                         />
                       </div>
                     </div>
@@ -87,6 +145,33 @@ export default function CombinationContainer(): React.ReactElement {
               />
             )}
           </AutoSizer>
+          <div>
+            <input
+              type="text"
+              ref={inputRef}
+              value={keyword}
+              onChange={handleChangeKeyword}
+              className="keyword"
+              placeholder="Subject or course number"
+              style={{ width: '230px' }}
+            />
+          </div>
+          <div className="dropDown">
+            {[
+              ['Credit Hours & Class Times', 'creditHours', CREDIT] as const,
+              ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
+              ['Campus', 'campus', CAMPUSES] as const,
+            ].map(([name, property, labels]) => (
+              <CourseFilter
+                key={property}
+                name={name}
+                labels={labels}
+                selectedTags={filter[property]}
+                onReset={(): void => handleResetFilter(property)}
+                onToggle={(tag): void => handleToggleFilter(property, tag)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 

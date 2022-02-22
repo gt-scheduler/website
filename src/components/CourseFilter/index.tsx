@@ -1,3 +1,5 @@
+/* eslint-disable no-multi-assign */
+/* eslint-disable react/self-closing-comp */
 import React, { useState } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,6 +24,10 @@ export default function CourseFilter({
   onToggle,
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
+  const string2 = name === 'Credit Hours & Class Times';
+  const buttonNumber = 4;
+  let boolValue = false;
+  const flipSwitch = (boolValue = !boolValue);
 
   return (
     <div className="CourseFilter">
@@ -53,13 +59,27 @@ export default function CourseFilter({
             All
           </div>
           {Object.keys(labels).map((tag) => (
-            <div
-              key={tag}
-              className={classes('tag', selectedTags.includes(tag) && 'active')}
-              property={tag}
-              onClick={(): void => onToggle(tag)}
-            >
-              {labels[tag]}
+            <div>
+              <div className="jo">
+                {labels[tag] === 'All' && (
+                  <div>
+                    <p>5</p>
+                  </div>
+                )}
+              </div>
+              <div className="buttonContainer">
+                <div
+                  key={tag}
+                  className={classes(
+                    'tag',
+                    selectedTags.includes(tag) && 'active'
+                  )}
+                  property={tag}
+                  onClick={(): void => onToggle(tag)}
+                >
+                  {labels[tag]}
+                </div>
+              </div>
             </div>
           ))}
         </div>

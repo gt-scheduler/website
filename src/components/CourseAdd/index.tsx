@@ -219,6 +219,7 @@ export default function CourseAdd({
             />
           </div>
         </div>
+
         {[
           ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
           ['Campus', 'campus', CAMPUSES] as const,

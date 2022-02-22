@@ -5,7 +5,17 @@
   flex-direction: column;
   align-items: stretch;
   border-right: 1px solid $color-border;
+  width: 400px;
 
+  .title {
+    display: flex;
+    align-items: stretch;
+    margin: 10px;
+  }
+  
+  
+
+  
   .scroller {
     flex: 1;
     overflow-y: auto;
@@ -15,15 +25,61 @@
     padding: 4px;
     width: 256px;
     margin-bottom: -1px;
+    width: 400px;
+    
+
+    .icon {
+      margin: 8px;
+
+      color: $color-neutral;
+      transition: color .2s;
+    }
+
+    
+    
+    .keyword {
+      position: relative;
+      flex-direction: row;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 1em;
+      font-weight: bold;
+      height: 40px;
+      margin-left: 35px;
+      
+  
+      &::placeholder {
+        font-weight: normal;
+        color: $color-neutral;
+      }
+  
+      &.autocomplete {
+        position: absolute;
+        opacity: .5;
+      }
+    
+        &.active {
+          color: inherit;
+        }
+      }
+      .dropDown {
+        display: flex;
+        align-items: stretch;
+        flex-direction: column;
+        
+      }
 
     .list-item {
       display: flex;
       align-items: stretch;
       height: 108px;
+      background-color: $color-border;
 
       .combination {
         @include card;
         flex: 1;
+        flex-direction: column;
         display: flex;
         align-items: stretch;
 
