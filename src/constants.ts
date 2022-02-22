@@ -74,6 +74,22 @@ const CREDIT: Record<string, string> = {
   '2 credit hours': '2.0',
   '3 credit hours': '3.0',
   '4 or more credit hours': '4.0+',
+  Monday: 'Mon',
+  Tuesday: 'Tue',
+  Wednesday: 'Wed',
+  Thursday: 'Thu',
+  Friday: 'Fri',
+  'Start Time': 'Any Time',
+  'End Time': 'Any Time',
+  Undergrad: 'Undergraduate',
+  Grad: 'Graduate',
+};
+
+const TIMES: Record<string, string> = {
+  '9:30am': '9:30am',
+  '10:30am': '10:30am',
+  '11:30am': '11:30am',
+  '12:30am': '12:30am',
 };
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
@@ -96,4 +112,5 @@ export {
   DESKTOP_BREAKPOINT,
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
+  TIMES,
 };

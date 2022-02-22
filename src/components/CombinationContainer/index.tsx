@@ -58,7 +58,7 @@ export default function CombinationContainer(): React.ReactElement {
   const handleChangeKeyword = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       let input = e.target.value.trim();
-      const results = /^([A-Z]+)(\d.*)$/i.exec(input);
+      const results = /^([a-z]+)(\d.*)$/i.exec(input);
       if (results != null) {
         const [, subject, number] = results as unknown as [
           string,
@@ -107,71 +107,36 @@ export default function CombinationContainer(): React.ReactElement {
 
   return (
     <>
-      <div className="CombinationContainer">
-        <title className="title">Search for a course</title>
+      <div className="CourseAdd">
+        <div className="add">
+          <div className="primary">
+            <FontAwesomeIcon className="icon" fixedWidth icon={faSearch} />
+            <div className="keyword-wrapper">
+              <input
+                type="text"
+                placeholder="Subject or course number"
+                ref={inputRef}
+                value={keyword}
+                onChange={handleChangeKeyword}
+                className="keyword"
+              />
+            </div>
+          </div>
 
-        <div className="scroller">
-          <AutoSizer>
-            {({ width, height }): React.ReactElement => (
-              <List
-                width={width}
-                height={height}
-                style={{ outline: 'none' }}
-                rowCount={sortedCombinations.length}
-                rowHeight={160}
-                rowRenderer={({ index, key, style }): React.ReactElement => {
-                  const { crns } = sortedCombinations[index] as Combination;
-                  return (
-                    <div className="list-item" style={style} key={key}>
-                      <div
-                        className="combination"
-                        onMouseEnter={(): void => setOverlayCrns(crns)}
-                        onMouseLeave={(): void => setOverlayCrns([])}
-                        onClick={(): void =>
-                          patchSchedule({
-                            pinnedCrns: [...pinnedCrns, ...crns],
-                          })
-                        }
-                      >
-                        <FontAwesomeIcon
-                          className="icon"
-                          fixedWidth
-                          icon={faSearch}
-                        />
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-            )}
-          </AutoSizer>
-          <div>
-            <input
-              type="text"
-              ref={inputRef}
-              value={keyword}
-              onChange={handleChangeKeyword}
-              className="keyword"
-              placeholder="Subject or course number"
-              style={{ width: '230px' }}
+          {[
+            ['Credit Hours & Class Times', 'creditHours', CREDIT] as const,
+            ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
+            ['Campus', 'campus', CAMPUSES] as const,
+          ].map(([name, property, labels]) => (
+            <CourseFilter
+              key={property}
+              name={name}
+              labels={labels}
+              selectedTags={filter[property]}
+              onReset={(): void => handleResetFilter(property)}
+              onToggle={(tag): void => handleToggleFilter(property, tag)}
             />
-          </div>
-          <div className="dropDown">
-            {[
-              ['Credit Hours & Class Times', 'creditHours', CREDIT] as const,
-              ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
-              ['Campus', 'campus', CAMPUSES] as const,
-            ].map(([name, property, labels]) => (
-              <CourseFilter
-                key={property}
-                name={name}
-                labels={labels}
-                selectedTags={filter[property]}
-                onReset={(): void => handleResetFilter(property)}
-                onToggle={(tag): void => handleToggleFilter(property, tag)}
-              />
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 

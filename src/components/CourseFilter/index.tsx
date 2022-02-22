@@ -5,6 +5,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes, humanizeArrayReact } from '../../utils/misc';
+import { TIMES } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -52,36 +53,212 @@ export default function CourseFilter({
       </div>
       {expanded && (
         <div className="tag-container">
-          <div
-            className={classes('tag', selectedTags.length === 0 && 'active')}
-            onClick={onReset}
-          >
-            All
-          </div>
-          {Object.keys(labels).map((tag) => (
-            <div>
-              <div className="jo">
-                {labels[tag] === 'All' && (
+          <div>
+            {!string2 && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels).map((tag) => (
                   <div>
-                    <p>5</p>
+                    <div>
+                      <div
+                        key={tag}
+                        className={classes(
+                          'tag',
+                          selectedTags.includes(tag) && 'active'
+                        )}
+                        property={tag}
+                        onClick={(): void => onToggle(tag)}
+                      >
+                        {labels[tag]}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            {string2 && (
+              <div className="subTitle">
+                <p>Credit Hours</p>
+              </div>
+            )}
+          </div>
+          <div>
+            {string2 && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels)
+                  .slice(0, 5)
+                  .map((tag) => (
+                    <div>
+                      <div className="jo">
+                        {labels[tag] === 'All' && (
+                          <div>
+                            <p>5</p>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div>
+            {string2 && (
+              <div className="subTitle">
+                <p>Days</p>
+              </div>
+            )}
+          </div>
+          <div>
+            {string2 && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels)
+                  .slice(5, 10)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="timeTitles">
+              <div>
+                {string2 && (
+                  <div className="startSubTitle">
+                    <p>Start After</p>
                   </div>
                 )}
               </div>
-              <div className="buttonContainer">
-                <div
-                  key={tag}
-                  className={classes(
-                    'tag',
-                    selectedTags.includes(tag) && 'active'
-                  )}
-                  property={tag}
-                  onClick={(): void => onToggle(tag)}
-                >
-                  {labels[tag]}
-                </div>
+
+              <div>
+                {string2 && (
+                  <div className="endSubTitle">
+                    <p>End After</p>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
+          </div>
+          <div>
+            {string2 && (
+              <div className="buttonContainer">
+                {Object.keys(labels)
+                  .slice(10, 12)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div>
+            {string2 && (
+              <div className="subTitle">
+                <p>Course Level</p>
+              </div>
+            )}
+          </div>
+          <div>
+            {string2 && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels)
+                  .slice(12, 14)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

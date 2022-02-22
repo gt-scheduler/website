@@ -1,113 +1,81 @@
-@import '../../variables';
+@import "../../variables";
 
-.CombinationContainer {
+.CourseAdd {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   border-right: 1px solid $color-border;
   width: 400px;
 
-  .title {
-    display: flex;
-    align-items: stretch;
-    margin: 10px;
-  }
-  
-  
-
-  
-  .scroller {
-    flex: 1;
-    overflow-y: auto;
+  .add {
+    @include card;
+    background-color: $color-border;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 4px;
-    width: 256px;
-    margin-bottom: -1px;
-    width: 400px;
-    
 
-    .icon {
-      margin: 8px;
+    .primary {
+      display: flex;
+      align-items: center;
 
-      color: $color-neutral;
-      transition: color .2s;
-    }
-
-    
-    
-    .keyword {
-      position: relative;
-      flex-direction: row;
-      background: none;
-      border: none;
-      outline: none;
-      font-size: 1em;
-      font-weight: bold;
-      height: 40px;
-      margin-left: 35px;
-      
-  
-      &::placeholder {
-        font-weight: normal;
+      .icon {
+        margin-left: 8px;
         color: $color-neutral;
-      }
-  
-      &.autocomplete {
-        position: absolute;
-        opacity: .5;
-      }
-    
+        transition: color .2s;
+
         &.active {
           color: inherit;
         }
       }
-      .dropDown {
-        display: flex;
-        align-items: stretch;
-        flex-direction: column;
-        
-      }
 
-    .list-item {
-      display: flex;
-      align-items: stretch;
-      height: 108px;
-      background-color: $color-border;
-
-      .combination {
-        @include card;
+      .keyword-wrapper {
         flex: 1;
-        flex-direction: column;
         display: flex;
-        align-items: stretch;
+        align-items: center;
+        position: relative;
+        
 
-        .number {
-          background-color: $color-border;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-
-          font-size: .8em;
+        .keyword {
+          position: relative;
+          flex-direction: row;
+          background: none;
+          border: none;
+          outline: none;
+          font-size: 1em;
           font-weight: bold;
-        }
+          height: 40px;
+        
+          
 
-        .calendar-preview {
-          flex: 1;
-          cursor: pointer;
+          &::placeholder {
+            font-weight: normal;
+            color: $color-neutral;
+            text-transform: none;
+          }
+
+          &.autocomplete {
+            position: absolute;
+            opacity: .5;
+          }
         }
       }
     }
   }
-}
 
-.mobile .CombinationContainer {
-  flex: 1;
-  border-right: none;
+  .Course {
+    background-color: $color-border;
+    opacity: .6;
+    transition: opacity .2s;
 
-  .scroller {
-    width: auto;
+    &:hover,
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  .disclaimer {
+    color: $color-neutral;
+    padding: 4px;
+    font-size: .8em;
   }
 }
