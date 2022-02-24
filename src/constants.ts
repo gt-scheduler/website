@@ -92,6 +92,25 @@ const TIMES: Record<string, string> = {
   '12:30am': '12:30am',
 };
 
+const CLASS_TIMESTAMPS: Array<string> = [
+  'Any time',
+  '8:00 am',
+  '9:00 am',
+  '10:00 am',
+  '11:00 am',
+  '12:00 pm',
+  '1:00 pm',
+  '2:00 pm',
+  '3:00 pm',
+  '4:00 pm',
+  '5:00 pm',
+  '6:00 pm',
+  '7:00 pm',
+  '8:00 pm',
+  '9:00 pm',
+  '10:00 pm',
+];
+
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 
 const LARGE_DESKTOP_BREAKPOINT = 1200;
@@ -113,4 +132,5 @@ export {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
   TIMES,
+  CLASS_TIMESTAMPS,
 };

@@ -5,7 +5,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes, humanizeArrayReact } from '../../utils/misc';
-import { TIMES } from '../../constants';
+import { TIMES, CLASS_TIMESTAMPS } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -193,7 +193,7 @@ export default function CourseFilter({
                   .map((tag) => (
                     <div>
                       <div>
-                        <div
+                        <select
                           key={tag}
                           className={classes(
                             'tag',
@@ -202,8 +202,13 @@ export default function CourseFilter({
                           property={tag}
                           onClick={(): void => onToggle(tag)}
                         >
-                          {labels[tag]}
-                        </div>
+                          {CLASS_TIMESTAMPS.map((timestamp) => (
+                            <option value={timestamp} key={timestamp}>
+                              {' '}
+                              {timestamp}{' '}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   ))}
