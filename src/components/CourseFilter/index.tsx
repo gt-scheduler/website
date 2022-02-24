@@ -25,11 +25,10 @@ export default function CourseFilter({
   onToggle,
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
-  const string2 = name === 'Credit Hours & Class Times';
+  const isCreditHourFilter = name === 'Credit Hours & Class Times';
   const buttonNumber = 4;
   let boolValue = false;
   const flipSwitch = (boolValue = !boolValue);
-
   return (
     <div className="CourseFilter">
       <div
@@ -54,7 +53,7 @@ export default function CourseFilter({
       {expanded && (
         <div className="tag-container">
           <div>
-            {!string2 && (
+            {!isCreditHourFilter && (
               <div className="buttonContainer">
                 <div
                   className={classes(
@@ -86,14 +85,14 @@ export default function CourseFilter({
             )}
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="subTitle">
                 <p>Credit Hours</p>
               </div>
             )}
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="buttonContainer">
                 <div
                   className={classes(
@@ -108,13 +107,6 @@ export default function CourseFilter({
                   .slice(0, 5)
                   .map((tag) => (
                     <div>
-                      <div className="jo">
-                        {labels[tag] === 'All' && (
-                          <div>
-                            <p>5</p>
-                          </div>
-                        )}
-                      </div>
                       <div>
                         <div
                           key={tag}
@@ -134,14 +126,14 @@ export default function CourseFilter({
             )}
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="subTitle">
                 <p>Days</p>
               </div>
             )}
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="buttonContainer">
                 <div
                   className={classes(
@@ -177,7 +169,7 @@ export default function CourseFilter({
           <div>
             <div className="timeTitles">
               <div>
-                {string2 && (
+                {isCreditHourFilter && (
                   <div className="startSubTitle">
                     <p>Start After</p>
                   </div>
@@ -185,7 +177,7 @@ export default function CourseFilter({
               </div>
 
               <div>
-                {string2 && (
+                {isCreditHourFilter && (
                   <div className="endSubTitle">
                     <p>End After</p>
                   </div>
@@ -194,7 +186,7 @@ export default function CourseFilter({
             </div>
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="buttonContainer">
                 {Object.keys(labels)
                   .slice(10, 12)
@@ -219,14 +211,14 @@ export default function CourseFilter({
             )}
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="subTitle">
                 <p>Course Level</p>
               </div>
             )}
           </div>
           <div>
-            {string2 && (
+            {isCreditHourFilter && (
               <div className="buttonContainer">
                 <div
                   className={classes(
