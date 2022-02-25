@@ -68,23 +68,6 @@ const CAMPUSES: Record<string, string> = {
   'MBA Evening Program': 'MBA Evening',
 };
 
-const CREDIT: Record<string, string> = {
-  'No credit hours': '0.0',
-  '1 credit hours': '1.0',
-  '2 credit hours': '2.0',
-  '3 credit hours': '3.0',
-  '4 or more credit hours': '4.0+',
-  Monday: 'Mon',
-  Tuesday: 'Tue',
-  Wednesday: 'Wed',
-  Thursday: 'Thu',
-  Friday: 'Fri',
-  'Start Time': 'Any Time',
-  'End Time': 'Any Time',
-  Undergrad: 'Undergraduate',
-  Grad: 'Graduate',
-};
-
 const TIMES: Record<string, string> = {
   '9:30am': '9:30am',
   '10:30am': '10:30am',
@@ -111,6 +94,9 @@ const CLASS_TIMESTAMPS: Array<string> = [
   '10:00 pm',
 ];
 
+const CREDIT_HOURS: Array<string> = ['0', '1', '2', '3', '4'];
+const COURSE_LEVEL: Array<string> = ['Undergraduate', 'Graduate'];
+
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 
 const LARGE_DESKTOP_BREAKPOINT = 1200;
@@ -126,7 +112,8 @@ export {
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,
-  CREDIT,
+  CREDIT_HOURS,
+  COURSE_LEVEL,
   BACKEND_BASE_URL,
   DESKTOP_BREAKPOINT,
   LARGE_MOBILE_BREAKPOINT,
