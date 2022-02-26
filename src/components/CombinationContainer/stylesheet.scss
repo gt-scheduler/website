@@ -1,81 +1,57 @@
-@import "../../variables";
+@import '../../variables';
 
-.CourseAdd {
+.CombinationContainer {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   border-right: 1px solid $color-border;
-  width: 400px;
 
-  .add {
-    @include card;
-    background-color: $color-border;
+  .scroller {
+    flex: 1;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    padding: 4px;
+    width: 256px;
+    margin-bottom: -1px;
 
-    .primary {
+    .list-item {
       display: flex;
-      align-items: center;
+      align-items: stretch;
+      height: 108px;
 
-      .icon {
-        margin-left: 8px;
-        color: $color-neutral;
-        transition: color .2s;
-
-        &.active {
-          color: inherit;
-        }
-      }
-
-      .keyword-wrapper {
+      .combination {
+        @include card;
         flex: 1;
         display: flex;
-        align-items: center;
-        position: relative;
-        
+        align-items: stretch;
 
-        .keyword {
-          position: relative;
-          flex-direction: row;
-          background: none;
-          border: none;
-          outline: none;
-          font-size: 1em;
+        .number {
+          background-color: $color-border;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+
+          font-size: .8em;
           font-weight: bold;
-          height: 40px;
-        
-          
+        }
 
-          &::placeholder {
-            font-weight: normal;
-            color: $color-neutral;
-            text-transform: none;
-          }
-
-          &.autocomplete {
-            position: absolute;
-            opacity: .5;
-          }
+        .calendar-preview {
+          flex: 1;
+          cursor: pointer;
         }
       }
     }
   }
+}
 
-  .Course {
-    background-color: $color-border;
-    opacity: .6;
-    transition: opacity .2s;
+.mobile .CombinationContainer {
+  flex: 1;
+  border-right: none;
 
-    &:hover,
-    &.active {
-      opacity: 1;
-    }
-  }
-
-  .disclaimer {
-    color: $color-neutral;
-    padding: 4px;
-    font-size: .8em;
+  .scroller {
+    width: auto;
   }
 }
