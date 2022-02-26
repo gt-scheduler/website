@@ -5,7 +5,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes, humanizeArrayReact } from '../../utils/misc';
-import { TIMES, CLASS_TIMESTAMPS } from '../../constants';
+import { CLASS_TIMESTAMPS } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -26,9 +26,6 @@ export default function CourseFilter({
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
   const isCreditHourFilter = name === 'Credit Hours & Class Times';
-  const buttonNumber = 4;
-  let boolValue = false;
-  const flipSwitch = (boolValue = !boolValue);
   return (
     <div className="CourseFilter">
       <div

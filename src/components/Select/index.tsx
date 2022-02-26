@@ -1,13 +1,4 @@
-import React, {
-  ChangeEvent,
-  useEffect,
-  KeyboardEvent,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCaretDown,
@@ -102,31 +93,12 @@ export default function Select<Id extends string | number>({
 
   const selectedOption = options.find((option) => option.id === current);
   const label = selectedOption ? selectedOption.label : '-';
-  const [keyword, setKeyword] = useState('');
 
   // Control inline editing state
   const [inputId, setInputId] = useState<Id | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
   const [inputEditAction, setInputEditAction] = useState<EditAction<Id> | null>(
     null
-  );
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleChangeKeyword = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      let input = e.target.value.trim();
-      const results = /^([A-Z]+)(\d.*)$/i.exec(input);
-      if (results != null) {
-        const [, subject, number] = results as unknown as [
-          string,
-          string,
-          string
-        ];
-        input = `${subject} ${number}`;
-      }
-      setKeyword(input);
-    },
-    []
   );
 
   // Try to commit the edit, sending the changes to the provided callback.
