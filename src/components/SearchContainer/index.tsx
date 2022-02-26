@@ -1,68 +1,26 @@
-// import React from 'react';
-
-// import './stylesheet.scss';
-
-// export default function SearchContainer(): React.ReactElement {
-//   return (
-//     <div className="SearchContainer">
-//       <h3 className="label">Search for a course</h3>
-//       <div className="scroller" />
-//     </div>
-//   );
-// }
-/* eslint-disable react/jsx-no-bind */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable func-names */
-/* eslint-disable import/no-duplicates */
 import React, {
   ChangeEvent,
-  useEffect,
-  KeyboardEvent,
   useCallback,
   useContext,
-  useMemo,
   useRef,
   useState,
 } from 'react';
-import { AutoSizer, List } from 'react-virtualized';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
-import { Course, CourseFilter } from '..';
-import { Button, Calendar, Select } from '..';
-import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
-import { Combination } from '../../types';
+import { CourseFilter } from '..';
+import { ScheduleContext } from '../../contexts';
 import Modal from '../Modal';
-import {
-  ASYNC_DELIVERY_MODE,
-  CAMPUSES,
-  DELIVERY_MODES,
-  CREDIT,
-} from '../../constants';
+import { CAMPUSES, DELIVERY_MODES, CREDIT } from '../../constants';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 export default function SearchContainer(): React.ReactElement {
-  const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
-    { patchSchedule },
-  ] = useContext(ScheduleContext);
-  const [, setOverlayCrns] = useContext(OverlayCrnsContext);
+  const [, { patchSchedule }] = useContext(ScheduleContext);
 
   const [confirmReset, setConfirmReset] = useState(false);
-  const handleResetPinnedCrns = useCallback(() => {
-    setConfirmReset(true);
-  }, []);
 
-  const combinations = useMemo(
-    () => oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns),
-    [oscar, desiredCourses, pinnedCrns, excludedCrns]
-  );
-  const sortedCombinations = useMemo(
-    () => oscar.sortCombinations(combinations, sortingOptionIndex),
-    [oscar, combinations, sortingOptionIndex]
-  );
   const [keyword, setKeyword] = useState('');
 
   const inputRef = useRef<HTMLInputElement | null>(null);

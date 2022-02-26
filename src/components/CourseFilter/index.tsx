@@ -1,5 +1,3 @@
-/* eslint-disable no-multi-assign */
-/* eslint-disable react/self-closing-comp */
 import React, { useState } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
