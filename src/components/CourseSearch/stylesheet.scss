@@ -1,42 +1,6 @@
 @import '../../variables';
 
-.SearchContainer {
-  padding: 10px 12px 10px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  border-right: 1px solid $color-border;
-
-  .scroller {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: 256px;
-    flex-shrink: 0;
-
-    .course-list {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .course-add {
-      margin: -4px;
-    }
-  }
-
-  .updated-at {
-    color: $color-neutral;
-    font-size: .8em;
-  }
-  .label {
-    margin: 0;
-  }
-  
-}
-
-.mobile .SearchContainer {
+.mobile .CourseSearch {
   flex: 1;
   border-right: none;
 
@@ -45,12 +9,10 @@
   }
 }
 
-.CourseAdd {
+.CourseSearch {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border-right: 1px solid $color-border;
-  width: 400px;
 
   .add {
     @include card;
