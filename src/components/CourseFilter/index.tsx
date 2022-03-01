@@ -22,7 +22,6 @@ export default function CourseFilter({
   onToggle,
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
-
   return (
     <div className="CourseFilter">
       <div
