@@ -33,11 +33,54 @@
     }
   }
 
+  
+  
+  
   .tag-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     margin-top: -12px;
     padding: 8px;
+    
+    
+    
+
+    .buttonContainer {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .subTitle {
+      display: flex;
+      height: 30px;
+      font-weight: normal;
+      opacity: .5;
+      font-size: 0.8em;
+
+    }
+    .timeTitles {
+      display: flex;
+      font-weight: normal;
+      opacity: .5;
+      font-size: 0.8em;
+    }
+
+    .endSubTitle {
+      margin-left: 23px;
+      position: relative;
+      bottom: -10px;
+      margin-top: -10px;
+
+    }
+
+    .startSubTitle {
+      position: relative;
+      bottom: -10px;
+      margin-top: -10px;
+
+    }
+
+    
 
     .tag {
       @include card;
@@ -47,15 +90,17 @@
       transition: opacity .2s;
       font-size: .8em;
       cursor: pointer;
+      
 
       &.active {
         opacity: 1;
-        font-weight: bold;
       }
 
       &:hover {
         opacity: 1;
       }
     }
-  }
+    
+  
+}
 }

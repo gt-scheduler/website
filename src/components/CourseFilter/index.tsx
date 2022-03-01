@@ -3,6 +3,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes, humanizeArrayReact } from '../../utils/misc';
+import { CLASS_TIMESTAMPS } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -22,7 +23,7 @@ export default function CourseFilter({
   onToggle,
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
-
+  const isCreditHourFilter = name === 'Credit Hours & Class Times';
   return (
     <div className="CourseFilter">
       <div
@@ -46,22 +47,210 @@ export default function CourseFilter({
       </div>
       {expanded && (
         <div className="tag-container">
-          <div
-            className={classes('tag', selectedTags.length === 0 && 'active')}
-            onClick={onReset}
-          >
-            All
+          <div>
+            {!isCreditHourFilter && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels).map((tag) => (
+                  <div>
+                    <div>
+                      <div
+                        key={tag}
+                        className={classes(
+                          'tag',
+                          selectedTags.includes(tag) && 'active'
+                        )}
+                        property={tag}
+                        onClick={(): void => onToggle(tag)}
+                      >
+                        {labels[tag]}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          {Object.keys(labels).map((tag) => (
-            <div
-              key={tag}
-              className={classes('tag', selectedTags.includes(tag) && 'active')}
-              property={tag}
-              onClick={(): void => onToggle(tag)}
-            >
-              {labels[tag]}
+          <div>
+            {isCreditHourFilter && (
+              <div className="subTitle">
+                <p>Credit Hours</p>
+              </div>
+            )}
+          </div>
+          <div>
+            {isCreditHourFilter && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels)
+                  .slice(0, 5)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div>
+            {isCreditHourFilter && (
+              <div className="subTitle">
+                <p>Days</p>
+              </div>
+            )}
+          </div>
+          <div>
+            {isCreditHourFilter && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels)
+                  .slice(5, 10)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="timeTitles">
+              <div>
+                {isCreditHourFilter && (
+                  <div className="startSubTitle">
+                    <p>Start After</p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                {isCreditHourFilter && (
+                  <div className="endSubTitle">
+                    <p>End After</p>
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
+          </div>
+          <div>
+            {isCreditHourFilter && (
+              <div className="buttonContainer">
+                {Object.keys(labels)
+                  .slice(10, 12)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <select
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {CLASS_TIMESTAMPS.map((timestamp) => (
+                            <option value={timestamp} key={timestamp}>
+                              {' '}
+                              {timestamp}{' '}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div>
+            {isCreditHourFilter && (
+              <div className="subTitle">
+                <p>Course Level</p>
+              </div>
+            )}
+          </div>
+          <div>
+            {isCreditHourFilter && (
+              <div className="buttonContainer">
+                <div
+                  className={classes(
+                    'tag',
+                    selectedTags.length === 0 && 'active'
+                  )}
+                  onClick={onReset}
+                >
+                  All
+                </div>
+                {Object.keys(labels)
+                  .slice(12, 14)
+                  .map((tag) => (
+                    <div>
+                      <div>
+                        <div
+                          key={tag}
+                          className={classes(
+                            'tag',
+                            selectedTags.includes(tag) && 'active'
+                          )}
+                          property={tag}
+                          onClick={(): void => onToggle(tag)}
+                        >
+                          {labels[tag]}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
