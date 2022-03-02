@@ -19,8 +19,9 @@ import CourseFilterByCreditHours from '../CourseFilterByCreditHours';
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
-export type CourseAddProps = {
+export type CourseSearchProps = {
   className?: string;
+  onShow: (courseToAdd: CourseBean) => void;
 };
 
 export type SortKey =
@@ -120,7 +121,9 @@ function doesFilterMatchCourse(
   });
 }
 
-export default function CourseSearch(): React.ReactElement {
+export default function CourseSearch({
+  onShow,
+}: CourseSearchProps): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
   // const [{ oscar, desiredCourses,
   //          excludedCrns, colorMap }, { patchSchedule }] =
@@ -210,19 +213,13 @@ export default function CourseSearch(): React.ReactElement {
 
   const handleAddCourse = useCallback(
     (course: CourseBean) => {
-      // const startLimit = filter.startTime[0];
-      // if (startLimit) {
-      //   const startLimitVal = stringToTime(startLimit)
-      // }
-
       // handler logic here
-      // need to populate the first and third column over here
+      // need to populate the first column using this handler
       setSelectedCourse([...selectedCourse, course]);
     },
     [selectedCourse]
-    // [filter, desiredCourses, excludedCrns, colorMap,
-    //  inputRef, patchSchedule, selectedCourse]
   );
+
   const activeCourse = courses[activeIndex];
 
   return (
@@ -276,6 +273,7 @@ export default function CourseSearch(): React.ReactElement {
             className={classes(course === activeCourse && 'active')}
             courseId={course.id}
             onAddCourse={(): void => handleAddCourse(course)}
+            onShowInfo={(): void => onShow(course)}
           />
         ))}
       </div>

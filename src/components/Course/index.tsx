@@ -23,20 +23,23 @@ export type CourseProps = {
   className?: string;
   courseId: string;
   onAddCourse?: () => void;
+  onShowInfo?: () => void;
 };
 
 export default function Course({
   className,
   courseId,
   onAddCourse,
+  onShowInfo,
 }: CourseProps): React.ReactElement | null {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
+  const isShowing = Boolean(onShowInfo);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -152,10 +155,11 @@ export default function Course({
 
   const infoAction = {
     icon: faInfoCircle,
-    href:
-      `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
-      `course_detail?cat_term_in=${term}&subj_code_in=` +
-      `${course.subject}&crse_numb_in=${course.number}`,
+    onClick: onShowInfo,
+    // href:
+    //   `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
+    //   `course_detail?cat_term_in=${term}&subj_code_in=` +
+    //   `${course.subject}&crse_numb_in=${course.number}`,
   };
 
   const pinnedSections = course.sections.filter((section) =>
@@ -177,8 +181,8 @@ export default function Course({
           course.id,
           pinnedSections.map((section) => section.id).join(', '),
         ].join(' ')}
-        actions={
-          isSearching
+        actions={[
+          ...(isSearching
             ? [
                 { icon: faPlus, onClick: onAddCourse },
                 hasPrereqs ? prereqAction : infoAction,
@@ -197,8 +201,9 @@ export default function Course({
                   icon: faTrash,
                   onClick: (): void => handleRemoveCourse(course),
                 },
-              ]
-        }
+              ]),
+          ...(isShowing ? [infoAction] : []),
+        ]}
       >
         <div className="course-row">
           <span className="course-title">{course.title}</span>
