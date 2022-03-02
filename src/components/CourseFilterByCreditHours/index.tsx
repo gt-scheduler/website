@@ -18,6 +18,7 @@ import './stylesheet.scss';
 export type CourseFilterProps = {
   onReset: (key: string) => void;
   onToggle: (key: SortKey, tag: string) => void;
+  onToggleDropdown: (key: SortKey, tag: string[]) => void;
   filter: SortFilter;
 };
 
@@ -25,6 +26,7 @@ export default function CourseFilterByCreditHours({
   onReset,
   onToggle,
   filter,
+  onToggleDropdown,
 }: CourseFilterProps): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
 
@@ -59,14 +61,18 @@ export default function CourseFilterByCreditHours({
               labels={CLASS_TIMESTAMPS}
               selectedTags={filter.startTime}
               onReset={(): void => onReset('startTime')}
-              onToggle={(tag: string): void => onToggle('startTime', tag)}
+              onToggle={(tags: string[]): void =>
+                onToggleDropdown('startTime', tags)
+              }
             />
             <CourseSubFilterDropdown
               name="End Time"
               labels={CLASS_TIMESTAMPS}
               selectedTags={filter.endTime}
               onReset={(): void => onReset('endTime')}
-              onToggle={(tag: string): void => onToggle('endTime', tag)}
+              onToggle={(tags: string[]): void =>
+                onToggleDropdown('endTime', tags)
+              }
             />
           </div>
           <CourseSubFilter

@@ -75,24 +75,24 @@ const TIMES: Record<string, string> = {
   '12:30am': '12:30am',
 };
 
-const CLASS_TIMESTAMPS: Array<string> = [
-  'Any time',
-  '8:00 am',
-  '9:00 am',
-  '10:00 am',
-  '11:00 am',
-  '12:00 pm',
-  '1:00 pm',
-  '2:00 pm',
-  '3:00 pm',
-  '4:00 pm',
-  '5:00 pm',
-  '6:00 pm',
-  '7:00 pm',
-  '8:00 pm',
-  '9:00 pm',
-  '10:00 pm',
-];
+const CLASS_TIMESTAMPS: Record<string, number> = {
+  '8:00 am': 480,
+  '9:00 am': 540,
+  '10:00 am': 600,
+  '11:00 am': 660,
+  '12:00 pm': 720,
+  '1:00 pm': 780,
+  '2:00 pm': 840,
+  '3:00 pm': 900,
+  '4:00 pm': 960,
+  '5:00 pm': 1020,
+  '6:00 pm': 1080,
+  '7:00 pm': 1140,
+  '8:00 pm': 1360,
+  '9:00 pm': 1260,
+};
+
+const ANY_TIME = 'Any time';
 
 const CREDIT_HOURS: Array<string> = ['0', '1', '2', '3', '4'];
 const COURSE_LEVEL: Array<string> = ['Undergraduate', 'Graduate'];
@@ -120,4 +120,5 @@ export {
   LARGE_DESKTOP_BREAKPOINT,
   TIMES,
   CLASS_TIMESTAMPS,
+  ANY_TIME,
 };

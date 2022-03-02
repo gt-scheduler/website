@@ -76,13 +76,31 @@ function doesFilterMatchCourse(
         })
       );
 
-    // TODO: Implement filter
     if (key === 'startTime') {
+      const startTimeLimitStr = filter.startTime[0];
+      if (startTimeLimitStr) {
+        return course.sections.some((section) => {
+          return section.meetings.some((meeting) => {
+            const startTime = meeting.period?.start;
+            const startTimeLimit = parseInt(startTimeLimitStr, 10);
+            return startTime && startTime >= startTimeLimit;
+          });
+        });
+      }
       return true;
     }
 
-    // TODO: Implement filter
     if (key === 'endTime') {
+      const endTimeLimitStr = filter.endTime[0];
+      if (endTimeLimitStr) {
+        return course.sections.some((section) => {
+          return section.meetings.some((meeting) => {
+            const endTime = meeting.period?.end;
+            const endTimeLimit = parseInt(endTimeLimitStr, 10);
+            return endTime && endTime <= endTimeLimit;
+          });
+        });
+      }
       return true;
     }
 
@@ -170,6 +188,16 @@ export default function CourseSearch(): React.ReactElement {
     [filter]
   );
 
+  const handleToggleFilterDropdown = useCallback(
+    (key: SortKey, tagArr: string[]) => {
+      setFilter({
+        ...filter,
+        [key]: tagArr,
+      });
+    },
+    [filter]
+  );
+
   const handleResetFilter = useCallback(
     (key) => {
       setFilter({
@@ -182,6 +210,11 @@ export default function CourseSearch(): React.ReactElement {
 
   const handleAddCourse = useCallback(
     (course: CourseBean) => {
+      // const startLimit = filter.startTime[0];
+      // if (startLimit) {
+      //   const startLimitVal = stringToTime(startLimit)
+      // }
+
       // handler logic here
       // need to populate the first and third column over here
       setSelectedCourse([...selectedCourse, course]);
@@ -218,6 +251,9 @@ export default function CourseSearch(): React.ReactElement {
             key="creditHours"
             onReset={(key: string): void => handleResetFilter(key)}
             onToggle={(key, tag): void => handleToggleFilter(key, tag)}
+            onToggleDropdown={(key, tags): void =>
+              handleToggleFilterDropdown(key, tags)
+            }
             filter={filter}
           />
           {[
