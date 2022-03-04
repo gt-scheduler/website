@@ -1,116 +1,58 @@
-/* eslint-disable */
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+// eslint-disable
+import React, { useContext, useEffect, useState } from 'react';
 
-import { Course as CourseBean } from '../../data/beans';
+import { Course as CourseBean, Section as SectionBean } from '../../data/beans';
+import { CourseGpa } from '../../types';
+import { periodToString } from '../../utils/misc';
+import { Seating } from '../../data/beans/Section';
+import { ErrorWithFields, softError } from '../../log';
+import { ScheduleContext } from '../../contexts';
 
 import './stylesheet.scss';
 
-const exampleCourse = {
-  title: 'CS 1100: Freshman Leap Seminar',
-  description:
-    'Small group discussions with first year students are led by one or more faculty members and include a variety of foundational, motivational, and topical subjects for computationalist.',
-  creditHours: 3,
-  prerequisites: ['CS 1331'],
-  gpa: 3.06,
-  gradeDistribution: { A: 45.6, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 },
-  professors: [
-    {
-      name: 'John Stasko',
-      gpa: 3.16,
-      gradeDistribution: { A: 45.6, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 },
-      sections: [
-        {
-          crn: '00000',
-          sectionNumber: 'A01',
-          days: 'MWF',
-          time: '11:00am-11:50am',
-          seatsFilled: '140/150',
-          waitlist: '10/20',
-          location: 'College of Business 100',
-        },
-        {
-          crn: '00000',
-          sectionNumber: 'A01',
-          days: 'MWF',
-          time: '11:00am-11:50am',
-          seatsFilled: '140/150',
-          waitlist: '10/20',
-          location: 'College of Business 100',
-        },
-      ],
-    },
-    {
-      name: 'Mary Hudachek-Buswell',
-      gpa: 3.16,
-      gradeDistribution: { A: 45.6, B: 34.9, C: 21.2, D: 2.3, F: 1.1, W: 5.4 },
-      sections: [
-        {
-          crn: '00000',
-          sectionNumber: 'A01',
-          days: 'MWF',
-          time: '11:00am-11:50am',
-          seatsFilled: '140/150',
-          waitlist: '10/20',
-          location: 'College of Business 100',
-        },
-        {
-          crn: '00000',
-          sectionNumber: 'A01',
-          days: 'MWF',
-          time: '11:00am-11:50am',
-          seatsFilled: '140/150',
-          waitlist: '10/20',
-          location: 'College of Business 100',
-        },
-      ],
-    },
-  ],
-};
-
-type SectionType = {
-  crn: string;
-  sectionNumber: string;
-  days: string;
-  time: string;
-  seatsFilled: string;
-  waitlist: string;
-  location: string;
-};
-
-type GradeDistribution = {
-  A: number;
-  B: number;
-  C: number;
-  D: number;
-  F: number;
-  W: number;
-};
-
-type Grade = keyof GradeDistribution;
-
 type ProfessorType = {
   name: string;
-  gpa: number;
-  gradeDistribution: GradeDistribution;
-  sections: SectionType[];
+  sections: SectionBean[];
+  gpa: string;
 };
+interface CourseDetailsAPIResponse {
+  header: [
+    {
+      course_name: string | null | unknown;
+      credits: number | null | unknown;
+      description: string | null | unknown;
+      full_name: string | null | unknown;
+    }
+  ];
+  raw: Array<{
+    instructor_gt_username: string | unknown;
+    instructor_name: string | unknown;
+    link: string | unknown;
+    class_size_group: string | unknown;
+    GPA: number | unknown;
+    A: number | unknown;
+    B: number | unknown;
+    C: number | unknown;
+    D: number | unknown;
+    F: number | unknown;
+    W: number | unknown;
+  }>;
+}
 
-const Professor = ({
-  professor,
-}: {
-  professor: ProfessorType;
-}): JSX.Element => {
+const Professor = ({ name, sections, gpa }: ProfessorType): JSX.Element => {
   return (
     <>
       <tr>
         <td colSpan={8}>
           <div className="professor-header">
             <div className="professor-header-left">
-              <p className="name">{professor.name}</p>
-              <p className="gpa">{`GPA: ${professor.gpa}`}</p>
+              <p className="name">{name}</p>
+              <p className="gpa">{`GPA: ${gpa}`}</p>
             </div>
             <div className="grade-distribution-string">
-              {Object.keys(professor.gradeDistribution).map((grade) => {
+              {/* {Object.keys(professor.gradeDistribution).map((grade) => {
                 return (
                   <>
                     <p className="letter">{`${grade}`}</p>
@@ -123,26 +65,45 @@ const Professor = ({
                     </p>
                   </>
                 );
-              })}
+              })} */}
             </div>
           </div>
         </td>
       </tr>
       <>
-        {professor.sections.map((section: SectionType) => {
-          return <Section section={section} />;
+        {sections.map((section: SectionBean) => {
+          return <Section key={section.id} section={section} />;
         })}
       </>
     </>
   );
 };
 
-const Section = ({
-  section: { crn, sectionNumber, days, time, seatsFilled, waitlist, location },
-}: {
-  section: SectionType;
-}): JSX.Element => {
+type SectionProps = {
+  section: SectionBean;
+};
+
+const Section = ({ section }: SectionProps): JSX.Element => {
+  const [{ term }] = useContext(ScheduleContext);
   const [selected, setSelected] = useState(false);
+  const [seating, setSeating] = useState<Seating>([[], 0]);
+
+  useEffect(() => {
+    section
+      .fetchSeating(term)
+      .then((newSeating) => {
+        setSeating(newSeating);
+      })
+      .catch((err) =>
+        softError(
+          new ErrorWithFields({
+            message: 'error while fetching seating',
+            source: err,
+            fields: { crn: section.crn, term: section.term },
+          })
+        )
+      );
+  });
 
   return (
     <tr className="section-info">
@@ -183,13 +144,27 @@ const Section = ({
           )}
         </button>
       </td>
-      <td>{crn}</td>
-      <td>{sectionNumber}</td>
-      <td>{days}</td>
-      <td>{time}</td>
-      <td>{seatsFilled}</td>
-      <td>{waitlist}</td>
-      <td>{location}</td>
+      <td>{section.crn}</td>
+      <td>{section.id}</td>
+      <td>{section.meetings[0]?.days.join('')}</td>
+      <td>{periodToString(section.meetings[0]?.period)}</td>
+      <td>
+        {seating[0].length === 0
+          ? `Loading...`
+          : typeof seating[0][1] === 'number'
+          ? // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            `${seating[0][1] ?? '<unknown>'}/${seating[0][0] ?? '<unknown>'}`
+          : `N/A`}
+      </td>
+      <td>
+        {seating[0].length === 0
+          ? `Loading...`
+          : typeof seating[0][1] === 'number'
+          ? // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            `${seating[0][3] ?? '<unknown>'}/${seating[0][2] ?? '<unknown>'}`
+          : `N/A`}
+      </td>
+      <td>{section.meetings[0]?.where}</td>
     </tr>
   );
 };
@@ -199,45 +174,114 @@ export type SearchResultContainerProps = {
   passedCourse?: CourseBean;
 };
 
+type CourseHeader = {
+  course_name: string | null | unknown;
+  credits: number | null | unknown;
+  description: string | null | unknown;
+  full_name: string | null | unknown;
+};
+
 export default function SearchResultContainer({
   // TODO: Fix props name to something more meaningful
   passedCourse,
-}: SearchResultContainerProps): React.ReactElement {
-  // TODO: replace exampleCourse with course from props, types will not match
-  const [selectedCourse] = useState(exampleCourse);
+}: SearchResultContainerProps): React.ReactElement | null {
+  const [selectedCourse, setSelectedCourse] = useState<CourseBean>();
+  const [selectedCourseGpa, setSelectedCourseGpa] = useState<string>();
+  const [courseHeader, setCourseHeader] = useState<CourseHeader>({
+    course_name: 'N/A',
+    credits: 'N/A',
+    description: 'N/A',
+    full_name: 'N/A',
+  });
+  const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
 
-  const generatePrereqString = (prereqs: string[]): string => {
-    let prereqString = '';
-    prereqs.forEach((course) => {
-      prereqString = `${prereqString} ${course}`;
+  // TODO: Use for course info
+  // const generatePrereqString = (prereqs: string[]): string => {
+  //   let prereqString = '';
+  //   prereqs.forEach((course) => {
+  //     prereqString = `${prereqString} ${course}`;
+  //   });
+
+  //   return prereqString;
+  // };
+
+  useEffect(() => {
+    setSelectedCourse(passedCourse);
+  }, [passedCourse]);
+
+  useEffect(() => {
+    const fetchGpa = async (): Promise<void> => {
+      if (selectedCourse) {
+        const courseGpa = await selectedCourse.fetchGpa();
+        setGpaMap(courseGpa);
+        setSelectedCourseGpa(courseGpa.averageGpa?.toFixed(2));
+        const details: CourseDetailsAPIResponse | null =
+          await selectedCourse.fetchCourseDetailAPIResponse();
+        if (details) {
+          if (details.header.length > 0) {
+            setCourseHeader(details.header[0]);
+          } else {
+            setCourseHeader({
+              course_name: 'Course info not available',
+              credits: 'Course info not available',
+              description: 'Course info not available',
+              full_name: 'Course info not available',
+            });
+          }
+        }
+      }
+    };
+    fetchGpa().catch((err) => {
+      softError(
+        new ErrorWithFields({
+          message: 'error fetching course GPA',
+          source: err,
+          fields: {
+            courseId: selectedCourse?.id,
+            term: selectedCourse?.term,
+          },
+        })
+      );
     });
+  }, [selectedCourse]);
 
-    return prereqString;
-  };
+  if (selectedCourse === null) {
+    return null;
+  }
+
+  const instructorMap: Record<string, SectionBean[] | undefined> = {};
+  selectedCourse?.sections.forEach((section) => {
+    const [primaryInstructor = 'Not Assigned'] = section.instructors;
+
+    const instructorSections = instructorMap[primaryInstructor] ?? [];
+    instructorSections.push(section);
+    instructorMap[primaryInstructor] = instructorSections;
+  });
 
   return (
     <div className="SearchResultContainer">
       {selectedCourse ? (
         <div className="selected-course">
           <h2>{selectedCourse.title}</h2>
-          <p>{selectedCourse.description}</p>
+          <p>{courseHeader.description as string}</p>
           <table className="info-table">
             <tr>
               <th className="header-title">Credit Hours</th>
-              <td>{selectedCourse.creditHours}</td>
+              <td>{courseHeader.credits as string}</td>
             </tr>
             <tr>
               <th className="header-title">Prerequisites</th>
-              <td>{generatePrereqString(selectedCourse.prerequisites)}</td>
+              {/* <td>{generatePrereqString()}</td> */}
+              <td>Prerequisites go here</td>
             </tr>
             <tr>
               <th className="header-title">Course GPA</th>
-              <td>{selectedCourse.gpa}</td>
+              <td>{selectedCourseGpa}</td>
             </tr>
             <tr>
               <th className="header-title">Grade Distr.</th>
               <td className="info-table-grade-distribution">
-                {Object.keys(selectedCourse.gradeDistribution).map((grade) => {
+                {/* {Object.keys(courseDetails.raw[0]).map((grade) => {
                   return (
                     <>
                       <p className="letter">{`${grade}`}</p>
@@ -246,7 +290,7 @@ export default function SearchResultContainer({
                       </p>
                     </>
                   );
-                })}
+                })} */}
               </td>
             </tr>
           </table>
@@ -261,9 +305,30 @@ export default function SearchResultContainer({
               <td>Waitlist</td>
               <td>Location</td>
             </tr>
-            {selectedCourse.professors.map((professor) => {
-              return <Professor professor={professor} />;
-            })}
+            {instructorMap ? (
+              Object.keys(instructorMap).map((professor: string) => {
+                let instructorGpa: number | undefined = 0;
+                if (gpaMap !== null) {
+                  instructorGpa = gpaMap[professor];
+                }
+                return (
+                  <Professor
+                    key={professor}
+                    name={professor}
+                    sections={instructorMap[professor] ?? []}
+                    gpa={
+                      gpaMap === null
+                        ? 'Loading...'
+                        : instructorGpa
+                        ? instructorGpa.toFixed(2)
+                        : 'N/A'
+                    }
+                  />
+                );
+              })
+            ) : (
+              <></>
+            )}
           </table>
         </div>
       ) : (

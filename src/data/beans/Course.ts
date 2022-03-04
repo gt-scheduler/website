@@ -203,6 +203,37 @@ export default class Course {
     return groups;
   }
 
+  async fetchCourseDetailAPIResponse(): Promise<CourseDetailsAPIResponse | null> {
+    const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
+    const encodedCourse = encodeURIComponent(id);
+    const url = `${COURSE_CRITIQUE_API_URL}?courseID=${encodedCourse}`;
+
+    let responseData: CourseDetailsAPIResponse;
+
+    try {
+      responseData = (await axios.get<CourseDetailsAPIResponse>(url)).data;
+    } catch (err) {
+      // Ignore network errors
+      if (!isAxiosNetworkError(err)) {
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching course details from Course Critique API',
+            source: err,
+            fields: {
+              baseId: this.id,
+              cleanedId: id,
+              url,
+            },
+          })
+        );
+      }
+
+      return null;
+    }
+
+    return responseData;
+  }
+
   async fetchGpa(): Promise<CourseGpa> {
     // Note: if `CourseGpa` ever changes,
     // the cache needs to be invalidated
