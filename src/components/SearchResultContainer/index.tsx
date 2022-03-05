@@ -1,4 +1,7 @@
+/* eslint-disable */
 import React, { useState } from 'react';
+
+import { Course as CourseBean } from '../../data/beans';
 
 import './stylesheet.scss';
 
@@ -191,7 +194,16 @@ const Section = ({
   );
 };
 
-export default function SearchResultContainer(): React.ReactElement {
+export type SearchResultContainerProps = {
+  // TODO: Fix props name to something more meaningful
+  passedCourse?: CourseBean;
+};
+
+export default function SearchResultContainer({
+  // TODO: Fix props name to something more meaningful
+  passedCourse,
+}: SearchResultContainerProps): React.ReactElement {
+  // TODO: replace exampleCourse with course from props, types will not match
   const [selectedCourse] = useState(exampleCourse);
 
   const generatePrereqString = (prereqs: string[]): string => {
