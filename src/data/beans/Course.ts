@@ -40,6 +40,7 @@ interface SectionGroup {
   sections: Section[];
 }
 
+type CourseDetailsResponse = CourseDetailsAPIResponse | null;
 export default class Course {
   id: string;
 
@@ -203,7 +204,7 @@ export default class Course {
     return groups;
   }
 
-  async fetchCourseDetailAPIResponse(): Promise<CourseDetailsAPIResponse | null> {
+  async fetchCourseDetailAPIResponse(): Promise<CourseDetailsResponse> {
     const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
     const url = `${COURSE_CRITIQUE_API_URL}?courseID=${encodedCourse}`;
