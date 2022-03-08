@@ -41,6 +41,7 @@ export default function Course({
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
+  // const isShowing = Boolean(onShowInfo);
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchSchedule },
