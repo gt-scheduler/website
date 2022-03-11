@@ -103,6 +103,11 @@ const LARGE_DESKTOP_BREAKPOINT = 1200;
 const DESKTOP_BREAKPOINT = 1024;
 const LARGE_MOBILE_BREAKPOINT = 600;
 
+const COURSE_CARD_TYPES = {
+  Schedule: 'schedule',
+  CourseSearch: 'courseSearch',
+};
+
 export {
   OPEN,
   CLOSE,
@@ -121,4 +126,5 @@ export {
   TIMES,
   CLASS_TIMESTAMPS,
   ANY_TIME,
+  COURSE_CARD_TYPES,
 };

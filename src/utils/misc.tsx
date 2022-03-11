@@ -6,7 +6,12 @@ import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 
 import { Oscar, Section } from '../data/beans';
-import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
+import {
+  DAYS,
+  PALETTE,
+  PNG_SCALE_FACTOR,
+  COURSE_CARD_TYPES,
+} from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import { ICS, Period, PrerequisiteClause, Theme } from '../types';
 import ics from '../vendor/ics';
@@ -56,6 +61,15 @@ export const getContentClassName = (color: string | undefined): string => {
   return r * 0.299 + g * 0.587 + b * 0.114 > 128
     ? 'light-content'
     : 'dark-content';
+};
+
+export const getColorTheme = (
+  courseCardType: string | undefined,
+  color: string | undefined
+): string => {
+  if (courseCardType && courseCardType === COURSE_CARD_TYPES.CourseSearch)
+    return 'dark-content';
+  return getContentClassName(color);
 };
 
 export const hasConflictBetween = (
