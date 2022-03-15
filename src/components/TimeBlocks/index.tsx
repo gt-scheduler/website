@@ -100,49 +100,54 @@ export default function TimeBlocks({
                   </span>
                 </div>
               )}
+              {!isAutosized && (
+                <ReactTooltip
+                  id={crn}
+                  className="tooltip"
+                  type="dark"
+                  place="top"
+                  effect="solid"
+                >
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <b>Course Name</b>
+                        </td>
+                        <td>{section.course.title}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b>Location</b>
+                        </td>
+                        <td>{meeting.where}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b>Delivery Type</b>
+                        </td>
+                        <td>{section.deliveryMode}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b>Course Number</b>
+                        </td>
+                        <td>{section.crn}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b>Credit Hours</b>
+                        </td>
+                        <td>{section.credits}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ReactTooltip>
+              )}
             </div>
           );
         });
       })}
-
-      {!isAutosized && (
-        <ReactTooltip
-          id={crn}
-          className="tooltip"
-          type="dark"
-          place="top"
-          effect="solid"
-        >
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <b>Course Name</b>
-                </td>
-                <td>{section.course.title}</td>
-              </tr>
-              <tr>
-                <td>
-                  <b>Delivery Type</b>
-                </td>
-                <td>{section.deliveryMode}</td>
-              </tr>
-              <tr>
-                <td>
-                  <b>Course Number</b>
-                </td>
-                <td>{section.crn}</td>
-              </tr>
-              <tr>
-                <td>
-                  <b>Credit Hours</b>
-                </td>
-                <td>{section.credits}</td>
-              </tr>
-            </tbody>
-          </table>
-        </ReactTooltip>
-      )}
     </div>
   );
 }
