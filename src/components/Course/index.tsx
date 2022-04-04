@@ -9,7 +9,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, getColorTheme } from '../../utils/misc';
+import { classes } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { ScheduleContext } from '../../contexts';
@@ -115,7 +115,6 @@ export default function Course({
   if (course == null) return null;
 
   const color = colorMap[course.id];
-  const contentClassName = getColorTheme(courseCardType, color);
 
   const hasPrereqs = oscar.version > 1;
   let prereqs: CrawlerPrerequisites | null = null;
@@ -201,7 +200,7 @@ export default function Course({
 
   return (
     <div
-      className={classes('Course', contentClassName, 'default', className)}
+      className={classes('Course', 'default', className)}
       style={{
         backgroundColor:
           courseCardType === COURSE_CARD_TYPES.CourseSearch ? undefined : color,

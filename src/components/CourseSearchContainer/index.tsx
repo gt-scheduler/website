@@ -16,7 +16,7 @@ export default function CourseSearchContainer({
   return (
     <>
       <div className="CourseSearchContainer">
-        <h3 className="label">Search for a course</h3>
+        <h3 className="label column-title">Search Course</h3>
         <div className="scroller">
           <CourseSearch onShow={onShow} />
         </div>
