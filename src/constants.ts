@@ -106,6 +106,7 @@ const LARGE_MOBILE_BREAKPOINT = 600;
 const COURSE_CARD_TYPES = {
   Schedule: 'schedule',
   CourseSearch: 'courseSearch',
+  MyCourse: 'mycourse',
 };
 
 export {
