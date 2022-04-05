@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import Course from '../Course';
+import MyCourse from '../MyCourse';
 import { ScheduleContext } from '../../contexts';
 
 import './stylesheet.scss';
@@ -15,7 +15,7 @@ export default function CurrentCourseContainer(): React.ReactElement {
         {desiredCourses.length > 0 ? (
           <div className="course-list">
             {desiredCourses.map((courseId) => {
-              return <Course courseId={courseId} key={courseId} />;
+              return <MyCourse courseId={courseId} key={courseId} />;
             })}
           </div>
         ) : (
