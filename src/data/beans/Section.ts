@@ -86,7 +86,6 @@ export default class Section {
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
     this.campus = oscar.campuses[campusIndex] ?? 'unknown';
-
     const attributes = attributeIndices
       .map((attributeIndex) => oscar.attributes[attributeIndex])
       .flatMap((attribute) => (attribute == null ? [] : [attribute]));
@@ -103,6 +102,8 @@ export default class Section {
         locationIndex,
         instructors,
         dateRangeIndex,
+        finalDateIndex,
+        finalTimeIndex,
       ]) => ({
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : days.split(''),
@@ -116,6 +117,10 @@ export default class Section {
           from: new Date(),
           to: new Date(),
         },
+        finalDate:
+          finalDateIndex !== -1 ? oscar.finalDates[finalDateIndex] : new Date(),
+        finalTime:
+          finalTimeIndex !== -1 ? oscar.finalTimes[finalTimeIndex] : undefined,
       })
     );
     this.instructors = unique(
