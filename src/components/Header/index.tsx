@@ -28,7 +28,14 @@ export default function Header({
 }: HeaderProps): React.ReactElement {
   const [
     { term, oscar, pinnedCrns, allVersionNames, currentVersion },
-    { setTerm, setCurrentVersion, addNewVersion, deleteVersion, renameVersion },
+    {
+      setTerm,
+      setCurrentVersion,
+      addNewVersion,
+      deleteVersion,
+      renameVersion,
+      cloneVersion,
+    },
   ] = useContext(ScheduleContext);
   const terms = useContext(TermsContext);
 
@@ -63,6 +70,7 @@ export default function Header({
         addNewVersion,
         deleteVersion,
         renameVersion,
+        cloneVersion,
       }}
     />
   );
