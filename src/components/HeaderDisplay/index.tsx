@@ -209,12 +209,7 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
             type: 'button',
             icon: faCopy,
             onClick: () => {
-              state.cloneVersion(
-                version.id,
-                getNextVersionName(
-                  state.allVersionNames.map(({ name }) => name)
-                )
-              );
+              state.cloneVersion(version.id, `Copy of ${version.name}`);
             },
           });
 

@@ -99,7 +99,7 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
     },
     cloneVersion: (id: string, newName: string): void => {
       throw new ErrorWithFields({
-        message: 'empty ScheduleContext.editVersion value being used',
+        message: 'empty ScheduleContext.cloneVersion value being used',
         fields: {
           id,
           newName,

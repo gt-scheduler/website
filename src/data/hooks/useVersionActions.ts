@@ -32,7 +32,8 @@ export default function useVersionActions({
   setVersion: (next: string) => void;
   currentVersion: string;
 }): HookResult {
-  // Create an `addNewVersion` function
+  // Create an `addNewVersion` function.
+  // Returns the ID of the created schedule version.
   const addNewVersion = useCallback(
     (name: string, select = false): string => {
       const id = generateScheduleVersionId();
