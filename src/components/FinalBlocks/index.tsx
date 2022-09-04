@@ -43,7 +43,7 @@ export default function FinalBlocks({
     <div className={classes('FinalBlocks', className)}>
       {section.meetings.map((meeting, i) => {
         const { finalTime, finalDate } = meeting;
-        if (finalTime === undefined || finalDate === undefined) return;
+        if (finalTime === null || finalDate === null) return;
 
         const sizeInfoKey = makeSizeInfoKey(finalTime);
         const day = finalDate.toDateString();

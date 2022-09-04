@@ -19,7 +19,7 @@ export default class Oscar {
 
   finalDates: Date[];
 
-  finalTimes: (Period | undefined)[];
+  finalTimes: (Period | null)[];
 
   scheduleTypes: string[];
 
@@ -73,28 +73,31 @@ export default class Oscar {
       };
     });
 
-    this.finalTimes = caches.finalTimes.map((period, i) => {
-      const periodSegments = period.split(' - ');
-      if (periodSegments.length !== 2) {
-        softError(
-          new ErrorWithFields({
-            message: 'period did not follow expected format',
-            fields: {
-              period,
-              cacheIndex: i,
-              term: this.term,
-            },
-          })
-        );
-        return undefined;
-      }
+    this.finalTimes =
+      caches.finalTimes === undefined
+        ? []
+        : caches.finalTimes.map((finalTime, i) => {
+            const finalSegments = finalTime.split(' - ');
+            if (finalSegments.length !== 2) {
+              softError(
+                new ErrorWithFields({
+                  message: 'finalTime did not follow expected format',
+                  fields: {
+                    finalTime,
+                    cacheIndex: i,
+                    term: this.term,
+                  },
+                })
+              );
+              return null;
+            }
 
-      const [start, end] = periodSegments as [string, string];
-      return {
-        start: stringToTime(start),
-        end: stringToTime(end),
-      };
-    });
+            const [start, end] = finalSegments as [string, string];
+            return {
+              start: stringToTime(start),
+              end: stringToTime(end),
+            };
+          });
 
     this.dateRanges = caches.dateRanges.map((dateRange, i) => {
       let segments = dateRange.split(' - ');
@@ -119,9 +122,12 @@ export default class Oscar {
       return { from, to };
     });
 
-    this.finalDates = caches.finalDates.map((date) => {
-      return new Date(date);
-    });
+    this.finalDates =
+      caches.finalDates === undefined
+        ? []
+        : caches.finalDates?.map((date) => {
+            return new Date(date);
+          });
 
     this.scheduleTypes = caches.scheduleTypes;
     this.campuses = caches.campuses;

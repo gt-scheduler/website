@@ -4,6 +4,10 @@
   margin: $day-height + $margin $margin $margin $time-width + $margin;
 }
 
+.FinalsEmpty {
+  text-align: center;
+}
+
 .FinalsContainer {
   @include finals-margin(24px);
   flex: 1;

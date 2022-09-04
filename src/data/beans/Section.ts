@@ -102,6 +102,7 @@ export default class Section {
         locationIndex,
         instructors,
         dateRangeIndex,
+        // These fields will be undefined if oscar.version < 3
         finalDateIndex,
         finalTimeIndex,
       ]) => ({
@@ -118,9 +119,13 @@ export default class Section {
           to: new Date(),
         },
         finalDate:
-          finalDateIndex !== -1 ? oscar.finalDates[finalDateIndex] : new Date(),
+          finalDateIndex === -1 || oscar.version < 3
+            ? new Date()
+            : oscar.finalDates[finalDateIndex] ?? new Date(),
         finalTime:
-          finalTimeIndex !== -1 ? oscar.finalTimes[finalTimeIndex] : undefined,
+          finalTimeIndex === -1 || oscar.version < 3
+            ? null
+            : oscar.finalTimes[finalTimeIndex] ?? null,
       })
     );
     this.instructors = unique(

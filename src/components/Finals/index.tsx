@@ -76,7 +76,7 @@ export default function Finals(): React.ReactElement {
       .filter((m) => m.finalTime)
       .forEach((meeting) => {
         const { finalTime, finalDate } = meeting;
-        if (finalTime === undefined || finalDate === undefined) return;
+        if (finalTime === null || finalDate === null) return;
         const day = finalDate.toDateString();
 
         const dayPeriodInfos = Object.values(crnSizeInfo)
@@ -122,6 +122,20 @@ export default function Finals(): React.ReactElement {
       });
   });
 
+  if (oscar.finalDates.length === 0)
+    return (
+      <div>
+        <h3 className="FinalsEmpty">
+          Finals Schedule not available for this semester
+        </h3>
+        <h5 className="FinalsEmpty">
+          Find out more about updating it{' '}
+          <a href="https://github.com/adityavidyadharan/crawler/tree/aditya/92-finals-schedule#:~:text=be%20found%20here-,Updating,-the%20list%20of">
+            here
+          </a>
+        </h5>
+      </div>
+    );
   return (
     <div className="FinalsContainer">
       <div className="times">
