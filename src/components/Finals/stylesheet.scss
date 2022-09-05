@@ -4,6 +4,16 @@
   margin: $day-height + $margin $margin $margin $time-width + $margin;
 }
 
+.FinalsEmptyContainer {
+  padding: 24px 8px;
+
+  // Make the container grow/shrink to the full screen
+  flex: 1 1;
+
+  // Include colored links
+  @extend %colored-link-container;
+}
+
 .FinalsEmpty {
   text-align: center;
 }

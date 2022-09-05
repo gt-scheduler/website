@@ -124,16 +124,16 @@ export default function Finals(): React.ReactElement {
 
   if (oscar.finalDates.length === 0)
     return (
-      <div>
-        <h3 className="FinalsEmpty">
+      <div className="FinalsEmptyContainer">
+        <h2 className="FinalsEmpty">
           Finals Schedule not available for this semester
-        </h3>
-        <h5 className="FinalsEmpty">
+        </h2>
+        <p className="FinalsEmpty">
           Find out more about updating it{' '}
           <a href="https://github.com/adityavidyadharan/crawler/tree/aditya/92-finals-schedule#:~:text=be%20found%20here-,Updating,-the%20list%20of">
             here
           </a>
-        </h5>
+        </p>
       </div>
     );
   return (
