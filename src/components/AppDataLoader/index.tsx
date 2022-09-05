@@ -286,11 +286,12 @@ function ContextProvider({
   }, [termScheduleData.versions]);
 
   // Get all version-related actions
-  const { addNewVersion, deleteVersion, renameVersion } = useVersionActions({
-    updateTermScheduleData,
-    setVersion,
-    currentVersion,
-  });
+  const { addNewVersion, deleteVersion, renameVersion, cloneVersion } =
+    useVersionActions({
+      updateTermScheduleData,
+      setVersion,
+      currentVersion,
+    });
 
   // Memoize the context values so that they are stable
   const scheduleContextValue = useMemo<ScheduleContextValue>(
@@ -310,6 +311,7 @@ function ContextProvider({
         addNewVersion,
         deleteVersion,
         renameVersion,
+        cloneVersion,
       },
     ],
     [
@@ -325,6 +327,7 @@ function ContextProvider({
       addNewVersion,
       deleteVersion,
       renameVersion,
+      cloneVersion,
     ]
   );
 
