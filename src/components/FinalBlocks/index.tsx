@@ -68,8 +68,6 @@ export default function FinalBlocks({
               }%`,
               backgroundColor: color,
             }}
-            data-tip
-            data-for={crn}
           >
             <div className="meeting-wrapper">
               <div className="ids">
