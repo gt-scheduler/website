@@ -120,8 +120,8 @@ export default class Section {
         },
         finalDate:
           finalDateIndex === -1 || oscar.version < 3
-            ? new Date()
-            : oscar.finalDates[finalDateIndex] ?? new Date(),
+            ? null
+            : oscar.finalDates[finalDateIndex] ?? null,
         finalTime:
           finalTimeIndex === -1 || oscar.version < 3
             ? null
