@@ -4,6 +4,7 @@ import {
   faBars,
   faPencilAlt,
   faTrashAlt,
+  faCopy,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { getSemesterName } from '../../utils/semesters';
@@ -26,9 +27,10 @@ type VersionState =
       currentVersion: string;
       allVersionNames: readonly { id: string; name: string }[];
       setCurrentVersion: (next: string) => void;
-      addNewVersion: (name: string, select?: boolean) => void;
+      addNewVersion: (name: string, select?: boolean) => string;
       deleteVersion: (id: string) => void;
       renameVersion: (id: string, newName: string) => void;
+      cloneVersion: (id: string, newName: string) => void;
     };
 
 export type HeaderDisplayProps = {
@@ -199,6 +201,15 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
             onCommit: (newName: string) => {
               state.renameVersion(version.id, newName);
               return true;
+            },
+          });
+
+          // Add the duplicate button
+          actions.push({
+            type: 'button',
+            icon: faCopy,
+            onClick: () => {
+              state.cloneVersion(version.id, `Copy of ${version.name}`);
             },
           });
 
