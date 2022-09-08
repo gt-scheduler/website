@@ -17,6 +17,10 @@ export default class Oscar {
 
   dateRanges: DateRange[];
 
+  finalDates: Date[];
+
+  finalTimes: (Period | null)[];
+
   scheduleTypes: string[];
 
   campuses: string[];
@@ -69,6 +73,32 @@ export default class Oscar {
       };
     });
 
+    this.finalTimes =
+      caches.finalTimes === undefined
+        ? []
+        : caches.finalTimes.map((finalTime, i) => {
+            const finalSegments = finalTime.split(' - ');
+            if (finalSegments.length !== 2) {
+              softError(
+                new ErrorWithFields({
+                  message: 'finalTime did not follow expected format',
+                  fields: {
+                    finalTime,
+                    cacheIndex: i,
+                    term: this.term,
+                  },
+                })
+              );
+              return null;
+            }
+
+            const [start, end] = finalSegments as [string, string];
+            return {
+              start: stringToTime(start),
+              end: stringToTime(end),
+            };
+          });
+
     this.dateRanges = caches.dateRanges.map((dateRange, i) => {
       let segments = dateRange.split(' - ');
       if (segments.length !== 2) {
@@ -91,6 +121,13 @@ export default class Oscar {
       to.setHours(23, 59, 59, 999);
       return { from, to };
     });
+
+    this.finalDates =
+      caches.finalDates === undefined
+        ? []
+        : caches.finalDates?.map((date) => {
+            return new Date(date);
+          });
 
     this.scheduleTypes = caches.scheduleTypes;
     this.campuses = caches.campuses;
@@ -314,6 +351,8 @@ export const EMPTY_OSCAR = new Oscar(
       attributes: [],
       gradeBases: [],
       locations: [],
+      finalDates: [],
+      finalTimes: [],
     },
     // This converts the Date to the expected string
     // that it serializes to in the crawler

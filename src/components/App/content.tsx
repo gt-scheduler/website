@@ -7,6 +7,7 @@ import ErrorHeader from '../ErrorHeader';
 import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
+import Finals from '../Finals';
 import {
   AppNavigationContext,
   AppMobileNav,
@@ -58,6 +59,7 @@ function AppContentBase(): React.ReactElement {
       >
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
+        {currentTabIndex === 2 && <Finals />}
 
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
