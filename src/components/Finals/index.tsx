@@ -130,7 +130,7 @@ export default function Finals(): React.ReactElement {
         </h2>
         <p className="FinalsEmpty">
           Find out more about updating it{' '}
-          <a href="https://github.com/adityavidyadharan/crawler/tree/aditya/92-finals-schedule#updating-the-list-of-finals-pdfs">
+          <a href="https://github.com/gt-scheduler/crawler#updating-the-list-of-finals-pdfs">
             here
           </a>
         </p>
