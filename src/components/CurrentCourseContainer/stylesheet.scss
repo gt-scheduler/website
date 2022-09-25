@@ -7,7 +7,6 @@
   align-items: stretch;
   border-right: 1px solid $color-border;
 
-  
   .scroller {
     flex: 1;
     overflow-y: auto;
@@ -38,7 +37,7 @@
 
   .updated-at {
     color: $color-neutral;
-    font-size: .8em;
+    font-size: 0.8em;
   }
 
   .default-icon {

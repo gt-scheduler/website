@@ -1,12 +1,20 @@
 import React, { useContext } from 'react';
 
 import MyCourse from '../MyCourse';
-import { ScheduleContext } from '../../contexts';
+import { ScheduleContext, ThemeContext } from '../../contexts';
 
 import './stylesheet.scss';
 
 export default function CurrentCourseContainer(): React.ReactElement {
   const [{ desiredCourses }] = useContext(ScheduleContext);
+  const [theme] = useContext(ThemeContext);
+
+  const imageLink =
+    theme === 'light'
+      ? '/courseSearchDefaultLight.png'
+      : '/courseSearchDefault.png';
+  const imageAlt =
+    theme === 'light' ? 'Course Search Default Light' : 'Course Search Default';
 
   return (
     <div className="CurrentCourseContainer">
@@ -22,8 +30,8 @@ export default function CurrentCourseContainer(): React.ReactElement {
           <div className="default-icon">
             <div>
               <img
-                src="/courseSearchDefault.png"
-                alt="Course Search Default Icon"
+                src={imageLink}
+                alt={imageAlt}
                 style={{ width: '120px', margin: '0 auto' }}
               />
             </div>
