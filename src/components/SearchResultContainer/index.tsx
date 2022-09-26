@@ -8,7 +8,7 @@ import { CourseGpa } from '../../types';
 import { periodToString } from '../../utils/misc';
 import { Seating } from '../../data/beans/Section';
 import { ErrorWithFields, softError } from '../../log';
-import { ScheduleContext } from '../../contexts';
+import { ScheduleContext, ThemeContext } from '../../contexts';
 
 import './stylesheet.scss';
 
@@ -195,6 +195,7 @@ export default function SearchResultContainer({
   });
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
 
+  const [theme] = useContext(ThemeContext);
   // TODO: Use for course info
   // const generatePrereqString = (prereqs: string[]): string => {
   //   let prereqString = '';
@@ -257,6 +258,15 @@ export default function SearchResultContainer({
     instructorSections.push(section);
     instructorMap[primaryInstructor] = instructorSections;
   });
+
+  const imageLink =
+    theme === 'light'
+      ? '/courseSearchResultDefaultLight.png'
+      : '/courseSearchResultDefault.png';
+  const imageAlt =
+    theme === 'light'
+      ? 'Course Search Result Default Light'
+      : 'Course Search Result Default';
 
   return (
     <div className="SearchResultContainer">
@@ -335,8 +345,8 @@ export default function SearchResultContainer({
         <div className="default-icon">
           <div>
             <img
-              src="/courseSearchResultDefault.png"
-              alt="Course Search Result Default Icon"
+              src={imageLink}
+              alt={imageAlt}
               style={{ width: '120px', margin: '0 auto' }}
             />
           </div>
