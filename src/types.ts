@@ -146,7 +146,7 @@ export type CrawlerMeeting = [
  */
 export type CrawlerSection = [
   /**
-   * the CRN number of this section of the course
+   * the CRN number of this section of the course.
    */
   crn: string,
   /**
