@@ -4,7 +4,6 @@ import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
 import useBodyClass from '../../hooks/useBodyClass';
 import { ThemeContext } from '../../contexts';
-import InformationModal from '../InformationModal';
 import ErrorBoundary from '../ErrorBoundary';
 import { ReactErrorDetails } from '../ErrorDetails';
 import ErrorDisplay from '../ErrorDisplay';
