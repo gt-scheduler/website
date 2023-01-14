@@ -216,10 +216,11 @@ export async function sleep({
  * which allows for importing into a third-party calendar application.
  */
 export function exportCoursesToCalendar(
+  term: string,
   oscar: Oscar,
   pinnedCrns: readonly string[]
 ): void {
-  const cal = ics() as ICS | undefined;
+  const cal = ics(`gt-scheduler-${term}`) as ICS | undefined;
   if (cal == null) {
     window.alert('This browser does not support calendar export');
     softError(

@@ -26,13 +26,13 @@ export type HookResult = Pick<
 export default function useHeaderActionBarProps(
   captureRef: React.RefObject<HTMLDivElement>
 ): HookResult {
-  const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
+  const [{ term, oscar, pinnedCrns }] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
   const accountState = useContext(AccountContext);
 
   const handleExport = useCallback(() => {
     try {
-      exportCoursesToCalendar(oscar, pinnedCrns);
+      exportCoursesToCalendar(term, oscar, pinnedCrns);
     } catch (err) {
       softError(
         new ErrorWithFields({
@@ -44,7 +44,7 @@ export default function useHeaderActionBarProps(
         })
       );
     }
-  }, [oscar, pinnedCrns]);
+  }, [term, oscar, pinnedCrns]);
 
   const handleDownload = useCallback(() => {
     const captureElement = captureRef.current;
