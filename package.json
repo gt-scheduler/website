@@ -36,7 +36,8 @@
     "react-virtualized": "^9.21.2",
     "s-ago": "^2.2.0",
     "tslib": "2.3.0",
-    "use-local-storage-state": "^11.0.0"
+    "use-local-storage-state": "^11.0.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@bitwarden/cli": "^2022.8.0",
