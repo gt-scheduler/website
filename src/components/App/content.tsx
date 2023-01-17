@@ -39,6 +39,8 @@ function AppContentBase(): React.ReactElement {
         captureRef={captureRef}
       />
       <ErrorBoundary
+        // ErrorBoundary.fallback is a normal render prop, not a component.
+        // eslint-disable-next-line react/no-unstable-nested-components
         fallback={(error, errorInfo): React.ReactElement => (
           <SkeletonContent>
             <ErrorHeader />

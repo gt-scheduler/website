@@ -182,7 +182,7 @@ export default function CourseAdd({
   );
 
   const handleResetFilter = useCallback(
-    (key) => {
+    (key: string) => {
       setFilter({
         ...filter,
         [key]: [],
