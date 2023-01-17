@@ -29,11 +29,7 @@ function mockUseLocalStorageState(
     replace !== undefined ? replace(original.default) : original.default;
 
   jest.spyOn(useLocalStorageState, 'default');
-  jest.spyOn(useLocalStorageState, 'useLocalStorageState');
   asMockFunction(useLocalStorageState.default).mockImplementation(replacement);
-  asMockFunction(useLocalStorageState.useLocalStorageState).mockImplementation(
-    replacement
-  );
 }
 
 describe('useRawScheduleDataFromStorage', () => {
@@ -132,7 +128,7 @@ describe('useRawScheduleDataFromStorage', () => {
   it('returns an error if the browser does not support persistence', async () => {
     mockUseLocalStorageState(
       (original) =>
-        ((...args) => {
+        ((...args: Parameters<UseLocalStorageState>) => {
           const [value, setValue, other] = original(...args);
           return [value, setValue, { ...other, isPersistent: false }];
         }) as UseLocalStorageState
@@ -161,7 +157,7 @@ describe('useRawScheduleDataFromStorage', () => {
   it('allows the user to continue even if the browser does not support persistence', async () => {
     mockUseLocalStorageState(
       (original) =>
-        ((...args) => {
+        ((...args: Parameters<UseLocalStorageState>) => {
           const [value, setValue, other] = original(...args);
           return [value, setValue, { ...other, isPersistent: false }];
         }) as UseLocalStorageState
