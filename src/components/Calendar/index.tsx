@@ -5,7 +5,7 @@ import { classes, timeToShortString } from '../../utils/misc';
 import { TimeBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
-import { Meeting, Period } from '../../types';
+import { Period } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
