@@ -37,6 +37,8 @@
     background-color: var(--meeting-color, $color-neutral);
     outline: none;
     border: none;
+    text-align: left;
+    padding: 0;
 
     &:focus {
       // Remove the default focus style, since selecting the meeting
