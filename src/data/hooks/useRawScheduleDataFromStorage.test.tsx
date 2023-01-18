@@ -1,6 +1,11 @@
 import React from 'react';
-import { render, fireEvent, getByText } from '@testing-library/react';
-import { renderHook } from '@testing-library/react-hooks';
+import {
+  render,
+  fireEvent,
+  getByText,
+  renderHook,
+  waitFor,
+} from '@testing-library/react';
 import * as useLocalStorageState from 'use-local-storage-state';
 import { act } from 'react-dom/test-utils';
 
@@ -13,7 +18,7 @@ import LoadingDisplay from '../../components/LoadingDisplay';
 // This function allows for mocking the `use-local-storage-state` hook,
 // which is used in tests to simulate specific behavior
 // (such as `isPersistent` being false).
-type UseLocalStorageState = typeof useLocalStorageState['default'];
+type UseLocalStorageState = (typeof useLocalStorageState)['default'];
 function mockUseLocalStorageState(
   replace?: (original: UseLocalStorageState) => UseLocalStorageState
 ): void {
@@ -24,11 +29,7 @@ function mockUseLocalStorageState(
     replace !== undefined ? replace(original.default) : original.default;
 
   jest.spyOn(useLocalStorageState, 'default');
-  jest.spyOn(useLocalStorageState, 'useLocalStorageState');
   asMockFunction(useLocalStorageState.default).mockImplementation(replacement);
-  asMockFunction(useLocalStorageState.useLocalStorageState).mockImplementation(
-    replacement
-  );
 }
 
 describe('useRawScheduleDataFromStorage', () => {
@@ -39,22 +40,21 @@ describe('useRawScheduleDataFromStorage', () => {
 
   // Tests that, with empty local storage,
   // the hook loads the default data (null) correctly.
-  it('loads default data', () => {
+  it('loads default data', async () => {
     const { result } = renderHook(() => useScheduleDataFromStorage());
-    expect(result.all).toEqual([
-      {
-        type: 'loaded',
-        result: {
-          setRawScheduleData: expect.any(Function) as unknown,
-          rawScheduleData: null,
-        },
+    await waitFor(() => expect(result.current.type).toEqual('loaded'));
+    expect(result.current).toEqual({
+      type: 'loaded',
+      result: {
+        setRawScheduleData: expect.any(Function) as unknown,
+        rawScheduleData: null,
       },
-    ]);
+    });
   });
 
   // Tests that users that have data in local storage get it loaded correctly.
   // Update this test when updating data schemas.
-  it('loads data from local storage', () => {
+  it('loads data from local storage', async () => {
     window.localStorage.setItem(
       SCHEDULE_DATA_LOCAL_STORAGE_KEY,
       JSON.stringify({
@@ -87,49 +87,48 @@ describe('useRawScheduleDataFromStorage', () => {
     );
 
     const { result } = renderHook(() => useScheduleDataFromStorage());
-    expect(result.all).toEqual([
-      {
-        type: 'loaded',
-        result: {
-          setRawScheduleData: expect.any(Function) as unknown,
-          rawScheduleData: {
-            terms: {
-              '202108': {
-                versions: {
-                  sv_48RC7kqO7YDiBK66qXOd: {
-                    name: 'Primary',
-                    createdAt: '2021-09-16T00:00:46.191Z',
-                    schedule: {
-                      desiredCourses: ['CS 1100', 'CS 1331'],
-                      pinnedCrns: [
-                        '87695',
-                        '82294',
-                        '88999',
-                        '90769',
-                        '89255',
-                        '94424',
-                      ],
-                      excludedCrns: ['95199'],
-                      colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
-                      sortingOptionIndex: 0,
-                    },
+    await waitFor(() => expect(result.current.type).toEqual('loaded'));
+    expect(result.current).toEqual({
+      type: 'loaded',
+      result: {
+        setRawScheduleData: expect.any(Function) as unknown,
+        rawScheduleData: {
+          terms: {
+            '202108': {
+              versions: {
+                sv_48RC7kqO7YDiBK66qXOd: {
+                  name: 'Primary',
+                  createdAt: '2021-09-16T00:00:46.191Z',
+                  schedule: {
+                    desiredCourses: ['CS 1100', 'CS 1331'],
+                    pinnedCrns: [
+                      '87695',
+                      '82294',
+                      '88999',
+                      '90769',
+                      '89255',
+                      '94424',
+                    ],
+                    excludedCrns: ['95199'],
+                    colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
+                    sortingOptionIndex: 0,
                   },
                 },
               },
             },
-            version: 2,
           },
+          version: 2,
         },
       },
-    ]);
+    });
   });
 
   // Tests that if `useLocalStorageState` returns `false` for `isPersistent`,
   // the `useScheduleDataFromStorage` hook returns an error result.
-  it('returns an error if the browser does not support persistence', () => {
+  it('returns an error if the browser does not support persistence', async () => {
     mockUseLocalStorageState(
       (original) =>
-        ((...args) => {
+        ((...args: Parameters<UseLocalStorageState>) => {
           const [value, setValue, other] = original(...args);
           return [value, setValue, { ...other, isPersistent: false }];
         }) as UseLocalStorageState
@@ -144,38 +143,39 @@ describe('useRawScheduleDataFromStorage', () => {
     // Using console.log and manually fixing it is recommended.
     // See https://github.com/facebook/jest/issues/10577
     const { result } = renderHook(() => useScheduleDataFromStorage());
-    expect(result.all).toEqual([
+    await waitFor(() => expect(result.current.type).toEqual('custom'));
+    expect(result.current).toEqual(
       expect.objectContaining({
         type: 'custom',
         // Other fields ignored
-      }),
-    ]);
+      })
+    );
   });
 
   // Tests that if `useLocalStorageState` returns `false` for `isPersistent`,
   // the "Accept" button can still be used to continue using the app.
-  it('allows the user to continue even if the browser does not support persistence', () => {
+  it('allows the user to continue even if the browser does not support persistence', async () => {
     mockUseLocalStorageState(
       (original) =>
-        ((...args) => {
+        ((...args: Parameters<UseLocalStorageState>) => {
           const [value, setValue, other] = original(...args);
           return [value, setValue, { ...other, isPersistent: false }];
         }) as UseLocalStorageState
     );
 
     const { result } = renderHook(() => useScheduleDataFromStorage());
-    expect(result.all).toEqual([
+    await waitFor(() => expect(result.current.type).toEqual('custom'));
+    expect(result.current).toEqual(
       expect.objectContaining({
         type: 'custom',
         // Other fields ignored
-      }),
-    ]);
-
-    const { current } = result;
-    if (current.type === 'loaded')
-      fail('result was loaded before user accepted');
+      })
+    );
 
     // Render the loading state and press the accept button
+    const { current } = result;
+    if (current.type !== 'custom')
+      fail('repeat assertion to narrow type failed');
     const { container } = render(<LoadingDisplay state={current} name="" />);
     fireEvent(
       getByText(container, 'Accept'),
@@ -185,39 +185,34 @@ describe('useRawScheduleDataFromStorage', () => {
       })
     );
 
-    expect(result.all).toEqual([
-      expect.objectContaining({
-        type: 'custom',
-        // Other fields ignored
-      }),
-      {
-        type: 'loaded',
-        result: {
-          setRawScheduleData: expect.any(Function) as unknown,
-          rawScheduleData: null,
-        },
+    await waitFor(() => expect(result.current.type).toEqual('loaded'));
+    expect(result.current).toEqual({
+      type: 'loaded',
+      result: {
+        setRawScheduleData: expect.any(Function) as unknown,
+        rawScheduleData: null,
       },
-    ]);
+    });
   });
 
   describe('setRawScheduleData', () => {
     // Tests that calling `setRawScheduleData` causes a re-render
     // with the new state as expected.
-    it('allows for modifying the schedule data', () => {
+    it('allows for modifying the schedule data', async () => {
       const { result } = renderHook(() => useScheduleDataFromStorage());
-      expect(result.all).toEqual([
-        {
-          type: 'loaded',
-          result: {
-            setRawScheduleData: expect.any(Function) as unknown,
-            rawScheduleData: null,
-          },
+      await waitFor(() => expect(result.current.type).toEqual('loaded'));
+      expect(result.current).toEqual({
+        type: 'loaded',
+        result: {
+          setRawScheduleData: expect.any(Function) as unknown,
+          rawScheduleData: null,
         },
-      ]);
+      });
 
       // Update the schedule data explicitly
       const { current } = result;
-      if (current.type !== 'loaded') fail("result hasn't yet loaded");
+      if (current.type !== 'loaded')
+        fail('repeat assertion to narrow type failed');
       act(() => {
         current.result.setRawScheduleData({
           terms: {
@@ -229,29 +224,21 @@ describe('useRawScheduleDataFromStorage', () => {
         });
       });
 
-      expect(result.all).toEqual([
-        {
-          type: 'loaded',
-          result: {
-            setRawScheduleData: expect.any(Function) as unknown,
-            rawScheduleData: null,
-          },
-        },
-        {
-          type: 'loaded',
-          result: {
-            setRawScheduleData: expect.any(Function) as unknown,
-            rawScheduleData: {
-              terms: {
-                '201808': {
-                  versions: {},
-                },
+      await waitFor(() => expect(result.current.type).toEqual('loaded'));
+      expect(result.current).toEqual({
+        type: 'loaded',
+        result: {
+          setRawScheduleData: expect.any(Function) as unknown,
+          rawScheduleData: {
+            terms: {
+              '201808': {
+                versions: {},
               },
-              version: 2,
             },
+            version: 2,
           },
         },
-      ]);
+      });
     });
 
     // Tests that local storage contains the updated schedule data

@@ -107,10 +107,10 @@ export function InformationModalContent(): React.ReactElement {
  */
 export default function InformationModal(): React.ReactElement {
   const [show, setShow] = useState(false);
-  const [hasSeen, setHasSeen] = useLocalStorageState(
-    MODAL_LOCAL_STORAGE_KEY,
-    false
-  );
+  const [hasSeen, setHasSeen] = useLocalStorageState(MODAL_LOCAL_STORAGE_KEY, {
+    defaultValue: false,
+    storageSync: true,
+  });
 
   useEffect(() => {
     if (!hasSeen) {

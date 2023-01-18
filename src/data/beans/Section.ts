@@ -6,6 +6,7 @@ import { DELIVERY_MODES, BACKEND_BASE_URL } from '../../constants';
 import Course from './Course';
 import Oscar from './Oscar';
 import { CrawlerMeeting, Meeting } from '../../types';
+import { ErrorWithFields, softError } from '../../log';
 
 export type Seating = [
   seating:
@@ -155,6 +156,17 @@ export default class Section {
         },
       })
         .then((response) => {
+          if (typeof response.data !== 'string') {
+            throw new ErrorWithFields({
+              message: 'seating response data was not a string',
+              fields: {
+                url,
+                term,
+                crn: this.crn,
+              },
+            });
+          }
+
           const $ = cheerio.load(response.data);
           const availabilityTable = $('.datadisplaytable .datadisplaytable');
           const tableRow = availabilityTable.find('tr');
@@ -171,7 +183,25 @@ export default class Section {
 
           return this.seating;
         })
-        .catch(() => [new Array(4).fill('N/A'), currDate]);
+        .catch((err) => {
+          if (err instanceof ErrorWithFields) {
+            softError(err);
+          } else {
+            softError(
+              new ErrorWithFields({
+                message: 'seating request failed',
+                source: err,
+                fields: {
+                  url,
+                  term,
+                  crn: this.crn,
+                },
+              })
+            );
+          }
+
+          return [new Array(4).fill('N/A'), currDate];
+        });
     }
     return this.seating;
   }

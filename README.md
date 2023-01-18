@@ -56,6 +56,27 @@ The app should then be viewable at [http://localhost:3000](http://localhost:3000
 
 With that, you're able to make changes to the code and have them be re-built and viewable after a short delay in the same tab. This is the main workflow for adding new features or fixing bugs and testing them in the actual app.
 
+> **Warning**
+>
+> When running the development server (and when building the site),
+> a large number of warnings may appear in the console that look something like:
+>
+> ```
+> WARNING in ./node_modules/parse5/dist/common/token.js
+> Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+> Failed to parse source map from '.../website/node_modules/parse5/dist/common/token.js.map' file: Error: ENOENT: no such file or directory, open '.../website/node_modules/parse5/dist/common/token.js.map'
+>  @ ./node_modules/parse5/dist/index.js 13:0-44 14:0-27
+>  @ ...
+> ```
+>
+> **These can be safely ignored.**
+>
+> They are due to a combination of misconfiguration in a few transitive dependencies
+> (such as `parse5`, `/@firebase/auth`, and `exponential-backoff`)
+> and the overzealousness of `create-react-app`'s default configuration in reporting non-issues.
+>
+> See https://github.com/facebook/create-react-app/discussions/11767 for more details.
+
 ### Linting
 
 The project uses pre-commit hooks using [Husky](https://typicode.github.io/husky/#/) and [`lint-staged`](https://www.npmjs.com/package/lint-staged) to run linting (via [ESLint](https://eslint.org/)) and formatting (via [Prettier](https://prettier.io/)). These can be run manually from the command line to format/lint the code on-demand, using the following commands:

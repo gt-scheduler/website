@@ -56,7 +56,6 @@ export default function CourseFilter({
             <div
               key={tag}
               className={classes('tag', selectedTags.includes(tag) && 'active')}
-              property={tag}
               onClick={(): void => onToggle(tag)}
             >
               {labels[tag]}

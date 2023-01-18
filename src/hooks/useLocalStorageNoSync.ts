@@ -8,6 +8,11 @@ export type HookResult<T> = [T, (value: T | ((curr: T) => T)) => void];
  * From https://usehooks.com/useLocalStorage/.
  * Similar to `use-local-storage-state` (which should be preferred),
  * except it does not sync the state between browser tabs.
+ *
+ * TODO(jazeved0): `use-local-storage-state` now supports `storageSync: false`,
+ * so this hook is no longer necessary.
+ *
+ * @deprecated Use `use-local-storage-state` instead.
  */
 export default function useLocalStorageNoSync<T>(
   key: string,

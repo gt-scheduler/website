@@ -61,6 +61,11 @@ export default function Modal({
   style,
   preserveChildrenWhileHiding = true,
 }: ModalProps): React.ReactElement {
+  // Empty fragment is used to provide a non-nil default value.
+  // This lets an undefined children prop represent a different state
+  // (`previousChildren` is an empty fragment) than the initial render
+  // (`previousChildren` is null).
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   const previousChildren = usePrevious(children ?? <></>);
   const previousShow = usePrevious(show);
   let derivedChildren = children;

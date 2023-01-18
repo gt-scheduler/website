@@ -206,9 +206,9 @@ export async function sleep({
 }: {
   amount_ms: number;
 }): Promise<void> {
-  await new Promise((resolve) =>
-    setTimeout(() => resolve(undefined), amount_ms)
-  );
+  await new Promise((resolve) => {
+    setTimeout(() => resolve(undefined), amount_ms);
+  });
 }
 
 /**

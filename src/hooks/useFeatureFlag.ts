@@ -7,6 +7,9 @@ import useLocalStorageState from 'use-local-storage-state';
  */
 export default function useFeatureFlag(date: string, key: string): boolean {
   const derivedKey = `ff-${date}-${key}`;
-  const [isEnabled] = useLocalStorageState<boolean>(derivedKey, false);
+  const [isEnabled] = useLocalStorageState<boolean>(derivedKey, {
+    defaultValue: false,
+    storageSync: true,
+  });
   return isEnabled;
 }
