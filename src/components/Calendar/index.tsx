@@ -6,6 +6,7 @@ import { TimeBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
 import { Period } from '../../types';
+import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
 
@@ -134,6 +135,14 @@ export default function Calendar({
       });
   });
 
+  // Allow the user to select a meeting, which will cause it to be highlighted
+  // and for the meeting "details" popover/tooltip to remain open.
+  type SelectedMeeting = [crn: string, meetingIndex: number, day: string];
+  const [selectedMeeting, setSelectedMeeting] =
+    React.useState<SelectedMeeting | null>(null);
+
+  const deviceHasHover = useMedia('(hover: hover)');
+
   return (
     <div
       className={classes(
@@ -173,6 +182,19 @@ export default function Calendar({
             capture={capture}
             isAutosized={isAutosized}
             sizeInfo={crnSizeInfo[crn] ?? {}}
+            selectedMeeting={
+              selectedMeeting !== null && selectedMeeting[0] === crn
+                ? [selectedMeeting[1], selectedMeeting[2]]
+                : null
+            }
+            onSelectMeeting={(meeting: [number, string] | null): void => {
+              if (meeting === null) {
+                setSelectedMeeting(null);
+              } else {
+                setSelectedMeeting([crn, meeting[0], meeting[1]]);
+              }
+            }}
+            deviceHasHover={deviceHasHover}
           />
         ))}
         {overlayCrns &&

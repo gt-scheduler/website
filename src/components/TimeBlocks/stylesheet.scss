@@ -7,13 +7,11 @@
     }
   }
 
-  :hover {
-    cursor: pointer;
-  }
-
   .tooltip {
-    opacity: 0.95;
+    opacity: 0.85;
     border-radius: 8px;
+    z-index: 2;
+    cursor: unset;
   }
 
   tr {
@@ -36,6 +34,36 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    background-color: var(--meeting-color, $color-neutral);
+    
+    // Add a box-shadow border to the meeting block when it is highlighted
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      z-index: -1;
+      box-shadow: 0 0 0 6px var(--meeting-color, $color-neutral);
+      border-radius: 2px;
+      transition: opacity 0.2s ease-in-out;
+    }
+    
+    &--selected {
+      &::after {
+        opacity: 0.3;
+      }
+
+      & + .tooltip {
+        opacity: 0.95;
+      }
+    }
+
+    :hover {
+      cursor: pointer;
+    }
 
     .meeting-wrapper {
       flex: 1;

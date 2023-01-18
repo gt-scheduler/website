@@ -1,5 +1,5 @@
-import React, { useCallback, useContext, useState } from 'react';
-import ReactTooltip from 'react-tooltip';
+import React, { useCallback, useContext, useId, useState } from 'react';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
   faBan,
   faChair,
@@ -84,7 +84,8 @@ export default function Section({
     [pinnedCrns, excludedCrns, patchSchedule]
   );
 
-  const excludeTooltipId = `section-exclude-${section.id}`;
+  const excludeTooltipId = useId();
+  const sectionTooltipId = useId();
   return (
     <ActionRow
       label={section.id}
@@ -98,25 +99,22 @@ export default function Section({
         },
         {
           icon: faChair,
-          dataTip: true,
-          dataFor: section.id,
+          id: sectionTooltipId,
           href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
           icon: faBan,
-          dataTip: true,
-          dataFor: excludeTooltipId,
+          id: excludeTooltipId,
           onClick: (): void => excludeSection(section),
         },
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
       <ReactTooltip
-        id={excludeTooltipId}
-        className="tooltip"
-        type="dark"
-        place="right"
-        effect="solid"
+        anchorId={excludeTooltipId}
+        className="popover"
+        variant="dark"
+        place="left"
       >
         Exclude from Combinations
       </ReactTooltip>
@@ -138,11 +136,10 @@ export default function Section({
         </div>
 
         <ReactTooltip
-          id={section.id}
+          anchorId={sectionTooltipId}
           className="tooltip"
-          type="dark"
-          place="right"
-          effect="solid"
+          variant="dark"
+          place="top"
           afterShow={(): void => handleHover()}
           afterHide={(): void => {
             hovering = false;

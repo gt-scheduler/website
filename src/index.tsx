@@ -7,6 +7,7 @@ import App from './components/App';
 import { ErrorWithFields } from './log';
 
 import 'normalize.css';
+import 'react-tooltip/dist/react-tooltip.css';
 import './stylesheet.scss';
 
 // Only initialize sentry on production
