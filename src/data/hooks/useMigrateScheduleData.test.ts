@@ -57,11 +57,8 @@ describe('useMigrateScheduleData', () => {
       rawScheduleData: AnyScheduleData | null;
     };
     const setRawScheduleDataMock = jest.fn();
-    const { result, rerender } = renderHook<
-      ReturnType<typeof useMigrateScheduleData>,
-      HookProps
-    >(
-      ({ rawScheduleData }) =>
+    const { result, rerender } = renderHook(
+      ({ rawScheduleData }: HookProps) =>
         useMigrateScheduleData({
           setRawScheduleData: setRawScheduleDataMock,
           rawScheduleData,
@@ -69,7 +66,7 @@ describe('useMigrateScheduleData', () => {
       {
         initialProps: {
           rawScheduleData: null,
-        },
+        } as HookProps,
       }
     );
 
@@ -224,11 +221,8 @@ describe('useMigrateScheduleData', () => {
       rawScheduleData: AnyScheduleData | null;
     };
     const setRawScheduleDataMock = jest.fn();
-    const { result } = renderHook<
-      ReturnType<typeof useMigrateScheduleData>,
-      HookProps
-    >(
-      ({ rawScheduleData }) =>
+    const { result } = renderHook(
+      ({ rawScheduleData }: HookProps) =>
         useMigrateScheduleData({
           setRawScheduleData: setRawScheduleDataMock,
           rawScheduleData,
@@ -236,7 +230,7 @@ describe('useMigrateScheduleData', () => {
       {
         initialProps: {
           rawScheduleData: null,
-        },
+        } as HookProps,
       }
     );
 
