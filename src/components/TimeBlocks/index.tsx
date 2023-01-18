@@ -194,7 +194,7 @@ function MeetingDayBlock({
           canBeTabFocused
             ? (e: React.FocusEvent): void => {
                 e.stopPropagation();
-                onSelect(true);
+                setIsHovered(true);
               }
             : undefined
         }
@@ -202,7 +202,7 @@ function MeetingDayBlock({
           canBeTabFocused
             ? (e: React.FocusEvent): void => {
                 e.stopPropagation();
-                onSelect(false);
+                setIsHovered(false);
               }
             : undefined
         }
