@@ -5,7 +5,7 @@ import { classes, timeToShortString } from '../../utils/misc';
 import { TimeBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
-import { Period } from '../../types';
+import { Meeting, Period } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
@@ -143,6 +143,30 @@ export default function Calendar({
 
   const deviceHasHover = useMedia('(hover: hover)');
 
+  // Render pinned CRNS in the order of their first meeting in the day,
+  // across all days. This results in better tab-ordering.
+  const pinnedCrnsByFirstMeeting: string[] = pinnedCrns
+    .map((crn) => {
+      const section = oscar.findSection(crn);
+      if (section == null) return null;
+      const firstMeetingPeriod = section.meetings
+        .map((m) => m.period)
+        .filter((m): m is Period => m != null)
+        .sort((a, b) => a.start - b.start)[0];
+      if (firstMeetingPeriod == null) return null;
+      return [crn, firstMeetingPeriod] as const;
+    })
+    .filter((crn): crn is [string, Period] => crn != null)
+    .sort((a, b) => a[1].start - b[1].start)
+    .map(([crn]) => crn);
+  // If there are any pinned CRNs that got filtered out, add them to the end.
+  const filteredSet = new Set(pinnedCrnsByFirstMeeting);
+  pinnedCrns.forEach((crn) => {
+    if (!filteredSet.has(crn)) {
+      pinnedCrnsByFirstMeeting.push(crn);
+    }
+  });
+
   return (
     <div
       className={classes(
@@ -174,13 +198,13 @@ export default function Calendar({
         </div>
       )}
       <div className="meetings">
-        {pinnedCrns.map((crn) => (
+        {pinnedCrnsByFirstMeeting.map((crn) => (
           <TimeBlocks
             key={crn}
             crn={crn}
-            preview={preview}
             capture={capture}
-            isAutosized={isAutosized}
+            includeDetailsPopover={!isAutosized && !capture}
+            includeContent={!preview}
             sizeInfo={crnSizeInfo[crn] ?? {}}
             selectedMeeting={
               selectedMeeting !== null && selectedMeeting[0] === crn
@@ -195,6 +219,7 @@ export default function Calendar({
               }
             }}
             deviceHasHover={deviceHasHover}
+            canBeTabFocused={!isAutosized && !capture}
           />
         ))}
         {overlayCrns &&
@@ -205,9 +230,9 @@ export default function Calendar({
                 key={crn}
                 crn={crn}
                 overlay={!preview}
-                preview={preview}
+                includeContent={!preview}
                 capture={capture}
-                isAutosized
+                includeDetailsPopover={false}
                 sizeInfo={crnSizeInfo[crn] ?? {}}
               />
             ))}

@@ -24,9 +24,10 @@ export type TimeBlocksProps = {
   crn: string;
   overlay?: boolean;
   capture: boolean;
-  preview: boolean;
-  isAutosized: boolean;
+  includeDetailsPopover: boolean;
+  includeContent: boolean;
   sizeInfo: SizeInfo;
+  canBeTabFocused?: boolean;
   /**
    * Passing through this prop to skip subscribing to a media query per
    * TimeBlocks component instance:
@@ -51,10 +52,11 @@ export default function TimeBlocks({
   className,
   crn,
   overlay = false,
-  preview,
   capture,
-  isAutosized,
   sizeInfo,
+  includeDetailsPopover,
+  includeContent,
+  canBeTabFocused = false,
   deviceHasHover = true,
   selectedMeeting,
   onSelectMeeting,
@@ -80,7 +82,7 @@ export default function TimeBlocks({
         if (period == null) return;
 
         const sizeInfoKey = makeSizeInfoKey(period);
-        return meeting.days.map((day) => {
+        return meeting.days.map((day, j) => {
           const sizeInfoDay = sizeInfo[day];
           if (sizeInfoDay == null) return;
           const sizeInfoPeriodDay = sizeInfoDay[sizeInfoKey];
@@ -94,8 +96,8 @@ export default function TimeBlocks({
               section={section}
               meeting={meeting}
               sizeInfo={sizeInfoPeriodDay}
-              includeDetailsPopover={!isAutosized}
-              includeContent={!preview}
+              includeDetailsPopover={includeDetailsPopover}
+              includeContent={includeContent}
               isSelected={
                 selectedMeeting != null &&
                 selectedMeeting[0] === i &&
@@ -111,6 +113,8 @@ export default function TimeBlocks({
               }}
               key={`${day}-${sizeInfoKey}`}
               deviceHasHover={deviceHasHover}
+              // Only the first day for a meeting can be tab focused
+              canBeTabFocused={canBeTabFocused && j === 0}
             />
           );
         });
@@ -126,6 +130,7 @@ type MeetingDayBlockProps = {
   section: Section;
   meeting: Meeting;
   sizeInfo: TimeBlockPosition;
+  canBeTabFocused: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
   isSelected: boolean;
@@ -140,6 +145,7 @@ function MeetingDayBlock({
   section,
   meeting,
   sizeInfo,
+  canBeTabFocused = false,
   includeDetailsPopover,
   includeContent,
   isSelected,
@@ -157,9 +163,10 @@ function MeetingDayBlock({
   });
 
   const [isHovered, setIsHovered] = React.useState(false);
+  const BlockElement = canBeTabFocused ? 'button' : 'div';
   return (
     <div ref={outerRef}>
-      <div
+      <BlockElement
         className={classes(
           'meeting',
           contentClassName,
@@ -181,16 +188,25 @@ function MeetingDayBlock({
         id={tooltipId}
         onClick={(e: React.MouseEvent): void => {
           e.stopPropagation();
-          onSelect(!isSelected);
-        }}
-        onFocus={(e: React.FocusEvent): void => {
-          e.stopPropagation();
           onSelect(true);
         }}
-        onBlur={(e: React.FocusEvent): void => {
-          e.stopPropagation();
-          onSelect(false);
-        }}
+        onFocus={
+          canBeTabFocused
+            ? (e: React.FocusEvent): void => {
+                e.stopPropagation();
+                onSelect(true);
+              }
+            : undefined
+        }
+        onBlur={
+          canBeTabFocused
+            ? (e: React.FocusEvent): void => {
+                e.stopPropagation();
+                onSelect(false);
+              }
+            : undefined
+        }
+        tabIndex={canBeTabFocused ? 0 : -1}
       >
         {includeContent && (
           <div className="meeting-wrapper">
@@ -205,7 +221,7 @@ function MeetingDayBlock({
             </span>
           </div>
         )}
-      </div>
+      </BlockElement>
       {/* Include a details popover that can be opened by either:
       - hovering over the meeting, on devices with hover. This opens a
         "preview", which has less opacity.

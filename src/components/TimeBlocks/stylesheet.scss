@@ -35,6 +35,14 @@
     flex-direction: column;
     align-items: stretch;
     background-color: var(--meeting-color, $color-neutral);
+    outline: none;
+    border: none;
+
+    &:focus {
+      // Remove the default focus style, since selecting the meeting
+      // adds its own focus style:
+      outline: none;
+    }
     
     // Add a box-shadow border to the meeting block when it is highlighted
     &::after {
