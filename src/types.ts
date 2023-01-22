@@ -77,6 +77,13 @@ export interface Meeting {
   finalTime: Period | null;
 }
 
+export interface Event {
+  id: string;
+  name: string;
+  period: Period;
+  days: string[];
+}
+
 // Note: if this type ever changes,
 // the course gpa cache needs to be invalidated
 // (by changing the local storage key).

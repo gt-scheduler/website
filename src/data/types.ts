@@ -1,5 +1,6 @@
 import { Immutable } from 'immer';
 
+import { Event } from '../types';
 import { generateRandomId } from '../utils/misc';
 
 // This file defines all of the possible types that the schedule data can take
@@ -13,11 +14,11 @@ import { generateRandomId } from '../utils/misc';
 // and the app not losing/corrupting their state.
 
 // These should always be the latest version of schedule data
-export const LATEST_SCHEDULE_DATA_VERSION: ScheduleData['version'] = 2;
-export type ScheduleData = Version2ScheduleData;
-export type TermScheduleData = Version2TermScheduleData;
-export type ScheduleVersion = Version2ScheduleVersion;
-export type Schedule = Version2Schedule;
+export const LATEST_SCHEDULE_DATA_VERSION: ScheduleData['version'] = 3;
+export type ScheduleData = Version3ScheduleData;
+export type TermScheduleData = Version3TermScheduleData;
+export type ScheduleVersion = Version3ScheduleVersion;
+export type Schedule = Version3Schedule;
 
 // Add additional types here named like "Version{N}OrNewer" for each version,
 // where they are an alias for:
@@ -25,14 +26,17 @@ export type Schedule = Version2Schedule;
 export type Version1ScheduleDataOrNewer =
   | Version2ScheduleDataOrNewer
   | Version1ScheduleData;
-export type Version2ScheduleDataOrNewer = Version2ScheduleData;
+export type Version2ScheduleDataOrNewer =
+  | Version3ScheduleDataOrNewer
+  | Version2ScheduleData;
+export type Version3ScheduleDataOrNewer = Version3ScheduleData;
 
 // This type should automatically accept any schedule data
 export type AnyScheduleData = Version1ScheduleDataOrNewer;
 
 export const defaultScheduleData: Immutable<ScheduleData> = {
   terms: {},
-  version: 2,
+  version: 3,
 };
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
@@ -43,6 +47,7 @@ export const defaultSchedule: Immutable<Schedule> = {
   desiredCourses: [],
   pinnedCrns: [],
   excludedCrns: [],
+  events: [],
   colorMap: {},
   sortingOptionIndex: 0,
 };
@@ -106,6 +111,34 @@ export interface Version2Schedule {
   desiredCourses: string[];
   pinnedCrns: string[];
   excludedCrns: string[];
+  colorMap: Record<string, string>;
+  sortingOptionIndex: number;
+}
+
+// Version 3 schedule data (2023-01-22)
+// ===================================
+// - addition of custom events
+
+export interface Version3ScheduleData {
+  terms: Record<string, Version3TermScheduleData>;
+  version: 3;
+}
+
+export interface Version3TermScheduleData {
+  versions: Record<string, Version3ScheduleVersion>;
+}
+
+export interface Version3ScheduleVersion {
+  name: string;
+  createdAt: string;
+  schedule: Version3Schedule;
+}
+
+export interface Version3Schedule {
+  desiredCourses: string[];
+  pinnedCrns: string[];
+  excludedCrns: string[];
+  events: Event[];
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
 }

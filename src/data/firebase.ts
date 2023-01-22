@@ -17,6 +17,10 @@ const firebaseConfig = {
   measurementId: process.env['REACT_APP_FIREBASE_MEASUREMENT_ID'],
 };
 
+const SCHEDULE_COLLECTION = process.env['PRODUCTION']
+  ? 'schedules'
+  : 'schedules-dev';
+
 /**
  * Whether Firebase authentication is enabled in this environment.
  * To enable, supply the 5 Firebase config environment variables.
@@ -38,7 +42,9 @@ if (isAuthEnabled) {
 
   auth = app.auth();
   db = app.firestore();
-  schedulesCollection = db.collection('schedules') as SchedulesCollection;
+  schedulesCollection = db.collection(
+    SCHEDULE_COLLECTION
+  ) as SchedulesCollection;
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
     softError(

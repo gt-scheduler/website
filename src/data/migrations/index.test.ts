@@ -58,6 +58,7 @@ describe('migrateScheduleData', () => {
                   '94424',
                 ],
                 excludedCrns: ['95199'],
+                events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
@@ -65,7 +66,7 @@ describe('migrateScheduleData', () => {
           },
         },
       },
-      version: 2,
+      version: 3,
     });
   });
 
@@ -126,6 +127,7 @@ describe('migrateScheduleData', () => {
                 desiredCourses: [],
                 pinnedCrns: [],
                 excludedCrns: [],
+                events: [],
                 colorMap: {},
                 sortingOptionIndex: 0,
               },
@@ -149,6 +151,7 @@ describe('migrateScheduleData', () => {
                   '94424',
                 ],
                 excludedCrns: ['95199'],
+                events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
@@ -156,7 +159,7 @@ describe('migrateScheduleData', () => {
           },
         },
       },
-      version: 2,
+      version: 3,
     });
   });
 
@@ -215,6 +218,7 @@ describe('migrateScheduleData', () => {
                 desiredCourses: [],
                 pinnedCrns: [],
                 excludedCrns: [],
+                events: [],
                 colorMap: {},
                 sortingOptionIndex: 0,
               },
@@ -237,6 +241,7 @@ describe('migrateScheduleData', () => {
                   '94424',
                 ],
                 excludedCrns: ['95199'],
+                events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
@@ -244,7 +249,7 @@ describe('migrateScheduleData', () => {
           },
         },
       },
-      version: 2,
+      version: 3,
     });
   });
 });
