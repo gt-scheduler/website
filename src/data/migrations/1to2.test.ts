@@ -40,9 +40,7 @@ describe('migrate1to2', () => {
 
   it('handles a migration with multiple schedule versions', () => {
     // Mock the current time to January 1, 1970
-    jest
-      .useFakeTimers('modern')
-      .setSystemTime(new Date('1970-01-01').getTime());
+    jest.useFakeTimers().setSystemTime(new Date('1970-01-01').getTime());
 
     // Mock the ID generation to be deterministic
     let current_id = 0;

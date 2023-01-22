@@ -11,14 +11,27 @@ import { ErrorWithFields, softError } from '../log';
  * @returns Whether the CSS media query is matched
  */
 export default function useMedia(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    try {
+      return window.matchMedia(query).matches;
+    } catch (error) {
+      softError(
+        new ErrorWithFields({
+          message: 'could not run useMedia query in useState init',
+          source: error,
+          fields: {
+            query,
+          },
+        })
+      );
+      return false;
+    }
+  });
 
   useLayoutEffect(() => {
     try {
       const media = window.matchMedia(query);
-      if (media.matches !== matches) {
-        setMatches(media.matches);
-      }
+      setMatches(media.matches);
 
       const listener = (): void => setMatches(media.matches);
       let apiUsed: 'addEventListener' | 'addListener' | null = null;
@@ -56,7 +69,6 @@ export default function useMedia(query: string): boolean {
               source: err,
               fields: {
                 previousQuery: query,
-                previousMatches: matches,
               },
             })
           );
@@ -69,13 +81,12 @@ export default function useMedia(query: string): boolean {
           source: err,
           fields: {
             query,
-            matches,
           },
         })
       );
       return (): void => undefined;
     }
-  }, [matches, query]);
+  }, [query]);
 
   return matches;
 }

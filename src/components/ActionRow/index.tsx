@@ -10,8 +10,7 @@ type FontAwesomeProps = React.ComponentProps<typeof FontAwesomeIcon>;
 export type Action = {
   icon: FontAwesomeProps['icon'];
   styling?: React.CSSProperties;
-  dataTip?: boolean;
-  dataFor?: string;
+  id?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 } & Omit<ButtonProps, 'children'>;
@@ -41,15 +40,7 @@ export default function ActionRow({
             .flatMap((action) => (action != null ? [action] : []))
             .map(
               (
-                {
-                  icon,
-                  styling,
-                  dataTip,
-                  dataFor,
-                  onMouseEnter,
-                  onMouseLeave,
-                  ...rest
-                },
+                { icon, styling, id, onMouseEnter, onMouseLeave, ...rest },
                 i
               ) => (
                 <Button className="action" {...rest} key={i}>
@@ -57,8 +48,7 @@ export default function ActionRow({
                     fixedWidth
                     style={styling}
                     icon={icon}
-                    data-tip={dataTip}
-                    data-for={dataFor}
+                    id={id}
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
                   />

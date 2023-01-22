@@ -206,9 +206,9 @@ export async function sleep({
 }: {
   amount_ms: number;
 }): Promise<void> {
-  await new Promise((resolve) =>
-    setTimeout(() => resolve(undefined), amount_ms)
-  );
+  await new Promise((resolve) => {
+    setTimeout(() => resolve(undefined), amount_ms);
+  });
 }
 
 /**
@@ -219,7 +219,7 @@ export function exportCoursesToCalendar(
   oscar: Oscar,
   pinnedCrns: readonly string[]
 ): void {
-  const cal = ics() as ICS | undefined;
+  const cal = ics('gt-scheduler') as ICS | undefined;
   if (cal == null) {
     window.alert('This browser does not support calendar export');
     softError(

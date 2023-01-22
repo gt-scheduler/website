@@ -27,7 +27,10 @@ export default function useRawScheduleDataFromStorage(): LoadingState<HookResult
   const [rawScheduleData, setRawScheduleData, { isPersistent }] =
     useLocalStorageState<AnyScheduleData | null>(
       SCHEDULE_DATA_LOCAL_STORAGE_KEY,
-      null
+      {
+        defaultValue: null,
+        storageSync: true,
+      }
     );
 
   const [userAcceptedNonPersistence, setUserAcceptedNonPersistence] =

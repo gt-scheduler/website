@@ -33,7 +33,6 @@ export type HeaderActionBarProps = {
   enableExportCalendar?: boolean;
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
-  handleThemeChange?: () => void;
 };
 
 /**

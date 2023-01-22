@@ -6,6 +6,7 @@ import { TimeBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
 import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
 import { Period } from '../../types';
+import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
 
@@ -134,6 +135,38 @@ export default function Calendar({
       });
   });
 
+  // Allow the user to select a meeting, which will cause it to be highlighted
+  // and for the meeting "details" popover/tooltip to remain open.
+  type SelectedMeeting = [crn: string, meetingIndex: number, day: string];
+  const [selectedMeeting, setSelectedMeeting] =
+    React.useState<SelectedMeeting | null>(null);
+
+  const deviceHasHover = useMedia('(hover: hover)');
+
+  // Render pinned CRNS in the order of their first meeting in the day,
+  // across all days. This results in better tab-ordering.
+  const pinnedCrnsByFirstMeeting: string[] = pinnedCrns
+    .map((crn) => {
+      const section = oscar.findSection(crn);
+      if (section == null) return null;
+      const firstMeetingPeriod = section.meetings
+        .map((m) => m.period)
+        .filter((m): m is Period => m != null)
+        .sort((a, b) => a.start - b.start)[0];
+      if (firstMeetingPeriod == null) return null;
+      return [crn, firstMeetingPeriod] as const;
+    })
+    .filter((crn): crn is [string, Period] => crn != null)
+    .sort((a, b) => a[1].start - b[1].start)
+    .map(([crn]) => crn);
+  // If there are any pinned CRNs that got filtered out, add them to the end.
+  const filteredSet = new Set(pinnedCrnsByFirstMeeting);
+  pinnedCrns.forEach((crn) => {
+    if (!filteredSet.has(crn)) {
+      pinnedCrnsByFirstMeeting.push(crn);
+    }
+  });
+
   return (
     <div
       className={classes(
@@ -165,14 +198,28 @@ export default function Calendar({
         </div>
       )}
       <div className="meetings">
-        {pinnedCrns.map((crn) => (
+        {pinnedCrnsByFirstMeeting.map((crn) => (
           <TimeBlocks
             key={crn}
             crn={crn}
-            preview={preview}
             capture={capture}
-            isAutosized={isAutosized}
+            includeDetailsPopover={!isAutosized && !capture}
+            includeContent={!preview}
             sizeInfo={crnSizeInfo[crn] ?? {}}
+            selectedMeeting={
+              selectedMeeting !== null && selectedMeeting[0] === crn
+                ? [selectedMeeting[1], selectedMeeting[2]]
+                : null
+            }
+            onSelectMeeting={(meeting: [number, string] | null): void => {
+              if (meeting === null) {
+                setSelectedMeeting(null);
+              } else {
+                setSelectedMeeting([crn, meeting[0], meeting[1]]);
+              }
+            }}
+            deviceHasHover={deviceHasHover}
+            canBeTabFocused={!isAutosized && !capture}
           />
         ))}
         {overlayCrns &&
@@ -183,9 +230,9 @@ export default function Calendar({
                 key={crn}
                 crn={crn}
                 overlay={!preview}
-                preview={preview}
+                includeContent={!preview}
                 capture={capture}
-                isAutosized
+                includeDetailsPopover={false}
                 sizeInfo={crnSizeInfo[crn] ?? {}}
               />
             ))}

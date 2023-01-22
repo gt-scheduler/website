@@ -1,5 +1,10 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { AutoSizer, List } from 'react-virtualized';
+import {
+  AutoSizer as _AutoSizer,
+  AutoSizerProps,
+  List as _List,
+  ListProps,
+} from 'react-virtualized';
 
 import { Button, Calendar, Select } from '..';
 import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
@@ -8,6 +13,12 @@ import Modal from '../Modal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+
+// Workaround for problem with `react-virtualized` types resolving to wrong
+// version of @types/react:
+// From https://github.com/bvaughn/react-virtualized/issues/1739#issuecomment-1264276522
+const List = _List as unknown as React.ComponentType<ListProps>;
+const AutoSizer = _AutoSizer as unknown as React.ComponentType<AutoSizerProps>;
 
 export default function CombinationContainer(): React.ReactElement {
   const [
@@ -59,6 +70,8 @@ export default function CombinationContainer(): React.ReactElement {
                 style={{ outline: 'none' }}
                 rowCount={sortedCombinations.length}
                 rowHeight={108}
+                // List.rowRenderer is a normal render prop, not a component.
+                // eslint-disable-next-line react/no-unstable-nested-components
                 rowRenderer={({ index, key, style }): React.ReactElement => {
                   const { crns } = sortedCombinations[index] as Combination;
                   return (

@@ -1,6 +1,8 @@
 /* global saveAs, BlobBuilder */
 /* exported ics */
 
+import { v4 as uuidv4 } from 'uuid';
+
 const ics = (uidDomain, prodId) => {
   if (
     navigator.userAgent.indexOf('MSIE') > -1 &&
@@ -208,10 +210,11 @@ const ics = (uidDomain, prodId) => {
       }
 
       // var stamp = new Date().toISOString();
+      let uid = uuidv4().toUpperCase();
 
       let calendarEvent = [
         'BEGIN:VEVENT',
-        `UID:${calendarEvents.length}@${uidDomain}`,
+        `UID:${uid}@${uidDomain}`,
         'CLASS:PUBLIC',
         `DESCRIPTION:${description}`,
         `DTSTAMP;VALUE=DATE-TIME:${now}`,
