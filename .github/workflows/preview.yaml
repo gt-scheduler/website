@@ -1,12 +1,12 @@
-name: Deploy
+name: Deploy PR Previews
 on:
-  push:
-    branches:
-      - main
+  pull-request:
+
+concurrnecy: preview-${{ github.ref }}
 
 jobs:
-  build-and-deploy:
-    name: Build & Deploy
+  deploy-preview:
+    name: Deploy PR Preview
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,22 +35,7 @@ jobs:
           REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
           REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}
 
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
         with:
-          environment: production
-          sourcemaps: 'build/static/js'
-          version: ${{ github.sha }}
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: build
-          CLEAN: true
-          CLEAN-EXCLUDE: pr-preview
+          source-dir: build
