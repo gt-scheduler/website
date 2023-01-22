@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.5a310e1e.css",
-    "main.js": "/static/js/main.0e94f7f2.js",
-    "index.html": "/index.html",
-    "main.5a310e1e.css.map": "/static/css/main.5a310e1e.css.map",
-    "main.0e94f7f2.js.map": "/static/js/main.0e94f7f2.js.map"
+    "main.css": "https://gt-scheduler.org/pr-preview/pr-147/static/css/main.5a310e1e.css",
+    "main.js": "https://gt-scheduler.org/pr-preview/pr-147/static/js/main.3354f0ce.js",
+    "index.html": "https://gt-scheduler.org/pr-preview/pr-147/index.html",
+    "main.5a310e1e.css.map": "https://gt-scheduler.org/pr-preview/pr-147/static/css/main.5a310e1e.css.map",
+    "main.3354f0ce.js.map": "https://gt-scheduler.org/pr-preview/pr-147/static/js/main.3354f0ce.js.map"
   },
   "entrypoints": [
     "static/css/main.5a310e1e.css",
-    "static/js/main.0e94f7f2.js"
+    "static/js/main.3354f0ce.js"
   ]
 }
