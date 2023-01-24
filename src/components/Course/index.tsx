@@ -9,13 +9,15 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, getContentClassName } from '../../utils/misc';
+import { classes } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import { COURSE_CARD_TYPES } from '../../constants';
+import { Action } from '../ActionRow';
 
 import './stylesheet.scss';
 
@@ -23,20 +25,25 @@ export type CourseProps = {
   className?: string;
   courseId: string;
   onAddCourse?: () => void;
+  onShowInfo?: () => void;
+  courseCardType?: string;
 };
 
 export default function Course({
   className,
   courseId,
   onAddCourse,
+  onShowInfo,
+  courseCardType,
 }: CourseProps): React.ReactElement | null {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
+  // const isShowing = Boolean(onShowInfo);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -108,7 +115,6 @@ export default function Course({
   if (course == null) return null;
 
   const color = colorMap[course.id];
-  const contentClassName = color != null && getContentClassName(color);
 
   const hasPrereqs = oscar.version > 1;
   let prereqs: CrawlerPrerequisites | null = null;
@@ -152,10 +158,11 @@ export default function Course({
 
   const infoAction = {
     icon: faInfoCircle,
-    href:
-      `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
-      `course_detail?cat_term_in=${term}&subj_code_in=` +
-      `${course.subject}&crse_numb_in=${course.number}`,
+    onClick: onShowInfo,
+    // href:
+    //   `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
+    //   `course_detail?cat_term_in=${term}&subj_code_in=` +
+    //   `${course.subject}&crse_numb_in=${course.number}`,
   };
 
   const pinnedSections = course.sections.filter((section) =>
@@ -166,10 +173,38 @@ export default function Course({
     0
   );
 
+  const getActions = (): Array<Action | null | undefined> => {
+    if (courseCardType === COURSE_CARD_TYPES.CourseSearch)
+      return [{ icon: faPlus, onClick: onAddCourse }, infoAction];
+    return isSearching
+      ? [
+          { icon: faPlus, onClick: onAddCourse },
+          hasPrereqs ? prereqAction : infoAction,
+        ]
+      : [
+          {
+            icon: expanded ? faAngleUp : faAngleDown,
+            onClick: (): void => prereqControl(false, !expanded),
+          },
+          hasPrereqs ? prereqAction : infoAction,
+          {
+            icon: faPalette,
+            onClick: (): void => setPaletteShown(!paletteShown),
+          },
+          {
+            icon: faTrash,
+            onClick: (): void => handleRemoveCourse(course),
+          },
+        ];
+  };
+
   return (
     <div
-      className={classes('Course', contentClassName, 'default', className)}
-      style={{ backgroundColor: color }}
+      className={classes('Course', 'default', className)}
+      style={{
+        backgroundColor:
+          courseCardType === COURSE_CARD_TYPES.CourseSearch ? undefined : color,
+      }}
       key={course.id}
     >
       <ActionRow
@@ -177,34 +212,15 @@ export default function Course({
           course.id,
           pinnedSections.map((section) => section.id).join(', '),
         ].join(' ')}
-        actions={
-          isSearching
-            ? [
-                { icon: faPlus, onClick: onAddCourse },
-                hasPrereqs ? prereqAction : infoAction,
-              ]
-            : [
-                {
-                  icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: (): void => prereqControl(false, !expanded),
-                },
-                hasPrereqs ? prereqAction : infoAction,
-                {
-                  icon: faPalette,
-                  onClick: (): void => setPaletteShown(!paletteShown),
-                },
-                {
-                  icon: faTrash,
-                  onClick: (): void => handleRemoveCourse(course),
-                },
-              ]
-        }
+        actions={getActions()}
       >
         <div className="course-row">
           <span className="course-title">{course.title}</span>
-          <span className="section-crns">
-            {pinnedSections.map((section) => section.crn).join(', ')}
-          </span>
+          {!isSearching && (
+            <span className="section-crns">
+              {pinnedSections.map((section) => section.crn).join(', ')}
+            </span>
+          )}
         </div>
         {!isSearching && (
           <div className="course-row">

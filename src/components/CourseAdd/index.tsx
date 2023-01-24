@@ -12,7 +12,12 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { Course, CourseFilter } from '..';
 import { classes, getRandomColor } from '../../utils/misc';
-import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
+import {
+  ASYNC_DELIVERY_MODE,
+  CAMPUSES,
+  COURSE_CARD_TYPES,
+  DELIVERY_MODES,
+} from '../../constants';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
 
@@ -240,6 +245,7 @@ export default function CourseAdd({
             className={classes(course === activeCourse && 'active')}
             courseId={course.id}
             onAddCourse={(): void => handleAddCourse(course)}
+            courseCardType={COURSE_CARD_TYPES.Schedule}
           />
         ))
       ) : (

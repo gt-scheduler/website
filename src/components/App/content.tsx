@@ -16,6 +16,7 @@ import {
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
+import CourseSearchTab from '../CourseSearchTab';
 
 /**
  * Renders the actual content at the root of the app
@@ -60,8 +61,9 @@ function AppContentBase(): React.ReactElement {
         )}
       >
         {currentTabIndex === 0 && <Scheduler />}
-        {currentTabIndex === 1 && <Map />}
-        {currentTabIndex === 2 && <Finals />}
+        {currentTabIndex === 1 && <CourseSearchTab />}
+        {currentTabIndex === 2 && <Map />}
+        {currentTabIndex === 3 && <Finals />}
 
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>

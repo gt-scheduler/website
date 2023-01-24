@@ -9,6 +9,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Node 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Install
         run: yarn install --frozen-lockfile
         id: install
@@ -29,6 +34,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Node 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Install
         run: yarn install --frozen-lockfile
 
@@ -44,6 +54,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Node 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - name: Install
         run: yarn install --frozen-lockfile
