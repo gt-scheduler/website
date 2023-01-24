@@ -14,13 +14,11 @@ export default function CourseSearchContainer({
   onShow,
 }: CourseSearchContainerProps): React.ReactElement {
   return (
-    <>
-      <div className="CourseSearchContainer">
-        <h3 className="label column-title">Search Course</h3>
-        <div className="scroller">
-          <CourseSearch onShow={onShow} />
-        </div>
+    <div className="CourseSearchContainer">
+      <h3 className="label column-title">Search Course</h3>
+      <div className="scroller">
+        <CourseSearch onShow={onShow} />
       </div>
-    </>
+    </div>
   );
 }

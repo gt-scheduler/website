@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // eslint-disable
@@ -41,7 +42,7 @@ interface CourseDetailsAPIResponse {
   }>;
 }
 
-const Professor = ({ name, sections, gpa }: ProfessorType): JSX.Element => {
+function Professor({ name, sections, gpa }: ProfessorType): JSX.Element {
   return (
     <>
       <tr>
@@ -77,13 +78,13 @@ const Professor = ({ name, sections, gpa }: ProfessorType): JSX.Element => {
       </>
     </>
   );
-};
+}
 
 type SectionProps = {
   section: SectionBean;
 };
 
-const Section = ({ section }: SectionProps): JSX.Element => {
+function Section({ section }: SectionProps): JSX.Element {
   const [{ term }] = useContext(ScheduleContext);
   const [selected, setSelected] = useState(false);
   const [seating, setSeating] = useState<Seating>([[], 0]);
@@ -167,7 +168,7 @@ const Section = ({ section }: SectionProps): JSX.Element => {
       <td>{section.meetings[0]?.where}</td>
     </tr>
   );
-};
+}
 
 export type SearchResultContainerProps = {
   // TODO: Fix props name to something more meaningful

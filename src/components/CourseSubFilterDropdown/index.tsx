@@ -15,6 +15,8 @@ export type CourseFilterProps = {
 export default function CourseSubFilterDropdown({
   name,
   labels,
+  selectedTags,
+  onReset,
   onToggle,
 }: CourseFilterProps): React.ReactElement {
   const dropdownToggleHandler = (e: ChangeEvent<HTMLSelectElement>): void => {

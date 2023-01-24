@@ -40,7 +40,7 @@ export default function CourseSubFilter({
                   'tag',
                   selectedTags.includes(tag) && 'active'
                 )}
-                property={tag}
+                // property={tag}
                 onClick={(): void => onToggle(tag)}
               >
                 {tag}

@@ -176,6 +176,7 @@ function doesFilterMatchCourse(
 }
 
 export default function CourseSearch({
+  className,
   onShow,
 }: CourseSearchProps): React.ReactElement {
   const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
@@ -252,7 +253,7 @@ export default function CourseSearch({
   );
 
   const handleResetFilter = useCallback(
-    (key) => {
+    (key: any) => {
       setFilter({
         ...filter,
         [key]: [],
@@ -329,62 +330,60 @@ export default function CourseSearch({
   const activeCourse = courses[activeIndex];
 
   return (
-    <>
-      <div className="CourseSearch">
-        <div className="add">
-          <div className="primary">
-            <FontAwesomeIcon className="icon" fixedWidth icon={faSearch} />
-            <div className="keyword-wrapper">
-              {activeCourse && (
-                <div className={classes('keyword', 'autocomplete')}>
-                  {activeCourse.id}
-                </div>
-              )}
-              <input
-                type="text"
-                placeholder="Subject or course number"
-                ref={inputRef}
-                value={keyword}
-                onChange={handleChangeKeyword}
-                onKeyDown={handleKeyDown}
-                className="keyword"
-              />
-            </div>
-          </div>
-          <CourseFilterByCreditHours
-            key="creditHours"
-            onReset={(key: string): void => handleResetFilter(key)}
-            onToggle={(key, tag): void => handleToggleFilter(key, tag)}
-            onToggleDropdown={(key, tags): void =>
-              handleToggleFilterDropdown(key, tags)
-            }
-            filter={filter}
-          />
-          {[
-            ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
-            ['Campus', 'campus', CAMPUSES] as const,
-          ].map(([name, property, labels]) => (
-            <CourseFilter
-              key={property}
-              name={name}
-              labels={labels}
-              selectedTags={filter[property]}
-              onReset={(): void => handleResetFilter(property)}
-              onToggle={(tag): void => handleToggleFilter(property, tag)}
+    <div className="CourseSearch">
+      <div className="add">
+        <div className="primary">
+          <FontAwesomeIcon className="icon" fixedWidth icon={faSearch} />
+          <div className="keyword-wrapper">
+            {activeCourse && (
+              <div className={classes('keyword', 'autocomplete')}>
+                {activeCourse.id}
+              </div>
+            )}
+            <input
+              type="text"
+              placeholder="Subject or course number"
+              ref={inputRef}
+              value={keyword}
+              onChange={handleChangeKeyword}
+              onKeyDown={handleKeyDown}
+              className="keyword"
             />
-          ))}
+          </div>
         </div>
-        {courses.map((course) => (
-          <Course
-            key={course.id}
-            className={classes(course === activeCourse && 'active')}
-            courseId={course.id}
-            onAddCourse={(): void => handleAddCourse(course)}
-            onShowInfo={(): void => onShow(course)}
-            courseCardType={COURSE_CARD_TYPES.CourseSearch}
+        <CourseFilterByCreditHours
+          key="creditHours"
+          onReset={(key: string): void => handleResetFilter(key)}
+          onToggle={(key, tag): void => handleToggleFilter(key, tag)}
+          onToggleDropdown={(key, tags): void =>
+            handleToggleFilterDropdown(key, tags)
+          }
+          filter={filter}
+        />
+        {[
+          ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
+          ['Campus', 'campus', CAMPUSES] as const,
+        ].map(([name, property, labels]) => (
+          <CourseFilter
+            key={property}
+            name={name}
+            labels={labels}
+            selectedTags={filter[property]}
+            onReset={(): void => handleResetFilter(property)}
+            onToggle={(tag): void => handleToggleFilter(property, tag)}
           />
         ))}
       </div>
-    </>
+      {courses.map((course) => (
+        <Course
+          key={course.id}
+          className={classes(course === activeCourse && 'active')}
+          courseId={course.id}
+          onAddCourse={(): void => handleAddCourse(course)}
+          onShowInfo={(): void => onShow(course)}
+          courseCardType={COURSE_CARD_TYPES.CourseSearch}
+        />
+      ))}
+    </div>
   );
 }
