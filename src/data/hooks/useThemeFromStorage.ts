@@ -13,14 +13,16 @@ const THEME_LOCAL_STORAGE_KEY = 'theme';
  * Returns a memoized value of the theme context.
  */
 export default function useThemeFromStorage(): ThemeContextValue {
-  const [theme, setTheme] = useLocalStorageState(
-    THEME_LOCAL_STORAGE_KEY,
-    () => {
-      const legacyValue = Cookies.get(THEME_LOCAL_STORAGE_KEY);
-      if (legacyValue !== undefined) return legacyValue;
-      return 'dark';
-    }
-  );
+  // Grab the cookie value, if it exists, and use it as the default value
+  // for the local storage state.
+  const maybeLegacyValue = Cookies.get(THEME_LOCAL_STORAGE_KEY);
+  const legacyValue =
+    maybeLegacyValue !== undefined ? maybeLegacyValue : 'dark';
+
+  const [theme, setTheme] = useLocalStorageState(THEME_LOCAL_STORAGE_KEY, {
+    defaultValue: legacyValue,
+    storageSync: true,
+  });
   const correctedTheme = isTheme(theme) ? theme : 'dark';
 
   // Ensure that the stored theme is valid; otherwise reset it

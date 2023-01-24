@@ -9,9 +9,10 @@ import {
 } from '../types';
 
 export type HookResult = {
-  addNewVersion: (name: string, select?: boolean) => void;
+  addNewVersion: (name: string, select?: boolean) => string;
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
+  cloneVersion: (id: string, newName: string) => void;
 };
 
 /**
@@ -31,9 +32,10 @@ export default function useVersionActions({
   setVersion: (next: string) => void;
   currentVersion: string;
 }): HookResult {
-  // Create an `addNewVersion` function
+  // Create an `addNewVersion` function.
+  // Returns the ID of the created schedule version.
   const addNewVersion = useCallback(
-    (name: string, select = false): void => {
+    (name: string, select = false): string => {
       const id = generateScheduleVersionId();
       updateTermScheduleData((draft) => {
         draft.versions[id] = {
@@ -45,6 +47,7 @@ export default function useVersionActions({
       if (select) {
         setVersion(id);
       }
+      return id;
     },
     [updateTermScheduleData, setVersion]
   );
@@ -147,5 +150,36 @@ export default function useVersionActions({
     [updateTermScheduleData]
   );
 
-  return { addNewVersion, deleteVersion, renameVersion };
+  const cloneVersion = useCallback(
+    (id: string, newName: string): void => {
+      const newId = addNewVersion(newName, false);
+      updateTermScheduleData((draft) => {
+        const existingDraft = draft.versions[id];
+        if (existingDraft === undefined) {
+          softError(
+            new ErrorWithFields({
+              message:
+                "cloneVersion called with current version name that doesn't exist; ignoring",
+              fields: {
+                allVersionNames: Object.entries(draft.versions).map(
+                  ([versionId, { name }]) => ({ id: versionId, name })
+                ),
+                id,
+                versionCount: Object.keys(draft.versions).length,
+                newName,
+              },
+            })
+          );
+          return;
+        }
+        const newDraft = draft.versions[newId];
+        if (newDraft !== undefined) {
+          newDraft.schedule = castDraft(existingDraft.schedule);
+        }
+      });
+    },
+    [updateTermScheduleData, addNewVersion]
+  );
+
+  return { addNewVersion, deleteVersion, renameVersion, cloneVersion };
 }

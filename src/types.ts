@@ -73,6 +73,8 @@ export interface Meeting {
   location: Location | null;
   instructors: string[];
   dateRange: DateRange;
+  finalDate: Date | null;
+  finalTime: Period | null;
 }
 
 // Note: if this type ever changes,
@@ -118,7 +120,21 @@ export type CrawlerMeeting = [
    * an integer index into `caches.dateRanges`,
    * specifying the start/end date of the class this semester
    */
-  dateRangeIndex: number
+  dateRangeIndex: number,
+  /**
+   * integer index into caches.finalDates,
+   * specifying the date at which the final is
+   * -1 when no match could be found and
+   * as a default value
+   */
+  finalDateIndex: number,
+  /**
+   * integer index into caches.finalTimes,
+   * specifying the time at which the final is
+   * -1 when no match could be found
+   * and as a default value
+   */
+  finalTimeIdx: number
 ];
 
 // Section type (imported as `CrawlerSection`):
@@ -236,6 +252,18 @@ export interface CrawlerCaches {
    * List of the different building locations a class can be at
    */
   locations: Location[];
+
+  /**
+   * List of the all the dates on which finals are happening
+   * Example date: Aug 02, 2022
+   */
+  finalDates: Date[];
+
+  /**
+   * List of the time blocks for finals
+   * Example time: 11:20 am - 2:10 pm
+   */
+  finalTimes: string[];
 }
 
 // Course type (imported as `CrawlerCourse`):

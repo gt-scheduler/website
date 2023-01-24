@@ -1,9 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 
 import App from './components/App';
+import { ErrorWithFields } from './log';
 
 import 'normalize.css';
 import './stylesheet.scss';
@@ -21,4 +22,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+if (container === null) {
+  throw new ErrorWithFields({
+    message: "couldn't find root element (failed to mount app)",
+  });
+}
+const root = createRoot(container);
+root.render(<App />);

@@ -72,3 +72,20 @@ $modal-strong-foreground-color-light: #444444;
     }
   }
 }
+
+// Causes inner `a` elements to be styled as standard web links
+%colored-link-container {
+  a {
+    @include dark {
+      color: #70a8ff;
+    }
+
+    @include light {
+      color: #1b61d1;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

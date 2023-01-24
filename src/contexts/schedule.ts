@@ -24,9 +24,10 @@ export type ScheduleContextSetters = {
     applyDraft: (draft: Draft<Schedule>) => void | Immutable<Schedule>
   ) => void;
   setCurrentVersion: (next: string) => void;
-  addNewVersion: (name: string, select?: boolean) => void;
+  addNewVersion: (name: string, select?: boolean) => string;
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
+  cloneVersion: (id: string, newName: string) => void;
 };
 export type ScheduleContextValue = [
   ScheduleContextData,
@@ -70,7 +71,7 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
         },
       });
     },
-    addNewVersion: (name: string, select?: boolean): void => {
+    addNewVersion: (name: string, select?: boolean): string => {
       throw new ErrorWithFields({
         message: 'empty ScheduleContext.addNewVersion value being used',
         fields: {
@@ -90,6 +91,15 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
     renameVersion: (id: string, newName: string): void => {
       throw new ErrorWithFields({
         message: 'empty ScheduleContext.renameVersion value being used',
+        fields: {
+          id,
+          newName,
+        },
+      });
+    },
+    cloneVersion: (id: string, newName: string): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.cloneVersion value being used',
         fields: {
           id,
           newName,

@@ -1,0 +1,113 @@
+@import '../../variables';
+
+.FinalBlocks {
+  &.overlay {
+    .meeting {
+      opacity: $opacity-disabled;
+    }
+  }
+
+  :hover {
+    cursor: pointer;
+  }
+
+  .tooltip {
+    opacity: 0.95;
+    border-radius: 8px;
+  }
+
+  tr {
+    :nth-child(1) {
+      text-align: right;
+      padding-right: 3px;
+    }
+
+    :nth-child(2) {
+      text-align: left;
+      padding-left: 3px;
+    }
+  }
+
+  .meeting {
+    position: absolute;
+    width: 20%;
+    height: 100px;
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .meeting-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      padding: 0 8px;
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: .72em;
+      }
+
+      .ids {
+        display: flex;
+        font-weight: bold;
+        overflow: hidden;
+
+        span {
+          font-size: .8em;
+        }
+      }
+    }
+
+    &.M {
+      left: 0;
+    }
+
+    &.T {
+      left: 20%;
+    }
+
+    &.W {
+      left: 40%;
+    }
+
+    &.R {
+      left: 60%;
+    }
+
+    &.F {
+      left: 80%;
+    }
+  }
+}
+
+.mobile .FinalBlocks:not(.capture) {
+  .meeting {
+    .meeting-wrapper {
+      padding: 2px;
+
+      span {
+        white-space: normal;
+      }
+
+      .ids {
+        .course-id {
+          flex: 1;
+        }
+
+        .section-id {
+          display: none;
+        }
+      }
+
+      .where,
+      .instructors {
+        display: none;
+      }
+    }
+  }
+}

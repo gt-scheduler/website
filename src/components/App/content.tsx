@@ -7,6 +7,7 @@ import ErrorHeader from '../ErrorHeader';
 import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
+import Finals from '../Finals';
 import {
   AppNavigationContext,
   AppMobileNav,
@@ -39,6 +40,8 @@ function AppContentBase(): React.ReactElement {
         captureRef={captureRef}
       />
       <ErrorBoundary
+        // ErrorBoundary.fallback is a normal render prop, not a component.
+        // eslint-disable-next-line react/no-unstable-nested-components
         fallback={(error, errorInfo): React.ReactElement => (
           <SkeletonContent>
             <ErrorHeader />
@@ -58,8 +61,9 @@ function AppContentBase(): React.ReactElement {
         )}
       >
         {currentTabIndex === 0 && <Scheduler />}
-        {currentTabIndex === 1 && <Map />}
-        {currentTabIndex === 2 && <CourseSearchTab />}
+        {currentTabIndex === 1 && <CourseSearchTab />}
+        {currentTabIndex === 2 && <Map />}
+        {currentTabIndex === 3 && <Finals />}
 
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>

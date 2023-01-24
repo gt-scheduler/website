@@ -114,7 +114,11 @@
           }
         ]
       }
-    ]
+    ],
+    // Disable false positives for render props
+    "react/no-unstable-nested-components": ["error", { "allowAsProps": true }],
+    // Allow code like `<>{children}</>` to convert React.ReactNode => React.ReactElement
+    "react/jsx-no-useless-fragment": ["error", { "allowExpressions": true }]
   },
   "overrides": [
     {
