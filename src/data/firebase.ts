@@ -17,9 +17,10 @@ const firebaseConfig = {
   measurementId: process.env['REACT_APP_FIREBASE_MEASUREMENT_ID'],
 };
 
-const SCHEDULE_COLLECTION = process.env['PRODUCTION']
-  ? 'schedules'
-  : 'schedules-dev';
+const SCHEDULE_COLLECTION =
+  process.env.NODE_ENV === 'production' && !process.env['PREVIEW']
+    ? 'schedules'
+    : 'schedules-dev';
 
 /**
  * Whether Firebase authentication is enabled in this environment.

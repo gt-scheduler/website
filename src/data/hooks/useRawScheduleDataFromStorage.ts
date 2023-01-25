@@ -6,9 +6,10 @@ import { renderDataNotPersistentNotification } from '../../components/DataNotPer
 import { LoadingState } from '../../types';
 import { AnyScheduleData } from '../types';
 
-export const SCHEDULE_DATA_LOCAL_STORAGE_KEY = process.env['PRODUCTION']
-  ? 'schedule-data'
-  : 'schedule-data-dev';
+export const SCHEDULE_DATA_LOCAL_STORAGE_KEY =
+  process.env.NODE_ENV === 'production' && !process.env['PREVIEW']
+    ? 'schedule-data'
+    : 'schedule-data-dev';
 
 type HookResult = {
   rawScheduleData: Immutable<AnyScheduleData> | null;
