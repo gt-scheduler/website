@@ -2,7 +2,12 @@ import React, { useContext, useId } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { useRootClose } from 'react-overlays';
 
-import { classes, getContentClassName, periodToString } from '../../utils/misc';
+import {
+  abbreviateLocation,
+  classes,
+  getContentClassName,
+  periodToString,
+} from '../../utils/misc';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
 import { Meeting, Period } from '../../types';
@@ -215,7 +220,7 @@ function MeetingDayBlock({
               <span className="section-id">&nbsp;{section.id}</span>
             </div>
             <span className="period">{periodToString(period)}</span>
-            <span className="where">{meeting.where}</span>
+            <span className="where">{abbreviateLocation(meeting.where)}</span>
             <span className="instructors">
               {meeting.instructors.join(', ')}
             </span>
