@@ -8,7 +8,7 @@ import {
 
 import { Button, Calendar, Select } from '..';
 import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
-import { Combination, Event } from '../../types';
+import { Combination } from '../../types';
 import Modal from '../Modal';
 
 import 'react-virtualized/styles.css';
@@ -42,7 +42,7 @@ export default function CombinationContainer(): React.ReactElement {
   const combinations = useMemo(
     () =>
       oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns, events),
-    [oscar, desiredCourses, pinnedCrns, excludedCrns]
+    [oscar, desiredCourses, pinnedCrns, excludedCrns, events]
   );
   const sortedCombinations = useMemo(
     () => oscar.sortCombinations(combinations, sortingOptionIndex),

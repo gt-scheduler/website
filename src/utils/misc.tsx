@@ -4,6 +4,7 @@ import { DelayFactory } from 'exponential-backoff/dist/delay/delay.factory';
 import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
+import { Immutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
@@ -16,8 +17,8 @@ import {
   PrerequisiteClause,
   Theme,
 } from '../types';
+
 import ics from '../vendor/ics';
-import { Immutable } from 'immer';
 
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
