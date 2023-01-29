@@ -8,8 +8,16 @@ import { saveAs } from 'file-saver';
 import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
 import { ErrorWithFields, softError } from '../log';
-import { ICS, Period, PrerequisiteClause, Theme } from '../types';
+import {
+  Event,
+  ICS,
+  Meeting,
+  Period,
+  PrerequisiteClause,
+  Theme,
+} from '../types';
 import ics from '../vendor/ics';
+import { Immutable } from 'immer';
 
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -58,21 +66,34 @@ export const getContentClassName = (color: string | undefined): string => {
     : 'dark-content';
 };
 
+export const hasConflictBetweenMeetings = (
+  meeting1: Meeting | Immutable<Event>,
+  meeting2: Meeting | Immutable<Event>
+): boolean | undefined =>
+  meeting1.period &&
+  meeting2.period &&
+  DAYS.some(
+    (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
+  ) &&
+  meeting1.period.start < meeting2.period.end &&
+  meeting2.period.start < meeting1.period.end;
+
 export const hasConflictBetween = (
   section1: Section,
   section2: Section
 ): boolean =>
   section1.meetings.some((meeting1) =>
-    section2.meetings.some(
-      (meeting2) =>
-        meeting1.period &&
-        meeting2.period &&
-        DAYS.some(
-          (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
-        ) &&
-        meeting1.period.start < meeting2.period.end &&
-        meeting2.period.start < meeting1.period.end
+    section2.meetings.some((meeting2) =>
+      hasConflictBetweenMeetings(meeting1, meeting2)
     )
+  );
+
+export const hasConflictBetweenSectionAndEvent = (
+  section: Section,
+  event: Immutable<Event>
+): boolean =>
+  section.meetings.some((meeting) =>
+    hasConflictBetweenMeetings(meeting, event)
   );
 
 export const classes = (

@@ -8,7 +8,7 @@ import {
 
 import { Button, Calendar, Select } from '..';
 import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
-import { Combination } from '../../types';
+import { Combination, Event } from '../../types';
 import Modal from '../Modal';
 
 import 'react-virtualized/styles.css';
@@ -22,7 +22,14 @@ const AutoSizer = _AutoSizer as unknown as React.ComponentType<AutoSizerProps>;
 
 export default function CombinationContainer(): React.ReactElement {
   const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
+    {
+      oscar,
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      events,
+      sortingOptionIndex,
+    },
     { patchSchedule },
   ] = useContext(ScheduleContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
@@ -33,7 +40,8 @@ export default function CombinationContainer(): React.ReactElement {
   }, []);
 
   const combinations = useMemo(
-    () => oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns),
+    () =>
+      oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns, events),
     [oscar, desiredCourses, pinnedCrns, excludedCrns]
   );
   const sortedCombinations = useMemo(

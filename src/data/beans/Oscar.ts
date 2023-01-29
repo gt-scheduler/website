@@ -1,12 +1,19 @@
 import { Course, Section, SortingOption } from '.';
-import { hasConflictBetween, stringToTime } from '../../utils/misc';
+import {
+  hasConflictBetween,
+  hasConflictBetweenSectionAndEvent,
+  stringToTime,
+} from '../../utils/misc';
 import {
   Combination,
   Period,
   DateRange,
   Location,
   CrawlerTermData,
+  Event,
+  Meeting,
 } from '../../types';
+import { Immutable } from 'immer';
 import { ErrorWithFields, softError } from '../../log';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
@@ -204,7 +211,8 @@ export default class Oscar {
   getCombinations(
     desiredCourses: readonly string[],
     pinnedCrns: readonly string[],
-    excludedCrns: readonly string[]
+    excludedCrns: readonly string[],
+    events: Immutable<Event[]>
   ): Combination[] {
     const crnsList: string[][] = [];
     const dfs = (courseIndex = 0, crns: string[] = []): void => {
@@ -225,7 +233,10 @@ export default class Oscar {
           const crnSection = this.findSection(crn);
           if (crnSection === undefined) return false;
           return hasConflictBetween(crnSection, section);
-        });
+        }) ||
+        events.some((event) =>
+          hasConflictBetweenSectionAndEvent(section, event)
+        );
       if (course.hasLab) {
         // If a course has a lab, then `onlyLectures`, `onlyLabs`,
         // and `allInOnes` should be non-undefined, but we have to check
@@ -278,13 +289,18 @@ export default class Oscar {
     return crnsList.map((crns) => {
       const startMap: Record<string, number> = {};
       const endMap: Record<string, number> = {};
-      this.iterateTimeBlocks([...pinnedCrns, ...crns], (day, period) => {
-        if (period === undefined) return;
-        const end = endMap[day];
-        const start = startMap[day];
-        if (start == null || start > period.start) startMap[day] = period.start;
-        if (end == null || end < period.end) endMap[day] = period.end;
-      });
+      this.iterateTimeBlocks(
+        [...pinnedCrns, ...crns],
+        events,
+        (day, period) => {
+          if (period === undefined) return;
+          const end = endMap[day];
+          const start = startMap[day];
+          if (start == null || start > period.start)
+            startMap[day] = period.start;
+          if (end == null || end < period.end) endMap[day] = period.end;
+        }
+      );
       return {
         crns,
         startMap,
@@ -319,19 +335,24 @@ export default class Oscar {
 
   iterateTimeBlocks(
     crns: string[],
+    events: Immutable<Event[]>,
     callback: (day: string, period: Period | undefined) => void
   ): void {
+    const meetingCallback = (meeting: Meeting | Immutable<Event>): void =>
+      meeting.period &&
+      meeting.days.forEach((day) => {
+        callback(day, meeting.period);
+      });
+
     crns.forEach((crn) => {
       const section = this.findSection(crn);
       if (section !== undefined) {
-        section.meetings.forEach(
-          (meeting) =>
-            meeting.period &&
-            meeting.days.forEach((day) => {
-              callback(day, meeting.period);
-            })
-        );
+        section.meetings.forEach(meetingCallback);
       }
+    });
+
+    events.forEach((event) => {
+      if (event !== undefined) meetingCallback(event);
     });
   }
 }
