@@ -37,9 +37,9 @@ jobs:
       - name: Build
         run: yarn build
         env:
-          CI: "true"
-          PREVIEW: "true"
+          CI: 'true'
           PUBLIC_URL: ${{ env.npm_package_homepage }}/pr-preview/pr-${{ github.event.number }}/
+          REACT_APP_PREVIEW: 'true'
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
           REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
           REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
@@ -68,4 +68,4 @@ jobs:
       - name: Test
         run: yarn run test --coverage
         env:
-          CI: "true"
+          CI: 'true'
