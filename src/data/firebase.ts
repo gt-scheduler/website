@@ -18,7 +18,7 @@ const firebaseConfig = {
 };
 
 const SCHEDULE_COLLECTION =
-  process.env.NODE_ENV === 'production' && !process.env['PREVIEW']
+  process.env.NODE_ENV === 'production' && process.env['STAGE'] !== 'preview'
     ? 'schedules'
     : 'schedules-dev';
 
