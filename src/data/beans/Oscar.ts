@@ -1,11 +1,11 @@
 import { Immutable } from 'immer';
+
 import { Course, Section, SortingOption } from '.';
 import {
   hasConflictBetween,
   hasConflictBetweenSectionAndEvent,
   stringToTime,
 } from '../../utils/misc';
-
 import {
   Combination,
   Period,
@@ -15,7 +15,6 @@ import {
   Event,
   Meeting,
 } from '../../types';
-
 import { ErrorWithFields, softError } from '../../log';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
