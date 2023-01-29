@@ -7,7 +7,7 @@ import { LoadingState } from '../../types';
 import { AnyScheduleData } from '../types';
 
 export const SCHEDULE_DATA_LOCAL_STORAGE_KEY =
-  process.env.NODE_ENV === 'production' && !process.env['PREVIEW']
+  process.env.NODE_ENV === 'production' && process.env['PREVIEW'] !== 'true'
     ? 'schedule-data'
     : 'schedule-data-dev';
 
