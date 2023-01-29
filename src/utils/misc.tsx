@@ -17,7 +17,6 @@ import {
   PrerequisiteClause,
   Theme,
 } from '../types';
-
 import ics from '../vendor/ics';
 
 export const stringToTime = (string: string): number => {
