@@ -4,8 +4,12 @@ import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { TimeBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
-import { makeSizeInfoKey, TimeBlockPosition } from '../TimeBlocks';
-import { Period } from '../../types';
+import {
+  makeSizeInfoKey,
+  TimeBlockPosition,
+  EventTimeBlockPosition,
+} from '../TimeBlocks';
+import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
@@ -27,11 +31,21 @@ export default function Calendar({
 }: CalendarProps): React.ReactElement {
   const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
 
+  const events = [
+    { id: 'test', period: { start: 900, end: 1100 }, days: ['T', 'R'] },
+  ] as Event[];
+
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
   const crnSizeInfo: Record<
     string,
     Record<string, Record<string, TimeBlockPosition>>
+  > = {};
+
+  // Contains the rowIndex's and rowSize's passed into each custom event's TimeBlocks, consistent with the rowIndex's and rowSize's of crns.
+  const eventSizeInfo: Record<
+    string,
+    Record<string, Record<string, EventTimeBlockPosition>>
   > = {};
 
   // Recursively sets the rowSize of all time blocks within the current
@@ -41,11 +55,13 @@ export default function Calendar({
     seen: Set<string>,
     curCrn: string,
     curPeriod: Period,
-    newRowSize: number
+    newRowSize: number,
+    eventPeriodInfos?: EventTimeBlockPosition[]
   ): void => {
     if (seen.has(curCrn)) {
       return;
     }
+
     seen.add(curCrn);
 
     periodInfos
@@ -64,9 +80,30 @@ export default function Calendar({
           newRowSize
         );
       });
+
+    if (eventPeriodInfos) {
+      eventPeriodInfos
+        .filter(
+          (period2Info) =>
+            period2Info.period.start < curPeriod.end &&
+            period2Info.period.end > curPeriod.start
+        )
+        .forEach((period2Info) => {
+          period2Info.rowSize = newRowSize;
+          updateJoinedRowSizes(
+            periodInfos,
+            seen,
+            period2Info.id,
+            period2Info.period,
+            newRowSize,
+            eventPeriodInfos
+          );
+        });
+    }
   };
 
   const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
+
   const maxMeetingLen = (crn: string): number => {
     const section = oscar.findSection(crn);
     if (section == null) return 0;
@@ -135,6 +172,70 @@ export default function Calendar({
       });
   });
 
+  events.forEach((event) => {
+    if (event.period == null) return;
+
+    event.days.forEach((day) => {
+      const dayPeriodInfos = Object.values(crnSizeInfo)
+        .flatMap<TimeBlockPosition | undefined>((days) =>
+          days != null ? Object.values(days[day] ?? {}) : []
+        )
+        .flatMap<TimeBlockPosition>((info) => (info == null ? [] : [info]));
+
+      const dayEventPeriodInfos = Object.values(eventSizeInfo)
+        .flatMap<EventTimeBlockPosition | undefined>((days) =>
+          days != null ? Object.values(days[day] ?? {}) : []
+        )
+        .flatMap<EventTimeBlockPosition>((info) =>
+          info == null ? [] : [info]
+        );
+
+      let curRowSize = dayPeriodInfos
+        .filter(
+          (period2Info) =>
+            period2Info.period.start < event.period.end &&
+            period2Info.period.end > event.period.start
+        )
+        .reduce(
+          (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
+          1
+        );
+
+      curRowSize = dayEventPeriodInfos
+        .filter(
+          (period2Info) =>
+            period2Info.period.start < event.period.end &&
+            period2Info.period.end > event.period.start
+        )
+        .reduce(
+          (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
+          curRowSize
+        );
+
+      updateJoinedRowSizes(
+        dayPeriodInfos,
+        new Set(),
+        event.id,
+        event.period,
+        curRowSize,
+        dayEventPeriodInfos
+      );
+
+      const evtSizeInfo = eventSizeInfo[event.id] || {};
+      eventSizeInfo[event.id] = evtSizeInfo;
+
+      const daySizeInfo = evtSizeInfo[day] || {};
+      evtSizeInfo[day] = daySizeInfo;
+
+      daySizeInfo[makeSizeInfoKey(event.period)] = {
+        period: event.period,
+        id: event.id,
+        rowIndex: curRowSize - 1,
+        rowSize: curRowSize,
+      };
+    });
+  });
+
   // Allow the user to select a meeting, which will cause it to be highlighted
   // and for the meeting "details" popover/tooltip to remain open.
   type SelectedMeeting = [crn: string, meetingIndex: number, day: string];
@@ -142,7 +243,6 @@ export default function Calendar({
     React.useState<SelectedMeeting | null>(null);
 
   const deviceHasHover = useMedia('(hover: hover)');
-
   // Render pinned CRNS in the order of their first meeting in the day,
   // across all days. This results in better tab-ordering.
   const pinnedCrnsByFirstMeeting: string[] = pinnedCrns
