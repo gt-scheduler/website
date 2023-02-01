@@ -1,4 +1,5 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { castDraft } from 'immer';
+import React, { useCallback, useContext, useState } from 'react';
 import {
   faPencil,
   faPalette,
@@ -8,7 +9,7 @@ import {
 import { classes, getContentClassName, periodToString } from '../../utils/misc';
 import { ActionRow, Palette } from '..';
 import { ScheduleContext } from '../../contexts';
-import { Event, Period } from '../../types';
+import { Period } from '../../types';
 
 import './stylesheet.scss';
 
@@ -33,18 +34,10 @@ export default function CustomEvent({
       const newColorMap = { ...colorMap };
       delete newColorMap[id];
 
-      const newEvents: Event[] = [];
-      events.forEach((singleEvent) => {
-        newEvents.push({
-          id: singleEvent.id,
-          name: singleEvent.name,
-          period: singleEvent.period,
-          days: singleEvent.days.concat(),
-        });
-      });
-
       patchSchedule({
-        events: newEvents.filter((singleEvent) => singleEvent.id !== id),
+        events: events
+          .filter((singleEvent) => singleEvent.id !== id)
+          .map((singleEvent) => castDraft(singleEvent)),
         colorMap: newColorMap,
       });
     },
