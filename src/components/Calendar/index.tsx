@@ -29,11 +29,12 @@ export default function Calendar({
   capture = false,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events }] = useContext(ScheduleContext);
+  const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
 
-  // const events = [
-  //   { id: 'test', period: { start: 900, end: 1100 }, days: ['T', 'R'] },
-  // ] as Event[];
+  const events = [
+    { id: 'test', period: { start: 900, end: 1100 }, days: ['T', 'R'] },
+    { id: 'ok', period: { start: 600, end: 1100 }, days: ['T', 'R'] },
+  ] as Event[];
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
@@ -171,6 +172,8 @@ export default function Calendar({
         });
       });
   });
+
+  events.sort((a: Event, b: Event) => a.period.start - b.period.start ?? 0);
 
   events.forEach((event) => {
     if (event.period == null) return;
