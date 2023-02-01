@@ -173,8 +173,12 @@ export default function Calendar({
       });
   });
 
+  // Sort the events according to size of meeting.
   events.sort((a: Event, b: Event) => a.period.start - b.period.start ?? 0);
 
+  // Populates eventSizeInfo by iteratively finding the next time block's
+  // rowSize and rowIndex (1 more than greatest of already processed connected
+  // blocks), updating the processed connected blocks to match its rowSize (both events and crns)
   events.forEach((event) => {
     if (event.period == null) return;
 
