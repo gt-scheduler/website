@@ -104,10 +104,18 @@
 
           .button {
             float: right;
+            display: block;
             background-color: #589BD5;
             margin: 10px 8px;         
             padding: 5px 25px;
             border-radius: 6px;
+            color: white;
+          }
+
+          .error {
+            color: red;
+            font-size: small;
+            padding: 10px 8px;  
           }
         }
       }
