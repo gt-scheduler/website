@@ -35,11 +35,15 @@ export default function EventAdd({
     } else {
       setSubmitDisabled(true);
     }
-  }, [eventName, selectedTags, start, end]);
+  }, [eventName, selectedTags, start, end, error]);
 
   function parseTime(time: string): number {
     const split = time.split(':').map((str) => Number(str));
-    return split[0]! * 60 + split[1]!;
+
+    if (split[0] && split[1]) {
+      return split[0] * 60 + split[1];
+    }
+    return -1; // invalid time string
   }
 
   function handleStartChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -80,7 +84,7 @@ export default function EventAdd({
       events: [...castDraft(events), event],
       colorMap: { ...colorMap, [id]: getRandomColor() },
     });
-  }, [eventName, start, end, selectedTags, events]);
+  }, [eventName, start, end, selectedTags, events, colorMap, patchSchedule]);
 
   return (
     <div className={classes('EventAdd', className)}>
