@@ -1,12 +1,12 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
+import Button from '../Button';
 import { classes, getRandomColor } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
+import { castDraft } from 'immer';
 
 import './stylesheet.scss';
-import Button from '../Button';
-import { castDraft } from 'immer';
 
 export type EventAddProps = {
   className?: string;
