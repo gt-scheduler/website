@@ -1,0 +1,116 @@
+@import "../../variables";
+
+.EventAdd {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+
+  .add {
+    @include card;
+    background-color: $color-border;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    table {
+      border-collapse: collapse;
+      table-layout: auto;
+      width: 100%;
+
+      tr:last-child {
+        border-bottom: none;
+      }
+
+      tr {
+        border-bottom: 1px solid $color-border;
+    
+        .label {
+          opacity: .5;
+          transition: opacity .2s;
+          font-weight: bold;
+          padding: 12px;
+          font-size: 13;
+  
+          &.active {
+            opacity: 1;
+          }
+        }
+  
+        .input {
+          display: flex;
+          align-items: center;
+          position: relative;
+    
+          input {
+            position: relative;
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            font-size: inherit;
+            padding: 12px 8px;
+            height: 100%; 
+    
+            &::placeholder {
+              font-weight: normal;
+              color: $color-neutral;
+            }
+          }
+
+          input[type="time"] {
+            min-height: 2.5rem;
+
+            &::-webkit-calendar-picker-indicator {
+              display: none;
+            }
+
+            &::-webkit-date-and-time-value {
+              text-align: left;
+            }
+          }
+        }
+
+        .tag-container {
+          display: flex;
+          flex-wrap: wrap;
+          padding: 10px;
+
+          .tag:first-child {
+            margin-left: 0;
+          }
+      
+          .tag {
+            @include card;
+            background-color: rgba($color-neutral, .5);
+            padding: 4px 8px;
+            opacity: .5;
+            transition: opacity .2s;
+            font-size: .8em;
+            cursor: pointer;
+      
+            &.active {
+              opacity: 1;
+              font-weight: bold;
+            }
+      
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+
+        .submit {
+          width: 100%;
+
+          .button {
+            float: right;
+            background-color: #589BD5;
+            margin: 10px 8px;         
+            padding: 5px 25px;
+            border-radius: 6px;
+          }
+        }
+      }
+    }
+  }
+}
