@@ -6,6 +6,7 @@ import { ScheduleContext } from '../../contexts';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+import EventAdd from '../EventAdd';
 
 export default function CourseContainer(): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
@@ -19,6 +20,7 @@ export default function CourseContainer(): React.ReactElement {
           })}
         </div>
         <CourseAdd className="course-add" />
+        <EventAdd className="course-add" />
       </div>
       <Button
         className="updated-at"
