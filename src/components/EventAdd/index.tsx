@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
+import { castDraft } from 'immer';
 import Button from '../Button';
 import { classes, getRandomColor } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
-import { castDraft } from 'immer';
 
 import './stylesheet.scss';
 
