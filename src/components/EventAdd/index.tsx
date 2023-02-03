@@ -40,7 +40,7 @@ export default function EventAdd({
   function parseTime(time: string): number {
     const split = time.split(':').map((str) => Number(str));
 
-    if (split[0] && split[1]) {
+    if (typeof split[0] !== 'undefined' && typeof split[1] !== 'undefined') {
       return split[0] * 60 + split[1];
     }
     return -1; // invalid time string
