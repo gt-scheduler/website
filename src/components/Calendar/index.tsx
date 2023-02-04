@@ -11,6 +11,7 @@ import {
 } from '../TimeBlocks';
 import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
+import { Immutable } from 'immer';
 
 import './stylesheet.scss';
 
@@ -29,12 +30,7 @@ export default function Calendar({
   capture = false,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
-
-  const events = [
-    { id: 'test', period: { start: 900, end: 1100 }, days: ['T', 'R'] },
-    { id: 'ok', period: { start: 600, end: 1100 }, days: ['T', 'R'] },
-  ] as Event[];
+  const [{ pinnedCrns, oscar, events }] = useContext(ScheduleContext);
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
@@ -174,14 +170,17 @@ export default function Calendar({
   });
 
   // Sort the events according to size of meeting.
-  events
+  const sortedEvents = events
     .slice()
-    .sort((a: Event, b: Event) => a.period.start - b.period.start ?? 0);
+    .sort(
+      (a: Immutable<Event>, b: Immutable<Event>) =>
+        a.period.start - b.period.start ?? 0
+    );
 
   // Populates eventSizeInfo by iteratively finding the next time block's
   // rowSize and rowIndex (1 more than greatest of already processed connected
   // blocks), updating the processed connected blocks to match its rowSize (both events and crns)
-  events.forEach((event) => {
+  sortedEvents.forEach((event) => {
     if (event.period == null) return;
 
     event.days.forEach((day) => {
