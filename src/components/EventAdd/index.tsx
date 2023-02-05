@@ -1,4 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { castDraft } from 'immer';
 
 import Button from '../Button';
@@ -10,16 +17,26 @@ import './stylesheet.scss';
 
 export type EventAddProps = {
   className?: string;
+  id?: string;
+  name?: string;
+  startTime?: string;
+  endTime?: string;
+  days?: string[];
 };
 
 export default function EventAdd({
   className,
+  id,
+  name = '',
+  startTime = '',
+  endTime = '',
+  days = [],
 }: EventAddProps): React.ReactElement {
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
-  const [eventName, setEventName] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [start, setStart] = useState<number>(-1);
-  const [end, setEnd] = useState<number>(-1);
+  const [eventName, setEventName] = useState(name);
+  const [selectedTags, setSelectedTags] = useState(days);
+  const [start, setStart] = useState(startTime);
+  const [end, setEnd] = useState(endTime);
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
 
@@ -27,8 +44,8 @@ export default function EventAdd({
     if (
       eventName.length > 0 &&
       selectedTags.length > 0 &&
-      start !== -1 &&
-      end !== -1 &&
+      start !== '' &&
+      end !== '' &&
       !error
     ) {
       setSubmitDisabled(false);
@@ -46,44 +63,63 @@ export default function EventAdd({
     return -1; // invalid time string
   }
 
-  function handleStartChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    const newStart = parseTime(event.target.value);
+  function handleStartChange(event: ChangeEvent<HTMLInputElement>): void {
+    const newStart = event.target.value;
 
     setError('');
     setStart(newStart);
 
-    if (end !== -1 && end <= newStart) {
+    const parsedStart = parseTime(newStart);
+    const parsedEnd = parseTime(end);
+    if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
       setError('Start time must be before end time.');
     }
   }
 
-  function handleEndChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    const newEnd = parseTime(event.target.value);
+  function handleEndChange(event: ChangeEvent<HTMLInputElement>): void {
+    const newEnd = event.target.value;
 
     setError('');
     setEnd(newEnd);
 
-    if (start !== -1 && newEnd <= start) {
+    const parsedStart = parseTime(start);
+    const parsedEnd = parseTime(newEnd);
+    if (parsedStart !== -1 && parsedEnd <= parsedStart) {
       setError('Start time must be before end time.');
     }
   }
 
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
+    if (event.key === 'Enter') {
+      if (!submitDisabled) {
+        onSubmit();
+      }
+
+      event.preventDefault();
+    }
+  }
+
   const onSubmit = useCallback((): void => {
-    const id = new Date().getTime().toString();
+    const eventId = id ?? new Date().getTime().toString();
     const event = {
-      id,
+      id: eventId,
       name: eventName,
       period: {
-        start,
-        end,
+        start: parseTime(start),
+        end: parseTime(end),
       },
       days: selectedTags,
     };
 
     patchSchedule({
       events: [...castDraft(events), event],
-      colorMap: { ...colorMap, [id]: getRandomColor() },
+      colorMap: { ...colorMap, [eventId]: getRandomColor() },
     });
+
+    setEventName('');
+    setSelectedTags([]);
+    setStart('');
+    setEnd('');
   }, [eventName, start, end, selectedTags, events, colorMap, patchSchedule]);
 
   return (
@@ -105,6 +141,7 @@ export default function EventAdd({
                   value={eventName}
                   onChange={(event): void => setEventName(event.target.value)}
                   placeholder="Event Name"
+                  onKeyDown={handleKeyDown}
                 />
               </td>
             </tr>
@@ -134,6 +171,7 @@ export default function EventAdd({
                         setSelectedTags([...selectedTags, tag]);
                       }
                     }}
+                    onKeyDown={handleKeyDown}
                   >
                     {tag}
                   </div>
@@ -142,22 +180,32 @@ export default function EventAdd({
             </tr>
             <tr>
               <td>
-                <div className={classes('label', start !== -1 && 'active')}>
+                <div className={classes('label', start !== '' && 'active')}>
                   Start
                 </div>
               </td>
               <td className="input">
-                <input type="time" onChange={handleStartChange} />
+                <input
+                  type="time"
+                  value={start}
+                  onChange={handleStartChange}
+                  onKeyDown={handleKeyDown}
+                />
               </td>
             </tr>
             <tr>
               <td>
-                <div className={classes('label', end !== -1 && 'active')}>
+                <div className={classes('label', end !== '' && 'active')}>
                   End
                 </div>
               </td>
               <td className="input">
-                <input type="time" onChange={handleEndChange} />
+                <input
+                  type="time"
+                  value={end}
+                  onChange={handleEndChange}
+                  onKeyDown={handleKeyDown}
+                />
               </td>
             </tr>
             <tr>
