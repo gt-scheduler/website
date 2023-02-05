@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { Immutable, castImmutable } from 'immer';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
@@ -10,7 +9,7 @@ import {
   TimeBlockPosition,
   EventTimeBlockPosition,
 } from '../TimeBlocks';
-import { Period, Event } from '../../types';
+import { Period } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
@@ -89,7 +88,8 @@ export default function Calendar({
 
   const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
 
-  // Find section using crn and convert the meetings into an array of CommonMeetingObject
+  // Find section using crn and convert the meetings into
+  // an array of CommonMeetingObject
   const crnMeetings: (CommmonMeetingObject | null)[] = crns
     .flatMap((crn) => {
       const section = oscar.findSection(crn);
@@ -130,9 +130,10 @@ export default function Calendar({
       a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
   );
 
-  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the next time block's
-  // rowSize and rowIndex (1 more than greatest of already processed connected
-  // blocks), updating the processed connected blocks to match its rowSize
+  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
+  // next time block's rowSize and rowIndex (1 more than
+  // greatest of already processed connected blocks), updating
+  // the processed connected blocks to match its rowSize
 
   meetings.forEach((meeting) => {
     const { period } = meeting;
