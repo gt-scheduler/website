@@ -120,7 +120,16 @@ export default function EventAdd({
     setSelectedTags([]);
     setStart('');
     setEnd('');
-  }, [eventName, start, end, selectedTags, events, colorMap, patchSchedule]);
+  }, [
+    eventName,
+    start,
+    end,
+    selectedTags,
+    events,
+    colorMap,
+    patchSchedule,
+    id,
+  ]);
 
   return (
     <div className={classes('EventAdd', className)}>
