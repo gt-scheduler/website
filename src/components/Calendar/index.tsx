@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Immutable } from 'immer';
+import { Immutable, castImmutable } from 'immer';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
@@ -21,6 +21,14 @@ export type CalendarProps = {
   preview?: boolean;
   capture?: boolean;
   isAutosized?: boolean;
+};
+
+// Object for storing Event object and Meeting object in the same array.
+type CommmonMeetingObject = {
+  id: string;
+  days: string[];
+  period: Period;
+  event: boolean;
 };
 
 export default function Calendar({
@@ -49,12 +57,11 @@ export default function Calendar({
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
   const updateJoinedRowSizes = (
-    periodInfos: TimeBlockPosition[],
+    periodInfos: (TimeBlockPosition | EventTimeBlockPosition)[],
     seen: Set<string>,
     curCrn: string,
     curPeriod: Period,
-    newRowSize: number,
-    eventPeriodInfos?: EventTimeBlockPosition[]
+    newRowSize: number
   ): void => {
     if (seen.has(curCrn)) {
       return;
@@ -73,126 +80,72 @@ export default function Calendar({
         updateJoinedRowSizes(
           periodInfos,
           seen,
-          period2Info.crn,
+          'crn' in period2Info ? period2Info.crn : period2Info.id,
           period2Info.period,
           newRowSize
         );
       });
-
-    if (eventPeriodInfos) {
-      eventPeriodInfos
-        .filter(
-          (period2Info) =>
-            period2Info.period.start < curPeriod.end &&
-            period2Info.period.end > curPeriod.start
-        )
-        .forEach((period2Info) => {
-          period2Info.rowSize = newRowSize;
-          updateJoinedRowSizes(
-            periodInfos,
-            seen,
-            period2Info.id,
-            period2Info.period,
-            newRowSize,
-            eventPeriodInfos
-          );
-        });
-    }
   };
 
   const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
 
-  const maxMeetingLen = (crn: string): number => {
-    const section = oscar.findSection(crn);
-    if (section == null) return 0;
-    return Math.max(
-      ...section.meetings.flatMap(({ period }) => {
-        if (period == null) return [];
-        return [period.end - period.start];
-      })
-    );
-  };
+  // Find section using crn and convert the meetings into an array of CommonMeetingObject
+  const crnMeetings: (CommmonMeetingObject | null)[] = crns
+    .flatMap((crn) => {
+      const section = oscar.findSection(crn);
+      if (section == null) return null;
+      const temp = section.meetings
+        .filter((m) => m.period)
+        .map((meeting) => {
+          return {
+            id: crn,
+            days: meeting.days,
+            period: meeting.period,
+            event: false,
+          } as CommmonMeetingObject;
+        });
 
-  crns.sort((a, b) => maxMeetingLen(a) - maxMeetingLen(b));
+      return temp;
+    })
+    .filter((m) => m != null);
 
-  // Populates crnSizeInfo by iteratively finding the next time block's
+  const meetings: CommmonMeetingObject[] =
+    crnMeetings as CommmonMeetingObject[];
+
+  // Add events to meetings array
+  meetings.push(
+    ...events.map((event) => {
+      return {
+        id: event.id,
+        days: event.days,
+        period: event.period,
+        event: true,
+      } as CommmonMeetingObject;
+    })
+  );
+
+  // Sort meetings by meeting length
+  meetings.sort(
+    (a, b) =>
+      a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
+  );
+
+  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the next time block's
   // rowSize and rowIndex (1 more than greatest of already processed connected
   // blocks), updating the processed connected blocks to match its rowSize
-  crns.forEach((crn) => {
-    const section = oscar.findSection(crn);
-    if (section == null) return;
 
-    section.meetings
-      .filter((m) => m.period)
-      .forEach((meeting) => {
-        const { period } = meeting;
-        if (period == null) return;
+  meetings.forEach((meeting) => {
+    const { period } = meeting;
+    if (period == null) return;
 
-        meeting.days.forEach((day) => {
-          const dayPeriodInfos = Object.values(crnSizeInfo)
-            .flatMap<TimeBlockPosition | undefined>((days) =>
-              days != null ? Object.values(days[day] ?? {}) : []
-            )
-            .flatMap<TimeBlockPosition>((info) => (info == null ? [] : [info]));
-
-          const curRowSize = dayPeriodInfos
-            .filter(
-              (period2Info) =>
-                period2Info.period.start < period.end &&
-                period2Info.period.end > period.start
-            )
-            .reduce(
-              (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
-              1
-            );
-
-          updateJoinedRowSizes(
-            dayPeriodInfos,
-            new Set(),
-            crn,
-            period,
-            curRowSize
-          );
-
-          const courseSizeInfo = crnSizeInfo[crn] || {};
-          crnSizeInfo[crn] = courseSizeInfo;
-
-          const daySizeInfo = courseSizeInfo[day] || {};
-          courseSizeInfo[day] = daySizeInfo;
-
-          daySizeInfo[makeSizeInfoKey(period)] = {
-            period,
-            crn,
-            rowIndex: curRowSize - 1,
-            rowSize: curRowSize,
-          };
-        });
-      });
-  });
-
-  // Sort the events according to size of meeting.
-  const sortedEvents = events
-    .slice()
-    .sort(
-      (a: Immutable<Event>, b: Immutable<Event>) =>
-        a.period.start - b.period.start ?? 0
-    );
-
-  // Populates eventSizeInfo by iteratively finding the next time block's
-  // rowSize and rowIndex (1 more than greatest of already processed connected
-  // blocks), updating the processed connected blocks to match its
-  // rowSize (both events and crns)
-  sortedEvents.forEach((event) => {
-    if (event.period == null) return;
-
-    event.days.forEach((day) => {
-      const dayPeriodInfos = Object.values(crnSizeInfo)
+    meeting.days.forEach((day) => {
+      const crnPeriodInfos = Object.values(crnSizeInfo)
         .flatMap<TimeBlockPosition | undefined>((days) =>
           days != null ? Object.values(days[day] ?? {}) : []
         )
         .flatMap<TimeBlockPosition>((info) => (info == null ? [] : [info]));
 
-      const dayEventPeriodInfos = Object.values(eventSizeInfo)
+      const eventPeriodInfos = Object.values(eventSizeInfo)
         .flatMap<EventTimeBlockPosition | undefined>((days) =>
           days != null ? Object.values(days[day] ?? {}) : []
         )
@@ -200,49 +153,56 @@ export default function Calendar({
           info == null ? [] : [info]
         );
 
-      let curRowSize = dayPeriodInfos
+      const dayPeriodInfos: (TimeBlockPosition | EventTimeBlockPosition)[] =
+        crnPeriodInfos;
+      dayPeriodInfos.push(...eventPeriodInfos);
+
+      const curRowSize = dayPeriodInfos
         .filter(
           (period2Info) =>
-            period2Info.period.start < event.period.end &&
-            period2Info.period.end > event.period.start
+            period2Info.period.start < period.end &&
+            period2Info.period.end > period.start
         )
         .reduce(
           (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
           1
         );
 
-      curRowSize = dayEventPeriodInfos
-        .filter(
-          (period2Info) =>
-            period2Info.period.start < event.period.end &&
-            period2Info.period.end > event.period.start
-        )
-        .reduce(
-          (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
-          curRowSize
-        );
-
       updateJoinedRowSizes(
         dayPeriodInfos,
         new Set(),
-        event.id,
-        event.period,
-        curRowSize,
-        dayEventPeriodInfos
+        meeting.id,
+        period,
+        curRowSize
       );
 
-      const evtSizeInfo = eventSizeInfo[event.id] || {};
-      eventSizeInfo[event.id] = evtSizeInfo;
+      if (!meeting.event) {
+        const courseSizeInfo = crnSizeInfo[meeting.id] || {};
+        crnSizeInfo[meeting.id] = courseSizeInfo;
 
-      const daySizeInfo = evtSizeInfo[day] || {};
-      evtSizeInfo[day] = daySizeInfo;
+        const daySizeInfo = courseSizeInfo[day] || {};
+        courseSizeInfo[day] = daySizeInfo;
 
-      daySizeInfo[makeSizeInfoKey(event.period)] = {
-        period: event.period,
-        id: event.id,
-        rowIndex: curRowSize - 1,
-        rowSize: curRowSize,
-      };
+        daySizeInfo[makeSizeInfoKey(period)] = {
+          period,
+          crn: meeting.id,
+          rowIndex: curRowSize - 1,
+          rowSize: curRowSize,
+        };
+      } else {
+        const evtSizeInfo = eventSizeInfo[meeting.id] || {};
+        eventSizeInfo[meeting.id] = evtSizeInfo;
+
+        const eventDaySizeInfo = evtSizeInfo[day] || {};
+        evtSizeInfo[day] = eventDaySizeInfo;
+
+        eventDaySizeInfo[makeSizeInfoKey(meeting.period)] = {
+          period: meeting.period,
+          id: meeting.id,
+          rowIndex: curRowSize - 1,
+          rowSize: curRowSize,
+        };
+      }
     });
   });
 
