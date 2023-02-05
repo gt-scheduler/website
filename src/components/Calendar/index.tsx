@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Immutable } from 'immer';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
@@ -11,7 +12,6 @@ import {
 } from '../TimeBlocks';
 import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
-import { Immutable } from 'immer';
 
 import './stylesheet.scss';
 
@@ -39,7 +39,8 @@ export default function Calendar({
     Record<string, Record<string, TimeBlockPosition>>
   > = {};
 
-  // Contains the rowIndex's and rowSize's passed into each custom event's TimeBlocks, consistent with the rowIndex's and rowSize's of crns.
+  // Contains the rowIndex's and rowSize's passed into each custom event's
+  // TimeBlocks, consistent with the rowIndex's and rowSize's of crns
   const eventSizeInfo: Record<
     string,
     Record<string, Record<string, EventTimeBlockPosition>>
@@ -179,7 +180,8 @@ export default function Calendar({
 
   // Populates eventSizeInfo by iteratively finding the next time block's
   // rowSize and rowIndex (1 more than greatest of already processed connected
-  // blocks), updating the processed connected blocks to match its rowSize (both events and crns)
+  // blocks), updating the processed connected blocks to match its
+  // rowSize (both events and crns)
   sortedEvents.forEach((event) => {
     if (event.period == null) return;
 
