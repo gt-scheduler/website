@@ -17,7 +17,7 @@ export type CourseProps = {
   eventId: string;
   eventName: string;
   eventPeriod: Period;
-  eventDays: string[];
+  eventDays: readonly string[];
 };
 
 export default function CustomEvent({
