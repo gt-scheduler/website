@@ -9,7 +9,7 @@ import React, {
 import { castDraft } from 'immer';
 
 import Button from '../Button';
-import { classes, getRandomColor } from '../../utils/misc';
+import { classes, getRandomColor, timeToString } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
 
@@ -19,8 +19,8 @@ export type EventAddProps = {
   className?: string;
   id?: string;
   name?: string;
-  startTime?: string;
-  endTime?: string;
+  startTime?: number;
+  endTime?: number;
   days?: string[];
 };
 
@@ -28,15 +28,19 @@ export default function EventAdd({
   className,
   id,
   name = '',
-  startTime = '',
-  endTime = '',
+  startTime = -1,
+  endTime = -1,
   days = [],
 }: EventAddProps): React.ReactElement {
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
   const [eventName, setEventName] = useState(name);
   const [selectedTags, setSelectedTags] = useState(days);
-  const [start, setStart] = useState(startTime);
-  const [end, setEnd] = useState(endTime);
+  const [start, setStart] = useState(
+    startTime === -1 ? '' : timeToString(startTime, false, true)
+  );
+  const [end, setEnd] = useState(
+    endTime === -1 ? '' : timeToString(endTime, false, true)
+  );
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
 
@@ -54,50 +58,46 @@ export default function EventAdd({
     }
   }, [eventName, selectedTags, start, end, error]);
 
-  function parseTime(time: string): number {
+  const parseTime = useCallback((time: string): number => {
     const split = time.split(':').map((str) => Number(str));
 
     if (typeof split[0] !== 'undefined' && typeof split[1] !== 'undefined') {
       return split[0] * 60 + split[1];
     }
     return -1; // invalid time string
-  }
+  }, []);
 
-  function handleStartChange(event: ChangeEvent<HTMLInputElement>): void {
-    const newStart = event.target.value;
+  const handleStartChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      const newStart = event.target.value;
 
-    setError('');
-    setStart(newStart);
+      setError('');
+      setStart(newStart);
 
-    const parsedStart = parseTime(newStart);
-    const parsedEnd = parseTime(end);
-    if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
-      setError('Start time must be before end time.');
-    }
-  }
-
-  function handleEndChange(event: ChangeEvent<HTMLInputElement>): void {
-    const newEnd = event.target.value;
-
-    setError('');
-    setEnd(newEnd);
-
-    const parsedStart = parseTime(start);
-    const parsedEnd = parseTime(newEnd);
-    if (parsedStart !== -1 && parsedEnd <= parsedStart) {
-      setError('Start time must be before end time.');
-    }
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
-    if (event.key === 'Enter') {
-      if (!submitDisabled) {
-        onSubmit();
+      const parsedStart = parseTime(newStart);
+      const parsedEnd = parseTime(end);
+      if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
+        setError('Start time must be before end time.');
       }
+    },
+    [end, parseTime]
+  );
 
-      event.preventDefault();
-    }
-  }
+  const handleEndChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      const newEnd = event.target.value;
+
+      setError('');
+      setEnd(newEnd);
+
+      const parsedStart = parseTime(start);
+      const parsedEnd = parseTime(newEnd);
+      if (parsedStart !== -1 && parsedEnd <= parsedStart) {
+        setError('Start time must be before end time.');
+      }
+    },
+    [start, parseTime]
+  );
 
   const onSubmit = useCallback((): void => {
     const eventId = id ?? new Date().getTime().toString();
@@ -128,8 +128,22 @@ export default function EventAdd({
     events,
     colorMap,
     patchSchedule,
+    parseTime,
     id,
   ]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>): void => {
+      if (event.key === 'Enter') {
+        if (!submitDisabled) {
+          onSubmit();
+        }
+
+        event.preventDefault();
+      }
+    },
+    [onSubmit, submitDisabled]
+  );
 
   return (
     <div className={classes('EventAdd', className)}>

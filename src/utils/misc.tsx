@@ -23,10 +23,15 @@ export const stringToTime = (string: string): number => {
   return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
-export const timeToString = (time: number, ampm = true): string => {
+export const timeToString = (
+  time: number,
+  ampm = true,
+  leadingZero = false
+): string => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
-  const hh = hour > 12 ? hour - 12 : hour;
+  const h = hour > 12 ? hour - 12 : hour;
+  const hh = leadingZero ? `${hour}`.padStart(2, '0') : h;
   const mm = `${minute}`.padStart(2, '0');
   const A = `${hour < 12 ? 'a' : 'p'}m`;
   return ampm ? `${hh}:${mm} ${A}` : `${hh}:${mm}`;
