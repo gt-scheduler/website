@@ -9,17 +9,15 @@ export type CourseNavMenuProps = {
   items: string[];
   currentItem: number;
   onChangeItem: (next: number) => void;
-  style?: React.CSSProperties;
 };
 
 export default function CourseNavMenu({
   items,
   currentItem,
   onChangeItem,
-  style,
 }: CourseNavMenuProps): React.ReactElement {
   return (
-    <div className="course-nav-menu" style={style}>
+    <div className="courseNavMenu">
       {items.map((item, idx) => (
         <Tab
           label={item}
@@ -29,7 +27,6 @@ export default function CourseNavMenu({
             'course-nav-button',
             currentItem === idx && 'active'
           )}
-          style={style}
         />
       ))}
     </div>

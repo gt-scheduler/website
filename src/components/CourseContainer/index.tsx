@@ -15,25 +15,23 @@ export default function CourseContainer(): React.ReactElement {
 
   return (
     <div className="CourseContainer">
-      <div className="CourseNavMenu">
-        <CourseNavMenu
-          items={courseTabs}
-          currentItem={currentTab}
-          onChangeItem={setCurrentTab}
-        />
-        {courseTabs[currentTab] === courseTabs[0] ? (
-          <div className="scroller">
-            <div className="course-list">
-              {desiredCourses.map((courseId) => {
-                return <Course courseId={courseId} key={courseId} />;
-              })}
-            </div>
-            <CourseAdd className="course-add" />
+      <CourseNavMenu
+        items={courseTabs}
+        currentItem={currentTab}
+        onChangeItem={setCurrentTab}
+      />
+      {courseTabs[currentTab] === courseTabs[0] ? (
+        <div className="scroller">
+          <div className="course-list">
+            {desiredCourses.map((courseId) => {
+              return <Course courseId={courseId} key={courseId} />;
+            })}
           </div>
-        ) : (
-          <div />
-        )}
-      </div>
+          <CourseAdd className="course-add" />
+        </div>
+      ) : (
+        <div className="scroller" />
+      )}
       <Button
         className="updated-at"
         href="https://github.com/gt-scheduler/crawler"
