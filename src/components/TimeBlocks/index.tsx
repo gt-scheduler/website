@@ -17,6 +17,13 @@ export interface TimeBlockPosition {
   crn: string;
 }
 
+export interface EventTimeBlockPosition {
+  rowIndex: number;
+  rowSize: number;
+  period: Period;
+  id: string;
+}
+
 export type SizeInfo = Record<string, Record<string, TimeBlockPosition>>;
 
 export type TimeBlocksProps = {
