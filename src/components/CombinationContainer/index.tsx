@@ -22,7 +22,14 @@ const AutoSizer = _AutoSizer as unknown as React.ComponentType<AutoSizerProps>;
 
 export default function CombinationContainer(): React.ReactElement {
   const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, sortingOptionIndex },
+    {
+      oscar,
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      events,
+      sortingOptionIndex,
+    },
     { patchSchedule },
   ] = useContext(ScheduleContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
@@ -33,8 +40,9 @@ export default function CombinationContainer(): React.ReactElement {
   }, []);
 
   const combinations = useMemo(
-    () => oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns),
-    [oscar, desiredCourses, pinnedCrns, excludedCrns]
+    () =>
+      oscar.getCombinations(desiredCourses, pinnedCrns, excludedCrns, events),
+    [oscar, desiredCourses, pinnedCrns, excludedCrns, events]
   );
   const sortedCombinations = useMemo(
     () => oscar.sortCombinations(combinations, sortingOptionIndex),
