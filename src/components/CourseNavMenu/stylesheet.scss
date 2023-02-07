@@ -1,0 +1,25 @@
+.courseNavMenu {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    .course-nav-button {
+        position: relative;
+        overflow: hidden;
+        justify-content: flex-start;
+
+        // Left-align the buttons with the close button
+        padding-left: 24px;
+        padding-right: 24px;
+
+        // Increase the size of the tap target
+        padding-top: 16px;
+        padding-bottom: 16px;
+
+        // Add an active background color
+        background-color: transparent;
+        transition: background-color 0.2s linear;
+
+    }
+}
