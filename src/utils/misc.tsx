@@ -4,11 +4,19 @@ import { DelayFactory } from 'exponential-backoff/dist/delay/delay.factory';
 import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
+import { Immutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
 import { ErrorWithFields, softError } from '../log';
-import { ICS, Period, PrerequisiteClause, Theme } from '../types';
+import {
+  Event,
+  ICS,
+  Meeting,
+  Period,
+  PrerequisiteClause,
+  Theme,
+} from '../types';
 import ics from '../vendor/ics';
 
 export const stringToTime = (string: string): number => {
@@ -23,10 +31,15 @@ export const stringToTime = (string: string): number => {
   return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
 };
 
-export const timeToString = (time: number, ampm = true): string => {
+export const timeToString = (
+  time: number,
+  ampm = true,
+  leadingZero = false
+): string => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
-  const hh = hour > 12 ? hour - 12 : hour;
+  const h = hour > 12 ? hour - 12 : hour;
+  const hh = leadingZero ? `${hour}`.padStart(2, '0') : h;
   const mm = `${minute}`.padStart(2, '0');
   const A = `${hour < 12 ? 'a' : 'p'}m`;
   return ampm ? `${hh}:${mm} ${A}` : `${hh}:${mm}`;
@@ -58,21 +71,34 @@ export const getContentClassName = (color: string | undefined): string => {
     : 'dark-content';
 };
 
+export const hasConflictBetweenMeetings = (
+  meeting1: Meeting | Immutable<Event>,
+  meeting2: Meeting | Immutable<Event>
+): boolean | undefined =>
+  meeting1.period &&
+  meeting2.period &&
+  DAYS.some(
+    (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
+  ) &&
+  meeting1.period.start < meeting2.period.end &&
+  meeting2.period.start < meeting1.period.end;
+
 export const hasConflictBetween = (
   section1: Section,
   section2: Section
 ): boolean =>
   section1.meetings.some((meeting1) =>
-    section2.meetings.some(
-      (meeting2) =>
-        meeting1.period &&
-        meeting2.period &&
-        DAYS.some(
-          (day) => meeting1.days.includes(day) && meeting2.days.includes(day)
-        ) &&
-        meeting1.period.start < meeting2.period.end &&
-        meeting2.period.start < meeting1.period.end
+    section2.meetings.some((meeting2) =>
+      hasConflictBetweenMeetings(meeting1, meeting2)
     )
+  );
+
+export const hasConflictBetweenSectionAndEvent = (
+  section: Section,
+  event: Immutable<Event>
+): boolean =>
+  section.meetings.some((meeting) =>
+    hasConflictBetweenMeetings(meeting, event)
   );
 
 export const classes = (
