@@ -1,8 +1,9 @@
+import { castDraft } from 'immer';
 import React, { useContext } from 'react';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
-import { TimeBlocks } from '..';
+import { TimeBlocks, EventBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
 import {
   makeSizeInfoKey,
@@ -307,6 +308,30 @@ export default function Calendar({
                 sizeInfo={crnSizeInfo[crn] ?? {}}
               />
             ))}
+        {events &&
+          events.map((event) => (
+            <EventBlocks
+              event={castDraft(event)}
+              capture={capture}
+              sizeInfo={eventSizeInfo[event.id] ?? {}}
+              includeDetailsPopover={!isAutosized && !capture}
+              includeContent={!preview}
+              canBeTabFocused={!isAutosized && !capture}
+              deviceHasHover={deviceHasHover}
+              selectedMeeting={
+                selectedMeeting !== null && selectedMeeting[0] === event.id
+                  ? selectedMeeting[2]
+                  : null
+              }
+              onSelectMeeting={(meeting: string | null): void => {
+                if (meeting === null) {
+                  setSelectedMeeting(null);
+                } else {
+                  setSelectedMeeting([event.id, 0, meeting]);
+                }
+              }}
+            />
+          ))}
       </div>
     </div>
   );
