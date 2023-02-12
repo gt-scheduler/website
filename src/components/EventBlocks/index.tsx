@@ -5,8 +5,7 @@ import { useRootClose } from 'react-overlays';
 import { classes, getContentClassName, periodToString } from '../../utils/misc';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
-import { Meeting, Period, Event } from '../../types';
-import { Section } from '../../data/beans';
+import { Period, Event } from '../../types';
 
 import './stylesheet.scss';
 
@@ -76,6 +75,7 @@ export default function EventBlocks({
             period={event.period}
             days={event.days}
             sizeInfo={sizeInfoPeriodDay}
+            includeTime={event.period.end - event.period.start >= 30}
             includeDetailsPopover={includeDetailsPopover}
             includeContent={includeContent}
             isSelected={selectedMeeting != null && selectedMeeting === day}
@@ -94,7 +94,6 @@ export default function EventBlocks({
           />
         );
       })}
-      ;
     </div>
   );
 }
@@ -107,6 +106,7 @@ type MeetingDayBlockProps = {
   days: string[];
   sizeInfo: EventBlockPosition;
   canBeTabFocused: boolean;
+  includeTime: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
   isSelected: boolean;
@@ -122,6 +122,7 @@ function MeetingDayBlock({
   days,
   sizeInfo,
   canBeTabFocused = false,
+  includeTime,
   includeDetailsPopover,
   includeContent,
   isSelected,
@@ -189,9 +190,11 @@ function MeetingDayBlock({
         {includeContent && (
           <div className="meeting-wrapper">
             <div className="ids">
-              <span className="course-id">{name}</span>
+              <span className="event-id">{name}</span>
             </div>
-            <span className="period">{periodToString(period)}</span>
+            {includeTime && (
+              <span className="period">{periodToString(period)}</span>
+            )}
           </div>
         )}
       </BlockElement>
@@ -245,7 +248,7 @@ function DetailsPopoverContent({
   days,
 }: DetailsPopoverContentProps): React.ReactElement {
   return (
-    <table>
+    <table className="details">
       <tbody>
         <tr>
           <td>

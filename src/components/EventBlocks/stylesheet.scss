@@ -133,7 +133,7 @@
       }
 
       .ids {
-        .course-id {
+        .event-id {
           flex: 1;
         }
       }
@@ -144,4 +144,9 @@
       }
     }
   }
+}
+
+.details tbody tr td {
+  max-width: calc(max(200px, 20vw));
+  overflow-wrap: break-word;
 }
