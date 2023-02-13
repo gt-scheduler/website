@@ -24,5 +24,5 @@ export { default as Tab } from './Tab';
 export { default as TimeBlocks } from './TimeBlocks';
 export { default as EventBlocks } from './EventBlocks';
 export { default as Attribution } from './Attribution';
-export { default as CustomEvent } from './Event';
+export { default as Event } from './Event';
 export { default as CourseNavMenu } from './CourseNavMenu';
