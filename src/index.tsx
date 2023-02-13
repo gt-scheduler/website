@@ -15,9 +15,6 @@ if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
   console.log('Initializing Sentry');
 
-  // eslint-disable-next-line no-console
-  console.log('Preview test - ', process.env['REACT_APP_PREVIEW']);
-
   Sentry.init({
     dsn: 'https://8955ef982197469e97c7644a8c090db1@o552970.ingest.sentry.io/5679614',
     integrations: [new Integrations.BrowserTracing()],

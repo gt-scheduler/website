@@ -6,40 +6,37 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { castDraft } from 'immer';
+import { Immutable, castDraft } from 'immer';
 
 import Button from '../Button';
 import { classes, getRandomColor, timeToString } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
+import { Event as EventData } from '../../types';
 
 import './stylesheet.scss';
 
 export type EventAddProps = {
   className?: string;
-  id?: string;
-  name?: string;
-  startTime?: number;
-  endTime?: number;
-  days?: string[];
+  event?: Immutable<EventData>;
+  setFormShown?: (next: boolean) => void;
 };
 
 export default function EventAdd({
   className,
-  id,
-  name = '',
-  startTime = -1,
-  endTime = -1,
-  days = [],
+  event,
+  setFormShown,
 }: EventAddProps): React.ReactElement {
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
-  const [eventName, setEventName] = useState(name);
-  const [selectedTags, setSelectedTags] = useState(days);
+  const [eventName, setEventName] = useState(event?.name || '');
+  const [selectedTags, setSelectedTags] = useState(
+    event?.days ? [...event.days] : []
+  );
   const [start, setStart] = useState(
-    startTime === -1 ? '' : timeToString(startTime, false, true)
+    event?.period.start ? timeToString(event.period.start, false, true) : ''
   );
   const [end, setEnd] = useState(
-    endTime === -1 ? '' : timeToString(endTime, false, true)
+    event?.period.end ? timeToString(event.period.end, false, true) : ''
   );
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
@@ -68,8 +65,8 @@ export default function EventAdd({
   }, []);
 
   const handleStartChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>): void => {
-      const newStart = event.target.value;
+    (e: ChangeEvent<HTMLInputElement>): void => {
+      const newStart = e.target.value;
 
       setError('');
       setStart(newStart);
@@ -84,8 +81,8 @@ export default function EventAdd({
   );
 
   const handleEndChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>): void => {
-      const newEnd = event.target.value;
+    (e: ChangeEvent<HTMLInputElement>): void => {
+      const newEnd = e.target.value;
 
       setError('');
       setEnd(newEnd);
@@ -100,27 +97,52 @@ export default function EventAdd({
   );
 
   const onSubmit = useCallback((): void => {
-    const eventId = id ?? new Date().getTime().toString();
-    const event = {
-      id: eventId,
-      name: eventName,
-      period: {
-        start: parseTime(start),
-        end: parseTime(end),
-      },
-      days: selectedTags,
-    };
+    if (event) {
+      const newEvents = castDraft(events).map((existingEvent) =>
+        existingEvent.id === event.id
+          ? {
+              ...existingEvent,
+              name: eventName,
+              period: {
+                start: parseTime(start),
+                end: parseTime(end),
+              },
+              days: selectedTags,
+            }
+          : existingEvent
+      );
 
-    patchSchedule({
-      events: [...castDraft(events), event],
-      colorMap: { ...colorMap, [eventId]: getRandomColor() },
-    });
+      patchSchedule({
+        events: newEvents,
+      });
 
-    setEventName('');
-    setSelectedTags([]);
-    setStart('');
-    setEnd('');
+      if (setFormShown) {
+        setFormShown(false);
+      }
+    } else {
+      const eventId = new Date().getTime().toString();
+      const newEvent = {
+        id: eventId,
+        name: eventName,
+        period: {
+          start: parseTime(start),
+          end: parseTime(end),
+        },
+        days: selectedTags,
+      };
+
+      patchSchedule({
+        events: [...castDraft(events), newEvent],
+        colorMap: { ...colorMap, [eventId]: getRandomColor() },
+      });
+
+      setEventName('');
+      setSelectedTags([]);
+      setStart('');
+      setEnd('');
+    }
   }, [
+    event,
     eventName,
     start,
     end,
@@ -129,17 +151,17 @@ export default function EventAdd({
     colorMap,
     patchSchedule,
     parseTime,
-    id,
+    setFormShown,
   ]);
 
   const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>): void => {
-      if (event.key === 'Enter') {
+    (e: KeyboardEvent<HTMLInputElement>): void => {
+      if (e.key === 'Enter') {
         if (!submitDisabled) {
           onSubmit();
         }
 
-        event.preventDefault();
+        e.preventDefault();
       }
     },
     [onSubmit, submitDisabled]
@@ -162,7 +184,7 @@ export default function EventAdd({
                 <input
                   type="text"
                   value={eventName}
-                  onChange={(event): void => setEventName(event.target.value)}
+                  onChange={(e): void => setEventName(e.target.value)}
                   placeholder="Event Name"
                   onKeyDown={handleKeyDown}
                 />
@@ -238,7 +260,7 @@ export default function EventAdd({
                   disabled={submitDisabled}
                   onClick={onSubmit}
                 >
-                  Add
+                  {event?.id ? 'Save' : 'Add'}
                 </Button>
                 {error && <div className="error">{error}</div>}
               </td>

@@ -7,7 +7,7 @@ import { ScheduleContext } from '../../contexts';
 import {
   makeSizeInfoKey,
   TimeBlockPosition,
-  EventTimeBlockPosition,
+  EventBlockPosition,
 } from '../TimeBlocks';
 import { Period } from '../../types';
 import useMedia from '../../hooks/useMedia';
@@ -50,13 +50,13 @@ export default function Calendar({
   // TimeBlocks, consistent with the rowIndex's and rowSize's of crns
   const eventSizeInfo: Record<
     string,
-    Record<string, Record<string, EventTimeBlockPosition>>
+    Record<string, Record<string, EventBlockPosition>>
   > = {};
 
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
   const updateJoinedRowSizes = (
-    periodInfos: (TimeBlockPosition | EventTimeBlockPosition)[],
+    periodInfos: (TimeBlockPosition | EventBlockPosition)[],
     seen: Set<string>,
     curCrn: string,
     curPeriod: Period,
@@ -134,7 +134,6 @@ export default function Calendar({
   // next time block's rowSize and rowIndex (1 more than
   // greatest of already processed connected blocks), updating
   // the processed connected blocks to match its rowSize
-
   meetings.forEach((meeting) => {
     const { period } = meeting;
     if (period == null) return;
@@ -147,14 +146,12 @@ export default function Calendar({
         .flatMap<TimeBlockPosition>((info) => (info == null ? [] : [info]));
 
       const eventPeriodInfos = Object.values(eventSizeInfo)
-        .flatMap<EventTimeBlockPosition | undefined>((days) =>
+        .flatMap<EventBlockPosition | undefined>((days) =>
           days != null ? Object.values(days[day] ?? {}) : []
         )
-        .flatMap<EventTimeBlockPosition>((info) =>
-          info == null ? [] : [info]
-        );
+        .flatMap<EventBlockPosition>((info) => (info == null ? [] : [info]));
 
-      const dayPeriodInfos: (TimeBlockPosition | EventTimeBlockPosition)[] =
+      const dayPeriodInfos: (TimeBlockPosition | EventBlockPosition)[] =
         crnPeriodInfos;
       dayPeriodInfos.push(...eventPeriodInfos);
 
