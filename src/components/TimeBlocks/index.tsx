@@ -17,7 +17,7 @@ export interface TimeBlockPosition {
   crn: string;
 }
 
-export interface EventTimeBlockPosition {
+export interface EventBlockPosition {
   rowIndex: number;
   rowSize: number;
   period: Period;
