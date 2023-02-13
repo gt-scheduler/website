@@ -53,7 +53,7 @@ export default function EventBlocks({
   selectedMeeting,
   onSelectMeeting,
 }: EventBlocksProps): React.ReactElement | null {
-  const [{ oscar, colorMap }] = useContext(ScheduleContext);
+  const [{ colorMap }] = useContext(ScheduleContext);
 
   const color = colorMap[event.id];
 
