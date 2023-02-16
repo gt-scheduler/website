@@ -3,7 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { ErrorWithFields, softError } from '../log';
-import { AnyScheduleData } from './types';
+import { AnyScheduleData, FriendsData } from './types';
 
 // This data is not secret; it is included in the application bundle.
 // Supply these environment variables when developing locally.
@@ -35,8 +35,12 @@ let db: firebase.firestore.Firestore =
   null as unknown as firebase.firestore.Firestore;
 type SchedulesCollection =
   firebase.firestore.CollectionReference<AnyScheduleData>;
+type FriendsCollection = firebase.firestore.CollectionReference<FriendsData>;
 let schedulesCollection: SchedulesCollection =
   null as unknown as SchedulesCollection;
+
+let friendsCollection: FriendsCollection = null as unknown as FriendsCollection;
+
 /* eslint-enable import/no-mutable-exports */
 if (isAuthEnabled) {
   const app = firebase.initializeApp(firebaseConfig);
@@ -46,6 +50,8 @@ if (isAuthEnabled) {
   schedulesCollection = db.collection(
     SCHEDULE_COLLECTION
   ) as SchedulesCollection;
+
+  friendsCollection = db.collection('friends') as FriendsCollection;
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
     softError(
@@ -57,7 +63,7 @@ if (isAuthEnabled) {
   });
 }
 
-export { auth, db, schedulesCollection };
+export { auth, db, schedulesCollection, friendsCollection };
 export { firebase };
 
 // Configure the enabled auth providers that firebase UI displays as options

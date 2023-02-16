@@ -23,6 +23,7 @@ import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
 import { AccountContextValue, SignedIn } from '../../contexts/account';
 import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
 import useRawScheduleDataFromFirebase from '../../data/hooks/useRawScheduleDataFromFirebase';
+import useRawFriendsDataFromFirebase from '../../data/hooks/useRawFriendsDataFromFirebase';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop

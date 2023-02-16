@@ -1,6 +1,5 @@
 import { Immutable } from 'immer';
 
-import { Event } from '../types';
 import { generateRandomId } from '../utils/misc';
 
 // This file defines all of the possible types that the schedule data can take
@@ -37,6 +36,10 @@ export type AnyScheduleData = Version1ScheduleDataOrNewer;
 export const defaultScheduleData: Immutable<ScheduleData> = {
   terms: {},
   version: 3,
+};
+
+export const defaultFriendsData: Immutable<FriendsData> = {
+  terms: [],
 };
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
@@ -141,4 +144,8 @@ export interface Version3Schedule {
   events: Event[];
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
+}
+
+export interface FriendsData {
+  terms: Record<string, Record<string, string[]>>[];
 }
