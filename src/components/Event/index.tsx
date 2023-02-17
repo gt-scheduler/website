@@ -6,11 +6,15 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, getContentClassName, periodToString } from '../../utils/misc';
+import {
+  classes,
+  getContentClassName,
+  periodToString,
+  daysToString,
+} from '../../utils/misc';
 import { ActionRow, EventAdd, Palette } from '..';
 import { ScheduleContext } from '../../contexts';
 import { Event as EventData } from '../../types';
-import { DAYS } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -72,10 +76,9 @@ export default function Event({
           >
             <div className="event-row">
               <span>
-                {[
-                  DAYS.filter((day) => new Set(event.days).has(day)).join(''),
-                  periodToString(event.period),
-                ].join(' ')}
+                {[daysToString(event.days), periodToString(event.period)].join(
+                  ' '
+                )}
               </span>
             </div>
             {paletteShown && (
