@@ -46,7 +46,7 @@ export default function CombinationContainer(): React.ReactElement {
   );
   const sortedCombinations = useMemo(
     () => oscar.sortCombinations(combinations, sortingOptionIndex, events),
-    [oscar, combinations, sortingOptionIndex]
+    [oscar, combinations, sortingOptionIndex, events]
   );
 
   return (
