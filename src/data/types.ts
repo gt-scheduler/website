@@ -1,5 +1,5 @@
 import { Immutable } from 'immer';
-
+import { Event } from '../types';
 import { generateRandomId } from '../utils/misc';
 
 // This file defines all of the possible types that the schedule data can take

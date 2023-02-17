@@ -9,7 +9,7 @@ import {
   TimeBlockPosition,
   EventBlockPosition,
 } from '../TimeBlocks';
-import { Period } from '../../types';
+import { Event, Period } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
