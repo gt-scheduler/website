@@ -1,4 +1,5 @@
 import { Immutable } from 'immer';
+
 import { Event } from '../types';
 import { generateRandomId } from '../utils/misc';
 

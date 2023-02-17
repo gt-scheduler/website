@@ -1,6 +1,7 @@
 import { Immutable } from 'immer';
 import { useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
+
 import { renderDataNotPersistentNotification } from '../../components/DataNotPersistentNotification';
 import { LoadingState } from '../../types';
 import { FriendsData } from '../types';
