@@ -1,4 +1,5 @@
 import { Immutable } from 'immer';
+
 import { Combination, Event } from '../../types';
 
 export default class SortingOption {
