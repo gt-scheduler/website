@@ -1,0 +1,245 @@
+.invitation-modal {
+    margin: -20px;
+}
+
+.invitation-modal-content {
+    text-align: center;
+    color: white;
+}
+
+.email-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding-bottom: 5px;
+}
+
+// form {
+//     display: flex;
+//     flex-direction: column;
+// }
+
+//Style for email input
+
+.email-input {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    width: 282px;
+    height: 24px;
+}
+
+input[type=email] {
+    padding: 15px;
+    border-radius: 6px;
+    background-color: rgb(35, 35, 35);
+}
+
+input[type=email]:focus {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    outline: none
+}
+
+.valid-email {
+    text-align: start;
+    color: rgba(34, 181, 49, 0.75);
+    font-size: 12px;
+    font-weight: bold;
+    padding-top: 3px;
+    opacity: 1;
+}
+
+.invalid-email {
+    text-align: start;
+    color: rgba(255, 0, 0, 0.5);
+    font-size: 12px;
+    font-weight: bold;
+    padding-top: 3px;
+    opacity: 1;
+}
+
+.email:has(+.invalid-email) {
+    border: 1px solid rgba(255, 0, 0, 0.5);
+
+}
+
+input:invalid {
+    border: 1px solid rgba(255, 0, 0, 0.5);
+}
+
+.dropdown {
+    width: 282px;
+}
+
+#recent-invites {
+    appearance: none;
+    width: 282px;
+    height: 24px;
+    min-width: 282px;
+    background-color: rgb(51, 51, 51);
+}
+
+.options {
+    width: 282px;
+}
+
+.send-button {
+    width: 86px;
+    height: 24px;
+    font-size: 14px;
+    color: white;
+    border-radius: 6px;
+    background-color: #C56E5B;
+    border: none;
+    margin-top: 4px;
+}
+
+button:hover {
+    background-color: #E2944B;
+}
+
+p {
+    padding: 20px;
+    padding-bottom: 0px;
+}
+
+.divider {
+    width: 480px;
+    height: 1.5px;
+    border: none;
+    background-color: rgb(80, 80, 80);
+    margin: -20px;
+    margin-top: 10px;
+}
+
+//Style for Invited Users
+
+.shared-emails {
+    height: 148px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 10px;
+    padding-top: 0px;
+    margin-left: -20px;
+    margin-right: -20px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.individual-shared-email {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: rgb(67, 67, 67);
+    border-radius: 16px;
+    height: 26px;
+    width: max-content;
+    max-width: 100%;
+    min-width: min-content;
+    padding-left: 8px;
+    padding-right: 6px;
+    padding-top: 1px;
+    padding-bottom: 10px;
+    margin: 5px;
+}
+
+.email-and-status {
+    display: flex;
+    flex-direction: column;
+    padding-top: 15px;
+}
+
+.status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-top: -60px;
+    padding-top: 10px;
+    visibility: hidden;
+}
+
+.status-text {
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 101px;
+    height: 22px;
+    border-radius: 4px;
+    padding: 3px;
+    font-size: 12px;
+}
+
+.caret-down {
+    width: 8px;
+    height: 8px;
+    margin-top: -23px;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.caret-down-button {
+    width: 8px;
+    height: 0px;
+    padding-bottom: 0px;
+    background-color: transparent;
+}
+
+.caret-down-button:hover {
+    background-color: transparent;
+}
+
+.individual-shared-email:hover+.status {
+    visibility: visible;
+}
+
+#Pending {
+    border-color: rgba(205, 165, 24, 0.5);
+    border-style: solid;
+    border-width: 1px;
+}
+
+
+#Accepted {
+    border-color: rgba(34, 181, 49, 0.5);
+    border-style: solid;
+    border-width: 1px;
+}
+
+
+.email-text {
+    padding-top: 0.5px;
+}
+
+.remove {
+    width: 10px;
+    height: 10px;
+    padding: 15px;
+    color: rgb(67, 67, 67);
+    position: relative;
+    display: inline-flex;
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    padding: 10px;
+    position: absolute;
+    position: absolute;
+    color: white;
+}
+
+.button-remove {
+    width: 10px;
+    height: 10px;
+    background-color: transparent;
+    position: relative;
+}
+
+.button-remove:hover {
+    .circle {
+        color: rgba(255, 255, 255, 0.25);
+    }
+
+    background-color: transparent;
+}
