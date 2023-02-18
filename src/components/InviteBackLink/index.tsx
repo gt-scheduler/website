@@ -18,10 +18,12 @@ export default function InviteBackLink(): React.ReactElement {
   const { id } = useParams();
 
   useEffect(() => {
-    sendInvite(id)
-      .then(() => navigate('/'))
-      .catch(() => navigate('/'));
-  }, []);
+    if (id && navigate) {
+      sendInvite(id)
+        .then(() => navigate('/'))
+        .catch(() => navigate('/'));
+    }
+  }, [id, navigate]);
 
   return <div />;
 }
