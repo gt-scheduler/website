@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
 import App from '../App';
 import InviteBackLink from '../InviteBackLink';
 
