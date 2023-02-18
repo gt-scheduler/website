@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 
-import App from './components/App';
+import RouterComponent from './components/RouterComponent';
 import { ErrorWithFields } from './log';
 
 import 'normalize.css';
@@ -31,4 +31,4 @@ if (container === null) {
   });
 }
 const root = createRoot(container);
-root.render(<App />);
+root.render(<RouterComponent />);

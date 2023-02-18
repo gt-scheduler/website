@@ -25,3 +25,5 @@ export { default as TimeBlocks } from './TimeBlocks';
 export { default as Attribution } from './Attribution';
 export { default as Event } from './Event';
 export { default as CourseNavMenu } from './CourseNavMenu';
+export { default as InviteBackLink } from './InviteBackLink';
+export { default as RouterComponent } from './RouterComponent';

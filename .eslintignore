@@ -9,3 +9,4 @@
 /tests/performance/**
 /tmp/**
 /src/vendor/**
+/src/components/CourseContainer/index.tsx
