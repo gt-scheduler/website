@@ -1,4 +1,3 @@
-import { castDraft } from 'immer';
 import React, { useContext } from 'react';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
@@ -306,7 +305,7 @@ export default function Calendar({
         {events &&
           events.map((event) => (
             <EventBlocks
-              event={castDraft(event)}
+              event={event}
               capture={capture}
               sizeInfo={eventSizeInfo[event.id] ?? {}}
               includeDetailsPopover={!isAutosized && !capture}

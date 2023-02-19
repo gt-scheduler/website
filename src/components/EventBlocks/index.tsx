@@ -1,4 +1,5 @@
 import React from 'react';
+import { Immutable } from 'immer';
 
 import { daysToString, periodToString } from '../../utils/misc';
 import { TimeBlocks } from '..';
@@ -16,7 +17,7 @@ export interface EventBlockPosition extends TimeBlockPosition {
 
 export type EventBlocksProps = {
   className?: string;
-  event: Event;
+  event: Immutable<Event>;
   capture: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;

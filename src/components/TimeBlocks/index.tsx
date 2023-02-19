@@ -32,7 +32,7 @@ export type TimeBlocksProps = {
   id: string;
   meetingIndex: number;
   period: Period;
-  days: string[];
+  days: string[] | readonly string[];
   contentHeader: TimeBlockContent[];
   contentBody: TimeBlockContent[];
   popover: TimeBlockPopover[];
