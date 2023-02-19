@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
-import { TimeBlocks, SectionBlocks, EventBlocks } from '..';
+import { SectionBlocks, EventBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
 import { makeSizeInfoKey } from '../TimeBlocks';
 import { EventBlockPosition } from '../EventBlocks';
