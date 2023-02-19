@@ -48,7 +48,6 @@ export default function SectionBlocks({
 
   const section = oscar.findSection(crn);
   if (section == null) return null;
-  const { id } = section.course;
 
   return (
     <div>
@@ -59,7 +58,7 @@ export default function SectionBlocks({
         return (
           <TimeBlocks
             className={className}
-            id={id}
+            id={section.course.id}
             meetingIndex={i}
             period={period}
             days={meeting.days}
