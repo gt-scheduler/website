@@ -2,14 +2,17 @@
 
 .mobile .TimeBlocks:not(.capture) .meeting .meeting-wrapper {
   .ids {
-    .event-name {
+    .course-id {
       flex: 1;
     }
+
+    .section-id {
+      display: none;
+    }
   }
-}
 
-
-.popover tbody tr td {
-  max-width: calc(max(200px, 15vw));
-  overflow-wrap: break-word;
+  .where,
+  .instructors {
+    display: none;
+  }
 }

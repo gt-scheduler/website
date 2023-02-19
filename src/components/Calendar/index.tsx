@@ -3,13 +3,11 @@ import React, { useContext } from 'react';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
-import { TimeBlocks, EventBlocks } from '..';
+import { TimeBlocks, SectionBlocks, EventBlocks } from '..';
 import { ScheduleContext } from '../../contexts';
-import {
-  makeSizeInfoKey,
-  TimeBlockPosition,
-  EventBlockPosition,
-} from '../TimeBlocks';
+import { makeSizeInfoKey } from '../TimeBlocks';
+import { EventBlockPosition } from '../EventBlocks';
+import { SectionBlockPosition } from '../SectionBlocks';
 import { Period } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
@@ -44,7 +42,7 @@ export default function Calendar({
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
   const crnSizeInfo: Record<
     string,
-    Record<string, Record<string, TimeBlockPosition>>
+    Record<string, Record<string, SectionBlockPosition>>
   > = {};
 
   // Contains the rowIndex's and rowSize's passed into each custom event's
@@ -57,7 +55,7 @@ export default function Calendar({
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
   const updateJoinedRowSizes = (
-    periodInfos: (TimeBlockPosition | EventBlockPosition)[],
+    periodInfos: (SectionBlockPosition | EventBlockPosition)[],
     seen: Set<string>,
     curCrn: string,
     curPeriod: Period,
@@ -141,10 +139,10 @@ export default function Calendar({
 
     meeting.days.forEach((day) => {
       const crnPeriodInfos = Object.values(crnSizeInfo)
-        .flatMap<TimeBlockPosition | undefined>((days) =>
+        .flatMap<SectionBlockPosition | undefined>((days) =>
           days != null ? Object.values(days[day] ?? {}) : []
         )
-        .flatMap<TimeBlockPosition>((info) => (info == null ? [] : [info]));
+        .flatMap<SectionBlockPosition>((info) => (info == null ? [] : [info]));
 
       const eventPeriodInfos = Object.values(eventSizeInfo)
         .flatMap<EventBlockPosition | undefined>((days) =>
@@ -152,7 +150,7 @@ export default function Calendar({
         )
         .flatMap<EventBlockPosition>((info) => (info == null ? [] : [info]));
 
-      const dayPeriodInfos: (TimeBlockPosition | EventBlockPosition)[] =
+      const dayPeriodInfos: (SectionBlockPosition | EventBlockPosition)[] =
         crnPeriodInfos;
       dayPeriodInfos.push(...eventPeriodInfos);
 
@@ -268,7 +266,7 @@ export default function Calendar({
       )}
       <div className="meetings">
         {pinnedCrnsByFirstMeeting.map((crn) => (
-          <TimeBlocks
+          <SectionBlocks
             key={crn}
             crn={crn}
             capture={capture}
@@ -295,7 +293,7 @@ export default function Calendar({
           overlayCrns
             .filter((crn) => !pinnedCrns.includes(crn))
             .map((crn) => (
-              <TimeBlocks
+              <SectionBlocks
                 key={crn}
                 crn={crn}
                 overlay={!preview}
@@ -317,14 +315,14 @@ export default function Calendar({
               deviceHasHover={deviceHasHover}
               selectedMeeting={
                 selectedMeeting !== null && selectedMeeting[0] === event.id
-                  ? selectedMeeting[2]
+                  ? [selectedMeeting[1], selectedMeeting[2]]
                   : null
               }
-              onSelectMeeting={(meeting: string | null): void => {
+              onSelectMeeting={(meeting: [number, string] | null): void => {
                 if (meeting === null) {
                   setSelectedMeeting(null);
                 } else {
-                  setSelectedMeeting([event.id, 0, meeting]);
+                  setSelectedMeeting([event.id, meeting[0], meeting[1]]);
                 }
               }}
             />
