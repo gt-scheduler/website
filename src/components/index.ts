@@ -23,6 +23,6 @@ export { default as Select } from './Select';
 export { default as Tab } from './Tab';
 export { default as TimeBlocks } from './TimeBlocks';
 export { default as Attribution } from './Attribution';
-export { default as CustomEvent } from './Event';
+export { default as Event } from './Event';
 export { default as CourseNavMenu } from './CourseNavMenu';
 export { default as InvitationModal } from './InvitationModal';
