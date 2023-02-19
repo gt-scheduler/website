@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const sendInvite = async (inviteId: string | undefined): Promise<void> =>
+const handleInvite = async (inviteId: string | undefined): Promise<void> =>
+  // The link should be changed to prod link, or we can choose the link based on environment
   axios.post(
     'http://127.0.0.1:5001/gt-scheduler-web-prod/us-central1/handleFriendInvitation',
     { inviteId },
@@ -19,7 +20,7 @@ export default function InviteBackLink(): React.ReactElement {
 
   useEffect(() => {
     if (id && navigate) {
-      sendInvite(id)
+      handleInvite(id)
         .then(() => navigate('/'))
         .catch(() => navigate('/'));
     }

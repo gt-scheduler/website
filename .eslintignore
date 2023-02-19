@@ -9,4 +9,6 @@
 /tests/performance/**
 /tmp/**
 /src/vendor/**
+
+# added this for testing purposes since I was getting a lot of TS errors
 /src/components/CourseContainer/index.tsx

@@ -4,6 +4,7 @@ import ago from 's-ago';
 import { Button, Course, CourseAdd, Event, EventAdd } from '..';
 import { ScheduleContext } from '../../contexts';
 import CourseNavMenu from '../CourseNavMenu';
+// all changes in this file are for testing purposes
 import { auth } from '../../data/firebase';
 
 import 'react-virtualized/styles.css';
