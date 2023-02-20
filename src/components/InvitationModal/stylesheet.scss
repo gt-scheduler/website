@@ -1,245 +1,238 @@
-.invitation-modal {
-    margin: -20px;
-}
+@import "../../variables";
 
-.invitation-modal-content {
-    text-align: center;
-    color: white;
-}
+.modal__content {
+    padding: 0px;
 
-.email-block {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    padding-bottom: 5px;
-}
+    .invitation-modal-content {
+        text-align: center;
+        color: white;
+        height: 320px;
 
-// form {
-//     display: flex;
-//     flex-direction: column;
-// }
+        //Style for email input
+        .top-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 30px 60px 5px 60px;
 
-//Style for email input
+            h2 {
+                color: white !important;
+            }
 
-.email-input {
-    display: flex;
-    flex-direction: column;
-}
+            p {
+                font-size: 13px;
+            }
 
-input {
-    width: 282px;
-    height: 24px;
-}
+            .email-input-block {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-evenly;
+                padding-bottom: 5px;
 
-input[type=email] {
-    padding: 15px;
-    border-radius: 6px;
-    background-color: rgb(35, 35, 35);
-}
+                .email-input {
+                    display: flex;
+                    flex-direction: column;
+                    position: relative;
 
-input[type=email]:focus {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    outline: none
-}
+                    .valid-email {
+                        text-align: start;
+                        color: rgba(34, 181, 49, 0.75);
+                        font-size: 12px;
+                        font-weight: bold;
+                        padding-top: 3px;
+                        opacity: 1;
 
-.valid-email {
-    text-align: start;
-    color: rgba(34, 181, 49, 0.75);
-    font-size: 12px;
-    font-weight: bold;
-    padding-top: 3px;
-    opacity: 1;
-}
+                    }
 
-.invalid-email {
-    text-align: start;
-    color: rgba(255, 0, 0, 0.5);
-    font-size: 12px;
-    font-weight: bold;
-    padding-top: 3px;
-    opacity: 1;
-}
+                    .invalid-email {
+                        text-align: start;
+                        color: rgba(255, 0, 0, 0.5);
+                        font-size: 12px;
+                        font-weight: bold;
+                        padding-top: 3px;
+                        opacity: 1;
+                    }
 
-.email:has(+.invalid-email) {
-    border: 1px solid rgba(255, 0, 0, 0.5);
+                    .email:has(+.invalid-email) {
+                        border: 1px solid rgba(255, 0, 0, 0.5);
 
-}
+                    }
+                }
 
-input:invalid {
-    border: 1px solid rgba(255, 0, 0, 0.5);
-}
+                input[type=email] {
+                    width: 282px;
+                    height: 24px;
+                    padding: 15px;
+                    border-radius: 6px;
+                    background-color: rgb(35, 35, 35);
 
-.dropdown {
-    width: 282px;
-}
+                    &:focus {
+                        border: 1px solid rgba(255, 255, 255, 0.5);
+                        outline: none
+                    }
 
-#recent-invites {
-    appearance: none;
-    width: 282px;
-    height: 24px;
-    min-width: 282px;
-    background-color: rgb(51, 51, 51);
-}
+                    &:invalid {
+                        border: 1px solid rgba(255, 0, 0, 0.5);
+                    }
+                }
 
-.options {
-    width: 282px;
-}
+                .send-button {
+                    width: 86px;
+                    height: 24px;
+                    font-size: 14px;
+                    color: white;
+                    border-radius: 6px;
+                    background-color: #C56E5B;
+                    border: none;
+                    margin-top: 4px;
 
-.send-button {
-    width: 86px;
-    height: 24px;
-    font-size: 14px;
-    color: white;
-    border-radius: 6px;
-    background-color: #C56E5B;
-    border: none;
-    margin-top: 4px;
-}
+                    &:hover {
+                        background-color: #E2944B;
+                    }
+                }
 
-button:hover {
-    background-color: #E2944B;
-}
+            }
+        }
 
-p {
-    padding: 20px;
-    padding-bottom: 0px;
-}
+        //Style for search dropdown
 
-.divider {
-    width: 480px;
-    height: 1.5px;
-    border: none;
-    background-color: rgb(80, 80, 80);
-    margin: -20px;
-    margin-top: 10px;
-}
+        #recent-invites {
+            width: 282px;
+            height: 96px;
+            overflow-y: scroll;
+            border-radius: 4px;
+            background-color: rgb(51, 51, 51);
+            text-align: start;
+            position: absolute;
+            z-index: 2;
+            margin-top: 30px;
 
-//Style for Invited Users
+            .search-option {
+                width: 282px;
+                height: 32px;
+                align-content: start;
+                padding: 5px;
+                padding-left: 15px;
+                position: relative;
 
-.shared-emails {
-    height: 148px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 10px;
-    padding-top: 0px;
-    margin-left: -20px;
-    margin-right: -20px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
+                &.active {
+                    background-color: rgba(83, 83, 83, 1.0);
+                }
 
-.individual-shared-email {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    background-color: rgb(67, 67, 67);
-    border-radius: 16px;
-    height: 26px;
-    width: max-content;
-    max-width: 100%;
-    min-width: min-content;
-    padding-left: 8px;
-    padding-right: 6px;
-    padding-top: 1px;
-    padding-bottom: 10px;
-    margin: 5px;
-}
+                &:hover {
+                    background-color: rgba(83, 83, 83, 0.5);
+                }
+            }
 
-.email-and-status {
-    display: flex;
-    flex-direction: column;
-    padding-top: 15px;
-}
+        }
 
-.status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    margin-top: -60px;
-    padding-top: 10px;
-    visibility: hidden;
-}
+        .divider {
+            height: 1.5px;
+            display: flex;
+            align-items: stretch !important;
+            border: none;
+            background-color: rgb(80, 80, 80);
+        }
 
-.status-text {
-    background-color: rgba(0, 0, 0, 0.8);
-    width: 101px;
-    height: 22px;
-    border-radius: 4px;
-    padding: 3px;
-    font-size: 12px;
-}
+        //Style for Invited Users
 
-.caret-down {
-    width: 8px;
-    height: 8px;
-    margin-top: -23px;
-    color: rgba(0, 0, 0, 0.8);
-}
+        .invited-users {
+            padding-top: 15px;
+        }
 
-.caret-down-button {
-    width: 8px;
-    height: 0px;
-    padding-bottom: 0px;
-    background-color: transparent;
-}
+        .shared-emails {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: start;
+            padding-left: 50px;
+            padding-right: 50px;
+            height: 68px;
+            overflow-y: scroll;
+            overflow-x: hidden;
 
-.caret-down-button:hover {
-    background-color: transparent;
-}
+            .individual-shared-email {
+                @include card;
+                background-color: rgb(67, 67, 67);
+                padding: 4px 8px;
+                height: 26px;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                border-radius: 16px;
+                width: max-content;
+                max-width: 100%;
+                min-width: min-content;
+                font-size: .8em;
+                cursor: pointer;
+            }
+        }
 
-.individual-shared-email:hover+.status {
-    visibility: visible;
-}
+        .email-and-status {
+            display: flex;
+            flex-direction: column;
+        }
 
-#Pending {
-    border-color: rgba(205, 165, 24, 0.5);
-    border-style: solid;
-    border-width: 1px;
-}
+        .status-tooltip {
+            background-color: rgba(0, 0, 0, 0.8);
+            width: 101px;
+            height: 22px;
+            border-radius: 4px;
+            padding: 3px;
+            font-size: 12px;
+            z-index: 2;
+        }
+
+        .email-text {
+            padding-top: 0.5px;
+        }
+
+        .button-remove {
+            width: 10px;
+            height: 10px;
+            background-color: transparent;
+            position: relative;
+            z-index: 1;
+            align-self: center;
+
+            .circle {
+                width: 12px;
+                height: 12px;
+                padding: 10px;
+                position: absolute;
+                position: absolute;
+                color: white;
+            }
+
+            .remove {
+                width: 10px;
+                height: 10px;
+                padding: 15px;
+                color: rgb(67, 67, 67);
+                position: relative;
+                display: inline-flex;
+            }
+
+            &:hover {
+                .circle {
+                    color: rgba(255, 255, 255, 0.25);
+                }
+
+                background-color: transparent;
+            }
+        }
+
+        #Pending {
+            border-color: rgba(205, 165, 24, 0.5);
+            border-style: solid;
+            border-width: 1px;
+        }
 
 
-#Accepted {
-    border-color: rgba(34, 181, 49, 0.5);
-    border-style: solid;
-    border-width: 1px;
-}
-
-
-.email-text {
-    padding-top: 0.5px;
-}
-
-.remove {
-    width: 10px;
-    height: 10px;
-    padding: 15px;
-    color: rgb(67, 67, 67);
-    position: relative;
-    display: inline-flex;
-}
-
-.circle {
-    width: 12px;
-    height: 12px;
-    padding: 10px;
-    position: absolute;
-    position: absolute;
-    color: white;
-}
-
-.button-remove {
-    width: 10px;
-    height: 10px;
-    background-color: transparent;
-    position: relative;
-}
-
-.button-remove:hover {
-    .circle {
-        color: rgba(255, 255, 255, 0.25);
+        #Accepted {
+            border-color: rgba(34, 181, 49, 0.5);
+            border-style: solid;
+            border-width: 1px;
+        }
     }
-
-    background-color: transparent;
 }
