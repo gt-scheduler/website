@@ -20,6 +20,7 @@ import './stylesheet.scss';
  */
 export function InvitationModalContent(): React.ReactElement {
   // Array for testing style of shared emails
+  // eslint-disable-next-line
   const [emails, setEmails] = useState([
     ['user1@example.com', 'Pending'],
     ['user2@example.com', 'Accepted'],
@@ -41,14 +42,17 @@ export function InvitationModalContent(): React.ReactElement {
   const [input, setInput] = useState('');
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
-  let valid = false;
 
   // Boolean to hide and open search dropdown
   const [hidden, setHidden] = useState(true);
 
   // Array for testing dropdown of recent invites
-  const [recentInvites, setRecentInvites] = useState<string[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
+  // eslint-disable-next-line
+  const [recentInvites, setRecentInvites] = useState<string[]>([
+    'user1@example.com',
+    'user2@example.com',
+  ]);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const handleChangeSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     let search = e.target.value.trim();
@@ -63,6 +67,7 @@ export function InvitationModalContent(): React.ReactElement {
   }, []);
 
   const searchResults = useMemo(() => {
+    if (!input) return recentInvites;
     const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(input?.toUpperCase());
     if (!results) {
       return [];
@@ -76,45 +81,41 @@ export function InvitationModalContent(): React.ReactElement {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      if (hidden) return;
       switch (e.key) {
         case 'ArrowDown':
-          if (searchResults.length === 1) {
-            setInput(searchResults[activeIndex] as string);
-          } else {
-            setInput(searchResults[activeIndex + 1] as string);
-            setActiveIndex(Math.min(activeIndex + 1, searchResults.length - 1));
-          }
+          setInput(
+            searchResults[
+              Math.min(activeIndex + 1, searchResults.length - 1)
+            ] as string
+          );
+          setActiveIndex(Math.min(activeIndex + 1, searchResults.length - 1));
           break;
         case 'ArrowUp':
-          setInput(searchResults[activeIndex - 1] as string);
+          setInput(searchResults[Math.max(activeIndex - 1, 0)] as string);
           setActiveIndex(Math.max(activeIndex - 1, 0));
+          break;
+        case 'Enter':
+          setHidden(true);
+          setActiveIndex(-1);
           break;
         default:
           return;
       }
       e.preventDefault();
     },
-    [searchResults, activeIndex]
+    [searchResults, activeIndex, hidden]
   );
 
   function verifyUser(): void {
-    validUsers.forEach((element) => {
-      if (element === input) {
-        valid = true;
-        setValidMessage('Successfully sent!');
-        setValidClassName('valid-email');
-        if (!recentInvites.includes(input)) {
-          setRecentInvites([...recentInvites, input]);
-        }
-        setInput('');
-      }
-      if (!valid) {
-        valid = false;
-        setValidMessage('Invalid Email');
-        setValidClassName('invalid-email');
-      }
-    });
-    setHidden(true);
+    if (validUsers.includes(input)) {
+      setValidMessage('Successfully sent!');
+      setValidClassName('valid-email');
+      setInput('');
+    } else {
+      setValidMessage('Invalid Email');
+      setValidClassName('invalid-email');
+    }
   }
 
   return (
@@ -136,35 +137,27 @@ export function InvitationModalContent(): React.ReactElement {
               className="email"
               placeholder="recipient@example.com"
               list="recent-invites"
-              onChange={(e): void => setInput(e.target.value)}
-              onInput={handleChangeSearch}
+              onChange={handleChangeSearch}
               onKeyDown={handleKeyDown}
+              onBlur={(): void => setHidden(true)}
             />
-            {searchResults.length > 0 && hidden === false ? (
+            {!hidden && (
               <div id="recent-invites">
-                {searchResults.map((element) => (
+                {searchResults.map((element, index) => (
                   <div
                     className={classes(
                       'search-option',
-                      element === searchResults[activeIndex] && 'active'
+                      index === activeIndex && 'active'
                     )}
                   >
                     {element}
                   </div>
                 ))}
               </div>
-            ) : (
-              <div />
             )}
             <text className={validClassName}>{validMessage}</text>
           </div>
-          <button
-            type="button"
-            className="send-button"
-            onClick={(e): void => {
-              verifyUser();
-            }}
-          >
+          <button type="button" className="send-button" onClick={verifyUser}>
             Send Invite
           </button>
         </div>
