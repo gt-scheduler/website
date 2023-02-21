@@ -40,7 +40,7 @@ export const defaultScheduleData: Immutable<ScheduleData> = {
 };
 
 export const defaultFriendsData: Immutable<FriendsData> = {
-  terms: [],
+  terms: {},
 };
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
@@ -148,5 +148,9 @@ export interface Version3Schedule {
 }
 
 export interface FriendsData {
-  terms: Record<string, Record<string, string[]>>[];
+  terms: Record<string, FriendsTermData>;
+}
+
+export interface FriendsTermData {
+  accessible_schedules: Record<string, string[]>;
 }
