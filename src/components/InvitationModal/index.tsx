@@ -59,11 +59,12 @@ export function InvitationModalContent(): React.ReactElement {
     const results = /^([A-Z]+)(\d.*)$/i.exec(search);
     if (results != null) {
       const [, email, number] = results as unknown as [string, string, string];
-      search = `${email} ${number}`;
+      search = `${email}${number}`;
     }
     setHidden(false);
     setInput(search);
     setValidMessage('');
+    setActiveIndex(-1);
   }, []);
 
   const searchResults = useMemo(() => {
@@ -81,9 +82,9 @@ export function InvitationModalContent(): React.ReactElement {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (hidden) return;
       switch (e.key) {
         case 'ArrowDown':
+          setHidden(false);
           setInput(
             searchResults[
               Math.min(activeIndex + 1, searchResults.length - 1)
@@ -92,19 +93,30 @@ export function InvitationModalContent(): React.ReactElement {
           setActiveIndex(Math.min(activeIndex + 1, searchResults.length - 1));
           break;
         case 'ArrowUp':
+          setHidden(false);
           setInput(searchResults[Math.max(activeIndex - 1, 0)] as string);
           setActiveIndex(Math.max(activeIndex - 1, 0));
           break;
         case 'Enter':
           setHidden(true);
-          setActiveIndex(-1);
           break;
         default:
           return;
       }
       e.preventDefault();
     },
-    [searchResults, activeIndex, hidden]
+    [searchResults, activeIndex]
+  );
+
+  const handleCloseDropdown = useCallback(
+    (index?: number) => {
+      if (index !== undefined) {
+        setInput(searchResults[index] as string);
+        setActiveIndex(index);
+      }
+      setHidden(true);
+    },
+    [searchResults]
   );
 
   function verifyUser(): void {
@@ -138,8 +150,9 @@ export function InvitationModalContent(): React.ReactElement {
               placeholder="recipient@example.com"
               list="recent-invites"
               onChange={handleChangeSearch}
+              onFocus={handleChangeSearch}
               onKeyDown={handleKeyDown}
-              onBlur={(): void => setHidden(true)}
+              onBlur={(): void => handleCloseDropdown()}
             />
             {!hidden && (
               <div id="recent-invites">
@@ -149,6 +162,7 @@ export function InvitationModalContent(): React.ReactElement {
                       'search-option',
                       index === activeIndex && 'active'
                     )}
+                    onMouseDown={(): void => handleCloseDropdown(index)}
                   >
                     {element}
                   </div>
@@ -194,7 +208,7 @@ export function InvitationModalContent(): React.ReactElement {
   );
 }
 
-export type LoginModalProps = {
+export type InvitationModalProps = {
   show: boolean;
   onHide: () => void;
 };
@@ -205,7 +219,7 @@ export type LoginModalProps = {
 export default function InvitationModal({
   show,
   onHide,
-}: LoginModalProps): React.ReactElement {
+}: InvitationModalProps): React.ReactElement {
   return (
     <Modal
       show={show}
