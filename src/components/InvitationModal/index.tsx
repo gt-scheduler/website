@@ -97,6 +97,9 @@ export function InvitationModalContent(): React.ReactElement {
           setInput(searchResults[Math.max(activeIndex - 1, 0)] as string);
           setActiveIndex(Math.max(activeIndex - 1, 0));
           break;
+        case 'Escape':
+          setHidden(true);
+          break;
         case 'Enter':
           setHidden(true);
           break;
