@@ -1,11 +1,22 @@
 @import "../../variables";
 
+
+
 .modal__content {
     padding: 0px;
 
     .invitation-modal-content {
         text-align: center;
-        color: white;
+
+        @include light {
+            background-color: $theme-light-background;
+            color: $modal-foreground-color-light;
+        }
+
+        @include dark {
+            background-color: $theme-dark-background;
+            color: white;
+        }
 
         //Style for email input
         .top-block {
@@ -14,12 +25,14 @@
             justify-content: center;
             padding: 30px 50px 5px 50px;
 
-            h2 {
-                color: white !important;
-            }
-
             p {
                 font-size: 13px;
+            }
+
+            h2 {
+                @include dark {
+                    color: white;
+                }
             }
 
             .email-input-block {
@@ -70,6 +83,11 @@
                     &:focus {
                         border-color: rgba(255, 255, 255, 0.5);
                     }
+
+                    @include light {
+                        background-color: rgba($color-neutral, 0.5);
+                        border: 1px solid rgba($color-neutral, 0.5);
+                    }
                 }
 
                 .send-button {
@@ -103,6 +121,10 @@
             z-index: 2;
             margin-top: 30px;
 
+            @include light {
+                background-color: $color-neutral;
+            }
+
             .search-option {
                 width: 282px;
                 height: 32px;
@@ -113,10 +135,14 @@
 
                 &.active {
                     background-color: rgba(83, 83, 83, 1.0);
+
+                    @include light {
+                        background-color: #333333;
+                    }
                 }
 
                 &:hover {
-                    background-color: rgba(83, 83, 83, 0.5);
+                    background-color: hsla(0, 0%, 33%, 0.5);
                 }
             }
 
@@ -148,6 +174,10 @@
             overflow-y: scroll;
             overflow-x: hidden;
 
+            @include light {
+                color: #333333;
+            }
+
             .individual-shared-email {
                 @include card;
                 background-color: rgb(67, 67, 67);
@@ -162,6 +192,11 @@
                 min-width: min-content;
                 font-size: .8em;
                 cursor: pointer;
+
+                @include light {
+                    background-color: rgba($color-neutral, 0.5);
+                    opacity: 0.75;
+                }
             }
         }
 
@@ -193,6 +228,10 @@
                 position: absolute;
                 position: absolute;
                 color: white;
+
+                @include light {
+                    color: rgba(128, 128, 128, 0.5);
+                }
             }
 
             .remove {
@@ -202,11 +241,19 @@
                 color: rgb(67, 67, 67);
                 position: relative;
                 display: inline-flex;
+
+                @include light {
+                    color: #e5e5e5;
+                }
             }
 
             &:hover {
                 .circle {
                     color: rgba(255, 255, 255, 0.25);
+
+                    @include light {
+                        color: #333333;
+                    }
                 }
 
                 background-color: transparent;
@@ -216,13 +263,13 @@
         #Pending {
             border-color: rgba(205, 165, 24, 0.5);
             border-style: solid;
-            border-width: 1px;
+            border-width: 1.5px;
         }
 
         #Accepted {
             border-color: rgba(34, 181, 49, 0.5);
             border-style: solid;
-            border-width: 1px;
+            border-width: 1.5px;
         }
     }
 }
