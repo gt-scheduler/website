@@ -152,5 +152,5 @@ export interface FriendsData {
 }
 
 export interface FriendsTermData {
-  accessible_schedules: Record<string, string[]>;
+  accessibleSchedules: Record<string, string[]>;
 }
