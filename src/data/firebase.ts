@@ -7,7 +7,7 @@ import { AnyScheduleData, FriendData } from './types';
 
 // This data is not secret; it is included in the application bundle.
 // Supply these environment variables when developing locally.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: process.env['REACT_APP_FIREBASE_API_KEY'],
   authDomain: process.env['REACT_APP_FIREBASE_AUTH_DOMAIN'],
   projectId: process.env['REACT_APP_FIREBASE_PROJECT_ID'],
@@ -17,15 +17,8 @@ const firebaseConfig = {
   measurementId: process.env['REACT_APP_FIREBASE_MEASUREMENT_ID'],
 };
 
-const SCHEDULE_COLLECTION =
-  process.env.NODE_ENV === 'production' && !process.env['REACT_APP_PREVIEW']
-    ? 'schedules'
-    : 'schedules-dev';
-
-const FRIEND_COLLECTION =
-  process.env.NODE_ENV === 'production' && !process.env['REACT_APP_PREVIEW']
-    ? 'friends'
-    : 'friends-dev';
+const SCHEDULE_COLLECTION = 'schedules';
+const FRIEND_COLLECTION = 'friends';
 
 /**
  * Whether Firebase authentication is enabled in this environment.

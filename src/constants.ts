@@ -1,3 +1,5 @@
+import { firebaseConfig } from './data/firebase';
+
 const OPEN = 8 * 60;
 const CLOSE = 21 * 60;
 const DAYS = ['M', 'T', 'W', 'R', 'F'];
@@ -69,6 +71,7 @@ const CAMPUSES: Record<string, string> = {
 };
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
+const FIREBASE_PROJECT_ID = firebaseConfig.projectId || `gt-scheduler-web-dev`;
 
 const LARGE_DESKTOP_BREAKPOINT = 1200;
 const DESKTOP_BREAKPOINT = 1024;
@@ -84,6 +87,7 @@ export {
   DELIVERY_MODES,
   CAMPUSES,
   BACKEND_BASE_URL,
+  FIREBASE_PROJECT_ID,
   DESKTOP_BREAKPOINT,
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
