@@ -3,7 +3,6 @@
 .EventAdd {
   display: flex;
   flex-direction: column;
-  padding: 4px;
 
   .add {
     @include card;

@@ -1,4 +1,4 @@
-import { castDraft } from 'immer';
+import { Immutable, castDraft } from 'immer';
 import React, { useCallback, useContext, useState } from 'react';
 import {
   faPencil,
@@ -6,26 +6,27 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { classes, getContentClassName, periodToString } from '../../utils/misc';
-import { ActionRow, Palette } from '..';
+import {
+  classes,
+  getContentClassName,
+  periodToString,
+  daysToString,
+} from '../../utils/misc';
+import { ActionRow, EventAdd, Palette } from '..';
 import { ScheduleContext } from '../../contexts';
-import { Period } from '../../types';
+import { Event as EventData } from '../../types';
 
 import './stylesheet.scss';
 
-export type CourseProps = {
-  eventId: string;
-  eventName: string;
-  eventPeriod: Period;
-  eventDays: readonly string[];
+export type EventProps = {
+  className?: string;
+  event: Immutable<EventData>;
 };
 
-export default function CustomEvent({
-  eventId,
-  eventName,
-  eventPeriod,
-  eventDays,
-}: CourseProps): React.ReactElement | null {
+export default function Event({
+  className,
+  event,
+}: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
   const [formShown, setFormShown] = useState<boolean>(false);
@@ -36,28 +37,28 @@ export default function CustomEvent({
       delete newColorMap[id];
 
       patchSchedule({
-        events: events
-          .filter((singleEvent) => singleEvent.id !== id)
-          .map((singleEvent) => castDraft(singleEvent)),
+        events: castDraft(events).filter(
+          (singleEvent) => singleEvent.id !== id
+        ),
         colorMap: newColorMap,
       });
     },
     [events, colorMap, patchSchedule]
   );
 
-  const color = colorMap[eventId];
+  const color = colorMap[event.id];
   const contentClassName = color != null && getContentClassName(color);
 
   return (
     <div>
       {!formShown && (
         <div
-          className={classes('Event', contentClassName, 'default')}
+          className={classes('Event', contentClassName, 'default', className)}
           style={{ backgroundColor: color }}
-          key={eventId}
+          key={event.id}
         >
           <ActionRow
-            label={[eventName].join(' ')}
+            label={[event.name].join(' ')}
             actions={[
               {
                 icon: faPencil,
@@ -69,20 +70,22 @@ export default function CustomEvent({
               },
               {
                 icon: faTrash,
-                onClick: (): void => handleRemoveEvent(eventId),
+                onClick: (): void => handleRemoveEvent(event.id),
               },
             ]}
           >
             <div className="event-row">
               <span>
-                {[eventDays.join(''), periodToString(eventPeriod)].join(' ')}
+                {[daysToString(event.days), periodToString(event.period)].join(
+                  ' '
+                )}
               </span>
             </div>
             {paletteShown && (
               <Palette
                 className="palette"
                 onSelectColor={(col): void =>
-                  patchSchedule({ colorMap: { ...colorMap, [eventId]: col } })
+                  patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
                 }
                 color={color ?? null}
                 onMouseLeave={(): void => setPaletteShown(false)}
@@ -92,8 +95,11 @@ export default function CustomEvent({
         </div>
       )}
       {formShown && (
-        // put form here
-        <div />
+        <EventAdd
+          className="event-add"
+          event={event}
+          setFormShown={setFormShown}
+        />
       )}
     </div>
   );

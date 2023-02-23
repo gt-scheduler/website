@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import ago from 's-ago';
 
-import { Button, Course, CourseAdd } from '..';
+import { Button, Course, CourseAdd, Event, EventAdd } from '..';
 import { ScheduleContext } from '../../contexts';
 import CourseNavMenu from '../CourseNavMenu';
 
@@ -9,7 +9,7 @@ import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 export default function CourseContainer(): React.ReactElement {
-  const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
+  const [{ oscar, events, desiredCourses }] = useContext(ScheduleContext);
   const courseTabs = ['Courses', 'Recurring Events'];
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -30,7 +30,12 @@ export default function CourseContainer(): React.ReactElement {
           <CourseAdd className="course-add" />
         </div>
       ) : (
-        <div className="scroller" />
+        <div className="scroller">
+          {events.map((event) => (
+            <Event className="event" event={event} />
+          ))}
+          <EventAdd className="event-add" />
+        </div>
       )}
       <Button
         className="updated-at"
