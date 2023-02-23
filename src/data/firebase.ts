@@ -3,7 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { ErrorWithFields, softError } from '../log';
-import { AnyScheduleData, FriendsData } from './types';
+import { AnyScheduleData, FriendData } from './types';
 
 // This data is not secret; it is included in the application bundle.
 // Supply these environment variables when developing locally.
@@ -22,6 +22,11 @@ const SCHEDULE_COLLECTION =
     ? 'schedules'
     : 'schedules-dev';
 
+const FRIEND_COLLECTION =
+  process.env.NODE_ENV === 'production' && !process.env['REACT_APP_PREVIEW']
+    ? 'friends'
+    : 'friends-dev';
+
 /**
  * Whether Firebase authentication is enabled in this environment.
  * To enable, supply the 5 Firebase config environment variables.
@@ -35,7 +40,7 @@ let db: firebase.firestore.Firestore =
   null as unknown as firebase.firestore.Firestore;
 type SchedulesCollection =
   firebase.firestore.CollectionReference<AnyScheduleData>;
-type FriendsCollection = firebase.firestore.CollectionReference<FriendsData>;
+type FriendsCollection = firebase.firestore.CollectionReference<FriendData>;
 let schedulesCollection: SchedulesCollection =
   null as unknown as SchedulesCollection;
 
@@ -51,7 +56,7 @@ if (isAuthEnabled) {
     SCHEDULE_COLLECTION
   ) as SchedulesCollection;
 
-  friendsCollection = db.collection('friends') as FriendsCollection;
+  friendsCollection = db.collection(FRIEND_COLLECTION) as FriendsCollection;
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
     softError(

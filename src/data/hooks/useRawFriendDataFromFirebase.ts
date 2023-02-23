@@ -9,16 +9,16 @@ import {
   LoadingStateError,
 } from '../../types';
 import { db, isAuthEnabled, friendsCollection } from '../firebase';
-import { FriendsData, defaultFriendsData } from '../types';
+import { FriendData, defaultFriendData } from '../types';
 
 type HookResult = {
-  rawFriendsData: Immutable<FriendsData> | null;
-  setFriendsScheduleData: (
-    next: ((current: FriendsData | null) => FriendsData | null) | FriendsData
+  rawFriendData: Immutable<FriendData> | null;
+  setFriendScheduleData: (
+    next: ((current: FriendData | null) => FriendData | null) | FriendData
   ) => void;
 };
 
-type FriendsDataState = Loading | NonExistant | FriendsDataExists;
+type FriendDataState = Loading | NonExistant | FriendDataExists;
 
 type Loading = {
   type: 'loading';
@@ -27,9 +27,9 @@ type NonExistant = {
   type: 'nonExistant';
 };
 
-type FriendsDataExists = {
+type FriendDataExists = {
   type: 'exists';
-  data: FriendsData;
+  data: FriendData;
 };
 
 /**
@@ -37,10 +37,10 @@ type FriendsDataExists = {
  * Do not call this function in a non-root component;
  * it should only be called once in a root component (i.e. <App>).
  */
-export default function useRawFriendsDataFromFirebase(
+export default function useRawFriendDataFromFirebase(
   account: SignedIn
 ): LoadingState<HookResult> {
-  const [friendsData, setFriendsData] = useState<FriendsDataState>({
+  const [friendData, setFriendData] = useState<FriendDataState>({
     type: 'loading',
   });
 
@@ -60,11 +60,11 @@ export default function useRawFriendsDataFromFirebase(
         (doc) => {
           const data = doc.data();
           if (data == null) {
-            setFriendsData({ type: 'nonExistant' });
+            setFriendData({ type: 'nonExistant' });
           } else {
-            setFriendsData({
+            setFriendData({
               type: 'exists',
-              data: doc.data() as FriendsData,
+              data: doc.data() as FriendData,
             });
           }
         }
@@ -74,33 +74,33 @@ export default function useRawFriendsDataFromFirebase(
     };
   }, [account.id]);
 
-  const setFriendsDataPersistent = useCallback(
+  const setFriendDataPersistent = useCallback(
     (
-      next: ((current: FriendsData | null) => FriendsData | null) | FriendsData
+      next: ((current: FriendData | null) => FriendData | null) | FriendData
     ): void => {
-      let nextFriendsData;
+      let nextFriendData;
       if (typeof next === 'function') {
-        let currentFriendsData;
-        if (friendsData.type === 'exists') {
-          currentFriendsData = friendsData.data;
+        let currentFriendData;
+        if (friendData.type === 'exists') {
+          currentFriendData = friendData.data;
         } else {
-          currentFriendsData = null;
+          currentFriendData = null;
         }
-        nextFriendsData = next(currentFriendsData);
+        nextFriendData = next(currentFriendData);
       } else {
-        nextFriendsData = next;
+        nextFriendData = next;
       }
-      if (nextFriendsData === null) return;
+      if (nextFriendData === null) return;
 
       // Eagerly set the friend data here as well.
       // It would be okay to wait until Firebase updates the state for us,
       // (which it will do, even before the network calls are made),
       // but this allows a window where state can react based on stale state.
-      setFriendsData({ type: 'exists', data: nextFriendsData });
+      setFriendData({ type: 'exists', data: nextFriendData });
 
       friendsCollection
         .doc(account.id)
-        .set(nextFriendsData)
+        .set(nextFriendData)
         .catch((err) => {
           softError(
             new ErrorWithFields({
@@ -113,7 +113,7 @@ export default function useRawFriendsDataFromFirebase(
           );
         });
     },
-    [account.id, friendsData]
+    [account.id, friendData]
   );
 
   // Perform a transaction if the type is non-existent,
@@ -123,9 +123,9 @@ export default function useRawFriendsDataFromFirebase(
   useEffect(() => {
     if (!isAuthEnabled) return;
 
-    if (friendsData.type === 'nonExistant') {
+    if (friendData.type === 'nonExistant') {
       // Imperatively get the latest migrated data
-      const currentFriendsData: Immutable<FriendsData> = defaultFriendsData;
+      const currentFriendData: Immutable<FriendData> = defaultFriendData;
 
       // Start the transaction
       db.runTransaction(async (transaction) => {
@@ -135,7 +135,7 @@ export default function useRawFriendsDataFromFirebase(
         if (currentDoc.exists) return;
         transaction.set(
           friendsCollection.doc(account.id),
-          castDraft(currentFriendsData)
+          castDraft(currentFriendData)
         );
       }).catch((err) => {
         // Send the error to Sentry
@@ -157,7 +157,7 @@ export default function useRawFriendsDataFromFirebase(
         });
       });
     }
-  }, [account.id, friendsData.type]);
+  }, [account.id, friendData.type]);
 
   // If this hook is running and auth is not enabled,
   // then something is wrong with the state.
@@ -177,15 +177,15 @@ export default function useRawFriendsDataFromFirebase(
     return permanentError;
   }
 
-  if (friendsData.type === 'loading' || friendsData.type === 'nonExistant') {
+  if (friendData.type === 'loading' || friendData.type === 'nonExistant') {
     return { type: 'loading' };
   }
 
   return {
     type: 'loaded',
     result: {
-      rawFriendsData: castImmutable(friendsData.data),
-      setFriendsScheduleData: setFriendsDataPersistent,
+      rawFriendData: castImmutable(friendData.data),
+      setFriendScheduleData: setFriendDataPersistent,
     },
   };
 }

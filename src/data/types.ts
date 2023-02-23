@@ -39,7 +39,7 @@ export const defaultScheduleData: Immutable<ScheduleData> = {
   version: 3,
 };
 
-export const defaultFriendsData: Immutable<FriendsData> = {
+export const defaultFriendData: Immutable<FriendData> = {
   terms: {},
 };
 
@@ -147,10 +147,10 @@ export interface Version3Schedule {
   sortingOptionIndex: number;
 }
 
-export interface FriendsData {
-  terms: Record<string, FriendsTermData>;
+export interface FriendData {
+  terms: Record<string, FriendTermData>;
 }
 
-export interface FriendsTermData {
+export interface FriendTermData {
   accessibleSchedules: Record<string, string[]>;
 }
