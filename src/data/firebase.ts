@@ -3,11 +3,11 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { ErrorWithFields, softError } from '../log';
-import { AnyScheduleData } from './types';
+import { AnyScheduleData, FriendData } from './types';
 
 // This data is not secret; it is included in the application bundle.
 // Supply these environment variables when developing locally.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: process.env['REACT_APP_FIREBASE_API_KEY'],
   authDomain: process.env['REACT_APP_FIREBASE_AUTH_DOMAIN'],
   projectId: process.env['REACT_APP_FIREBASE_PROJECT_ID'],
@@ -17,10 +17,8 @@ const firebaseConfig = {
   measurementId: process.env['REACT_APP_FIREBASE_MEASUREMENT_ID'],
 };
 
-const SCHEDULE_COLLECTION =
-  process.env.NODE_ENV === 'production' && !process.env['REACT_APP_PREVIEW']
-    ? 'schedules'
-    : 'schedules-dev';
+const SCHEDULE_COLLECTION = 'schedules';
+const FRIEND_COLLECTION = 'friends';
 
 /**
  * Whether Firebase authentication is enabled in this environment.
@@ -35,8 +33,12 @@ let db: firebase.firestore.Firestore =
   null as unknown as firebase.firestore.Firestore;
 type SchedulesCollection =
   firebase.firestore.CollectionReference<AnyScheduleData>;
+type FriendsCollection = firebase.firestore.CollectionReference<FriendData>;
 let schedulesCollection: SchedulesCollection =
   null as unknown as SchedulesCollection;
+
+let friendsCollection: FriendsCollection = null as unknown as FriendsCollection;
+
 /* eslint-enable import/no-mutable-exports */
 if (isAuthEnabled) {
   const app = firebase.initializeApp(firebaseConfig);
@@ -46,6 +48,8 @@ if (isAuthEnabled) {
   schedulesCollection = db.collection(
     SCHEDULE_COLLECTION
   ) as SchedulesCollection;
+
+  friendsCollection = db.collection(FRIEND_COLLECTION) as FriendsCollection;
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
     softError(
@@ -57,7 +61,7 @@ if (isAuthEnabled) {
   });
 }
 
-export { auth, db, schedulesCollection };
+export { auth, db, schedulesCollection, friendsCollection };
 export { firebase };
 
 // Configure the enabled auth providers that firebase UI displays as options
