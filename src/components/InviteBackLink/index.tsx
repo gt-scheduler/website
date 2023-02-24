@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+
 const handleInvite = async (inviteId: string | undefined): Promise<void> =>
   // The link should be changed to prod link, or we can choose the link based
   // on environment
   axios.post(
-    'https://us-central1-gt-scheduler-web-prod.cloudfunctions.net/us-central1/handleFriendInvitation',
+    `${CLOUD_FUNCTION_BASE_URL}/handleFriendInvitation`,
     { inviteId },
     {
       headers: {
