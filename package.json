@@ -83,7 +83,7 @@
     "secrets:linux": "echo Enter Bitwarden Password: && read BW_PASSWORD && (bw logout || exit 0) && export BW_SESSION=`bw login product@bitsofgood.org $BW_PASSWORD --raw` && npm run secrets:get",
     "secrets:windows": "set /p BW_PASSWORD=Enter Bitwarden Password:&& (bw logout || VER>NUL) && npm run secrets:login",
     "secrets:login": "FOR /F %a IN ('bw login product@bitsofgood.org %BW_PASSWORD% --raw') DO SET BW_SESSION=%a && npm run secrets:get",
-    "secrets:get": "bw sync && bw get item gt-scheduler/.env | fx .notes > \".env\""
+    "secrets:get": "bw sync && bw get item gt-scheduler/.env.development.local | fx .notes > \".env\""
   },
   "eslintConfig": {
     "extends": "react-app"

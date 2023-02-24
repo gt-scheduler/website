@@ -5,9 +5,10 @@ import {
   faPaste,
   faAdjust,
   faCaretDown,
+  faShare,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
 import { Button } from '..';
 import {
@@ -20,6 +21,7 @@ import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
+import InvitationModal from '../InvitationModal';
 
 import './stylesheet.scss';
 
@@ -58,6 +60,8 @@ export default function HeaderActionBar({
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   }, [theme, setTheme]);
+  const [invitationOpen, setInvitationOpen] = useState(false);
+  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   // Coalesce the export options into the props for a single <DropdownMenu>
   const enableExport =
@@ -84,6 +88,13 @@ export default function HeaderActionBar({
       onClick: onCopyCrns,
     });
   }
+  exportActions.push({
+    label: 'Share Schedule',
+    icon: faShare,
+    onClick: (): void => {
+      setInvitationOpen(true);
+    },
+  });
 
   // On small mobile screens and on large desktop,
   // left-anchor the "Export" dropdown.
@@ -112,6 +123,7 @@ export default function HeaderActionBar({
           <FontAwesomeIcon fixedWidth icon={faCaretDown} />
         </div>
       </DropdownMenu>
+      <InvitationModal show={invitationOpen} onHide={hideInvitation} />
 
       <Button onClick={handleThemeChange} className="header-action-bar__button">
         <FontAwesomeIcon

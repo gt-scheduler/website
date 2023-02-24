@@ -55,6 +55,11 @@ export const periodToString = (period: Period | undefined): string =>
     ? `${timeToString(period.start, false)} - ${timeToString(period.end)}`
     : 'TBA';
 
+export const daysToString = (days: readonly string[] | string[]): string => {
+  const set = new Set(days);
+  return DAYS.filter((day) => set.has(day)).join('');
+};
+
 export const getRandomColor = (): string => {
   const colors = PALETTE.flat();
   const index = (Math.random() * colors.length) | 0;

@@ -39,6 +39,10 @@ export const defaultScheduleData: Immutable<ScheduleData> = {
   version: 3,
 };
 
+export const defaultFriendData: Immutable<FriendData> = {
+  terms: {},
+};
+
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
   versions: {},
 };
@@ -141,4 +145,12 @@ export interface Version3Schedule {
   events: Event[];
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
+}
+
+export interface FriendData {
+  terms: Record<string, FriendTermData>;
+}
+
+export interface FriendTermData {
+  accessibleSchedules: Record<string, string[]>;
 }
