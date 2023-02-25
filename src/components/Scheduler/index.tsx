@@ -5,7 +5,7 @@ import {
   Button,
   Calendar,
   CombinationContainer,
-  ComparisonContainer,
+  ComparisonPanel,
   CourseContainer,
 } from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
@@ -54,7 +54,7 @@ export default function Scheduler(): React.ReactElement {
               <Calendar className="calendar" overlayCrns={overlayCrns} />
             </div>
           )}
-          {(!mobile || tabIndex === 3) && <ComparisonContainer />}
+          {(!mobile || tabIndex === 3) && <ComparisonPanel />}
         </div>
       </OverlayCrnsContext.Provider>
     </>

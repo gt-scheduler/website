@@ -1,0 +1,75 @@
+@import '../../variables';
+
+.comparison-panel {
+  display: flex;
+  flex-direction: row;
+  border-right: 1px solid $color-border;
+
+  .drawer {
+    width: 10.5px;
+    border-width: 0px 1px 0px 1px;
+    border-color: $color-border;
+    border-style: solid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:hover {
+      background: $color-border;
+    }
+    
+    .drawer-line {
+      flex: 1;
+      width: 4px;
+      border-width: 0px 1px 0px 1px;
+      border-color: $color-border;
+      border-style: solid;
+    }
+
+    .icon {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      transform: scale(0.9, 2.5);
+
+      .arrow {
+        position: absolute;
+        height: 10px;
+        width: 10px;
+        right: -8px;
+        border-width: 0px 1px 1px 0px;
+        border-color: $color-border;
+        border-style: solid;
+        transform: rotate(135deg);
+
+        &.right {
+          left: -8px;
+          transform: rotate(-45deg);
+        }
+      }
+
+    }
+  }
+
+  .panel {
+    display: flex;
+    flex: 0 0 1;
+    flex-direction: column;
+    overflow: hidden;
+    align-items: stretch;
+    width: 256px;
+    transition: width 0.15s;
+
+    &.closed {
+      width: 0px;
+    }
+
+    .combination {
+      flex: 1;
+
+      .CombinationContainer {
+        height: 100%;
+      }
+    }
+  }
+}
