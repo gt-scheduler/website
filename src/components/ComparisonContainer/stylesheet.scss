@@ -1,0 +1,192 @@
+@import '../../variables';
+
+.comparison-container {
+  display: flex;
+  flex-direction: row;
+  border-right: 1px solid $color-border;
+
+  .drawer {
+    width: 10.5px;
+    border-width: 0px 1px 0px 1px;
+    border-color: $color-border;
+    border-style: solid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:hover {
+      background: $color-border;
+    }
+    
+    .drawer-line {
+      flex: 1;
+      width: 4px;
+      border-width: 0px 1px 0px 1px;
+      border-color: $color-border;
+      border-style: solid;
+    }
+
+    .icon {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      transform: scale(0.9, 2.5);
+
+      .arrow {
+        position: absolute;
+        height: 10px;
+        width: 10px;
+        right: -8px;
+        border-width: 0px 1px 1px 0px;
+        border-color: $color-border;
+        border-style: solid;
+        transform: rotate(135deg);
+
+        &.right {
+          left: -8px;
+          transform: rotate(-45deg);
+        }
+      }
+
+    }
+  }
+
+  .comparison-panel {
+    display: flex;
+    flex: 0 0 1;
+    flex-direction: column;
+    overflow: hidden;
+    align-items: stretch;
+    width: 256px;
+    transition: width 0.15s;
+
+    &.closed {
+      width: 0px;
+    }
+
+    .comparison-body {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid $color-border;
+      padding: 12px;
+      white-space: nowrap;
+
+      .comparison-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 7px;
+
+        p {
+          margin: 0px;
+          overflow: hidden;
+
+          &.header-title{
+            flex: 1;
+            font-size: 16px;
+          }
+
+          &.header-text{
+            font-size: 12px;
+            margin-right: 4px;
+          }
+        }
+
+        .switch {
+          display: inline-block;
+          height: 19px;
+          position: relative;
+          width: 43px;
+        }
+        
+        .switch input {
+          display: none;
+        }
+        
+        .slider {
+          background-color: #ccc;
+          bottom: 0;
+          cursor: pointer;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+          transition: .4s;
+          border-radius: 19px;
+        }
+        
+        .slider:before {
+          background-color: #ffffff;
+          bottom: 2px;
+          content: "";
+          height: 15px;
+          left: 2px;
+          position: absolute;
+          transition: .4s;
+          width: 15px;
+          border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+          background-color: #589BD5;
+        }
+        
+        input:checked + .slider:before {
+          transform: translateX(24px);
+        }
+      }
+  
+      .comparison-content {
+        p {
+          margin: 0px;
+          overflow: hidden;
+
+          &.content-title{
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 14px;
+            margin-top: 16px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid $color-border;
+          }
+        }
+      }
+    }
+
+    .combination {
+      flex: 1;
+
+      .CombinationContainer {
+        height: 100%;
+      }
+    }
+  }
+}
+
+.comparison-overlay {
+  background-color: var(--theme-bg);
+  position: absolute;
+  top: 64px;
+  left: 0px;
+  width: 320px;
+  bottom: 41px;
+
+  pointer-events: none;
+  opacity: 0;
+  z-index: 100;
+  transition-duration: 0.15s, $theme-switch-transition-duration;
+  transition-property: opacity, color, background-color;
+
+  &.open {
+    pointer-events: all;
+    opacity: 0.4;
+  }
+}
+
+.mobile .comparison-container {
+  flex: 1;
+  border-right: none;
+
+  .scroller {
+    width: auto;
+  }
+}
