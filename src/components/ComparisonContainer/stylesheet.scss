@@ -5,8 +5,8 @@
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid $color-border;
-    padding: 12px;
     white-space: nowrap;
+    padding: 12px;
 
     .comparison-header {
       display: flex;
@@ -73,39 +73,101 @@
     }
 
     .comparison-content {
+      position: relative;
       p {
         margin: 0px;
         overflow: hidden;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 14px;
 
         &.content-title{
-          font-size: 12px;
           font-weight: 700;
-          line-height: 14px;
           margin-top: 16px;
-          padding-bottom: 4px;
+          margin-bottom: 4px;
           border-bottom: 1px solid $color-border;
         }
       }
-    }
-  }
 
-  .comparison-overlay {
-    background-color: var(--theme-bg);
-    position: absolute;
-    top: 64px;
-    left: 0px;
-    width: 320px;
-    bottom: 41px;
+      .shared-schedules {
+        .checkbox-container {
+          padding-left: 12px;
+        }
+      }
 
-    pointer-events: none;
-    opacity: 0;
-    z-index: 100;
-    transition-duration: 0.15s, $theme-switch-transition-duration;
-    transition-property: opacity, color, background-color;
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 22px;
+        
+        .checkbox {
+          border: 1px solid;
+          border-radius: 3px;
+          border-color: var(--theme-fg);
 
-    &.open {
-      pointer-events: all;
-      opacity: 0.4;
+          width: 11px;
+          height: 11px;
+          margin-right: 8px;
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+
+        .icon {
+          width: 27px;
+          height: 100%;
+          position: relative;
+          right: -12px;
+          padding: 0px;
+        }
+        
+        p {
+          flex: 1;
+        }
+
+        &:hover::after {
+          content: '';
+          position: absolute;
+          left: -12px;
+          right: -12px;
+          height: 100%;
+          background-color: $color-border;
+          z-index: -10;
+        }
+      }
+
+      .comparison-overlay {
+        background-color: var(--theme-bg);
+    
+        pointer-events: none;
+        opacity: 0;
+        z-index: 100;
+        transition-duration: 0.15s, $theme-switch-transition-duration;
+        transition-property: opacity, color, background-color;
+
+        &.left {
+          position: fixed;
+          top: 64px;
+          left: 0px;
+          width: 320px;
+          bottom: 41px;
+        }
+
+        &.right {
+          position: absolute;
+          height: 100%;
+          top: 0px;
+          left: -12px;
+          right: -12px;
+        }
+    
+        &.open {
+          pointer-events: all;
+          opacity: 0.4;
+        }
+      }
     }
   }
 }

@@ -47,7 +47,18 @@
           transform: rotate(-45deg);
         }
       }
+    }
 
+    .tooltip {
+      background: black;
+      border-radius: 4px;
+      z-index: 100;
+
+      p {
+        margin: 0px;
+        font-size: 12px;
+        font-weight: 400;
+      }
     }
   }
 
