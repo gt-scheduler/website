@@ -4,6 +4,7 @@ import { ScheduleContext } from '../../contexts';
 import { faPencil, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button, { ButtonProps } from '../Button';
+import Modal from '../Modal';
 import './stylesheet.scss';
 
 export type SharedSchedule = {
@@ -18,6 +19,13 @@ export type SharedSchedule = {
 export default function ComparisonContainer(): React.ReactElement {
   const [compare, setCompare] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    type: string;
+    name: string;
+    owner?: string;
+  } | null>(null);
+
   const [{ allVersionNames }, { deleteVersion, renameVersion }] =
     useContext(ScheduleContext);
 
@@ -26,8 +34,12 @@ export default function ComparisonContainer(): React.ReactElement {
     console.log('edit friend schedule');
   }, []);
 
-  const handleRemoveSchedule = useCallback(() => {
-    console.log('remove friend schedule');
+  const handleRemoveSchedule = useCallback((id: string) => {
+    console.log('remove friend schedule', id);
+  }, []);
+
+  const handleRemoveFriend = useCallback((id: string) => {
+    console.log('remove user friend', id);
   }, []);
 
   const handleToggleSchedule = useCallback(
@@ -83,27 +95,22 @@ export default function ComparisonContainer(): React.ReactElement {
             <p className="content-title">My Schedules</p>
             {allVersionNames.map((version, i) => {
               return (
-                <div className="checkbox-container">
-                  <div className="checkbox" />
-                  {/* style={selected ? {background-color: {versionBgColor}} : {}} */}
-                  <p>{version.name}</p>
-                  <Button
-                    className="icon"
-                    onClick={handleEditSchedule}
-                    key={`${i}-edit`}
-                  >
-                    <FontAwesomeIcon icon={faPencil} size="xs" />
-                  </Button>
-                  {allVersionNames.length >= 2 && (
-                    <Button
-                      className="icon"
-                      onClick={handleRemoveSchedule}
-                      key={`${i}-delete`}
-                    >
-                      <FontAwesomeIcon icon={faCircleXmark} size="xs" />
-                    </Button>
-                  )}
-                </div>
+                <ScheduleRow
+                  id={version.id}
+                  onClick={(): void => handleToggleSchedule(version.id)}
+                  checkboxColor={selected.includes(version.id) ? '#FFFFFF' : ''}
+                  name={version.name}
+                  // placeholder functions
+                  handleEditSchedule={handleEditSchedule}
+                  handleRemoveSchedule={(): void => {
+                    setDeleteConfirm({
+                      id: version.id,
+                      type: 'Version',
+                      name: version.name,
+                    });
+                  }}
+                  hasDelete={allVersionNames.length >= 2}
+                />
               );
             })}
           </div>
@@ -112,40 +119,40 @@ export default function ComparisonContainer(): React.ReactElement {
             {sharedSchedules.map((friend) => {
               return (
                 <div className="friend">
-                  <p>{friend.name}</p>
+                  <ScheduleRow
+                    // change id later on
+                    id={friend.name}
+                    hasCheck={false}
+                    name={friend.name}
+                    handleEditSchedule={handleEditSchedule}
+                    handleRemoveSchedule={(): void => {
+                      setDeleteConfirm({
+                        id: friend.name,
+                        type: 'User',
+                        name: friend.name,
+                      });
+                    }}
+                  />
                   {friend.schedules.map((schedule, i) => {
                     return (
-                      <div className="checkbox-container">
-                        <div
-                          className="checkbox"
-                          onClick={(): void =>
-                            handleToggleSchedule(schedule.id)
-                          }
-                          style={
-                            selected.includes(schedule.id)
-                              ? { backgroundColor: schedule.color }
-                              : {}
-                          }
-                        />
-                        {/* style={selected ? {background-color: {versionBgColor}} : {}} */}
-                        <p>{schedule.name}</p>
-                        <Button
-                          className="icon"
-                          onClick={handleEditSchedule}
-                          key={`${i}-edit`}
-                        >
-                          <FontAwesomeIcon icon={faPencil} size="xs" />
-                        </Button>
-                        {friend.schedules.length >= 2 && (
-                          <Button
-                            className="icon"
-                            onClick={handleRemoveSchedule}
-                            key={`${i}-delete`}
-                          >
-                            <FontAwesomeIcon icon={faCircleXmark} size="xs" />
-                          </Button>
-                        )}
-                      </div>
+                      <ScheduleRow
+                        id={schedule.id}
+                        className="indented"
+                        onClick={(): void => handleToggleSchedule(schedule.id)}
+                        checkboxColor={
+                          selected.includes(schedule.id) ? schedule.color : ''
+                        }
+                        name={schedule.name}
+                        handleEditSchedule={handleEditSchedule}
+                        handleRemoveSchedule={(): void => {
+                          setDeleteConfirm({
+                            id: schedule.id,
+                            type: 'Schedule',
+                            name: schedule.name,
+                            owner: friend.name,
+                          });
+                        }}
+                      />
                     );
                   })}
                 </div>
@@ -162,8 +169,129 @@ export default function ComparisonContainer(): React.ReactElement {
               !compare && 'open'
             )}
           />
+          <Modal
+            show={deleteConfirm != null}
+            onHide={(): void => setDeleteConfirm(null)}
+            buttons={[
+              {
+                label: 'Cancel',
+                cancel: true,
+                onClick: (): void => setDeleteConfirm(null),
+              },
+              {
+                label: 'Remove',
+                onClick: (): void => {
+                  if (deleteConfirm != null) {
+                    if (deleteConfirm.type === 'Version') {
+                      deleteVersion(deleteConfirm.id);
+                    } else if (deleteConfirm.type === 'User') {
+                      handleRemoveFriend(deleteConfirm.id);
+                    } else {
+                      handleRemoveSchedule(deleteConfirm.id);
+                    }
+                  }
+                  setDeleteConfirm(null);
+                },
+              },
+            ]}
+            preserveChildrenWhileHiding
+          >
+            {deleteConfirm?.type === 'Version' && (
+              <div style={{ textAlign: 'center' }}>
+                <h2>Delete confirmation</h2>
+                <p>
+                  Are you sure you want to delete schedule &ldquo;
+                  {deleteConfirm?.name ?? '<unknown>'}&rdquo;?
+                </p>
+              </div>
+            )}
+            {deleteConfirm?.type === 'User' && (
+              <div style={{ textAlign: 'center' }}>
+                <h2>Remove User</h2>
+                <p>
+                  Are you sure you want to remove the following user&apos;s
+                  schedules from your view?
+                </p>
+                <p>
+                  User: <b>{deleteConfirm?.name}</b>
+                </p>
+                <p>
+                  You will not be able to see any of their schedules unless the
+                  owner sends another invite for each one.
+                </p>
+              </div>
+            )}
+            {deleteConfirm?.type === 'Schedule' && (
+              <div style={{ textAlign: 'center' }}>
+                <h2>Remove Schedule</h2>
+                <p>
+                  Are you sure you want to remove the following schedule from
+                  your view?
+                </p>
+                <p>
+                  Schedule: <b>{deleteConfirm?.name}</b>
+                </p>
+                <p>
+                  Owner: <b>{deleteConfirm?.owner}</b>
+                </p>
+                <p>
+                  You will not be able to see it unless the owner sends another
+                  invite.
+                </p>
+              </div>
+            )}
+          </Modal>
         </div>
       </div>
+    </div>
+  );
+}
+
+type ScheduleRowProps = {
+  id: string;
+  className?: string;
+  hasCheck?: boolean;
+  onClick?: () => void;
+  checkboxColor?: string;
+  name: string;
+  handleEditSchedule: () => void;
+  handleRemoveSchedule: () => void;
+  hasDelete?: boolean;
+};
+
+function ScheduleRow({
+  id,
+  className,
+  hasCheck = true,
+  onClick,
+  checkboxColor,
+  name,
+  handleEditSchedule,
+  handleRemoveSchedule,
+  hasDelete = true,
+}: ScheduleRowProps): React.ReactElement {
+  return (
+    <div className={classes('checkbox-container', className)}>
+      {hasCheck && (
+        <div
+          className="checkbox"
+          onClick={onClick}
+          style={{ backgroundColor: checkboxColor }}
+        />
+      )}
+      <p>{name}</p>
+      <Button className="icon" onClick={handleEditSchedule} key={`${id}-edit`}>
+        <FontAwesomeIcon icon={faPencil} size="xs" />
+      </Button>
+      {hasDelete && (
+        <Button
+          className="icon"
+          onClick={handleRemoveSchedule}
+          key={`${id}-delete`}
+        >
+          <FontAwesomeIcon icon={faCircleXmark} size="xs" />
+        </Button>
+      )}
     </div>
   );
 }

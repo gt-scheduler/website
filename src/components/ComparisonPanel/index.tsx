@@ -1,4 +1,4 @@
-import React, { useState, useId } from 'react';
+import React, { useState, useId, useCallback } from 'react';
 import { CombinationContainer, ComparisonContainer } from '..';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { classes } from '../../utils/misc';
@@ -7,7 +7,16 @@ import './stylesheet.scss';
 export default function ComparisonPanel(): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
+  const [tooltipY, setTooltipY] = useState(0);
   const tooltipId = useId();
+
+  const handleHover = useCallback(
+    (e: React.MouseEvent) => {
+      setHover(true);
+      setTooltipY(e.clientY);
+    },
+    [hover, tooltipY]
+  );
 
   return (
     <div className="comparison-panel">
@@ -17,7 +26,9 @@ export default function ComparisonPanel(): React.ReactElement {
           setExpanded(!expanded);
           setHover(false);
         }}
-        onMouseEnter={(): void => setHover(true)}
+        onMouseEnter={(e: React.MouseEvent): void => {
+          handleHover(e);
+        }}
         onMouseLeave={(): void => setHover(false)}
         id={tooltipId}
       >
@@ -27,15 +38,15 @@ export default function ComparisonPanel(): React.ReactElement {
         </div>
         <div className="drawer-line" />
         <ReactTooltip
+          key={tooltipY}
           anchorId={tooltipId}
           className="tooltip"
           variant="dark"
-          clickable
           isOpen={hover}
           setIsOpen={setHover}
           delayShow={20}
           delayHide={100}
-          float
+          offset={70 - tooltipY}
           // key={deviceHasHover ? 0 : 1}
           // events={deviceHasHover ? ['hover'] : []}
         >

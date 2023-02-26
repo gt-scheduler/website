@@ -6,12 +6,11 @@
     flex-direction: column;
     border-bottom: 1px solid $color-border;
     white-space: nowrap;
-    padding: 12px;
 
     .comparison-header {
       display: flex;
       align-items: center;
-      margin-bottom: 7px;
+      margin: 11px 12px 7px 12px;
 
       p {
         margin: 0px;
@@ -74,6 +73,8 @@
 
     .comparison-content {
       position: relative;
+      margin-bottom: 12px;
+
       p {
         margin: 0px;
         overflow: hidden;
@@ -83,15 +84,8 @@
 
         &.content-title{
           font-weight: 700;
-          margin-top: 16px;
-          margin-bottom: 4px;
+          margin: 16px 12px 4px 12px;
           border-bottom: 1px solid $color-border;
-        }
-      }
-
-      .shared-schedules {
-        .checkbox-container {
-          padding-left: 12px;
         }
       }
 
@@ -100,6 +94,11 @@
         align-items: center;
         position: relative;
         height: 22px;
+        padding-left: 12px;
+
+        &.indented {
+          padding-left: 24px;
+        }
         
         .checkbox {
           border: 1px solid;
@@ -118,28 +117,20 @@
         .icon {
           width: 27px;
           height: 100%;
-          position: relative;
-          right: -12px;
           padding: 0px;
           opacity: 0;
         }
 
-        &:hover .icon {
-          opacity: 1;
+        &:hover {
+          background-color: $color-border;
+
+          & .icon {
+            opacity: 1;
+          }
         }
         
         p {
           flex: 1;
-        }
-
-        &:hover::after {
-          content: '';
-          position: absolute;
-          left: -12px;
-          right: -12px;
-          height: 100%;
-          background-color: $color-border;
-          z-index: -10;
         }
       }
 
@@ -148,8 +139,7 @@
     
         pointer-events: none;
         opacity: 0;
-        z-index: 100;
-        transition-duration: 0.15s, $theme-switch-transition-duration;
+        transition-duration: 0.15s, $theme-switch-transition-duration, $theme-switch-transition-duration;
         transition-property: opacity, color, background-color;
 
         &.left {
