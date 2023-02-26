@@ -121,6 +121,11 @@
           position: relative;
           right: -12px;
           padding: 0px;
+          opacity: 0;
+        }
+
+        &:hover .icon {
+          opacity: 1;
         }
         
         p {

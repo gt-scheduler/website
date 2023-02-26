@@ -9,6 +9,7 @@ import './stylesheet.scss';
 export type SharedSchedule = {
   name: string;
   schedules: {
+    id: string;
     name: string;
     color: string;
   }[];
@@ -16,9 +17,11 @@ export type SharedSchedule = {
 
 export default function ComparisonContainer(): React.ReactElement {
   const [compare, setCompare] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
   const [{ allVersionNames }, { deleteVersion, renameVersion }] =
     useContext(ScheduleContext);
 
+  // placeholder callbacks
   const handleEditSchedule = useCallback(() => {
     console.log('edit friend schedule');
   }, []);
@@ -27,25 +30,36 @@ export default function ComparisonContainer(): React.ReactElement {
     console.log('remove friend schedule');
   }, []);
 
+  const handleToggleSchedule = useCallback(
+    (id: string) => {
+      if (selected.includes(id)) {
+        setSelected(selected.filter((selectedId: string) => selectedId !== id));
+      } else {
+        setSelected(selected.concat([id]));
+      }
+    },
+    [selected]
+  );
+
   const sharedSchedules: SharedSchedule[] = [
     {
       name: 'John Smith',
       schedules: [
-        { name: 'Main', color: '#760000' },
-        { name: 'Backup', color: '#760076' },
+        { id: '1', name: 'Main', color: '#760000' },
+        { id: '2', name: 'Backup', color: '#760076' },
       ],
     },
     {
       name: 'friend2@gatech.edu',
       schedules: [
-        { name: 'Primary', color: '#007600' },
-        { name: 'New Name', color: '#000076' },
-        { name: 'Alternative', color: '#007676' },
+        { id: '3', name: 'Primary', color: '#007600' },
+        { id: '4', name: 'New Name', color: '#000076' },
+        { id: '5', name: 'Alternative', color: '#007676' },
       ],
     },
     {
       name: 'friend3@yahoo.com',
-      schedules: [{ name: 'Preferred', color: '#562738' }],
+      schedules: [{ id: '6', name: 'Preferred', color: '#562738' }],
     },
   ];
 
@@ -80,13 +94,15 @@ export default function ComparisonContainer(): React.ReactElement {
                   >
                     <FontAwesomeIcon icon={faPencil} size="xs" />
                   </Button>
-                  <Button
-                    className="icon"
-                    onClick={handleRemoveSchedule}
-                    key={`${i}-delete`}
-                  >
-                    <FontAwesomeIcon icon={faCircleXmark} size="xs" />
-                  </Button>
+                  {allVersionNames.length >= 2 && (
+                    <Button
+                      className="icon"
+                      onClick={handleRemoveSchedule}
+                      key={`${i}-delete`}
+                    >
+                      <FontAwesomeIcon icon={faCircleXmark} size="xs" />
+                    </Button>
+                  )}
                 </div>
               );
             })}
@@ -100,7 +116,17 @@ export default function ComparisonContainer(): React.ReactElement {
                   {friend.schedules.map((schedule, i) => {
                     return (
                       <div className="checkbox-container">
-                        <div className="checkbox" />
+                        <div
+                          className="checkbox"
+                          onClick={(): void =>
+                            handleToggleSchedule(schedule.id)
+                          }
+                          style={
+                            selected.includes(schedule.id)
+                              ? { backgroundColor: schedule.color }
+                              : {}
+                          }
+                        />
                         {/* style={selected ? {background-color: {versionBgColor}} : {}} */}
                         <p>{schedule.name}</p>
                         <Button
