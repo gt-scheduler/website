@@ -67,11 +67,25 @@ export default function ComparisonContainer(): React.ReactElement {
         { id: '3', name: 'Primary', color: '#007600' },
         { id: '4', name: 'New Name', color: '#000076' },
         { id: '5', name: 'Alternative', color: '#007676' },
+        { id: '6', name: 'Primary', color: '#007600' },
+        { id: '7', name: 'New Name', color: '#000076' },
+        { id: '8', name: 'Alternative', color: '#007676' },
+        { id: '9', name: 'Primary', color: '#007600' },
+        { id: '10', name: 'New Name', color: '#000076' },
+        { id: '11', name: 'Alternative', color: '#007676' },
+        { id: '12', name: 'Alternative', color: '#007676' },
+        { id: '13', name: 'Primary', color: '#007600' },
+        { id: '14', name: 'New Name', color: '#000076' },
+        { id: '15', name: 'Alternative', color: '#007676' },
+        { id: '16', name: 'Primary', color: '#007600' },
+        { id: '17', name: 'New Name', color: '#000076' },
+        { id: '18', name: 'Alternative', color: '#007676' },
+        { id: '19', name: 'Alternative', color: '#007676' },
       ],
     },
     {
       name: 'friend3@yahoo.com',
-      schedules: [{ id: '6', name: 'Preferred', color: '#562738' }],
+      schedules: [{ id: '12', name: 'Preferred', color: '#562738' }],
     },
   ];
 
@@ -159,16 +173,6 @@ export default function ComparisonContainer(): React.ReactElement {
               );
             })}
           </div>
-          <div
-            className={classes('comparison-overlay', 'left', compare && 'open')}
-          />
-          <div
-            className={classes(
-              'comparison-overlay',
-              'right',
-              !compare && 'open'
-            )}
-          />
           <Modal
             show={deleteConfirm != null}
             onHide={(): void => setDeleteConfirm(null)}
@@ -242,6 +246,12 @@ export default function ComparisonContainer(): React.ReactElement {
             )}
           </Modal>
         </div>
+        <div
+          className={classes('comparison-overlay', 'left', compare && 'open')}
+        />
+        <div
+          className={classes('comparison-overlay', 'right', !compare && 'open')}
+        />
       </div>
     </div>
   );

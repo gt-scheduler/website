@@ -4,8 +4,8 @@
   .comparison-body {
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid $color-border;
     white-space: nowrap;
+    height: 100%;
 
     .comparison-header {
       display: flex;
@@ -74,6 +74,9 @@
     .comparison-content {
       position: relative;
       margin-bottom: 12px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      flex: 1 1 auto;
 
       p {
         margin: 0px;
@@ -133,35 +136,34 @@
           flex: 1;
         }
       }
+    }
 
-      .comparison-overlay {
-        background-color: var(--theme-bg);
-    
-        pointer-events: none;
-        opacity: 0;
-        transition-duration: 0.15s, $theme-switch-transition-duration, $theme-switch-transition-duration;
-        transition-property: opacity, color, background-color;
+    .comparison-overlay {
+      background-color: var(--theme-bg);
+  
+      pointer-events: none;
+      opacity: 0;
+      transition-duration: 0.15s, $theme-switch-transition-duration, $theme-switch-transition-duration;
+      transition-property: opacity, color, background-color;
 
-        &.left {
-          position: fixed;
-          top: 64px;
-          left: 0px;
-          width: 320px;
-          bottom: 41px;
-        }
+      &.left {
+        position: fixed;
+        top: 64px;
+        left: 0px;
+        width: 320px;
+        bottom: 41px;
+      }
 
-        &.right {
-          position: absolute;
-          height: 100%;
-          top: 0px;
-          left: -12px;
-          right: -12px;
-        }
-    
-        &.open {
-          pointer-events: all;
-          opacity: 0.4;
-        }
+      &.right {
+        position: absolute;
+        top: 100px;
+        width: 256px;
+        height: 360px;
+      }
+  
+      &.open {
+        pointer-events: all;
+        opacity: 0.4;
       }
     }
   }

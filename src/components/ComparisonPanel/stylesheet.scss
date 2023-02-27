@@ -3,7 +3,6 @@
 .comparison-panel {
   display: flex;
   flex-direction: row;
-  border-right: 1px solid $color-border;
 
   .drawer {
     width: 10.5px;
@@ -75,9 +74,14 @@
       width: 0px;
     }
 
+    .comparison-container {
+      max-height: 400px;
+      border-bottom: 1px solid $color-border;
+    }
+
     .combination {
       flex: 1;
-
+      
       .CombinationContainer {
         height: 100%;
       }
