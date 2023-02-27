@@ -407,7 +407,7 @@ type AutoFocusInputProps = {
  * Simple wrapper around `<input>`
  * that automatically focuses its contents when it is first mounted
  */
-function AutoFocusInput({
+export function AutoFocusInput({
   className,
   style,
   value,

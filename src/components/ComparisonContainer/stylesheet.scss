@@ -117,6 +117,15 @@
           }
         }
 
+        .spacing {
+          flex: 1;
+        }
+
+        .tooltip {
+          background: rgba(0, 0, 0, 0.8);
+          border-radius: 4px;
+        }
+
         .icon {
           width: 27px;
           height: 100%;
@@ -130,10 +139,6 @@
           & .icon {
             opacity: 1;
           }
-        }
-        
-        p {
-          flex: 1;
         }
       }
     }

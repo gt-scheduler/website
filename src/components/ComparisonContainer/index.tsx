@@ -1,13 +1,16 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useCallback, useId } from 'react';
 import { classes } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { faPencil, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button, { ButtonProps } from '../Button';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import Modal from '../Modal';
+import { AutoFocusInput } from '../Select';
 import './stylesheet.scss';
 
 export type SharedSchedule = {
+  id: string;
   name: string;
   schedules: {
     id: string;
@@ -16,23 +19,33 @@ export type SharedSchedule = {
   }[];
 };
 
+export type DeleteInfo = {
+  id: string;
+  type: string;
+  name: string;
+  owner?: string;
+} | null;
+
+export type EditInfo = {
+  id: string;
+  type: string;
+} | null;
+
 export default function ComparisonContainer(): React.ReactElement {
   const [compare, setCompare] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [deleteConfirm, setDeleteConfirm] = useState<{
-    id: string;
-    type: string;
-    name: string;
-    owner?: string;
-  } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
+  const [editInfo, setEditInfo] = useState<EditInfo>(null);
+  const [editValue, setEditValue] = useState('');
 
   const [{ allVersionNames }, { deleteVersion, renameVersion }] =
     useContext(ScheduleContext);
 
   // placeholder callbacks
-  const handleEditSchedule = useCallback(() => {
+  const handleEdit = useCallback(() => {
     console.log('edit friend schedule');
-  }, []);
+    console.log(editValue);
+  }, [editValue]);
 
   const handleRemoveSchedule = useCallback((id: string) => {
     console.log('remove friend schedule', id);
@@ -55,6 +68,7 @@ export default function ComparisonContainer(): React.ReactElement {
 
   const sharedSchedules: SharedSchedule[] = [
     {
+      id: 'friend1@gatech.edu',
       name: 'John Smith',
       schedules: [
         { id: '1', name: 'Main', color: '#760000' },
@@ -62,7 +76,8 @@ export default function ComparisonContainer(): React.ReactElement {
       ],
     },
     {
-      name: 'friend2@gatech.edu',
+      id: 'friend2@gatech.edu',
+      name: 'friend2',
       schedules: [
         { id: '3', name: 'Primary', color: '#007600' },
         { id: '4', name: 'New Name', color: '#000076' },
@@ -84,6 +99,7 @@ export default function ComparisonContainer(): React.ReactElement {
       ],
     },
     {
+      id: 'friend3@yahoo.com',
       name: 'friend3@yahoo.com',
       schedules: [{ id: '12', name: 'Preferred', color: '#562738' }],
     },
@@ -110,12 +126,20 @@ export default function ComparisonContainer(): React.ReactElement {
             {allVersionNames.map((version, i) => {
               return (
                 <ScheduleRow
+                  key={version.id}
                   id={version.id}
+                  type="Version"
                   onClick={(): void => handleToggleSchedule(version.id)}
                   checkboxColor={selected.includes(version.id) ? '#FFFFFF' : ''}
                   name={version.name}
                   // placeholder functions
-                  handleEditSchedule={handleEditSchedule}
+                  handleEditSchedule={(): void => {
+                    setEditInfo({
+                      id: version.id,
+                      type: 'Version',
+                    });
+                    setEditValue(version.name);
+                  }}
                   handleRemoveSchedule={(): void => {
                     setDeleteConfirm({
                       id: version.id,
@@ -124,6 +148,12 @@ export default function ComparisonContainer(): React.ReactElement {
                     });
                   }}
                   hasDelete={allVersionNames.length >= 2}
+                  editOnChange={(
+                    e: React.ChangeEvent<HTMLInputElement>
+                  ): void => setEditValue(e.target.value)}
+                  editOnKeyDown={handleEdit}
+                  editInfo={editInfo}
+                  editValue={editValue}
                 />
               );
             })}
@@ -132,13 +162,20 @@ export default function ComparisonContainer(): React.ReactElement {
             <p className="content-title">Shared with me</p>
             {sharedSchedules.map((friend) => {
               return (
-                <div className="friend">
+                <div key={friend.id} className="friend">
                   <ScheduleRow
                     // change id later on
-                    id={friend.name}
+                    id={friend.id}
+                    type="User"
                     hasCheck={false}
                     name={friend.name}
-                    handleEditSchedule={handleEditSchedule}
+                    handleEditSchedule={(): void => {
+                      setEditInfo({
+                        id: friend.id,
+                        type: 'User',
+                      });
+                      setEditValue(friend.name);
+                    }}
                     handleRemoveSchedule={(): void => {
                       setDeleteConfirm({
                         id: friend.name,
@@ -146,18 +183,33 @@ export default function ComparisonContainer(): React.ReactElement {
                         name: friend.name,
                       });
                     }}
+                    hasTooltip
+                    editOnChange={(
+                      e: React.ChangeEvent<HTMLInputElement>
+                    ): void => setEditValue(e.target.value)}
+                    editOnKeyDown={handleEdit}
+                    editInfo={editInfo}
+                    editValue={editValue}
                   />
                   {friend.schedules.map((schedule, i) => {
                     return (
                       <ScheduleRow
+                        key={schedule.id}
                         id={schedule.id}
+                        type="Schedule"
                         className="indented"
                         onClick={(): void => handleToggleSchedule(schedule.id)}
                         checkboxColor={
                           selected.includes(schedule.id) ? schedule.color : ''
                         }
                         name={schedule.name}
-                        handleEditSchedule={handleEditSchedule}
+                        handleEditSchedule={(): void => {
+                          setEditInfo({
+                            id: schedule.id,
+                            type: 'Schedule',
+                          });
+                          setEditValue(schedule.name);
+                        }}
                         handleRemoveSchedule={(): void => {
                           setDeleteConfirm({
                             id: schedule.id,
@@ -166,6 +218,12 @@ export default function ComparisonContainer(): React.ReactElement {
                             owner: friend.name,
                           });
                         }}
+                        editOnChange={(
+                          e: React.ChangeEvent<HTMLInputElement>
+                        ): void => setEditValue(e.target.value)}
+                        editOnKeyDown={handleEdit}
+                        editInfo={editInfo}
+                        editValue={editValue}
                       />
                     );
                   })}
@@ -259,6 +317,7 @@ export default function ComparisonContainer(): React.ReactElement {
 
 type ScheduleRowProps = {
   id: string;
+  type: string;
   className?: string;
   hasCheck?: boolean;
   onClick?: () => void;
@@ -267,10 +326,16 @@ type ScheduleRowProps = {
   handleEditSchedule: () => void;
   handleRemoveSchedule: () => void;
   hasDelete?: boolean;
+  hasTooltip?: boolean;
+  editOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  editOnKeyDown: () => void;
+  editInfo: EditInfo;
+  editValue: string;
 };
 
 function ScheduleRow({
   id,
+  type,
   className,
   hasCheck = true,
   onClick,
@@ -279,7 +344,17 @@ function ScheduleRow({
   handleEditSchedule,
   handleRemoveSchedule,
   hasDelete = true,
+  hasTooltip = false,
+  editOnChange,
+  editOnKeyDown,
+  editInfo,
+  editValue,
 }: ScheduleRowProps): React.ReactElement {
+  const tooltipId = useId();
+  const [hover, setHover] = useState(false);
+
+  const edit = editInfo != null && editInfo.type === type && editInfo.id === id;
+
   return (
     <div className={classes('checkbox-container', className)}>
       {hasCheck && (
@@ -289,7 +364,43 @@ function ScheduleRow({
           style={{ backgroundColor: checkboxColor }}
         />
       )}
-      <p>{name}</p>
+      {edit && (
+        <AutoFocusInput
+          className="edit-input"
+          value={editValue}
+          onChange={editOnChange}
+          placeholder={name}
+          onKeyDown={editOnKeyDown}
+        />
+      )}
+      {!edit && (
+        <>
+          <div
+            id={tooltipId}
+            onMouseEnter={(): void => setHover(true)}
+            onMouseLeave={(): void => setHover(false)}
+          >
+            <p>{name}</p>
+            {hasTooltip && id !== name && (
+              <ReactTooltip
+                key={id}
+                anchorId={tooltipId}
+                className="tooltip"
+                variant="dark"
+                isOpen={hover}
+                setIsOpen={setHover}
+                delayShow={20}
+                delayHide={100}
+                // key={deviceHasHover ? 0 : 1}
+                // events={deviceHasHover ? ['hover'] : []}
+              >
+                <p>{id}</p>
+              </ReactTooltip>
+            )}
+          </div>
+          <div className="spacing" />
+        </>
+      )}
       <Button className="icon" onClick={handleEditSchedule} key={`${id}-edit`}>
         <FontAwesomeIcon icon={faPencil} size="xs" />
       </Button>
