@@ -28,6 +28,7 @@ export type DeleteInfo = {
 
 export type EditInfo = {
   id: string;
+  owner?: string;
   type: string;
 } | null;
 
@@ -41,32 +42,7 @@ export default function ComparisonContainer(): React.ReactElement {
   const [{ allVersionNames }, { deleteVersion, renameVersion }] =
     useContext(ScheduleContext);
 
-  // placeholder callbacks
-  const handleEdit = useCallback(() => {
-    console.log('edit friend schedule');
-    console.log(editValue);
-  }, [editValue]);
-
-  const handleRemoveSchedule = useCallback((id: string) => {
-    console.log('remove friend schedule', id);
-  }, []);
-
-  const handleRemoveFriend = useCallback((id: string) => {
-    console.log('remove user friend', id);
-  }, []);
-
-  const handleToggleSchedule = useCallback(
-    (id: string) => {
-      if (selected.includes(id)) {
-        setSelected(selected.filter((selectedId: string) => selectedId !== id));
-      } else {
-        setSelected(selected.concat([id]));
-      }
-    },
-    [selected]
-  );
-
-  const sharedSchedules: SharedSchedule[] = [
+  const [sharedSchedules, setSharedSchedules] = useState<SharedSchedule[]>([
     {
       id: 'friend1@gatech.edu',
       name: 'John Smith',
@@ -103,7 +79,102 @@ export default function ComparisonContainer(): React.ReactElement {
       name: 'friend3@yahoo.com',
       schedules: [{ id: '12', name: 'Preferred', color: '#562738' }],
     },
-  ];
+  ]);
+
+  // placeholder callbacks
+  const handleEdit = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        if (editValue.trim() === '') return;
+        if (editInfo?.type === 'Version') {
+          renameVersion(editInfo?.id, editValue.trim());
+        } else if (editInfo?.type === 'User') {
+          setSharedSchedules(
+            sharedSchedules.map((friend) => {
+              if (friend.id === editInfo?.id) {
+                return {
+                  id: friend.id,
+                  name: editValue.trim(),
+                  schedules: friend.schedules,
+                };
+              }
+              return friend;
+            })
+          );
+        } else {
+          setSharedSchedules(
+            sharedSchedules.map((friend) => {
+              if (friend.id === editInfo?.owner) {
+                return {
+                  id: friend.id,
+                  name: friend.name,
+                  schedules: friend.schedules.map((schedule) => {
+                    if (schedule.id === editInfo?.id) {
+                      return {
+                        id: schedule.id,
+                        name: editValue.trim(),
+                        color: schedule.color,
+                      };
+                    }
+                    return schedule;
+                  }),
+                };
+              }
+              return friend;
+            })
+          );
+        }
+        setEditInfo(null);
+        setEditValue('');
+      }
+
+      if (e.key === 'Escape') {
+        setEditInfo(null);
+        setEditValue('');
+      }
+    },
+    [editInfo, editValue, sharedSchedules]
+  );
+
+  const handleRemoveFriend = useCallback(
+    (id: string) => {
+      setSharedSchedules(sharedSchedules.filter((friend) => friend.id !== id));
+    },
+    [sharedSchedules]
+  );
+
+  const handleRemoveSchedule = useCallback(
+    (id: string, owner?: string) => {
+      setSharedSchedules(
+        sharedSchedules
+          .map((friend) => {
+            if (friend.id === owner) {
+              return {
+                id: friend.id,
+                name: friend.name,
+                schedules: friend.schedules.filter(
+                  (schedule) => schedule.id !== id
+                ),
+              };
+            }
+            return friend;
+          })
+          .filter((friend) => friend.schedules.length !== 0)
+      );
+    },
+    [sharedSchedules]
+  );
+
+  const handleToggleSchedule = useCallback(
+    (id: string) => {
+      if (selected.includes(id)) {
+        setSelected(selected.filter((selectedId: string) => selectedId !== id));
+      } else {
+        setSelected(selected.concat([id]));
+      }
+    },
+    [selected]
+  );
 
   return (
     <div className="comparison-container">
@@ -178,7 +249,7 @@ export default function ComparisonContainer(): React.ReactElement {
                     }}
                     handleRemoveSchedule={(): void => {
                       setDeleteConfirm({
-                        id: friend.name,
+                        id: friend.id,
                         type: 'User',
                         name: friend.name,
                       });
@@ -197,7 +268,7 @@ export default function ComparisonContainer(): React.ReactElement {
                         key={schedule.id}
                         id={schedule.id}
                         type="Schedule"
-                        className="indented"
+                        owner={friend.id}
                         onClick={(): void => handleToggleSchedule(schedule.id)}
                         checkboxColor={
                           selected.includes(schedule.id) ? schedule.color : ''
@@ -206,6 +277,7 @@ export default function ComparisonContainer(): React.ReactElement {
                         handleEditSchedule={(): void => {
                           setEditInfo({
                             id: schedule.id,
+                            owner: friend.id,
                             type: 'Schedule',
                           });
                           setEditValue(schedule.name);
@@ -215,7 +287,7 @@ export default function ComparisonContainer(): React.ReactElement {
                             id: schedule.id,
                             type: 'Schedule',
                             name: schedule.name,
-                            owner: friend.name,
+                            owner: friend.id,
                           });
                         }}
                         editOnChange={(
@@ -249,7 +321,10 @@ export default function ComparisonContainer(): React.ReactElement {
                     } else if (deleteConfirm.type === 'User') {
                       handleRemoveFriend(deleteConfirm.id);
                     } else {
-                      handleRemoveSchedule(deleteConfirm.id);
+                      handleRemoveSchedule(
+                        deleteConfirm.id,
+                        deleteConfirm.owner
+                      );
                     }
                   }
                   setDeleteConfirm(null);
@@ -318,7 +393,7 @@ export default function ComparisonContainer(): React.ReactElement {
 type ScheduleRowProps = {
   id: string;
   type: string;
-  className?: string;
+  owner?: string;
   hasCheck?: boolean;
   onClick?: () => void;
   checkboxColor?: string;
@@ -328,7 +403,7 @@ type ScheduleRowProps = {
   hasDelete?: boolean;
   hasTooltip?: boolean;
   editOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  editOnKeyDown: () => void;
+  editOnKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   editInfo: EditInfo;
   editValue: string;
 };
@@ -336,7 +411,7 @@ type ScheduleRowProps = {
 function ScheduleRow({
   id,
   type,
-  className,
+  owner,
   hasCheck = true,
   onClick,
   checkboxColor,
@@ -353,20 +428,24 @@ function ScheduleRow({
   const tooltipId = useId();
   const [hover, setHover] = useState(false);
 
-  const edit = editInfo != null && editInfo.type === type && editInfo.id === id;
+  const edit =
+    editInfo != null &&
+    editInfo.type === type &&
+    editInfo.id === id &&
+    editInfo.owner === owner;
 
   return (
-    <div className={classes('checkbox-container', className)}>
+    <div className="checkbox-container">
       {hasCheck && (
         <div
-          className="checkbox"
+          className={classes('checkbox', type === 'Schedule' && 'indented')}
           onClick={onClick}
           style={{ backgroundColor: checkboxColor }}
         />
       )}
       {edit && (
         <AutoFocusInput
-          className="edit-input"
+          className={classes('edit-input', hasCheck && 'check')}
           value={editValue}
           onChange={editOnChange}
           placeholder={name}
@@ -377,6 +456,7 @@ function ScheduleRow({
         <>
           <div
             id={tooltipId}
+            className={classes('name', hasCheck && 'check')}
             onMouseEnter={(): void => setHover(true)}
             onMouseLeave={(): void => setHover(false)}
           >

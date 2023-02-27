@@ -97,23 +97,48 @@
         align-items: center;
         position: relative;
         height: 22px;
-        padding-left: 12px;
-
-        &.indented {
-          padding-left: 24px;
-        }
         
         .checkbox {
+          margin-left: 12px;
           border: 1px solid;
           border-radius: 3px;
           border-color: var(--theme-fg);
+          transition-duration: $theme-switch-transition-duration;
+          transition-property: border-color;
 
           width: 11px;
           height: 11px;
-          margin-right: 8px;
 
           &:hover {
             cursor: pointer;
+          }
+
+          &.indented {
+            margin-left: 24px;
+          }
+        }
+
+        .name {
+          margin-left: 12px;
+
+          &.check {
+            margin-left: 8px;
+          }
+        }
+
+        .edit-input {
+          height: 22px;
+          border-radius: 4px;
+          padding: 4px;
+          flex: 1 1;
+          font-size: 12px;
+          font-weight: 500;
+          outline: none;
+          border: 1px solid var(--theme-fg);
+          margin-left: 8px;
+
+          &.check {
+            margin-left: 4px;
           }
         }
 

@@ -5,7 +5,7 @@
   flex-direction: row;
 
   .drawer {
-    width: 10.5px;
+    width: 13px;
     border-width: 0px 1px 0px 1px;
     border-color: $color-border;
     border-style: solid;
@@ -19,7 +19,7 @@
     
     .drawer-line {
       flex: 1;
-      width: 4px;
+      width: 5px;
       border-width: 0px 1px 0px 1px;
       border-color: $color-border;
       border-style: solid;
@@ -29,14 +29,14 @@
       display: flex;
       align-items: center;
       height: 48px;
-      transform: scale(0.9, 2.5);
+      transform: scale(0.9, 1.5);
 
       .arrow {
         position: absolute;
         height: 10px;
         width: 10px;
         right: -8px;
-        border-width: 0px 1px 1px 0px;
+        border-width: 0px 2px 2px 0px;
         border-color: $color-border;
         border-style: solid;
         transform: rotate(135deg);
@@ -51,7 +51,7 @@
     .tooltip {
       background: black;
       border-radius: 4px;
-      z-index: 100;
+      z-index: 10;
 
       p {
         margin: 0px;
