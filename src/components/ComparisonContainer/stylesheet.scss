@@ -207,3 +207,26 @@
     width: auto;
   }
 }
+
+.shared-schedule-modal {
+
+  h2 {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  p {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .cancel-button {
+    width: 26px;
+    height: 26px;
+    position: absolute;
+    top: 11px;
+    right: 11px;
+    border-radius: 50%;
+  }
+}

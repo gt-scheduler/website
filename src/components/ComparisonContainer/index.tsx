@@ -1,7 +1,11 @@
 import React, { useState, useContext, useCallback, useId } from 'react';
 import { classes } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
-import { faPencil, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPencil,
+  faCircleXmark,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button, { ButtonProps } from '../Button';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
@@ -304,6 +308,7 @@ export default function ComparisonContainer(): React.ReactElement {
             })}
           </div>
           <Modal
+            className="shared-schedule-modal"
             show={deleteConfirm != null}
             onHide={(): void => setDeleteConfirm(null)}
             buttons={[
@@ -333,9 +338,15 @@ export default function ComparisonContainer(): React.ReactElement {
             ]}
             preserveChildrenWhileHiding
           >
+            <Button
+              className="cancel-button"
+              onClick={(): void => setDeleteConfirm(null)}
+            >
+              <FontAwesomeIcon icon={faXmark} size="xl" />
+            </Button>
             {deleteConfirm?.type === 'Version' && (
               <div style={{ textAlign: 'center' }}>
-                <h2>Delete confirmation</h2>
+                <p>Delete confirmation</p>
                 <p>
                   Are you sure you want to delete schedule &ldquo;
                   {deleteConfirm?.name ?? '<unknown>'}&rdquo;?
@@ -366,9 +377,7 @@ export default function ComparisonContainer(): React.ReactElement {
                   your view?
                 </p>
                 <p>
-                  Schedule: <b>{deleteConfirm?.name}</b>
-                </p>
-                <p>
+                  Schedule: <b>{deleteConfirm?.name}</b> <br />
                   Owner: <b>{deleteConfirm?.owner}</b>
                 </p>
                 <p>
