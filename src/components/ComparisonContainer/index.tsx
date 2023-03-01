@@ -313,11 +313,6 @@ export default function ComparisonContainer(): React.ReactElement {
             onHide={(): void => setDeleteConfirm(null)}
             buttons={[
               {
-                label: 'Cancel',
-                cancel: true,
-                onClick: (): void => setDeleteConfirm(null),
-              },
-              {
                 label: 'Remove',
                 onClick: (): void => {
                   if (deleteConfirm != null) {
@@ -346,7 +341,7 @@ export default function ComparisonContainer(): React.ReactElement {
             </Button>
             {deleteConfirm?.type === 'Version' && (
               <div style={{ textAlign: 'center' }}>
-                <p>Delete confirmation</p>
+                <h2>Delete confirmation</h2>
                 <p>
                   Are you sure you want to delete schedule &ldquo;
                   {deleteConfirm?.name ?? '<unknown>'}&rdquo;?
