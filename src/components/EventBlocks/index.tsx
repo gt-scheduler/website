@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { MouseEventHandler, useState } from 'react';
 import { Immutable } from 'immer';
+import Draggable, {
+  DraggableCore,
+  DraggableData,
+  DraggableEvent,
+} from 'react-draggable';
 
 import { daysToString, periodToString } from '../../utils/misc';
 import { TimeBlocks } from '..';
 import { Period, Event } from '../../types';
 import { TimeBlockPosition, SizeInfo } from '../TimeBlocks';
+import { CLOSE, OPEN, DAYS } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -42,50 +48,149 @@ export default function EventBlocks({
   selectedMeeting,
   onSelectMeeting,
 }: EventBlocksProps): React.ReactElement | null {
+  const [newPos, setNewPos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleDragStart = (
+    dragEvent: DraggableEvent,
+    info: DraggableData
+  ): void => {
+    console.log('drag start', info);
+    // setNewPos({ ...newPos, x: info.deltaX, y: info.deltaY });
+    // console.log('New Pos: ', newPos);
+    // console.log('Days: ', event.days);
+    // console.log('SizeInfo: ', sizeInfo);
+  };
+
+  const handleMouseMovement = (
+    mouse: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ): void => {
+    setMousePos({ ...mousePos, x: mouse.clientX, y: mouse.clientY });
+  };
+
+  const handleDrag = (dragEvent: DraggableEvent, info: DraggableData): void => {
+    console.log('drag');
+    setNewPos({ ...newPos, x: mousePos.x, y: mousePos.y });
+    if (document.getElementById(event.id) != null) {
+      document.getElementById(event.id)!.style.translate =
+        '(newPos.x, newPos.y)';
+    }
+  };
+
+  const handleDragStop = (
+    dragEvent: DraggableEvent,
+    info: DraggableData
+  ): void => {
+    // console.log('drag stop');
+    setNewPos({ ...newPos, x: info.lastX, y: info.lastY });
+  };
+
+  // sizeInfo[event.days[0]!]![`${event.period.start}-${event.period.end}`]!.rowIndex
+
   return (
-    <TimeBlocks
-      className={className}
-      id={event.id}
-      meetingIndex={1}
-      period={event.period}
-      days={event.days}
-      contentHeader={[
-        {
-          className: 'event-name',
-          content: event.name,
-        },
-      ]}
-      contentBody={
-        event.period.end - event.period.start >= 30
-          ? [
-              {
-                className: 'period',
-                content: periodToString(event.period),
-              },
-            ]
-          : []
-      }
-      popover={[
-        {
-          name: 'Name',
-          content: event.name,
-        },
-        {
-          name: 'Time',
-          content: [
-            daysToString(event.days),
-            periodToString(event.period),
-          ].join(' '),
-        },
-      ]}
-      capture={capture}
-      sizeInfo={sizeInfo}
-      includeDetailsPopover={includeDetailsPopover}
-      includeContent={includeContent}
-      canBeTabFocused={canBeTabFocused}
-      deviceHasHover={deviceHasHover}
-      selectedMeeting={selectedMeeting}
-      onSelectMeeting={onSelectMeeting}
-    />
+    <Draggable
+    // onStart={handleDragStart}
+    // onDrag={handleDrag}
+    // onStop={handleDragStop}
+    >
+      <div id="TEST" onMouseMove={handleMouseMovement}>
+        <TimeBlocks
+          className={className}
+          id={event.id}
+          meetingIndex={1}
+          period={event.period}
+          days={event.days}
+          contentHeader={[
+            {
+              className: 'event-name',
+              content: event.name,
+            },
+          ]}
+          contentBody={
+            event.period.end - event.period.start >= 30
+              ? [
+                  {
+                    className: 'period',
+                    content: periodToString(event.period),
+                  },
+                ]
+              : []
+          }
+          popover={[
+            {
+              name: 'Name',
+              content: event.name,
+            },
+            {
+              name: 'Time',
+              content: [
+                daysToString(event.days),
+                periodToString(event.period),
+              ].join(' '),
+            },
+          ]}
+          capture={capture}
+          sizeInfo={sizeInfo}
+          includeDetailsPopover={includeDetailsPopover}
+          includeContent={includeContent}
+          canBeTabFocused={canBeTabFocused}
+          deviceHasHover={deviceHasHover}
+          selectedMeeting={selectedMeeting}
+          onSelectMeeting={onSelectMeeting}
+        />
+      </div>
+    </Draggable>
+
+    // <div className="TEST"
+    //   draggable
+    // // onDragStart={handleDragStart}
+    // // onDrag={handleDrag}
+    // // onDragEnd={handleDragStop}
+    // >
+    //   <TimeBlocks
+    //     className={className}
+    //     id={event.id}
+    //     meetingIndex={1}
+    //     period={event.period}
+    //     days={event.days}
+    //     contentHeader={[
+    //       {
+    //         className: 'event-name',
+    //         content: event.name,
+    //       },
+    //     ]}
+    //     contentBody={
+    //       event.period.end - event.period.start >= 30
+    //         ? [
+    //           {
+    //             className: 'period',
+    //             content: periodToString(event.period),
+    //           },
+    //         ]
+    //         : []
+    //     }
+    //     popover={[
+    //       {
+    //         name: 'Name',
+    //         content: event.name,
+    //       },
+    //       {
+    //         name: 'Time',
+    //         content: [
+    //           daysToString(event.days),
+    //           periodToString(event.period),
+    //         ].join(' '),
+    //       },
+    //     ]}
+    //     capture={capture}
+    //     sizeInfo={sizeInfo}
+    //     includeDetailsPopover={includeDetailsPopover}
+    //     includeContent={includeContent}
+    //     canBeTabFocused={canBeTabFocused}
+    //     deviceHasHover={deviceHasHover}
+    //     selectedMeeting={selectedMeeting}
+    //     onSelectMeeting={onSelectMeeting}
+    //   />
+    // </div>
   );
 }

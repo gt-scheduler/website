@@ -25,6 +25,7 @@
     "node-sass": "^6.0.1",
     "normalize.css": "^8.0.1",
     "react": "^18.2.0",
+    "react-draggable": "4.4.5",
     "react-dom": "^18.2.0",
     "react-firebaseui": "^5.0.2",
     "react-map-gl": "^5.2.10",

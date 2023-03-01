@@ -13,3 +13,12 @@
   max-width: calc(max(200px, 15vw));
   overflow-wrap: break-word;
 }
+
+.TEST {
+
+  // cursor: grab;
+  .meeting:active {
+    z-index: 1;
+    background-color: none;
+  }
+}

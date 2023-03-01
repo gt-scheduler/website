@@ -85,6 +85,10 @@ export default function TimeBlocks({
   const color = colorMap[id];
   const sizeInfoKey = makeSizeInfoKey(period);
 
+  // console.log("!!!!!!");
+  // console.log("Class Name: ", contentHeader);
+  // console.log("Period: ", period);
+
   return (
     <div
       className={classes(
