@@ -88,12 +88,26 @@ export default function EventBlocks({
   // sizeInfo[event.days[0]!]![`${event.period.start}-${event.period.end}`]!.rowIndex
 
   return (
-    <Draggable
-    // onStart={handleDragStart}
-    // onDrag={handleDrag}
-    // onStop={handleDragStop}
+    <DraggableCore
+      onStart={handleDragStart}
+      onDrag={handleDrag}
+      onStop={handleDragStop}
     >
-      <div id="TEST" onMouseMove={handleMouseMovement}>
+      <div
+        id="TEST"
+        onMouseMove={handleMouseMovement}
+        // style={{
+        //   top: `${((event.period.start - OPEN) / (CLOSE - OPEN)) * 100}%`,
+        //   height: `${(Math.max(15, event.period.end - event.period.start) / (CLOSE - OPEN)) * 100
+        //     }%`,
+        //   width: `${20 / sizeInfo[event.days[0]!]![`${event.period.start}-${event.period.end}`]!.rowSize}%`,
+        //   left: `${DAYS.indexOf(event.days[0]!) * 20 + sizeInfo[event.days[0]!]![`${event.period.start}-${event.period.end}`]!.rowIndex * (20 / sizeInfo[event.days[0]!]![`${event.period.start}-${event.period.end}`]!.rowSize)
+        //     }%`,
+        //   // ...({
+        //   //   '--meeting-color': color,
+        //   // } as React.CSSProperties),
+        // }}
+      >
         <TimeBlocks
           className={className}
           id={event.id}
@@ -139,7 +153,7 @@ export default function EventBlocks({
           onSelectMeeting={onSelectMeeting}
         />
       </div>
-    </Draggable>
+    </DraggableCore>
 
     // <div className="TEST"
     //   draggable
