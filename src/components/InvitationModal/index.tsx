@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { castDraft } from 'immer';
 import axios, { AxiosError } from 'axios';
 
+import { ApiErrorResponse } from '../../data/types';
 import { ScheduleContext } from '../../contexts';
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
@@ -27,14 +28,6 @@ export function InvitationModalContent(): React.ReactElement {
   const [{ currentFriends, currentVersion, term }, { updateFriends }] =
     useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
-
-  const emails = Object.keys(currentFriends ?? {}).map((friend: string) => {
-    return [
-      currentFriends[friend]!.email,
-      currentFriends[friend]!.status,
-      friend,
-    ];
-  });
 
   const [input, setInput] = useState('');
   const [validMessage, setValidMessage] = useState('');
@@ -131,16 +124,18 @@ export function InvitationModalContent(): React.ReactElement {
           version: currentVersion,
         }
       )
-      .then((res) => {
+      .then(() => {
         setValidMessage('Successfully sent!');
         setValidClassName('valid-email');
       })
-      .catch((err: AxiosError) => {
+      .catch((err) => {
         setValidClassName('invalid-email');
-        // if (err.response && err.response.data.message) {
-        //   setValidMessage(err.response.data.message);
-        //   return;
-        // }
+        const error = err as AxiosError;
+        if (error.response) {
+          const apiError = error.response.data as ApiErrorResponse;
+          setValidMessage(apiError.message);
+          return;
+        }
 
         setValidMessage('Error sending invitation. Please try again later.');
       });
@@ -150,15 +145,13 @@ export function InvitationModalContent(): React.ReactElement {
   const verifyEmail = (): void => {
     if (
       // eslint-disable-next-line
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-        input
-      )
+      /^\S+@\S+\.\S+$/.test(input)
     ) {
       sendInvitation()
         .then(() => {
           setInput('');
         })
-        .catch((err) => {
+        .catch(() => {
           setValidMessage('Error sending invitation. Please try again later.');
           setValidClassName('invalid-email');
         });
@@ -227,27 +220,30 @@ export function InvitationModalContent(): React.ReactElement {
           Users Invited to View <strong>Primary</strong>
         </p>
         <div className="shared-emails" key="email">
-          {emails.map((element) => (
-            <div className="email-and-status" id={element[0]}>
-              <div className="individual-shared-email" id={element[1]}>
-                {element[0]}
+          {Object.keys(currentFriends).map((friend) => (
+            <div
+              className="email-and-status"
+              id={currentFriends[friend]?.email}
+            >
+              <div className="individual-shared-email">
+                {currentFriends[friend]?.email}
                 <Button
                   className="button-remove"
                   onClick={(): void => {
-                    handleDelete(element[2]!);
+                    handleDelete(friend);
                   }}
                 >
                   <FontAwesomeIcon className="circle" icon={faCircle} />
                   <FontAwesomeIcon className="remove" icon={faClose} />
                 </Button>
                 <ReactTooltip
-                  anchorId={element[0]}
+                  anchorId={currentFriends[friend]?.email}
                   className="status-tooltip"
                   variant="dark"
                   place="top"
                   offset={2}
                 >
-                  Status: {element[1]}
+                  Status: {currentFriends[friend]?.status}
                 </ReactTooltip>
               </div>
             </div>

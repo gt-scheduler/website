@@ -33,24 +33,22 @@ export default function useFirebaseAuth(): LoadingState<AccountContextValue> {
             email: user.email,
             id: user.uid,
             getToken: (): Promise<string | void> => {
-              if (firebase.auth().currentUser === null) {
+              const { currentUser } = firebase.auth();
+              if (!currentUser) {
                 return Promise.reject(
                   new ErrorWithFields({
                     message: 'firebase.auth().currentUser is null',
                   })
                 );
               }
-              return firebase
-                .auth()
-                .currentUser!.getIdToken()
-                .catch((err) => {
-                  softError(
-                    new ErrorWithFields({
-                      message: 'call to firebase.auth().getIdToken() failed',
-                      source: err,
-                    })
-                  );
-                });
+              return currentUser.getIdToken().catch((err) => {
+                softError(
+                  new ErrorWithFields({
+                    message: 'call to firebase.auth().getIdToken() failed',
+                    source: err,
+                  })
+                );
+              });
             },
             provider,
             signOut: () => {

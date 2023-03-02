@@ -160,3 +160,7 @@ export interface FriendData {
 export interface FriendTermData {
   accessibleSchedules: Record<string, string[]>;
 }
+
+export type ApiErrorResponse = {
+  message: string;
+};
