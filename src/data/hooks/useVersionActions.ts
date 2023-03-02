@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { softError, ErrorWithFields } from '../../log';
 import {
   defaultSchedule,
+  FriendShareData,
   generateScheduleVersionId,
   TermScheduleData,
 } from '../types';
@@ -13,6 +14,10 @@ export type HookResult = {
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
+  updateFriends: (
+    versionId: string,
+    newFriends: Record<string, FriendShareData>
+  ) => void;
 };
 
 /**
@@ -40,6 +45,7 @@ export default function useVersionActions({
       updateTermScheduleData((draft) => {
         draft.versions[id] = {
           name,
+          friends: {},
           schedule: castDraft(defaultSchedule),
           createdAt: new Date().toISOString(),
         };
@@ -90,6 +96,7 @@ export default function useVersionActions({
             const newId = generateScheduleVersionId();
             draft.versions[newId] = {
               name: 'Primary',
+              friends: {},
               createdAt: new Date().toISOString(),
               schedule: castDraft(defaultSchedule),
             };
@@ -181,5 +188,37 @@ export default function useVersionActions({
     [updateTermScheduleData, addNewVersion]
   );
 
-  return { addNewVersion, deleteVersion, renameVersion, cloneVersion };
+  const updateFriends = useCallback(
+    (versionId: string, newFriends: Record<string, FriendShareData>): void => {
+      updateTermScheduleData((draft) => {
+        const existingDraft = draft.versions[versionId];
+        if (existingDraft === undefined) {
+          softError(
+            new ErrorWithFields({
+              message:
+                "deleteFriendRecord called with version name that doesn't exist; ignoring",
+              fields: {
+                allVersionNames: Object.entries(draft.versions).map(
+                  ([versionId_, { name }]) => ({ id: versionId_, name })
+                ),
+                versionId,
+                versionCount: Object.keys(draft.versions).length,
+              },
+            })
+          );
+          return;
+        }
+        existingDraft.friends = castDraft(newFriends);
+      });
+    },
+    [updateTermScheduleData]
+  );
+
+  return {
+    addNewVersion,
+    deleteVersion,
+    renameVersion,
+    cloneVersion,
+    updateFriends,
+  };
 }

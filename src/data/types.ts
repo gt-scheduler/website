@@ -134,8 +134,14 @@ export interface Version3TermScheduleData {
 
 export interface Version3ScheduleVersion {
   name: string;
+  friends: Record<string, FriendShareData>;
   createdAt: string;
   schedule: Version3Schedule;
+}
+
+export interface FriendShareData {
+  status: 'Pending' | 'Accepted';
+  email: string;
 }
 
 export interface Version3Schedule {

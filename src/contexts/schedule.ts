@@ -3,12 +3,13 @@ import { Draft, Immutable } from 'immer';
 
 import { Oscar } from '../data/beans';
 import { EMPTY_OSCAR } from '../data/beans/Oscar';
-import { defaultSchedule, Schedule } from '../data/types';
+import { defaultSchedule, FriendShareData, Schedule } from '../data/types';
 import { ErrorWithFields } from '../log';
 
 type ExtraData = {
   term: string;
   currentVersion: string;
+  currentFriends: Record<string, FriendShareData>;
   allVersionNames: { id: string; name: string }[];
   // `oscar` is included below as a separate type
 };
@@ -28,6 +29,10 @@ export type ScheduleContextSetters = {
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
+  updateFriends: (
+    versionId: string,
+    newFriends: Record<string, FriendShareData>
+  ) => void;
 };
 export type ScheduleContextValue = [
   ScheduleContextData,
@@ -37,6 +42,7 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
   {
     term: '',
     currentVersion: '',
+    currentFriends: {},
     allVersionNames: [],
     oscar: EMPTY_OSCAR,
     ...defaultSchedule,
@@ -68,6 +74,18 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
         message: 'empty ScheduleContext.setCurrentVersion value being used',
         fields: {
           next,
+        },
+      });
+    },
+    updateFriends: (
+      versionId: string,
+      newFriends: Record<string, FriendShareData>
+    ): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.deleteFriendRecord value being used',
+        fields: {
+          versionId,
+          newFriends,
         },
       });
     },

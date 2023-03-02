@@ -3,15 +3,20 @@ import React, {
   KeyboardEvent,
   useCallback,
   useMemo,
+  useContext,
   useState,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { faCircle, faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { castDraft } from 'immer';
+import axios, { AxiosError } from 'axios';
 
+import { ScheduleContext } from '../../contexts';
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
 import Button from '../Button';
+import { AccountContext, SignedIn } from '../../contexts/account';
 
 import './stylesheet.scss';
 
@@ -19,26 +24,18 @@ import './stylesheet.scss';
  * Inner content of the invitation modal.
  */
 export function InvitationModalContent(): React.ReactElement {
-  // Array for testing style of shared emails
-  // eslint-disable-next-line
-  const [emails, setEmails] = useState([
-    ['user1@example.com', 'Pending'],
-    ['user2@example.com', 'Accepted'],
-    ['ReallyLongNameThatWillNotFitInRowAbove@example.com', 'Accepted'],
-    ['goodEmail@gmail.com', 'Accepted'],
-    ['user12@example.com', 'Pending'],
-    ['user22@example.com', 'Accepted'],
-    ['2ReallyLongNameThatWillNotFitInRowAbove@example.com', 'Accepted'],
-    ['2goodEmail@gmail.com', 'Accepted'],
-  ]);
+  const [{ currentFriends, currentVersion, term }, { updateFriends }] =
+    useContext(ScheduleContext);
+  const accountContext = useContext(AccountContext);
 
-  // Array to test invalid email
-  const validUsers = [
-    'user1@example.com',
-    'user2@example.com',
-    'ReallyLongNameThatWillNotFitInRowAbove@example.com',
-    'goodEmail@gmail.com',
-  ];
+  const emails = Object.keys(currentFriends ?? {}).map((friend: string) => {
+    return [
+      currentFriends[friend]!.email,
+      currentFriends[friend]!.status,
+      friend,
+    ];
+  });
+
   const [input, setInput] = useState('');
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
@@ -122,16 +119,61 @@ export function InvitationModalContent(): React.ReactElement {
     [searchResults]
   );
 
-  function verifyUser(): void {
-    if (validUsers.includes(input)) {
-      setValidMessage('Successfully sent!');
-      setValidClassName('valid-email');
-      setInput('');
+  const sendInvitation = async (): Promise<void> => {
+    const IdToken = await (accountContext as SignedIn).getToken();
+    axios
+      .post(
+        'http://127.0.0.1:5001/gt-scheduler-web-dev/us-central1/createFriendInvitation',
+        {
+          term,
+          friendEmail: input,
+          IDToken: IdToken,
+          version: currentVersion,
+        }
+      )
+      .then((res) => {
+        setValidMessage('Successfully sent!');
+        setValidClassName('valid-email');
+      })
+      .catch((err: AxiosError) => {
+        setValidClassName('invalid-email');
+        // if (err.response && err.response.data.message) {
+        //   setValidMessage(err.response.data.message);
+        //   return;
+        // }
+
+        setValidMessage('Error sending invitation. Please try again later.');
+      });
+  };
+
+  // verify email with a regex and send invitation if valid
+  const verifyEmail = (): void => {
+    if (
+      // eslint-disable-next-line
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        input
+      )
+    ) {
+      sendInvitation()
+        .then(() => {
+          setInput('');
+        })
+        .catch((err) => {
+          setValidMessage('Error sending invitation. Please try again later.');
+          setValidClassName('invalid-email');
+        });
     } else {
       setValidMessage('Invalid Email');
       setValidClassName('invalid-email');
     }
-  }
+  };
+
+  // delete friend from record of friends
+  const handleDelete = (friendId: string): void => {
+    const newFriends = castDraft(currentFriends);
+    delete newFriends[friendId];
+    updateFriends(currentVersion, newFriends);
+  };
 
   return (
     <div className="invitation-modal-content">
@@ -174,7 +216,7 @@ export function InvitationModalContent(): React.ReactElement {
             )}
             <text className={validClassName}>{validMessage}</text>
           </div>
-          <button type="button" className="send-button" onClick={verifyUser}>
+          <button type="button" className="send-button" onClick={verifyEmail}>
             Send Invite
           </button>
         </div>
@@ -189,7 +231,12 @@ export function InvitationModalContent(): React.ReactElement {
             <div className="email-and-status" id={element[0]}>
               <div className="individual-shared-email" id={element[1]}>
                 {element[0]}
-                <Button className="button-remove">
+                <Button
+                  className="button-remove"
+                  onClick={(): void => {
+                    handleDelete(element[2]!);
+                  }}
+                >
                   <FontAwesomeIcon className="circle" icon={faCircle} />
                   <FontAwesomeIcon className="remove" icon={faClose} />
                 </Button>
