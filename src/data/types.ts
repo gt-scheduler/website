@@ -1,4 +1,4 @@
-import { Immutable } from 'immer';
+import { castImmutable, Immutable } from 'immer';
 
 import { Event } from '../types';
 import { generateRandomId } from '../utils/misc';
@@ -41,6 +41,16 @@ export const defaultScheduleData: Immutable<ScheduleData> = {
 
 export const defaultFriendData: Immutable<FriendData> = {
   terms: {},
+  info: {},
+};
+
+export const defaultFriendInfo: Immutable<FriendInfo> = castImmutable({
+  nickname: '',
+  email: '',
+});
+
+export const defaultFriendTermData: Immutable<FriendTermData> = {
+  accessibleSchedules: {},
 };
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
@@ -147,10 +157,32 @@ export interface Version3Schedule {
   sortingOptionIndex: number;
 }
 
-export interface FriendData {
-  terms: Record<string, FriendTermData>;
-}
+export type FriendIds = Record<string, string[]>;
 
 export interface FriendTermData {
-  accessibleSchedules: Record<string, string[]>;
+  accessibleSchedules: FriendIds;
 }
+
+export interface FriendInfo {
+  nickname: string;
+  email: string;
+}
+
+export type FriendInfos = Record<string, FriendInfo>;
+
+export interface FriendData {
+  terms: Record<string, FriendTermData>;
+  info: FriendInfos;
+}
+
+export interface FriendScheduleData {
+  versions: Record<
+    string,
+    {
+      name: string;
+      schedule: ScheduleData;
+    }
+  >;
+}
+
+export type FriendSchedulesData = Record<string, FriendScheduleData>;
