@@ -15,6 +15,7 @@ import {
   TermScheduleData,
   ScheduleVersion,
   ScheduleData,
+  FriendData,
 } from '../../data/types';
 import { lexicographicCompare } from '../../utils/misc';
 import {
@@ -22,6 +23,7 @@ import {
   StageLoadTerms,
   StageEnsureValidTerm,
   StageLoadAccount,
+  StageLoadRawFriendData,
   StageLoadRawScheduleDataHybrid,
   StageMigrateScheduleData,
   StageCreateScheduleDataProducer,
@@ -29,6 +31,7 @@ import {
   StageLoadOscarData,
   StageExtractScheduleVersion,
   StageSkeletonProps,
+  StageCreateFriendDataProducer,
 } from './stages';
 
 export type DataLoaderProps = {
@@ -200,6 +203,40 @@ function GroupLoadScheduleData({
         </StageMigrateScheduleData>
       )}
     </StageLoadRawScheduleDataHybrid>
+  );
+}
+
+type GroupLoadFriendDataProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
+  children: (props: {
+    friendData: Immutable<FriendData> | null;
+    updateFriendData: (
+      applyDraft: (draft: Draft<FriendData>) => void | Immutable<FriendData>
+    ) => void;
+  }) => React.ReactNode;
+};
+
+function GroupLoadFriendData({
+  skeletonProps,
+  accountState,
+  children,
+}: GroupLoadFriendDataProps): React.ReactElement {
+  return (
+    <StageLoadRawFriendData
+      skeletonProps={skeletonProps}
+      accountState={accountState}
+    >
+      {({ rawFriendData, setFriendScheduleData }): React.ReactElement => (
+        <StageCreateFriendDataProducer
+          setFriendScheduleData={setFriendScheduleData}
+        >
+          {({ updateFriendData }): React.ReactElement => (
+            <>{children({ friendData: rawFriendData, updateFriendData })}</>
+          )}
+        </StageCreateFriendDataProducer>
+      )}
+    </StageLoadRawFriendData>
   );
 }
 
