@@ -44,13 +44,20 @@ export const defaultFriendData: Immutable<FriendData> = {
   info: {},
 };
 
-export const defaultFriendInfo: Immutable<FriendInfo> = castImmutable({
-  nickname: '',
+export const defaultFriendInfo: Immutable<{
+  name: string;
+  email: string;
+}> = castImmutable({
+  name: '',
   email: '',
 });
 
 export const defaultFriendTermData: Immutable<FriendTermData> = {
   accessibleSchedules: {},
+};
+
+export const defaultFriendScheduleData: Immutable<FriendScheduleData> = {
+  //
 };
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
@@ -163,26 +170,43 @@ export interface FriendTermData {
   accessibleSchedules: FriendIds;
 }
 
-export interface FriendInfo {
-  nickname: string;
-  email: string;
-}
-
-export type FriendInfos = Record<string, FriendInfo>;
+export type FriendInfo = Record<
+  string,
+  {
+    name: string;
+    email: string;
+  }
+>;
 
 export interface FriendData {
   terms: Record<string, FriendTermData>;
-  info: FriendInfos;
+  info: FriendInfo;
 }
 
-export interface FriendScheduleData {
-  versions: Record<
-    string,
-    {
-      name: string;
-      schedule: ScheduleData;
-    }
-  >;
-}
+export type RawFriendScheduleData = Record<
+  string,
+  {
+    versions: Record<
+      string,
+      {
+        name: string;
+        schedule: ScheduleData;
+      }
+    >;
+  }
+>;
 
-export type FriendSchedulesData = Record<string, FriendScheduleData>;
+export type FriendScheduleData = Record<
+  string,
+  {
+    name: string;
+    email: string;
+    versions: Record<
+      string,
+      {
+        name: string;
+        schedule: ScheduleData;
+      }
+    >;
+  }
+>;

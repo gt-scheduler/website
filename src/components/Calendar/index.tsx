@@ -305,6 +305,7 @@ export default function Calendar({
         {events &&
           events.map((event) => (
             <EventBlocks
+              key={event.id}
               event={event}
               capture={capture}
               sizeInfo={eventSizeInfo[event.id] ?? {}}

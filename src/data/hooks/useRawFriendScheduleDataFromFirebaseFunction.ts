@@ -12,27 +12,26 @@ import {
 } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
-import { FriendIds, FriendSchedulesData } from '../types';
+import { FriendIds, RawFriendScheduleData } from '../types';
 
 interface HookResult {
-  friendSchedulesData: FriendSchedulesData;
+  friendScheduleData: RawFriendScheduleData;
   term: string;
 }
 
 const url = `${CLOUD_FUNCTION_BASE_URL}/fetchFriendSchedules`;
 
-// Number of minutes between re-downloads of the oscar data
-const REFRESH_INTERVAL_MIN = 15;
+// Number of minutes between re-fetches of the friend schedules
+const REFRESH_INTERVAL_MIN = 5;
 
 /**
- * Downloads the crawled data from Oscar that the crawler prepared
+ * Fetches the schedules of friends that have been shared with the user
  * for the given term.
  * Repeatedly attempts to load in the case of errors,
  * and cancels any in-flight downloads if the parent context is unmounted
  * or the term is changed.
- * Once loaded, this also attempts to update the data every 15 minutes
- * in case the crawler has run again and there is updated data.
- * @param term - The term to fetch crawler data for
+ * Once loaded, this also attempts to update the data every 5 minutes
+ * in case the friends' schedules have been updated.
  */
 export default function useRawFriendScheduleDataFromFirebaseFunction({
   currentTerm,
@@ -45,19 +44,30 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
     type: 'loading',
   });
 
-  // Keep a ref of the latest loaded Oscar
+  // Keep a ref of the latest loaded schedules
   // to check if it is any newer than the current one.
-  const loadedFriendSchedulesRef = useRef<HookResult | null>(null);
+  const loadedFriendScheduleRef = useRef<HookResult | null>(null);
 
-  // Fetch the current term's crawler information
+  // Fetch the current term's friend schedules information
   useEffect(() => {
+    if (Object.keys(termFriendData).length === 0) {
+      const res = {
+        friendScheduleData: {},
+        term: currentTerm,
+      };
+      loadedFriendScheduleRef.current = res;
+      return setState({
+        type: 'loaded',
+        result: res,
+      });
+    }
     const loadOperation = new Cancellable();
 
     async function loadAndRefresh(): Promise<void> {
       let isFirst = true;
       while (!loadOperation.isCancelled) {
-        // Load the oscar data, showing errors only if this is the first time
-        // it is being loaded (otherwise, just log errors
+        // Load the friend schedules, showing errors only if this is the
+        // first time it is being loaded (otherwise, just log errors
         // but don't disrupt the user). This is to prevent
         // a background refresh from showing an error screen
         // in the middle of a session.
@@ -91,19 +101,16 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const promise = axios.post<FriendSchedulesData>(
-            url,
-            {
-              IDToken: await auth.currentUser?.getIdToken(),
-              friends: termFriendData,
-              term: currentTerm,
+          const test = {
+            IDToken: await auth.currentUser?.getIdToken(),
+            friends: termFriendData,
+            term: currentTerm,
+          };
+          const promise = axios.post<RawFriendScheduleData>(url, test, {
+            headers: {
+              'Content-Type': 'application/json',
             },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          );
+          });
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;
@@ -114,16 +121,16 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
           // If the data is the same as the currently loaded data,
           // skip loading it
           if (
-            loadedFriendSchedulesRef.current !== null &&
-            (loadedFriendSchedulesRef.current.friendSchedulesData === json ||
-              loadedFriendSchedulesRef.current.term !== currentTerm)
+            loadedFriendScheduleRef.current !== null &&
+            loadedFriendScheduleRef.current.friendScheduleData === json &&
+            loadedFriendScheduleRef.current.term === currentTerm
           ) {
             // Skip this update
             return;
           }
 
           const res = {
-            friendSchedulesData: json,
+            friendScheduleData: json,
             term: currentTerm,
           };
 
@@ -131,7 +138,7 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
             type: 'loaded',
             result: res,
           });
-          loadedFriendSchedulesRef.current = res;
+          loadedFriendScheduleRef.current = res;
 
           return;
         } catch (err) {
@@ -139,11 +146,12 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
           if (!isAxiosNetworkError(err)) {
             softError(
               new ErrorWithFields({
-                message: 'error fetching crawler data',
+                message: 'error fetching friend schedules',
                 source: err,
                 fields: {
-                  term: currentTerm,
                   url,
+                  term: currentTerm,
+                  termFriendData,
                 },
               })
             );
@@ -157,7 +165,8 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
                 err instanceof Error
                   ? err
                   : new ErrorWithFields({
-                      message: 'an error occurred while fetching crawler data',
+                      message:
+                        'an error occurred while fetching friend schedules',
                       source: err,
                     }),
               stillLoading: true,
@@ -175,11 +184,12 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
     loadAndRefresh().catch((err) => {
       softError(
         new ErrorWithFields({
-          message: 'error loading and refreshing oscar data',
+          message: 'error loading and refreshing friend schedules',
           source: err,
           fields: {
-            term: currentTerm,
             url,
+            term: currentTerm,
+            termFriendData,
           },
         })
       );
@@ -192,7 +202,8 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
   }, [currentTerm, termFriendData, setState]);
 
   // If we are about to start a new background load
-  // after the term changed, then don't return a loaded Oscar
+  // after the term changed, then don't return the already fetched
+  // friend schedules
   if (state.type === 'loaded' && state.result.term !== currentTerm) {
     return { type: 'loading' };
   }

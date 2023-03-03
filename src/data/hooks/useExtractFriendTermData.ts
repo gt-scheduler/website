@@ -17,11 +17,11 @@ import { ErrorWithFields, softError } from '../../log';
  */
 export default function useExtractFriendTermData({
   currentTerm,
-  friendData,
+  rawFriendData,
   updateFriendData,
 }: {
   currentTerm: string;
-  friendData: Immutable<FriendData>;
+  rawFriendData: Immutable<FriendData>;
   updateFriendData: (
     applyDraft: (draft: Draft<FriendData>) => void | Immutable<FriendData>
   ) => void;
@@ -35,7 +35,7 @@ export default function useExtractFriendTermData({
 }> {
   // Ensure that there is a valid term friend data object for the term
   useEffect(() => {
-    const currentFriendTermData = friendData.terms[currentTerm];
+    const currentFriendTermData = rawFriendData.terms[currentTerm];
     const correctedFriendTermData =
       currentFriendTermData === undefined ||
       currentFriendTermData.accessibleSchedules === undefined
@@ -47,7 +47,7 @@ export default function useExtractFriendTermData({
         draft.terms[currentTerm] = castDraft(correctedFriendTermData);
       });
     }
-  }, [currentTerm, friendData.terms, updateFriendData]);
+  }, [currentTerm, rawFriendData.terms, updateFriendData]);
 
   // Create a nested update callback for just the friend term data.
   const updateFriendTermData = useCallback(
@@ -84,7 +84,7 @@ export default function useExtractFriendTermData({
     [updateFriendData, currentTerm]
   );
 
-  const currentFriendTermData = friendData.terms[currentTerm];
+  const currentFriendTermData = rawFriendData.terms[currentTerm];
 
   if (
     currentFriendTermData === undefined ||
