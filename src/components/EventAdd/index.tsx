@@ -75,6 +75,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(end);
       if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
+      } else if (parsedStart < 480 || parsedEnd > 1260) {
+        setError('Start and end time must be between 08:00 AM and 09:00 PM.');
       }
     },
     [end, parseTime]
@@ -91,6 +93,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(newEnd);
       if (parsedStart !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
+      } else if (parsedStart < 480 || parsedEnd > 1260) {
+        setError('Start and end time must be between 08:00 AM and 09:00 PM.');
       }
     },
     [start, parseTime]
@@ -232,6 +236,8 @@ export default function EventAdd({
               <td className="input">
                 <input
                   type="time"
+                  min="08:00"
+                  max="21:00"
                   value={start}
                   onChange={handleStartChange}
                   onKeyDown={handleKeyDown}
@@ -247,6 +253,8 @@ export default function EventAdd({
               <td className="input">
                 <input
                   type="time"
+                  min="08:00"
+                  max="21:00"
                   value={end}
                   onChange={handleEndChange}
                   onKeyDown={handleKeyDown}
