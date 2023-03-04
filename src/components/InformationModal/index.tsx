@@ -6,7 +6,7 @@ import Modal from '../Modal';
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
 const MODAL_LOCAL_STORAGE_KEY =
-  '2021-10-27-spr2022-schedule-versions-account-sync';
+  '2021-10-27-spr2022-schedule-versions-account-sync-preview';
 
 /**
  * Inner content of the information modal.
@@ -115,15 +115,23 @@ export default function InformationModal(): React.ReactElement {
   useEffect(() => {
     if (!hasSeen) {
       setShow(true);
-      setHasSeen(true);
     }
-  }, [hasSeen, setHasSeen]);
+  }, [hasSeen, setShow]);
 
   return (
     <Modal
       show={show}
       onHide={(): void => setShow(false)}
-      buttons={[{ label: 'Got it!', onClick: (): void => setShow(false) }]}
+      buttons={[
+        { label: 'Cancel', onClick: (): void => setShow(false) },
+        {
+          label: 'Never Show Again',
+          onClick: (): void => {
+            setShow(false);
+            setHasSeen(false);
+          },
+        },
+      ]}
       width={800}
     >
       <InformationModalContent />
