@@ -107,7 +107,7 @@ export default function Modal({
                       setCheckbox(!checkbox);
                     }
                   }}
-                  style={checkbox ? { backgroundColor: '#C56E5B' } : {}}
+                  style={checkbox ? { backgroundColor: '#FFFFFF' } : {}}
                 />
                 <p>{checkboxContent}</p>
               </div>

@@ -25,10 +25,11 @@ export function MigrationModalContent(): React.ReactElement {
         Scheduled Maintenance March 15 - March 16
       </h1>
       <h4 style={{ opacity: 0.7, fontWeight: '500' }}>March 5, 2023</h4>
-      <p style={{ width: '500px', margin: '8px auto', textAlign: 'center' }}>
+      <p style={{ width: '550px', margin: '16px auto', textAlign: 'center' }}>
         The Registrar’s Office announced that the old version of the
         self-service registration system on OSCAR will sunset on March 16, 2023.
-        In response to this change,
+        <br />
+        In response to this change,&nbsp;
         <span style={{ color: '#C56E5B' }}>
           GT Scheduler will be undergoing maintenance, from March 15 12:00 AM ET
           to March 16 11:59 PM ET
@@ -37,9 +38,9 @@ export function MigrationModalContent(): React.ReactElement {
         of BuzzPort - OSCAR. During this period, all services on
         gt-scheduler.org will be unavailable.
       </p>
-      <p style={{ width: '500px', margin: '8px auto', textAlign: 'center' }}>
-        We appreciate your continued support for GT Scheduler. For any
-        inquiries, please{' '}
+      <p style={{ width: '500px', margin: '16px auto', textAlign: 'center' }}>
+        We appreciate your continued support for GT Scheduler. <br />
+        For any inquiries, please&nbsp;
         <a href="mailto: contact@gt-scheduler.org">contact us</a>.
       </p>
     </>
