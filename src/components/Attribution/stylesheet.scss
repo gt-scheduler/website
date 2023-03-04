@@ -13,4 +13,10 @@
     border-top: 1px solid $color-border;
     font-size: .8em;
     white-space: pre-wrap;
+
+    p {
+        display: flex;
+        max-width: fit-content;
+        flex-wrap: wrap;
+    }
 }
