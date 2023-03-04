@@ -210,6 +210,7 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
             icon: faCopy,
             onClick: () => {
               state.cloneVersion(version.id, `Copy of ${version.name}`);
+              // state.addNewVersion(`Copy of ${version.name}`, false);
             },
           });
 
