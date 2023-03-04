@@ -170,11 +170,10 @@ export default class Section {
           const $ = cheerio.load(response.data);
 
           const availabilities = $('span').not('.status-bold');
-
           this.seating = [
             [
-              parseInt(availabilities.eq(0).text(), 10),
               parseInt(availabilities.eq(1).text(), 10),
+              parseInt(availabilities.eq(0).text(), 10),
               parseInt(availabilities.eq(3).text(), 10),
               parseInt(availabilities.eq(4).text(), 10),
             ],
