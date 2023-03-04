@@ -180,7 +180,7 @@ export default function useVersionActions({
         setVersion(newId);
       });
     },
-    [updateTermScheduleData]
+    [updateTermScheduleData, setVersion]
   );
 
   return { addNewVersion, deleteVersion, renameVersion, cloneVersion };
