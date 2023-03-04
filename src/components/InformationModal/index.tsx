@@ -128,7 +128,7 @@ export default function InformationModal(): React.ReactElement {
           label: 'Never Show Again',
           onClick: (): void => {
             setShow(false);
-            setHasSeen(false);
+            setHasSeen(true);
           },
         },
       ]}
