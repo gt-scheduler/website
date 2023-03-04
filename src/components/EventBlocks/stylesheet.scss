@@ -14,11 +14,48 @@
   overflow-wrap: break-word;
 }
 
-.TEST {
+.draggable-main-container {
+  .react-draggable {
+    position: fixed;
+    width: 100% !important;
+    height: 100% !important;
+    left: 0% !important;
+    top: 0% !important;
 
-  // cursor: grab;
-  .meeting:active {
-    z-index: 1;
-    background-color: none;
+    .TimeBlocks {
+      .meeting {
+        position: fixed;
+        width: 100% !important;
+        height: 100% !important;
+        left: 0% !important;
+        top: 0% !important;
+      }
+    }
+  }
+
+  .draggable-meeting-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0 8px;
+
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: .72em;
+    }
+
+    .ids {
+      display: flex;
+      font-weight: bold;
+      overflow: hidden;
+
+      span {
+        font-size: .8em;
+      }
+    }
   }
 }

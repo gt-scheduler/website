@@ -59,7 +59,6 @@ export default function EventAdd({
     const split = time.split(':').map((str) => Number(str));
 
     if (typeof split[0] !== 'undefined' && typeof split[1] !== 'undefined') {
-      console.log(split[0] * 60 + split[1]);
       return split[0] * 60 + split[1];
     }
     return -1; // invalid time string
