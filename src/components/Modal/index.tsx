@@ -103,8 +103,6 @@ export default function Modal({
               <div className="checkbox">
                 <div
                   onClick={(): void => {
-                    console.log(setCheckbox !== undefined);
-                    console.log(checkbox);
                     if (setCheckbox !== undefined) {
                       setCheckbox(!checkbox);
                     }

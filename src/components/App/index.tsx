@@ -68,6 +68,7 @@ export default function App(): React.ReactElement {
             <Feedback />
 
             {/* Display a popup when first visiting the site */}
+            {/* Include <InformationModal /> here */}
             <MigrationModal />
           </ErrorBoundary>
         </TooltipProvider>
