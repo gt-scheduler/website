@@ -236,8 +236,6 @@ export default function EventAdd({
               <td className="input">
                 <input
                   type="time"
-                  min="08:00"
-                  max="21:00"
                   value={start}
                   onChange={handleStartChange}
                   onKeyDown={handleKeyDown}
@@ -253,8 +251,6 @@ export default function EventAdd({
               <td className="input">
                 <input
                   type="time"
-                  min="08:00"
-                  max="21:00"
                   value={end}
                   onChange={handleEndChange}
                   onKeyDown={handleKeyDown}
