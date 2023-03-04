@@ -204,6 +204,30 @@
     @include dark {
       background-color: scale-color($theme-dark-background, $lightness: -20%);
     }
+
+    .checkbox {
+      position: absolute;
+      left: 0px;
+      display: flex;
+      align-items: center;
+      margin-left: 24px;
+
+      div {
+        border: 1px solid;
+        border-radius: 3px;
+        border-color: var(--theme-fg);
+        transition-duration: $theme-switch-transition-duration;
+        transition-property: border-color;
+
+        width: 11px;
+        height: 11px;
+        margin-right: 8px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
   }
 
   &__button {

@@ -34,6 +34,9 @@ export type ModalProps = {
    * Default: `true`
    */
   preserveChildrenWhileHiding?: boolean;
+  checkbox?: boolean;
+  setCheckbox?: (checkbox: boolean) => void;
+  checkboxContent?: string;
 };
 
 type TransitionProps = {
@@ -60,6 +63,9 @@ export default function Modal({
   className,
   style,
   preserveChildrenWhileHiding = true,
+  checkbox,
+  setCheckbox,
+  checkboxContent,
 }: ModalProps): React.ReactElement {
   // Empty fragment is used to provide a non-nil default value.
   // This lets an undefined children prop represent a different state
@@ -93,6 +99,21 @@ export default function Modal({
         <div className="modal__content">{derivedChildren}</div>
         {buttons.length > 0 && (
           <div className="modal__footer">
+            {checkboxContent && (
+              <div className="checkbox">
+                <div
+                  onClick={(): void => {
+                    console.log(setCheckbox !== undefined);
+                    console.log(checkbox);
+                    if (setCheckbox !== undefined) {
+                      setCheckbox(!checkbox);
+                    }
+                  }}
+                  style={checkbox ? { backgroundColor: '#C56E5B' } : {}}
+                />
+                <p>{checkboxContent}</p>
+              </div>
+            )}
             {buttons.map((props, i) => (
               <ModalButton {...props} key={i} />
             ))}
