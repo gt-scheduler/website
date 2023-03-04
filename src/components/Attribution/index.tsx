@@ -11,7 +11,7 @@ export default function Attribution(): React.ReactElement {
   return (
     <div className={classes('Attribution')}>
       <p>
-        Copyright (c) 2021 with{' '}
+        Copyright (c) 2023 with{' '}
         <span role="img" aria-label="love">
           ❤️
         </span>{' '}
