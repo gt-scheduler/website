@@ -177,6 +177,7 @@ export default function useVersionActions({
           schedule: castDraft(existingDraft.schedule),
           createdAt: new Date().toISOString(),
         };
+        setVersion(newId);
       });
     },
     [updateTermScheduleData, addNewVersion]
