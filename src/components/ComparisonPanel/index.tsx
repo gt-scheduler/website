@@ -1,7 +1,9 @@
 import React, { useState, useId, useCallback } from 'react';
-import { CombinationContainer, ComparisonContainer } from '..';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+
+import { CombinationContainer, ComparisonContainer } from '..';
 import { classes } from '../../utils/misc';
+
 import './stylesheet.scss';
 
 export default function ComparisonPanel(): React.ReactElement {
@@ -10,13 +12,10 @@ export default function ComparisonPanel(): React.ReactElement {
   const [tooltipY, setTooltipY] = useState(0);
   const tooltipId = useId();
 
-  const handleHover = useCallback(
-    (e: React.MouseEvent) => {
-      setHover(true);
-      setTooltipY(e.clientY);
-    },
-    [hover, tooltipY]
-  );
+  const handleHover = useCallback((e: React.MouseEvent) => {
+    setHover(true);
+    setTooltipY(e.clientY);
+  }, []);
 
   return (
     <div className="comparison-panel">

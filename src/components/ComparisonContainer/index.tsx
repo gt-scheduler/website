@@ -1,16 +1,18 @@
 import React, { useState, useContext, useCallback, useId } from 'react';
-import { classes } from '../../utils/misc';
-import { ScheduleContext } from '../../contexts';
 import {
   faPencil,
   faCircleXmark,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Button, { ButtonProps } from '../Button';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+
+import { classes } from '../../utils/misc';
+import { ScheduleContext } from '../../contexts';
+import Button from '../Button';
 import Modal from '../Modal';
 import { AutoFocusInput } from '../Select';
+
 import './stylesheet.scss';
 
 export type SharedSchedule = {
@@ -137,7 +139,7 @@ export default function ComparisonContainer(): React.ReactElement {
         setEditValue('');
       }
     },
-    [editInfo, editValue, sharedSchedules]
+    [editInfo, editValue, sharedSchedules, renameVersion]
   );
 
   const handleRemoveFriend = useCallback(
@@ -198,7 +200,7 @@ export default function ComparisonContainer(): React.ReactElement {
         <div className="comparison-content">
           <div className="my-schedules">
             <p className="content-title">My Schedules</p>
-            {allVersionNames.map((version, i) => {
+            {allVersionNames.map((version) => {
               return (
                 <ScheduleRow
                   key={version.id}
@@ -266,7 +268,7 @@ export default function ComparisonContainer(): React.ReactElement {
                     editInfo={editInfo}
                     editValue={editValue}
                   />
-                  {friend.schedules.map((schedule, i) => {
+                  {friend.schedules.map((schedule) => {
                     return (
                       <ScheduleRow
                         key={schedule.id}
