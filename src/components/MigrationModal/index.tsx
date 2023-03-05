@@ -19,7 +19,7 @@ export function MigrationModalContent(): React.ReactElement {
   return (
     <>
       <img alt="GT Scheduler Logo" src="/mascot.png" />
-      <h1>Scheduled Maintenance March 15 - March 16</h1>
+      <h2>Scheduled Maintenance March 15 - March 16</h2>
       <h4>March 5, 2023</h4>
       <p className="migration-content">
         The Registrar’s Office announced that the old version of the
