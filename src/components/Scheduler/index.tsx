@@ -1,10 +1,16 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useContext } from 'react';
 
 import { classes } from '../../utils/misc';
 import { Button, Calendar, CombinationContainer, CourseContainer } from '..';
-import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
+import {
+  OverlayCrnsContext,
+  OverlayCrnsContextValue,
+  ScheduleContext,
+} from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
+
+import './stylesheet.scss';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -23,6 +29,29 @@ export default function Scheduler(): React.ReactElement {
     () => [overlayCrns, setOverlayCrns],
     [overlayCrns, setOverlayCrns]
   );
+
+  const [{ oscar, desiredCourses, pinnedCrns }] = useContext(ScheduleContext);
+
+  const filteredCourses = oscar.courses.filter((course) => {
+    if (desiredCourses.includes(course.id)) {
+      return course;
+    }
+    return '';
+  });
+
+  const finalFilteredCourses = filteredCourses.filter((course) => {
+    let match;
+    course.sections.forEach((section) => {
+      if (
+        section.campus !== 'Georgia Tech-Atlanta *' ||
+        section.meetings[0]?.days.includes('S')
+      ) {
+        match = course;
+      }
+      return '';
+    });
+    return match;
+  });
 
   return (
     <>
@@ -46,6 +75,26 @@ export default function Scheduler(): React.ReactElement {
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">
               <Calendar className="calendar" overlayCrns={overlayCrns} />
+              {finalFilteredCourses.length !== 0 ? (
+                <div className="hidden-courses">
+                  *Other Courses/Events not shown in view:{' '}
+                  {finalFilteredCourses.map((course) => {
+                    let sectionId = '';
+                    pinnedCrns.filter((crn) => {
+                      course.sections.every((section) => {
+                        if (section.crn === crn) {
+                          sectionId = section.id;
+                        }
+                        return 'i';
+                      });
+                      return 'j';
+                    });
+                    return `${course.id}(${sectionId}), `;
+                  })}
+                </div>
+              ) : (
+                <div />
+              )}
             </div>
           )}
         </div>

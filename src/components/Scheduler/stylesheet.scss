@@ -1,0 +1,14 @@
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+
+    .hidden-courses {
+        max-width: fit-content;
+        padding-left: 70px;
+        padding-bottom: 40px;
+        align-self: self-start;
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 12px;
+    }
+}
