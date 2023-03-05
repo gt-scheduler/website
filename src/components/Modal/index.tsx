@@ -3,7 +3,9 @@ import { Modal as ReactOverlaysModal } from 'react-overlays';
 import { CSSTransition } from 'react-transition-group';
 
 import { classes } from '../../utils/misc';
+import { DESKTOP_BREAKPOINT } from '../../constants';
 import usePrevious from '../../hooks/usePrevious';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
@@ -34,6 +36,9 @@ export type ModalProps = {
    * Default: `true`
    */
   preserveChildrenWhileHiding?: boolean;
+  checkbox?: boolean;
+  setCheckbox?: (checkbox: boolean) => void;
+  checkboxContent?: string;
 };
 
 type TransitionProps = {
@@ -60,6 +65,9 @@ export default function Modal({
   className,
   style,
   preserveChildrenWhileHiding = true,
+  checkbox,
+  setCheckbox,
+  checkboxContent,
 }: ModalProps): React.ReactElement {
   // Empty fragment is used to provide a non-nil default value.
   // This lets an undefined children prop represent a different state
@@ -68,6 +76,7 @@ export default function Modal({
   // eslint-disable-next-line react/jsx-no-useless-fragment
   const previousChildren = usePrevious(children ?? <></>);
   const previousShow = usePrevious(show);
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   let derivedChildren = children;
   if (!show && previousShow === true) {
     // We are transitioning out,
@@ -89,10 +98,31 @@ export default function Modal({
       transition={FadeZoom}
       backdropTransition={Fade}
     >
-      <div className={classes('modal', className)} style={{ width, ...style }}>
+      <div
+        className={classes('modal', className, mobile && 'mobile')}
+        style={{ width, ...style }}
+      >
         <div className="modal__content">{derivedChildren}</div>
         {buttons.length > 0 && (
-          <div className="modal__footer">
+          <div
+            className={classes(
+              'modal__footer',
+              checkboxContent && 'has-checkbox'
+            )}
+          >
+            {checkboxContent && (
+              <div className="checkbox">
+                <div
+                  onClick={(): void => {
+                    if (setCheckbox !== undefined) {
+                      setCheckbox(!checkbox);
+                    }
+                  }}
+                  style={checkbox ? { backgroundColor: '#FFFFFF' } : {}}
+                />
+                <p>{checkboxContent}</p>
+              </div>
+            )}
             {buttons.map((props, i) => (
               <ModalButton {...props} key={i} />
             ))}
