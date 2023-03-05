@@ -148,6 +148,8 @@ export default function Course({
     onClick: (): void => {
       prereqControl(true, !prereqOpen ? true : !expanded);
     },
+    tooltip: 'Prerequisites',
+    id: `${course.id}-prerequisites`,
   };
 
   const infoAction = {
@@ -187,15 +189,21 @@ export default function Course({
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
                   onClick: (): void => prereqControl(false, !expanded),
+                  tooltip: expanded ? 'Hide Sections' : 'View Sections',
+                  id: `${course.id}-expansion`,
                 },
                 hasPrereqs ? prereqAction : infoAction,
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
+                  tooltip: 'Course Color',
+                  id: `${course.id}-color`,
                 },
                 {
                   icon: faTrash,
                   onClick: (): void => handleRemoveCourse(course),
+                  tooltip: 'Delete Course',
+                  id: `${course.id}-delete`,
                 },
               ]
         }
