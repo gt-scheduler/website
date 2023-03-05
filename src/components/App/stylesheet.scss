@@ -95,7 +95,7 @@ body.light .App {
   }
 }
 
-:not(.mobile) .Maintenance {
+.Maintenance {
   display: flex;
   align-items: center;
   width: 100vw;
@@ -155,8 +155,6 @@ body.light .App {
 .mobile .Maintenance {
   .content {
     .main-content {
-      display: flex;
-      align-items: center;
       flex-direction: column-reverse;
 
       .text {
@@ -178,14 +176,6 @@ body.light .App {
           font-weight: 400;
           line-height: 24px;
           margin: 8px 24px;
-
-          span {
-            color: #C56E5B;
-          }
-          
-          a {
-            color: #C56E5B;
-          }
         }
       }
 
@@ -195,7 +185,6 @@ body.light .App {
     }
 
     .footer {
-      position: absolute;
       bottom: 18px;
       
       img {
