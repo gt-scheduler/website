@@ -48,12 +48,26 @@ export function MigrationModalContent(): React.ReactElement {
  * upon the user's first visit to the site
  * when they haven't seen this version of the information modal before.
  */
-export default function MigrationModal(): React.ReactElement {
+export default function MaintenanceModal(): React.ReactElement {
+  const date = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  );
+
+  // modal should only be shown before Mar 15, 2023 0:00 AM ET
+  const isValid =
+    date.getFullYear() === 2023 && date.getMonth() <= 3 && date.getDate() < 15;
+
   const [show, setShow] = useState(false);
   const [hasSeen, setHasSeen] = useLocalStorageState(MODAL_LOCAL_STORAGE_KEY, {
-    defaultValue: false,
+    defaultValue: !isValid,
     storageSync: true,
   });
+
+  // override storage key
+  useEffect(() => {
+    if (!isValid) setHasSeen(!isValid);
+  }, [isValid, setHasSeen]);
+
   const [checkbox, setCheckbox] = useState(false);
 
   useEffect(() => {
