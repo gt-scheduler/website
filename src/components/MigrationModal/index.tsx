@@ -3,6 +3,8 @@ import useLocalStorageState from 'use-local-storage-state';
 
 import Modal from '../Modal';
 
+import './stylesheet.scss';
+
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
 const MODAL_LOCAL_STORAGE_KEY = '2023-03-05-spr2023-oscar-migration';
@@ -16,16 +18,10 @@ const MODAL_LOCAL_STORAGE_KEY = '2023-03-05-spr2023-oscar-migration';
 export function MigrationModalContent(): React.ReactElement {
   return (
     <>
-      <img
-        style={{ width: '175px', margin: '0 auto', display: 'block' }}
-        alt="GT Scheduler Logo"
-        src="/mascot.png"
-      />
-      <h1 style={{ lineHeight: 1, fontWeight: '700' }}>
-        Scheduled Maintenance March 15 - March 16
-      </h1>
-      <h4 style={{ opacity: 0.7, fontWeight: '500' }}>March 5, 2023</h4>
-      <p style={{ width: '550px', margin: '16px auto', textAlign: 'center' }}>
+      <img alt="GT Scheduler Logo" src="/mascot.png" />
+      <h1>Scheduled Maintenance March 15 - March 16</h1>
+      <h4>March 5, 2023</h4>
+      <p className="migration-content">
         The Registrar’s Office announced that the old version of the
         self-service registration system on OSCAR will sunset on March 16, 2023.
         <br />
@@ -38,7 +34,7 @@ export function MigrationModalContent(): React.ReactElement {
         of BuzzPort - OSCAR. During this period, all services on
         gt-scheduler.org will be unavailable.
       </p>
-      <p style={{ width: '500px', margin: '16px auto', textAlign: 'center' }}>
+      <p className="migration-content">
         We appreciate your continued support for GT Scheduler. <br />
         For any inquiries, please&nbsp;
         <a href="mailto: contact@gt-scheduler.org">contact us</a>.
@@ -68,7 +64,7 @@ export default function MigrationModal(): React.ReactElement {
 
   return (
     <Modal
-      className="migration"
+      className="MigrationModal"
       show={show}
       onHide={(): void => setShow(false)}
       buttons={[
@@ -83,7 +79,7 @@ export default function MigrationModal(): React.ReactElement {
       width={800}
       checkbox={checkbox}
       setCheckbox={setCheckbox}
-      checkboxContent="Don't show this mesage again"
+      checkboxContent={`Don't show this again`}
     >
       <MigrationModalContent />
     </Modal>

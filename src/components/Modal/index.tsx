@@ -3,7 +3,9 @@ import { Modal as ReactOverlaysModal } from 'react-overlays';
 import { CSSTransition } from 'react-transition-group';
 
 import { classes } from '../../utils/misc';
+import { DESKTOP_BREAKPOINT } from '../../constants';
 import usePrevious from '../../hooks/usePrevious';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
@@ -74,6 +76,7 @@ export default function Modal({
   // eslint-disable-next-line react/jsx-no-useless-fragment
   const previousChildren = usePrevious(children ?? <></>);
   const previousShow = usePrevious(show);
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   let derivedChildren = children;
   if (!show && previousShow === true) {
     // We are transitioning out,
@@ -95,10 +98,18 @@ export default function Modal({
       transition={FadeZoom}
       backdropTransition={Fade}
     >
-      <div className={classes('modal', className)} style={{ width, ...style }}>
+      <div
+        className={classes('modal', className, mobile && 'mobile')}
+        style={{ width, ...style }}
+      >
         <div className="modal__content">{derivedChildren}</div>
         {buttons.length > 0 && (
-          <div className="modal__footer">
+          <div
+            className={classes(
+              'modal__footer',
+              checkboxContent && 'has-checkbox'
+            )}
+          >
             {checkboxContent && (
               <div className="checkbox">
                 <div
