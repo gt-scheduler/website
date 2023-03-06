@@ -95,7 +95,18 @@
     }
   }
 
-  .meeting {
+  .meeting {}
+
+  .hidden-courses {
+    max-width: fit-content;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    align-self: self-start;
+    display: flex !important;
+    flex-wrap: wrap;
+    font-size: 12px;
+    position: relative !important;
+    top: 100% !important;
   }
 }
 

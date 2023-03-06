@@ -14,7 +14,6 @@ import {
   NAV_TABS,
   AppMobileNavDisplay,
 } from './navigation';
-import { ScheduleContext } from '../../contexts';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
 
@@ -28,29 +27,6 @@ function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
-
-  const [{ oscar, desiredCourses, pinnedCrns }] = useContext(ScheduleContext);
-
-  const filteredCourses = oscar.courses.filter((course) => {
-    if (desiredCourses.includes(course.id)) {
-      return course;
-    }
-    return '';
-  });
-
-  const finalFilteredCourses = filteredCourses.filter((course) => {
-    let match;
-    course.sections.forEach((section) => {
-      if (
-        section.campus !== 'Georgia Tech-Atlanta *' ||
-        section.meetings[0]?.days.includes('S')
-      ) {
-        match = course;
-      }
-      return '';
-    });
-    return match;
-  });
 
   return (
     <>
@@ -90,36 +66,6 @@ function AppContentBase(): React.ReactElement {
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
-          {finalFilteredCourses.length !== 0 ? (
-            <div
-              className="hidden-courses-for-download"
-              style={{
-                maxWidth: 'fit-content',
-                paddingLeft: 70,
-                paddingBottom: 40,
-                display: 'flex',
-                alignSelf: 'flex-start',
-                flexWrap: 'wrap',
-              }}
-            >
-              *Other Courses/Events not shown in view:{' '}
-              {finalFilteredCourses.map((course) => {
-                let sectionId = '';
-                pinnedCrns.filter((crn) => {
-                  course.sections.every((section) => {
-                    if (section.crn === crn) {
-                      sectionId = section.id;
-                    }
-                    return 'i';
-                  });
-                  return 'j';
-                });
-                return `${course.id}(${sectionId}), `;
-              })}
-            </div>
-          ) : (
-            <div />
-          )}
         </div>
       </ErrorBoundary>
       <Attribution />
