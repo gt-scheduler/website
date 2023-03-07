@@ -234,8 +234,6 @@ export default function Calendar({
     }
   });
 
-  // const [{ oscar, desiredCourses, pinnedCrns }] = useContext(ScheduleContext);
-
   const filteredCourses = oscar.courses.filter((course) => {
     if (desiredCourses.includes(course.id)) {
       return course;
@@ -245,13 +243,20 @@ export default function Calendar({
 
   const finalFilteredCourses = filteredCourses.filter((course) => {
     let match;
-    course.sections.forEach((section) => {
-      if (
-        section.campus !== 'Georgia Tech-Atlanta *' ||
-        section.meetings[0]?.days.includes('S')
-      ) {
-        match = course;
-      }
+
+    pinnedCrns.forEach((courseCrn) => {
+      course.sections.forEach((section) => {
+        if (courseCrn === section.crn) {
+          if (
+            section.campus !== 'Georgia Tech-Atlanta *' ||
+            section.meetings[0]?.days.includes('S')
+          ) {
+            match = course;
+          }
+          return '';
+        }
+        return '';
+      });
       return '';
     });
     return match;
@@ -351,7 +356,7 @@ export default function Calendar({
             />
           ))}
       </div>
-      {!preview ? (
+      {finalFilteredCourses.length !== 0 ? (
         <div className="hidden-courses">
           *Other Courses/Events not shown in view:{' '}
           {finalFilteredCourses.map((course) => {
