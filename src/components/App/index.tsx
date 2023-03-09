@@ -39,7 +39,9 @@ export default function App(): React.ReactElement {
     <ThemeContext.Provider value={themeContextValue}>
       <AppCSSRoot>
         <TooltipProvider>
-          {!websiteDown && (
+          {websiteDown ? (
+            <Maintenance />
+          ) : (
             <ErrorBoundary
               fallback={(error, errorInfo): React.ReactElement => (
                 <AppSkeleton>
@@ -85,7 +87,6 @@ export default function App(): React.ReactElement {
               {/* Include <InformationModal /> here */}
             </ErrorBoundary>
           )}
-          {websiteDown && <Maintenance />}
         </TooltipProvider>
       </AppCSSRoot>
     </ThemeContext.Provider>
