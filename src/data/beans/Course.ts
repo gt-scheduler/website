@@ -14,14 +14,14 @@ import {
   isAxiosNetworkError,
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
 // but it should behave the same as the real API.
 // See the implementation at:
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
-const COURSE_CRITIQUE_API_URL =
-  'https://us-central1-gt-scheduler-web-prod.cloudfunctions.net/getCourseDataFromCourseCritique';
+const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
