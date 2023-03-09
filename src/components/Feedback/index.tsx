@@ -30,6 +30,13 @@ export default function Feedback(): React.ReactElement {
       });
   };
 
+  const finishSubmit = (): void => {
+    setExpanded(false);
+    setSubmit(false);
+    setRating(null);
+    setFeedback('');
+  };
+
   return (
     <>
       {!expanded && (
@@ -100,7 +107,7 @@ export default function Feedback(): React.ReactElement {
                   <div>
                     <Button
                       className="SubmitButton"
-                      onClick={(): void => setExpanded(false)}
+                      onClick={(): void => finishSubmit()}
                     >
                       Close
                     </Button>
