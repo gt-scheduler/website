@@ -172,8 +172,7 @@
             justify-content: center;
             border-radius: 16px;
             width: max-content;
-            max-width: 100%;
-            min-width: min-content;
+            max-width: calc(100% - 8px);
             font-size: .9em;
             cursor: pointer;
 
@@ -181,12 +180,20 @@
                 background-color: rgba($color-neutral, 0.5);
                 opacity: 0.75;
             }
+
+            .email-text {
+              margin: 0px;
+              flex: 1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
         }
     }
 
     .email-and-status {
         display: flex;
         flex-direction: column;
+        max-width: 100%;
     }
 
     .status-tooltip {
@@ -255,4 +262,17 @@
         border-style: solid;
         border-width: 1.5px;
     }
+}
+
+.mobile.invitation-modal-content {
+  .email-input-block {
+    flex-direction: column;
+    align-items: center;
+    .email-input {
+      max-width: 100%;
+      .email {
+        max-width: 100%;
+      }
+    }
+  }
 }

@@ -8,6 +8,8 @@ import React, {
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { faCircle, faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { DESKTOP_BREAKPOINT } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
@@ -19,12 +21,16 @@ import './stylesheet.scss';
  * Inner content of the invitation modal.
  */
 export function InvitationModalContent(): React.ReactElement {
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   // Array for testing style of shared emails
   // eslint-disable-next-line
   const [emails, setEmails] = useState([
     ['user1@example.com', 'Pending'],
     ['user2@example.com', 'Accepted'],
-    ['ReallyLongNameThatWillNotFitInRowAbove@example.com', 'Accepted'],
+    [
+      'SuperDuperExtraReallyLongNameThatWillNotFitInRowAbove@example.com',
+      'Accepted',
+    ],
     ['goodEmail@gmail.com', 'Accepted'],
     ['user12@example.com', 'Pending'],
     ['user22@example.com', 'Accepted'],
@@ -134,7 +140,7 @@ export function InvitationModalContent(): React.ReactElement {
   }
 
   return (
-    <div className="invitation-modal-content">
+    <div className={classes('invitation-modal-content', mobile && 'mobile')}>
       <div className="top-block">
         <h2>Share Schedule</h2>
         <p>
@@ -188,7 +194,7 @@ export function InvitationModalContent(): React.ReactElement {
           {emails.map((element) => (
             <div className="email-and-status" id={element[0]}>
               <div className="individual-shared-email" id={element[1]}>
-                {element[0]}
+                <p className="email-text">{element[0]}</p>
                 <Button className="button-remove">
                   <FontAwesomeIcon className="circle" icon={faCircle} />
                   <FontAwesomeIcon className="remove" icon={faClose} />
