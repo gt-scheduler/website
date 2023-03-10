@@ -8,9 +8,9 @@ import React, {
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { faCircle, faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
-
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
 import Button from '../Button';
