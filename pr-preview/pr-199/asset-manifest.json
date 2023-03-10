@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pr-preview/pr-199/static/css/main.badbbc78.css",
+    "main.js": "/pr-preview/pr-199/static/js/main.6de5b2a0.js",
+    "index.html": "/pr-preview/pr-199/index.html",
+    "main.badbbc78.css.map": "/pr-preview/pr-199/static/css/main.badbbc78.css.map",
+    "main.6de5b2a0.js.map": "/pr-preview/pr-199/static/js/main.6de5b2a0.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.badbbc78.css",
+    "static/js/main.6de5b2a0.js"
+  ]
+}
