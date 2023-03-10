@@ -61,7 +61,14 @@ export default function SectionBlocks({
             id={section.course.id}
             meetingIndex={i}
             period={period}
-            days={meeting.days}
+            days={meeting.days.filter((day) => {
+              if (day !== 'S') {
+                if (day !== 'U') {
+                  return day;
+                }
+              }
+              return '';
+            })}
             contentHeader={[
               {
                 className: 'course-id',

@@ -234,6 +234,7 @@ export default function Calendar({
     }
   });
 
+  // Filter for hidden courses
   const filteredCourses = oscar.courses.filter((course) => {
     if (desiredCourses.includes(course.id)) {
       return course;
@@ -247,12 +248,11 @@ export default function Calendar({
     pinnedCrns.forEach((courseCrn) => {
       course.sections.forEach((section) => {
         if (courseCrn === section.crn) {
-          if (
-            section.campus !== 'Georgia Tech-Atlanta *' ||
-            section.meetings[0]?.days.includes('S')
-          ) {
-            match = course;
-          }
+          section.meetings.forEach((meeting) => {
+            if (meeting.days.includes('S') || meeting.period === undefined) {
+              match = course;
+            }
+          });
           return '';
         }
         return '';
@@ -364,7 +364,11 @@ export default function Calendar({
             pinnedCrns.filter((crn) => {
               course.sections.every((section) => {
                 if (section.crn === crn) {
-                  sectionId = section.id;
+                  if (sectionId !== '') {
+                    sectionId = sectionId.concat(`, ${section.id}`);
+                  } else {
+                    sectionId = section.id;
+                  }
                 }
                 return 'i';
               });
