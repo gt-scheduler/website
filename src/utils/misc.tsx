@@ -11,16 +11,22 @@ import { ErrorWithFields, softError } from '../log';
 import { ICS, Period, PrerequisiteClause, Theme } from '../types';
 import ics from '../vendor/ics';
 
+/* Converts a string of the form "930" to 750. strings of the mentioned format are returned by crawler v2 */
 export const stringToTime = (string: string): number => {
-  const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
-  if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = regexResult as unknown as [
-    string,
-    string,
-    string,
-    string
+  if (
+    string === 'null' ||
+    string.length < 3 ||
+    string.length > 4 ||
+    Number.isNaN(parseInt(string, 10))
+  ) {
+    return 0;
+  }
+
+  const [hour, minute] = [
+    string.substring(0, string.length - 2),
+    string.substring(string.length - 2, string.length),
   ];
-  return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
+  return parseInt(hour, 10) * 60 + parseInt(minute, 10);
 };
 
 export const timeToString = (time: number, ampm = true): string => {

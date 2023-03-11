@@ -113,7 +113,7 @@ export default class Oscar {
           })
         );
         // We need some fallback here
-        segments = ['Jan 1, 1970', 'Jan 2, 1970'];
+        segments = ['1/1/1970', '1/2/1970'];
       }
 
       const [from, to] = segments.map((v) => new Date(v)) as [Date, Date];
