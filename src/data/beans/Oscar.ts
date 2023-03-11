@@ -353,6 +353,7 @@ export const EMPTY_OSCAR = new Oscar(
       locations: [],
       finalDates: [],
       finalTimes: [],
+      fullCourseNames: {},
     },
     // This converts the Date to the expected string
     // that it serializes to in the crawler
