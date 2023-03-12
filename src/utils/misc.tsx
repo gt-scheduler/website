@@ -11,7 +11,8 @@ import { ErrorWithFields, softError } from '../log';
 import { ICS, Period, PrerequisiteClause, Theme } from '../types';
 import ics from '../vendor/ics';
 
-/* Converts a string of the form "930" to 750. strings of the mentioned format are returned by crawler v2 */
+/* Converts a string of the form "930" to 750. strings of the
+  mentioned format are returned by crawler v2 */
 export const stringToTime = (string: string): number => {
   if (
     string === 'null' ||

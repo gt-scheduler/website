@@ -1,11 +1,6 @@
-import React, { useContext, useState } from 'react';
-import {
-  faInfoCircle,
-  faAngleUp,
-  faAngleDown,
-} from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from 'react';
+import { faAngleUp, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
-import { ScheduleContext } from '../../contexts';
 import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
 import { Course } from '../../data/beans';
@@ -90,36 +85,17 @@ export default function Prerequisite({
 
   return (
     <div className={classes('hover-container', 'nested')}>
-      <PrerequisiteHeader course={course} />
+      <ActionRow
+        className={classes('hover-container')}
+        label="Prerequisites"
+        actions={[]}
+      />
       <div className={classes('nested')}>{content}</div>
     </div>
   );
 }
 
 // Private sub-components
-
-type PrerequisiteHeaderProps = {
-  course: Course;
-};
-
-/**
- * Renders the "header" at the top of a prereq display,
- * which includes a link to Oscar giving the original prereq source,
- * plus other course information.
- */
-function PrerequisiteHeader({
-  course,
-}: PrerequisiteHeaderProps): React.ReactElement {
-  const [{ term }] = useContext(ScheduleContext);
-
-  return (
-    <ActionRow
-      className={classes('hover-container')}
-      label="Prerequisites"
-      actions={[]}
-    />
-  );
-}
 
 type PrerequisiteOptionProps = {
   clause: PrerequisiteClause;

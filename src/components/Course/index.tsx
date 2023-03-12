@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   faAngleDown,
   faAngleUp,
-  faInfoCircle,
   faShareAlt,
   faPalette,
   faPlus,
@@ -36,7 +35,7 @@ export default function Course({
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
