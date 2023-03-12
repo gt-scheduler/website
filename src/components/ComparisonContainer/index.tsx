@@ -369,16 +369,22 @@ function ScheduleRow({
   editValue,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
-  const [hover, setHover] = useState(false);
+  const [tooltipHover, setTooltipHover] = useState(false);
+  const [divHover, setDivHover] = useState(false);
 
   const edit =
+    hasEdit &&
     editInfo != null &&
     editInfo.type === type &&
     editInfo.id === id &&
     editInfo.owner === owner;
 
   return (
-    <div className="checkbox-container">
+    <div
+      className={classes('checkbox-container', edit && 'editing')}
+      onMouseEnter={(): void => setDivHover(true)}
+      onMouseLeave={(): void => setDivHover(false)}
+    >
       {hasCheck && (
         <div
           className={classes('checkbox', type === 'Schedule' && 'indented')}
@@ -401,8 +407,8 @@ function ScheduleRow({
           <div
             id={tooltipId}
             className={classes('name', hasCheck && 'check')}
-            onMouseEnter={(): void => setHover(true)}
-            onMouseLeave={(): void => setHover(false)}
+            onMouseEnter={(): void => setTooltipHover(true)}
+            onMouseLeave={(): void => setTooltipHover(false)}
           >
             <p>{name}</p>
             {hasTooltip && id !== name && (
@@ -411,8 +417,8 @@ function ScheduleRow({
                 anchorId={tooltipId}
                 className="tooltip"
                 variant="dark"
-                isOpen={hover}
-                setIsOpen={setHover}
+                isOpen={tooltipHover}
+                setIsOpen={setTooltipHover}
                 delayShow={20}
                 delayHide={100}
                 // key={deviceHasHover ? 0 : 1}
@@ -425,7 +431,7 @@ function ScheduleRow({
           <div className="spacing" />
         </>
       )}
-      {hasEdit && (
+      {(divHover || edit) && hasEdit && (
         <Button
           className="icon"
           onClick={handleEditSchedule}
@@ -434,7 +440,7 @@ function ScheduleRow({
           <FontAwesomeIcon icon={faPencil} size="xs" />
         </Button>
       )}
-      {hasDelete && (
+      {(divHover || edit) && hasDelete && (
         <Button
           className="icon"
           onClick={handleRemoveSchedule}

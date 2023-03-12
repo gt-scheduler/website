@@ -120,6 +120,7 @@
 
         .name {
           margin-left: 12px;
+          margin-right: 12px;
           min-width: 0;
           flex-shrink: 1;
 
@@ -167,7 +168,17 @@
         &:hover {
           background-color: $color-border;
 
-          & .icon {
+          .icon {
+            opacity: 1;
+          }
+
+          .name {
+            margin-right: 0px;
+          }
+        }
+
+        &.editing {
+          .icon {
             opacity: 1;
           }
         }
