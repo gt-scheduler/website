@@ -51,10 +51,14 @@ export default function ComparisonContainer(): React.ReactElement {
   const [sharedSchedules, setSharedSchedules] = useState<SharedSchedule[]>([
     {
       id: 'friend1@gatech.edu',
-      name: 'John Smith',
+      name: 'SuperLongFriendNameThatShouldBreakEverythingIncludingModalSoIHaveToMakeThisSuperLongYay',
       schedules: [
         { id: '1', name: 'Main', color: '#760000' },
-        { id: '2', name: 'Backup', color: '#760076' },
+        {
+          id: '2',
+          name: 'SuperLongScheduleNameThatBreaksEverythingIncludingModalSoIHaveToMakeThisSuperLongYay',
+          color: '#760076',
+        },
       ],
     },
     {
@@ -230,6 +234,7 @@ export default function ComparisonContainer(): React.ReactElement {
                   ): void => setEditValue(e.target.value)}
                   editOnKeyDown={handleEdit}
                   editInfo={editInfo}
+                  setEditInfo={setEditInfo}
                   editValue={editValue}
                 />
               );
@@ -266,6 +271,7 @@ export default function ComparisonContainer(): React.ReactElement {
                     ): void => setEditValue(e.target.value)}
                     editOnKeyDown={handleEdit}
                     editInfo={editInfo}
+                    setEditInfo={setEditInfo}
                     editValue={editValue}
                   />
                   {friend.schedules.map((schedule) => {
@@ -296,12 +302,7 @@ export default function ComparisonContainer(): React.ReactElement {
                             owner: friend.id,
                           });
                         }}
-                        editOnChange={(
-                          e: React.ChangeEvent<HTMLInputElement>
-                        ): void => setEditValue(e.target.value)}
-                        editOnKeyDown={handleEdit}
-                        editInfo={editInfo}
-                        editValue={editValue}
+                        hasEdit={false}
                       />
                     );
                   })}
@@ -309,81 +310,13 @@ export default function ComparisonContainer(): React.ReactElement {
               );
             })}
           </div>
-          <Modal
-            className="shared-schedule-modal"
-            show={deleteConfirm != null}
-            onHide={(): void => setDeleteConfirm(null)}
-            buttons={[
-              {
-                label: 'Remove',
-                onClick: (): void => {
-                  if (deleteConfirm != null) {
-                    if (deleteConfirm.type === 'Version') {
-                      deleteVersion(deleteConfirm.id);
-                    } else if (deleteConfirm.type === 'User') {
-                      handleRemoveFriend(deleteConfirm.id);
-                    } else {
-                      handleRemoveSchedule(
-                        deleteConfirm.id,
-                        deleteConfirm.owner
-                      );
-                    }
-                  }
-                  setDeleteConfirm(null);
-                },
-              },
-            ]}
-            preserveChildrenWhileHiding
-          >
-            <Button
-              className="cancel-button"
-              onClick={(): void => setDeleteConfirm(null)}
-            >
-              <FontAwesomeIcon icon={faXmark} size="xl" />
-            </Button>
-            {deleteConfirm?.type === 'Version' && (
-              <div style={{ textAlign: 'center' }}>
-                <h2>Delete confirmation</h2>
-                <p>
-                  Are you sure you want to delete schedule &ldquo;
-                  {deleteConfirm?.name ?? '<unknown>'}&rdquo;?
-                </p>
-              </div>
-            )}
-            {deleteConfirm?.type === 'User' && (
-              <div style={{ textAlign: 'center' }}>
-                <h2>Remove User</h2>
-                <p>
-                  Are you sure you want to remove the following user&apos;s
-                  schedules from your view?
-                </p>
-                <p>
-                  User: <b>{deleteConfirm?.name}</b>
-                </p>
-                <p>
-                  You will not be able to see any of their schedules unless the
-                  owner sends another invite for each one.
-                </p>
-              </div>
-            )}
-            {deleteConfirm?.type === 'Schedule' && (
-              <div style={{ textAlign: 'center' }}>
-                <h2>Remove Schedule</h2>
-                <p>
-                  Are you sure you want to remove the following schedule from
-                  your view?
-                </p>
-                <p>
-                  Schedule: <b>{deleteConfirm?.name}</b> <br />
-                  Owner: <b>{deleteConfirm?.owner}</b>
-                </p>
-                <p>
-                  You will not be able to see it unless the owner sends another
-                  invite.
-                </p>
-              </div>
-            )}
-          </Modal>
+          <ComparisonModal
+            deleteConfirm={deleteConfirm}
+            setDeleteConfirm={setDeleteConfirm}
+            deleteVersion={deleteVersion}
+            handleRemoveFriend={handleRemoveFriend}
+            handleRemoveSchedule={handleRemoveSchedule}
+          />
         </div>
         <div
           className={classes('comparison-overlay', 'left', compare && 'open')}
@@ -406,12 +339,14 @@ type ScheduleRowProps = {
   name: string;
   handleEditSchedule: () => void;
   handleRemoveSchedule: () => void;
+  hasEdit?: boolean;
   hasDelete?: boolean;
   hasTooltip?: boolean;
-  editOnChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  editOnKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  editInfo: EditInfo;
-  editValue: string;
+  editOnChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  editOnKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  editInfo?: EditInfo;
+  setEditInfo?: (info: EditInfo) => void;
+  editValue?: string;
 };
 
 function ScheduleRow({
@@ -424,11 +359,13 @@ function ScheduleRow({
   name,
   handleEditSchedule,
   handleRemoveSchedule,
+  hasEdit = true,
   hasDelete = true,
   hasTooltip = false,
   editOnChange,
   editOnKeyDown,
   editInfo,
+  setEditInfo,
   editValue,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
@@ -449,13 +386,14 @@ function ScheduleRow({
           style={{ backgroundColor: checkboxColor }}
         />
       )}
-      {edit && (
+      {hasEdit && setEditInfo && editValue && edit && (
         <AutoFocusInput
           className={classes('edit-input', hasCheck && 'check')}
           value={editValue}
           onChange={editOnChange}
           placeholder={name}
           onKeyDown={editOnKeyDown}
+          onBlur={(): void => setEditInfo(null)}
         />
       )}
       {!edit && (
@@ -487,9 +425,15 @@ function ScheduleRow({
           <div className="spacing" />
         </>
       )}
-      <Button className="icon" onClick={handleEditSchedule} key={`${id}-edit`}>
-        <FontAwesomeIcon icon={faPencil} size="xs" />
-      </Button>
+      {hasEdit && (
+        <Button
+          className="icon"
+          onClick={handleEditSchedule}
+          key={`${id}-edit`}
+        >
+          <FontAwesomeIcon icon={faPencil} size="xs" />
+        </Button>
+      )}
       {hasDelete && (
         <Button
           className="icon"
@@ -500,5 +444,96 @@ function ScheduleRow({
         </Button>
       )}
     </div>
+  );
+}
+
+type ComparisonModalProps = {
+  deleteConfirm: DeleteInfo;
+  setDeleteConfirm: (deleteConfirm: DeleteInfo) => void;
+  deleteVersion: (id: string) => void;
+  handleRemoveFriend: (id: string) => void;
+  handleRemoveSchedule: (id: string, owner?: string) => void;
+};
+
+function ComparisonModal({
+  deleteConfirm,
+  setDeleteConfirm,
+  deleteVersion,
+  handleRemoveFriend,
+  handleRemoveSchedule,
+}: ComparisonModalProps): React.ReactElement {
+  return (
+    <Modal
+      className="shared-schedule-modal"
+      show={deleteConfirm != null}
+      onHide={(): void => setDeleteConfirm(null)}
+      buttons={[
+        {
+          label: 'Remove',
+          onClick: (): void => {
+            if (deleteConfirm != null) {
+              if (deleteConfirm.type === 'Version') {
+                deleteVersion(deleteConfirm.id);
+              } else if (deleteConfirm.type === 'User') {
+                handleRemoveFriend(deleteConfirm.id);
+              } else {
+                handleRemoveSchedule(deleteConfirm.id, deleteConfirm.owner);
+              }
+            }
+            setDeleteConfirm(null);
+          },
+        },
+      ]}
+      preserveChildrenWhileHiding
+    >
+      <Button
+        className="cancel-button"
+        onClick={(): void => setDeleteConfirm(null)}
+      >
+        <FontAwesomeIcon icon={faXmark} size="xl" />
+      </Button>
+      {deleteConfirm?.type === 'Version' && (
+        <div style={{ textAlign: 'center' }}>
+          <h2>Delete confirmation</h2>
+          <p>
+            Are you sure you want to delete schedule &ldquo;
+            {deleteConfirm?.name ?? '<unknown>'}&rdquo;?
+          </p>
+        </div>
+      )}
+      {deleteConfirm?.type === 'User' && (
+        <div style={{ textAlign: 'center' }}>
+          <h2>Remove User</h2>
+          <p>
+            Are you sure you want to remove the following user&apos;s schedules
+            from your view?
+          </p>
+          <p>
+            User: <b>{deleteConfirm?.name}</b>
+          </p>
+          <p>
+            You will not be able to see any of their schedules unless the owner
+            sends another invite for each one.
+          </p>
+        </div>
+      )}
+      {deleteConfirm?.type === 'Schedule' && (
+        <div style={{ textAlign: 'center' }}>
+          <h2>Remove Schedule</h2>
+          <p>
+            Are you sure you want to remove the following schedule from your
+            view?
+          </p>
+          <p>
+            Schedule: <b>{deleteConfirm?.name}</b> <br />
+            Owner: <b>{deleteConfirm?.owner}</b>
+          </p>
+          <p>
+            You will not be able to see it unless the owner sends another
+            invite.
+          </p>
+        </div>
+      )}
+    </Modal>
   );
 }

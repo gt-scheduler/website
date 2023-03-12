@@ -120,9 +120,15 @@
 
         .name {
           margin-left: 12px;
+          min-width: 0;
+          flex-shrink: 1;
 
           &.check {
             margin-left: 8px;
+          }
+          
+          p {
+            text-overflow: ellipsis;
           }
         }
 
@@ -219,6 +225,7 @@
   p {
     font-size: 12px;
     line-height: 18px;
+    overflow-wrap: break-word;
   }
 
   .cancel-button {
