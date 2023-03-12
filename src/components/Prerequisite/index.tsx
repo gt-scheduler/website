@@ -116,15 +116,7 @@ function PrerequisiteHeader({
     <ActionRow
       className={classes('hover-container')}
       label="Prerequisites"
-      actions={[
-        {
-          icon: faInfoCircle,
-          href:
-            `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
-            `course_detail?cat_term_in=${term}&subj_code_in=` +
-            `${course.subject}&crse_numb_in=${course.number}`,
-        },
-      ]}
+      actions={[]}
     />
   );
 }

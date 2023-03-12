@@ -11,8 +11,8 @@ import {
 } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
-const constructTermDataUrl = (term: string): string =>
-  `https://gt-scheduler.github.io/crawler/${term}.json`;
+// test url, change to https://gt-scheduler.github.io/crawler/${term}.json when deploying
+const constructTermDataUrl = (term: string): string => `/test.json`;
 
 // Number of minutes between re-downloads of the oscar data
 const REFRESH_INTERVAL_MIN = 15;
