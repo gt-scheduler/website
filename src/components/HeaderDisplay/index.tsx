@@ -178,6 +178,7 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
     id: string;
     name: string;
   } | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   if (state.type === 'loading') {
     return <LoadingSelect />;
@@ -221,6 +222,7 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
               onClick: () => {
                 // Display a confirmation dialog before deleting the version
                 setDeleteConfirm(version);
+                setShowModal(true);
               },
             });
           }
@@ -242,13 +244,13 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
       />
 
       <Modal
-        show={deleteConfirm != null}
+        show={showModal}
         onHide={(): void => setDeleteConfirm(null)}
         buttons={[
           {
             label: 'Cancel',
             cancel: true,
-            onClick: (): void => setDeleteConfirm(null),
+            onClick: (): void => setShowModal(false),
           },
           {
             label: 'Delete',
@@ -256,7 +258,7 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
               if (deleteConfirm != null) {
                 state.deleteVersion(deleteConfirm.id);
               }
-              setDeleteConfirm(null);
+              setShowModal(false);
             },
           },
         ]}
