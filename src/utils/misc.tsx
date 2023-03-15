@@ -403,6 +403,7 @@ const LOCATION_ABBREVIATIONS: Record<string, string> = {
   'Engr Science & Mech': 'ESM',
   'Engineering Sci and Mechanics': 'ESM',
   'Ford Environmental Sci & Tech': 'ES&T',
+  'Ford Environmental Sci &amp; Tech': 'ES&T',
   'Howey (Physics)': 'Howey',
   'Howey Physics': 'Howey',
   'Instr Center': 'IC',
@@ -417,6 +418,7 @@ const LOCATION_ABBREVIATIONS: Record<string, string> = {
   'Sustainable Education': 'SEB',
   'U A Whitaker Biomedical Engr': 'Whitaker',
   'West Village Dining Commons': 'West Village',
+  'Guggenheim Aerospace': 'Guggenheim',
 };
 
 export function abbreviateLocation(location: string): string {

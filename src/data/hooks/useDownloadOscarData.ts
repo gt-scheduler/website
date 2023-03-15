@@ -11,9 +11,8 @@ import {
 } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
-// test url, change to https://gt-scheduler.github.io/crawler/${term}.json when deploying
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const constructTermDataUrl = (term: string): string => `/test.json`;
+const constructTermDataUrl = (term: string): string =>
+  `https://gt-scheduler.github.io/crawler-v2/${term}.json`;
 
 // Number of minutes between re-downloads of the oscar data
 const REFRESH_INTERVAL_MIN = 15;
