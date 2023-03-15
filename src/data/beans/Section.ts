@@ -168,15 +168,14 @@ export default class Section {
           }
 
           const $ = cheerio.load(response.data);
-          const availabilityTable = $('.datadisplaytable .datadisplaytable');
-          const tableRow = availabilityTable.find('tr');
 
+          const availabilities = $('span').not('.status-bold');
           this.seating = [
             [
-              parseInt(tableRow.eq(1).children('td').first().text(), 10),
-              parseInt(tableRow.eq(1).children('td').eq(1).text(), 10),
-              parseInt(tableRow.eq(2).children('td').first().text(), 10),
-              parseInt(tableRow.eq(2).children('td').eq(1).text(), 10),
+              parseInt(availabilities.eq(1).text(), 10),
+              parseInt(availabilities.eq(0).text(), 10),
+              parseInt(availabilities.eq(3).text(), 10),
+              parseInt(availabilities.eq(4).text(), 10),
             ],
             currDate,
           ];
