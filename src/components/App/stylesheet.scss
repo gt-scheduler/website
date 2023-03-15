@@ -116,13 +116,13 @@ body.light .App {
         margin-right: 36px;
 
         h1 {
-          font-size: 64px;
+          font-size: 56px;
           font-weight: 700;
           line-height: 75px;
         }
 
         p {
-          font-size: 24px;
+          font-size: 1.25em;
           font-weight: 400;
           line-height: 28px;
 
@@ -153,20 +153,20 @@ body.light .App {
 }
 
 .mobile .Maintenance {
+  overflow-y: scroll;
   .content {
     .main-content {
       flex-direction: column-reverse;
+      display: flex;
+      margin-bottom: 56px;
 
       .text {
-        display: flex;
-        flex-direction: column;
         max-width: 85vw;
         margin: 0px;
         text-align: center;
-        margin-bottom: 48px;
 
         h1 {
-          font-size: 36px;
+          font-size: 28px;
           font-weight: 650;
           line-height: 42px;
         }

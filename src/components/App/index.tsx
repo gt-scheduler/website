@@ -29,10 +29,13 @@ export default function App(): React.ReactElement {
   // Add the current theme as a class on the body element
   useBodyClass(themeContextValue[0]);
 
-  const date = new Date();
+  const date = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  );
+
   const websiteDown =
     date.getFullYear() === 2023 &&
-    date.getMonth() === 2 &&
+    date.getMonth() + 1 === 3 &&
     (date.getDate() === 15 || date.getDate() === 16);
 
   return (
@@ -79,12 +82,9 @@ export default function App(): React.ReactElement {
                 </AppDataLoader>
               </AppNavigation>
               <Feedback />
-            {/* Display a popup when first visiting the site */}
-            {/* Include <InformationModal /> here */}
-            <MaintenanceModal />
-          </ErrorBoundary>
               {/* Display a popup when first visiting the site */}
               {/* Include <InformationModal /> here */}
+              <MaintenanceModal />
             </ErrorBoundary>
           )}
         </TooltipProvider>
