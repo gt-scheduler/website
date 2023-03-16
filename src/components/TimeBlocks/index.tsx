@@ -1,7 +1,6 @@
 import React, { useContext, useId } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { useRootClose } from 'react-overlays';
-import { decode } from 'html-entities';
 
 import {
   abbreviateLocation,
@@ -262,7 +261,7 @@ function MeetingDayBlock({
           <DetailsPopoverContent
             title={section.course.title}
             instructors={meeting.instructors}
-            location={decode(meeting.where)}
+            location={meeting.where}
             crn={section.crn}
             credits={section.credits}
             deliveryMode={section.deliveryMode ?? null}
@@ -328,7 +327,7 @@ function DetailsPopoverContent({
             <td>
               <b>Delivery Type</b>
             </td>
-            <td>{deliveryMode}</td>
+            <td>deliveryMode</td>
           </tr>
         )}
       </tbody>

@@ -7,7 +7,6 @@ import {
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { decode } from 'html-entities';
 
 import { classes, getContentClassName } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
@@ -186,7 +185,7 @@ export default function Course({
         }
       >
         <div className="course-row">
-          <span className="course-title">{decode(course.title)}</span>
+          <span className="course-title">{course.title}</span>
           <span className="section-crns">
             {pinnedSections.map((section) => section.crn).join(', ')}
           </span>
@@ -228,7 +227,7 @@ export default function Course({
               <Instructor
                 key={name}
                 color={color}
-                name={decode(name)}
+                name={name}
                 sections={instructorMap[name] ?? []}
                 gpa={
                   gpaMap === null

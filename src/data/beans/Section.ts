@@ -1,5 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
+import { decode } from 'html-entities';
 
 import { unique } from '../../utils/misc';
 import { DELIVERY_MODES, BACKEND_BASE_URL } from '../../constants';
@@ -109,7 +110,7 @@ export default class Section {
       ]) => ({
         period: oscar.periods[periodIndex],
         days: days === '&nbsp;' ? [] : days.split(''),
-        where,
+        where: decode(where),
         location: oscar.locations[locationIndex] ?? null,
         instructors: instructors.map((instructor) =>
           instructor.replace(/ \(P\)$/, '').trim()

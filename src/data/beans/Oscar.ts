@@ -1,3 +1,5 @@
+import { decode } from 'html-entities';
+
 import { Course, Section, SortingOption } from '.';
 import { hasConflictBetween, stringToTime } from '../../utils/misc';
 import {
@@ -130,7 +132,7 @@ export default class Oscar {
           });
 
     this.scheduleTypes = caches.scheduleTypes;
-    this.campuses = caches.campuses;
+    this.campuses = caches.campuses.map((campus: string) => decode(campus));
     this.attributes = caches.attributes;
     this.gradeBases = caches.gradeBases;
     this.locations = caches.locations;
