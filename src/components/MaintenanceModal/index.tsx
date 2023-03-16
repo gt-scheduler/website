@@ -55,7 +55,9 @@ export default function MaintenanceModal(): React.ReactElement {
 
   // modal should only be shown before Mar 15, 2023 0:00 AM ET
   const isValid =
-    date.getFullYear() === 2023 && date.getMonth() <= 3 && date.getDate() < 15;
+    date.getFullYear() === 2023 &&
+    date.getMonth() + 1 <= 3 &&
+    date.getDate() < 15;
 
   const [show, setShow] = useState(false);
   const [hasSeen, setHasSeen] = useLocalStorageState(MODAL_LOCAL_STORAGE_KEY, {
