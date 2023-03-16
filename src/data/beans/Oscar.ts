@@ -79,6 +79,7 @@ export default class Oscar {
       caches.finalTimes === undefined
         ? []
         : caches.finalTimes.map((finalTime, i) => {
+            if (finalTime === 'TBA') return null;
             const finalSegments = finalTime.split(' - ');
             if (finalSegments.length !== 2) {
               softError(
