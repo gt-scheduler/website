@@ -7,7 +7,7 @@ import { AnyScheduleData } from './types';
 
 // This data is not secret; it is included in the application bundle.
 // Supply these environment variables when developing locally.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: process.env['REACT_APP_FIREBASE_API_KEY'],
   authDomain: process.env['REACT_APP_FIREBASE_AUTH_DOMAIN'],
   projectId: process.env['REACT_APP_FIREBASE_PROJECT_ID'],
@@ -16,6 +16,8 @@ const firebaseConfig = {
   appId: process.env['REACT_APP_FIREBASE_APP_ID'],
   measurementId: process.env['REACT_APP_FIREBASE_MEASUREMENT_ID'],
 };
+
+const SCHEDULE_COLLECTION = 'schedules';
 
 /**
  * Whether Firebase authentication is enabled in this environment.
@@ -38,7 +40,9 @@ if (isAuthEnabled) {
 
   auth = app.auth();
   db = app.firestore();
-  schedulesCollection = db.collection('schedules') as SchedulesCollection;
+  schedulesCollection = db.collection(
+    SCHEDULE_COLLECTION
+  ) as SchedulesCollection;
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
     softError(

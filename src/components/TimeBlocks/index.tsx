@@ -327,7 +327,7 @@ function DetailsPopoverContent({
             <td>
               <b>Delivery Type</b>
             </td>
-            <td>{deliveryMode}</td>
+            <td>deliveryMode</td>
           </tr>
         )}
       </tbody>

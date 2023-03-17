@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { decode } from 'html-entities';
 
 import { Oscar, Section } from '.';
 import {
@@ -14,14 +15,14 @@ import {
   isAxiosNetworkError,
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
 // but it should behave the same as the real API.
 // See the implementation at:
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
-const COURSE_CRITIQUE_API_URL =
-  'https://us-central1-gt-scheduler-web-prod.cloudfunctions.net/getCourseDataFromCourseCritique';
+const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
@@ -85,7 +86,7 @@ export default class Course {
     this.subject = subject;
     this.number = number;
 
-    this.title = title;
+    this.title = decode(title);
     this.sections = Object.entries(sections).flatMap<Section>(
       ([sectionId, sectionData]) => {
         if (sectionData == null) return [];
@@ -368,7 +369,7 @@ export default class Course {
         }
 
         // Normalize the instructor name from "LN, FN" to "FN LN"
-        let instructorName = rawInstructorName;
+        let instructorName = decode(rawInstructorName);
         const nameSegments = instructorName.split(', ');
         if (nameSegments.length === 2) {
           const [lastName, firstName] = nameSegments as [string, string];
