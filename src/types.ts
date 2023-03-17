@@ -264,6 +264,11 @@ export interface CrawlerCaches {
    * Example time: 11:20 am - 2:10 pm
    */
   finalTimes: string[];
+  /**
+   * List of the full names of courses
+   * Example name: Accounting for ACCT
+   * */
+  fullCourseNames: { [key: string]: string };
 }
 
 // Course type (imported as `CrawlerCourse`):
