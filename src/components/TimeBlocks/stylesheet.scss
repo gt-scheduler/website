@@ -71,6 +71,19 @@
       }
     }
 
+    &--clone {
+      & {
+        opacity: 0.5;
+      }
+    }
+
+    &--dragging {
+      & {
+        background-color: transparent;
+        border: 2px solid var(--meeting-color, $color-neutral);
+      }
+    }
+
     :hover {
       cursor: pointer;
     }
