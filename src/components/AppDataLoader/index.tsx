@@ -306,7 +306,7 @@ function ContextProvider({
         oscar,
         currentVersion,
         allVersionNames,
-        currentFriends: scheduleVersion.friends,
+        currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
       },
       {

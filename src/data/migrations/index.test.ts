@@ -132,6 +132,7 @@ describe('migrateScheduleData', () => {
                 colorMap: {},
                 sortingOptionIndex: 0,
               },
+              friends: {},
             },
           },
         },
