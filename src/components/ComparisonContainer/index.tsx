@@ -3,6 +3,7 @@ import {
   faPencil,
   faCircleXmark,
   faXmark,
+  faPalette,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
@@ -12,6 +13,7 @@ import { ScheduleContext } from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import { AutoFocusInput } from '../Select';
+import { Palette } from '..';
 
 import './stylesheet.scss';
 
@@ -186,6 +188,33 @@ export default function ComparisonContainer(): React.ReactElement {
     [selected]
   );
 
+  const setFriendScheduleColor = useCallback(
+    (color: string, id: string, owner?: string) => {
+      setSharedSchedules(
+        sharedSchedules.map((friend) => {
+          if (friend.id === owner) {
+            return {
+              id: friend.id,
+              name: friend.name,
+              schedules: friend.schedules.map((schedule) => {
+                if (schedule.id === id) {
+                  return {
+                    id: schedule.id,
+                    name: schedule.name,
+                    color,
+                  };
+                }
+                return schedule;
+              }),
+            };
+          }
+          return friend;
+        })
+      );
+    },
+    [sharedSchedules]
+  );
+
   return (
     <div className="comparison-container">
       <div className="comparison-body">
@@ -307,7 +336,16 @@ export default function ComparisonContainer(): React.ReactElement {
                               owner: friend.id,
                             });
                           }}
+                          hasPalette
                           hasEdit={false}
+                          setFriendScheduleColor={(color: string): void => {
+                            setFriendScheduleColor(
+                              color,
+                              schedule.id,
+                              friend.id
+                            );
+                          }}
+                          color={schedule.color}
                         />
                       );
                     })}
@@ -362,9 +400,12 @@ type ScheduleRowProps = {
   name: string;
   handleEditSchedule: () => void;
   handleRemoveSchedule: () => void;
+  hasPalette?: boolean;
   hasEdit?: boolean;
   hasDelete?: boolean;
   hasTooltip?: boolean;
+  setFriendScheduleColor?: (color: string) => void;
+  color?: string;
   editOnChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editOnKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   editInfo?: EditInfo;
@@ -382,9 +423,12 @@ function ScheduleRow({
   name,
   handleEditSchedule,
   handleRemoveSchedule,
+  hasPalette = false,
   hasEdit = true,
   hasDelete = true,
   hasTooltip = false,
+  setFriendScheduleColor,
+  color,
   editOnChange,
   editOnKeyDown,
   editInfo,
@@ -394,6 +438,7 @@ function ScheduleRow({
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
   const [divHover, setDivHover] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const edit =
     hasEdit &&
@@ -403,74 +448,93 @@ function ScheduleRow({
     editInfo.owner === owner;
 
   return (
-    <div
-      className={classes('checkbox-container', edit && 'editing')}
-      onMouseEnter={(): void => setDivHover(true)}
-      onMouseLeave={(): void => setDivHover(false)}
-    >
-      {hasCheck && (
-        <div
-          className={classes('checkbox', type === 'Schedule' && 'indented')}
-          onClick={onClick}
-          style={{ backgroundColor: checkboxColor }}
-        />
-      )}
-      {hasEdit && setEditInfo && editValue && edit && (
-        <AutoFocusInput
-          className={classes('edit-input', hasCheck && 'check')}
-          value={editValue}
-          onChange={editOnChange}
-          placeholder={name}
-          onKeyDown={editOnKeyDown}
-          onBlur={(): void => setEditInfo(null)}
-        />
-      )}
-      {!edit && (
-        <>
+    <div className="schedule-row">
+      <div
+        className={classes('checkbox-container', edit && 'editing')}
+        onMouseEnter={(): void => setDivHover(true)}
+        onMouseLeave={(): void => setDivHover(false)}
+      >
+        {hasCheck && (
           <div
-            id={tooltipId}
-            className={classes('name', hasCheck && 'check')}
-            onMouseEnter={(): void => setTooltipHover(true)}
-            onMouseLeave={(): void => setTooltipHover(false)}
+            className={classes('checkbox', type === 'Schedule' && 'indented')}
+            onClick={onClick}
+            style={{ backgroundColor: checkboxColor }}
+          />
+        )}
+        {hasEdit && setEditInfo && editValue && edit && (
+          <AutoFocusInput
+            className={classes('edit-input', hasCheck && 'check')}
+            value={editValue}
+            onChange={editOnChange}
+            placeholder={name}
+            onKeyDown={editOnKeyDown}
+            onBlur={(): void => setEditInfo(null)}
+          />
+        )}
+        {!edit && (
+          <>
+            <div
+              id={tooltipId}
+              className={classes('name', hasCheck && 'check')}
+              onMouseEnter={(): void => setTooltipHover(true)}
+              onMouseLeave={(): void => setTooltipHover(false)}
+            >
+              <p>{name}</p>
+              {hasTooltip && id !== name && (
+                <ReactTooltip
+                  key={id}
+                  anchorId={tooltipId}
+                  className="tooltip"
+                  variant="dark"
+                  isOpen={tooltipHover}
+                  setIsOpen={setTooltipHover}
+                  delayShow={20}
+                  delayHide={100}
+                  // key={deviceHasHover ? 0 : 1}
+                  // events={deviceHasHover ? ['hover'] : []}
+                >
+                  <p>{id}</p>
+                </ReactTooltip>
+              )}
+            </div>
+            <div className="spacing" />
+          </>
+        )}
+        {(divHover || edit) && hasPalette && (
+          <Button
+            className="icon"
+            onClick={(): void => setPaletteOpen(!paletteOpen)}
+            key={`${id}-palette`}
           >
-            <p>{name}</p>
-            {hasTooltip && id !== name && (
-              <ReactTooltip
-                key={id}
-                anchorId={tooltipId}
-                className="tooltip"
-                variant="dark"
-                isOpen={tooltipHover}
-                setIsOpen={setTooltipHover}
-                delayShow={20}
-                delayHide={100}
-                // key={deviceHasHover ? 0 : 1}
-                // events={deviceHasHover ? ['hover'] : []}
-              >
-                <p>{id}</p>
-              </ReactTooltip>
-            )}
-          </div>
-          <div className="spacing" />
-        </>
-      )}
-      {(divHover || edit) && hasEdit && (
-        <Button
-          className="icon"
-          onClick={handleEditSchedule}
-          key={`${id}-edit`}
-        >
-          <FontAwesomeIcon icon={faPencil} size="xs" />
-        </Button>
-      )}
-      {(divHover || edit) && hasDelete && (
-        <Button
-          className="icon"
-          onClick={handleRemoveSchedule}
-          key={`${id}-delete`}
-        >
-          <FontAwesomeIcon icon={faCircleXmark} size="xs" />
-        </Button>
+            <FontAwesomeIcon icon={faPalette} size="xs" />
+          </Button>
+        )}
+        {(divHover || edit) && hasEdit && (
+          <Button
+            className="icon"
+            onClick={handleEditSchedule}
+            key={`${id}-edit`}
+          >
+            <FontAwesomeIcon icon={faPencil} size="xs" />
+          </Button>
+        )}
+        {(divHover || edit) && hasDelete && (
+          <Button
+            className="icon"
+            onClick={handleRemoveSchedule}
+            key={`${id}-delete`}
+          >
+            <FontAwesomeIcon icon={faCircleXmark} size="xs" />
+          </Button>
+        )}
+      </div>
+      {hasPalette && paletteOpen && setFriendScheduleColor && (
+        <Palette
+          className="palette"
+          onSelectColor={setFriendScheduleColor}
+          color={color ?? null}
+          onMouseLeave={(): void => undefined}
+        />
       )}
     </div>
   );

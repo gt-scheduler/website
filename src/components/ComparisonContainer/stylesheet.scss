@@ -92,95 +92,103 @@
         }
       }
 
-      .checkbox-container {
-        display: flex;
-        align-items: center;
-        position: relative;
-        height: 22px;
-        
-        .checkbox {
-          margin-left: 12px;
-          border: 1px solid;
-          border-radius: 3px;
-          border-color: var(--theme-fg);
-          transition-duration: $theme-switch-transition-duration;
-          transition-property: border-color;
-
-          width: 11px;
-          height: 11px;
-
-          &:hover {
-            cursor: pointer;
-          }
-
-          &.indented {
-            margin-left: 24px;
-          }
-        }
-
-        .name {
-          margin-left: 12px;
-          margin-right: 12px;
-          min-width: 0;
-          flex-shrink: 1;
-
-          &.check {
-            margin-left: 8px;
-          }
-          
-          p {
-            text-overflow: ellipsis;
-          }
-        }
-
-        .edit-input {
+      .schedule-row {
+        .checkbox-container {
+          display: flex;
+          align-items: center;
+          position: relative;
           height: 22px;
-          border-radius: 4px;
-          padding: 4px;
-          flex: 1 1;
-          font-size: 12px;
-          font-weight: 500;
-          outline: none;
-          border: 1px solid var(--theme-fg);
-          margin-left: 8px;
+          
+          .checkbox {
+            margin-left: 12px;
+            border: 1px solid;
+            border-radius: 3px;
+            border-color: var(--theme-fg);
+            transition-duration: $theme-switch-transition-duration;
+            transition-property: border-color;
 
-          &.check {
-            margin-left: 4px;
-          }
-        }
+            width: 11px;
+            height: 11px;
 
-        .spacing {
-          flex: 1;
-        }
+            &:hover {
+              cursor: pointer;
+            }
 
-        .tooltip {
-          background: rgba(0, 0, 0, 0.8);
-          border-radius: 4px;
-        }
-
-        .icon {
-          width: 27px;
-          height: 100%;
-          padding: 0px;
-          opacity: 0;
-        }
-
-        &:hover {
-          background-color: $color-border;
-
-          .icon {
-            opacity: 1;
+            &.indented {
+              margin-left: 24px;
+            }
           }
 
           .name {
-            margin-right: 0px;
+            margin-left: 12px;
+            margin-right: 12px;
+            min-width: 0;
+            flex-shrink: 1;
+
+            &.check {
+              margin-left: 8px;
+            }
+            
+            p {
+              text-overflow: ellipsis;
+            }
+          }
+
+          .edit-input {
+            height: 22px;
+            border-radius: 4px;
+            padding: 4px;
+            flex: 1 1;
+            font-size: 12px;
+            font-weight: 500;
+            outline: none;
+            border: 1px solid var(--theme-fg);
+            margin-left: 8px;
+
+            &.check {
+              margin-left: 4px;
+            }
+          }
+
+          .spacing {
+            flex: 1;
+          }
+
+          .tooltip {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+          }
+
+          .icon {
+            width: 27px;
+            height: 100%;
+            padding: 0px;
+            opacity: 0;
+          }
+
+          &:hover {
+            background-color: $color-border;
+
+            .icon {
+              opacity: 1;
+            }
+
+            .name {
+              margin-right: 0px;
+            }
+          }
+
+          &.editing {
+            .icon {
+              opacity: 1;
+            }
           }
         }
-
-        &.editing {
-          .icon {
-            opacity: 1;
-          }
+        .palette {
+          margin: 0px 12px 0px 24px;
+          height: 50px;
+          border-radius: 4px;
+          overflow: hidden;
         }
       }
     }
