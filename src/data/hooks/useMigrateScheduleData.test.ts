@@ -188,6 +188,7 @@ describe('useMigrateScheduleData', () => {
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
+              friends: {},
             },
           },
         },
