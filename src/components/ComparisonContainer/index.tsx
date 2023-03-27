@@ -382,9 +382,9 @@ export default function ComparisonContainer(): React.ReactElement {
             to access courses and events
           </p>
         </ReactTooltip>
-        <div
+        {/* <div
           className={classes('comparison-overlay', 'right', !compare && 'open')}
-        />
+        /> */}
       </div>
     </div>
   );
