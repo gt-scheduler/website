@@ -1,11 +1,11 @@
-import React, { ReactElement, useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Immutable, castDraft } from 'immer';
 
 import { daysToString, periodToString } from '../../utils/misc';
 import { TimeBlocks } from '..';
 import { Period, Event } from '../../types';
 import { TimeBlockPosition, SizeInfo } from '../TimeBlocks';
-import { CLOSE, OPEN } from '../../constants';
+import { CLOSE, OPEN, DAYS } from '../../constants';
 import { ThemeContext, ScheduleContext } from '../../contexts';
 
 import './stylesheet.scss';
@@ -26,10 +26,6 @@ export type EventBlocksProps = {
   sizeInfo: SizeInfo;
   canBeTabFocused?: boolean;
   deviceHasHover?: boolean;
-  selectedMeeting?: [meetingIndex: number, day: string] | null;
-  onSelectMeeting?: (
-    meeting: [meetingIndex: number, day: string] | null
-  ) => void;
   daysRef: React.RefObject<HTMLDivElement>;
   timesRef: React.RefObject<HTMLDivElement>;
 };
@@ -43,16 +39,16 @@ export default function EventBlocks({
   includeContent,
   canBeTabFocused = false,
   deviceHasHover = true,
-  selectedMeeting,
-  onSelectMeeting,
   daysRef,
   timesRef,
 }: EventBlocksProps): React.ReactElement | null {
   const [tempStart, setTempStart] = useState<number>(event.period.start);
-  const [tempDays, setTempDays] = useState<string[]>([...event.days]);
 
   const tempStartRef = useRef<number>(event.period.start);
   const tempDaysRef = useRef<string[]>([...event.days]);
+
+  const savedStyleRef = useRef<string>();
+  const savedClassListRef = useRef<string>();
 
   const [dragging, setDragging] = useState<boolean>(false);
   const [theme] = useContext(ThemeContext);
@@ -63,26 +59,37 @@ export default function EventBlocks({
     e: React.MouseEvent,
     ref: React.RefObject<HTMLDivElement>
   ): void => {
-    const cloneMeeting = ref.current!.cloneNode(true) as HTMLDivElement;
+    if (!ref.current) return;
+    savedStyleRef.current = ref.current.style.cssText;
+    savedClassListRef.current = ref.current.className;
+
+    const cloneMeeting = ref.current.cloneNode(true) as HTMLDivElement;
     cloneMeeting.classList.add('meeting--clone');
     cloneMeeting.id = 'meeting--clone';
 
     setDragging(true);
 
-    ref.current?.classList.remove('light-content', 'dark-content');
-    ref.current?.classList.add(`${theme}-content`);
-    ref.current?.parentNode?.appendChild(cloneMeeting);
-    ref.current?.classList.add('meeting--dragging');
+    if (ref.current) {
+      ref.current.classList.remove('light-content', 'dark-content');
+      ref.current.classList.add(`${theme}-content`);
+      ref.current.parentNode?.appendChild(cloneMeeting);
+      ref.current.classList.add('meeting--dragging');
+      ref.current.style.width = '20%';
+    }
 
     // eslint-disable-next-line
-    const mouseMoveHandler = (e_: any): void => handleMouseMove(e_, ref);
+    const mouseMoveHandler = (e_: MouseEvent): void => handleMouseMove(e_, ref);
 
     const handleMouseUp = (
-      e_: React.MouseEvent,
+      e_: MouseEvent,
       ref_: React.RefObject<HTMLDivElement>
     ): void => {
-      ref_.current?.classList.remove('meeting--dragging');
+      if (!ref_.current) return;
+      ref_.current.className = savedClassListRef.current || '';
+      ref_.current.style.cssText = savedStyleRef.current || '';
+
       cloneMeeting.remove();
+
       setDragging(false);
 
       const newEvents = castDraft(events).map((existingEvent: Event) => {
@@ -93,7 +100,8 @@ export default function EventBlocks({
               start: tempStartRef.current,
               end: tempStartRef.current + event.period.end - event.period.start,
             },
-            days: tempDaysRef.current,
+            days:
+              event.days.length === 1 ? tempDaysRef.current : [...event.days],
           };
         }
         return existingEvent;
@@ -113,30 +121,30 @@ export default function EventBlocks({
   };
 
   const handleMouseMove = (
-    e: React.MouseEvent,
+    e: MouseEvent,
     ref: React.RefObject<HTMLDivElement>
   ): void => {
+    if (!ref.current || !timesRef.current || !daysRef.current) return;
     const start = Math.round(
       (Math.round(
         e.pageY -
-          timesRef.current!.getBoundingClientRect().y -
-          ref.current!.offsetHeight / 2
+          timesRef.current.getBoundingClientRect().y -
+          ref.current.offsetHeight / 2
       ) /
-        timesRef.current!.getBoundingClientRect().height) *
+        timesRef.current.getBoundingClientRect().height) *
         (CLOSE - OPEN) +
         OPEN
     );
     const end = start + event.period.end - event.period.start;
-    const left = e.pageX - daysRef.current!.getBoundingClientRect().x;
-    const day = ['M', 'T', 'W', 'R', 'F'][
-      Math.floor(
-        ((left / daysRef.current!.getBoundingClientRect().width) * 100) / 20
-      )
-    ];
+    const left = e.pageX - daysRef.current.getBoundingClientRect().x;
+    const day =
+      DAYS[
+        Math.floor(
+          ((left / daysRef.current.getBoundingClientRect().width) * 100) / 20
+        )
+      ];
     if (day && event.days.length === 1) {
-      ref.current!.classList.remove('M', 'T', 'W', 'R', 'F');
-      ref.current!.classList.add(day);
-      setTempDays([day]);
+      ref.current.style.left = `${DAYS.indexOf(day) * 20}%`;
       tempDaysRef.current = [day];
     }
 

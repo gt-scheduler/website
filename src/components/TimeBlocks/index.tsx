@@ -214,7 +214,6 @@ function MeetingDayBlock({
   useRootClose(outerRef, handleRootClose, {
     disabled: !isSelected,
   });
-
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
   return (
@@ -224,12 +223,15 @@ function MeetingDayBlock({
           'meeting',
           contentClassName,
           'default',
-          day,
+          // day,
           isSelected && 'meeting--selected'
         )}
         style={{
           top: `${
             (((tempStart ?? period.start) - OPEN) / (CLOSE - OPEN)) * 100
+          }%`,
+          left: `${
+            DAYS.indexOf(day) * 20 + sizeInfo.rowIndex * (20 / sizeInfo.rowSize)
           }%`,
           height: `${
             (Math.max(15, period.end - period.start) / (CLOSE - OPEN)) * 100
