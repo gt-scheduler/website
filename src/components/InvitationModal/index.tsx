@@ -2,9 +2,9 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
   useCallback,
-  useMemo,
   useContext,
   useState,
+  useRef,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { faCircle, faClose } from '@fortawesome/free-solid-svg-icons';
@@ -25,135 +25,69 @@ import './stylesheet.scss';
  * Inner content of the invitation modal.
  */
 export function InvitationModalContent(): React.ReactElement {
-  const [{ currentFriends, currentVersion, term }, { updateFriends }] =
+  const [{ currentFriends, currentVersion, term }, { deleteFriendRecord }] =
     useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
 
-  const [input, setInput] = useState('');
+  const input = useRef<HTMLInputElement>(null);
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
 
-  // Boolean to hide and open search dropdown
-  const [hidden, setHidden] = useState(true);
-
-  // Array for testing dropdown of recent invites
-  // eslint-disable-next-line
-  const [recentInvites, setRecentInvites] = useState<string[]>([
-    'user1@example.com',
-    'user2@example.com',
-  ]);
-  const [activeIndex, setActiveIndex] = useState(-1);
-
   const handleChangeSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    let search = e.target.value.trim();
-    const results = /^([A-Z]+)(\d.*)$/i.exec(search);
-    if (results != null) {
-      const [, email, number] = results as unknown as [string, string, string];
-      search = `${email}${number}`;
-    }
-    setHidden(false);
-    setInput(search);
     setValidMessage('');
-    setActiveIndex(-1);
+    setValidClassName('');
   }, []);
 
-  const searchResults = useMemo(() => {
-    if (!input) return recentInvites;
-    const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(input?.toUpperCase());
-    if (!results) {
-      return [];
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    switch (e.key) {
+      case 'Enter':
+        verifyEmail();
+        break;
+      default:
+        return;
     }
-
-    return recentInvites.filter((invite) => {
-      const searchMatch = recentInvites.includes(invite);
-      return searchMatch;
-    });
-  }, [input, recentInvites]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      switch (e.key) {
-        case 'ArrowDown':
-          setHidden(false);
-          setInput(
-            searchResults[
-              Math.min(activeIndex + 1, searchResults.length - 1)
-            ] as string
-          );
-          setActiveIndex(Math.min(activeIndex + 1, searchResults.length - 1));
-          break;
-        case 'ArrowUp':
-          setHidden(false);
-          setInput(searchResults[Math.max(activeIndex - 1, 0)] as string);
-          setActiveIndex(Math.max(activeIndex - 1, 0));
-          break;
-        case 'Escape':
-          setHidden(true);
-          break;
-        case 'Enter':
-          setHidden(true);
-          break;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [searchResults, activeIndex]
-  );
-
-  const handleCloseDropdown = useCallback(
-    (index?: number) => {
-      if (index !== undefined) {
-        setInput(searchResults[index] as string);
-        setActiveIndex(index);
-      }
-      setHidden(true);
-    },
-    [searchResults]
-  );
+    e.preventDefault();
+  }, []);
 
   const sendInvitation = async (): Promise<void> => {
     const IdToken = await (accountContext as SignedIn).getToken();
-    axios
-      .post(
-        'http://127.0.0.1:5001/gt-scheduler-web-dev/us-central1/createFriendInvitation',
-        {
-          term,
-          friendEmail: input,
-          IDToken: IdToken,
-          version: currentVersion,
-        }
-      )
-      .then(() => {
-        setValidMessage('Successfully sent!');
-        setValidClassName('valid-email');
-      })
-      .catch((err) => {
-        setValidClassName('invalid-email');
-        const error = err as AxiosError;
-        if (error.response) {
-          const apiError = error.response.data as ApiErrorResponse;
-          setValidMessage(apiError.message);
-          return;
-        }
-
-        setValidMessage('Error sending invitation. Please try again later.');
-      });
+    return axios.post(
+      'http://127.0.0.1:5001/gt-scheduler-web-dev/us-central1/createFriendInvitation',
+      {
+        term,
+        friendEmail: input.current?.value,
+        IDToken: IdToken,
+        version: currentVersion,
+      }
+    );
   };
 
   // verify email with a regex and send invitation if valid
   const verifyEmail = (): void => {
+    console.log(input.current?.value);
     if (
       // eslint-disable-next-line
-      /^\S+@\S+\.\S+$/.test(input)
+      input.current &&
+      /^\S+@\S+\.\S+$/.test(input.current.value)
     ) {
       sendInvitation()
         .then(() => {
-          setInput('');
+          setValidMessage('Successfully sent!');
+          setValidClassName('valid-email');
+          if (input.current) {
+            input.current.value = '';
+          }
         })
-        .catch(() => {
-          setValidMessage('Error sending invitation. Please try again later.');
+        .catch((err) => {
+          console.log(err);
           setValidClassName('invalid-email');
+          const error = err as AxiosError;
+          if (error.response) {
+            const apiError = error.response.data as ApiErrorResponse;
+            setValidMessage(apiError.message);
+            return;
+          }
+          setValidMessage('Error sending invitation. Please try again later.');
         });
     } else {
       setValidMessage('Invalid Email');
@@ -163,9 +97,7 @@ export function InvitationModalContent(): React.ReactElement {
 
   // delete friend from record of friends
   const handleDelete = (friendId: string): void => {
-    const newFriends = castDraft(currentFriends);
-    delete newFriends[friendId];
-    updateFriends(currentVersion, newFriends);
+    deleteFriendRecord(currentVersion, friendId);
   };
 
   return (
@@ -183,30 +115,14 @@ export function InvitationModalContent(): React.ReactElement {
               type="email"
               id="email"
               key="email"
-              value={input}
+              ref={input}
               className="email"
               placeholder="recipient@example.com"
               list="recent-invites"
-              onChange={handleChangeSearch}
               onFocus={handleChangeSearch}
               onKeyDown={handleKeyDown}
-              onBlur={(): void => handleCloseDropdown()}
+              onChange={handleChangeSearch}
             />
-            {!hidden && (
-              <div id="recent-invites">
-                {searchResults.map((element, index) => (
-                  <div
-                    className={classes(
-                      'search-option',
-                      index === activeIndex && 'active'
-                    )}
-                    onMouseDown={(): void => handleCloseDropdown(index)}
-                  >
-                    {element}
-                  </div>
-                ))}
-              </div>
-            )}
             <text className={validClassName}>{validMessage}</text>
           </div>
           <button type="button" className="send-button" onClick={verifyEmail}>
@@ -220,12 +136,17 @@ export function InvitationModalContent(): React.ReactElement {
           Users Invited to View <strong>Primary</strong>
         </p>
         <div className="shared-emails" key="email">
-          {Object.keys(currentFriends).map((friend) => (
+          {Object.keys(currentFriends ?? {}).map((friend) => (
             <div
               className="email-and-status"
               id={currentFriends[friend]?.email}
             >
-              <div className="individual-shared-email">
+              <div
+                className={classes(
+                  'individual-shared-email',
+                  currentFriends[friend]?.status
+                )}
+              >
                 {currentFriends[friend]?.email}
                 <Button
                   className="button-remove"

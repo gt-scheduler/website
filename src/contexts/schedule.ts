@@ -29,10 +29,7 @@ export type ScheduleContextSetters = {
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
-  updateFriends: (
-    versionId: string,
-    newFriends: Record<string, FriendShareData>
-  ) => void;
+  deleteFriendRecord: (versionId: string, friendId: string) => void;
 };
 export type ScheduleContextValue = [
   ScheduleContextData,
@@ -77,15 +74,12 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
         },
       });
     },
-    updateFriends: (
-      versionId: string,
-      newFriends: Record<string, FriendShareData>
-    ): void => {
+    deleteFriendRecord: (versionId: string, friendId: string): void => {
       throw new ErrorWithFields({
         message: 'empty ScheduleContext.deleteFriendRecord value being used',
         fields: {
           versionId,
-          newFriends,
+          friendId,
         },
       });
     },

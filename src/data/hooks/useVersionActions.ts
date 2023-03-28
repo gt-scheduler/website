@@ -14,10 +14,7 @@ export type HookResult = {
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
-  updateFriends: (
-    versionId: string,
-    newFriends: Record<string, FriendShareData>
-  ) => void;
+  deleteFriendRecord: (versionId: string, friendId: string) => void;
 };
 
 /**
@@ -188,8 +185,8 @@ export default function useVersionActions({
     [updateTermScheduleData, addNewVersion]
   );
 
-  const updateFriends = useCallback(
-    (versionId: string, newFriends: Record<string, FriendShareData>): void => {
+  const deleteFriendRecord = useCallback(
+    (versionId: string, friendId: string): void => {
       updateTermScheduleData((draft) => {
         const existingDraft = draft.versions[versionId];
         if (existingDraft === undefined) {
@@ -208,7 +205,20 @@ export default function useVersionActions({
           );
           return;
         }
-        existingDraft.friends = castDraft(newFriends);
+        if (friendId in existingDraft.friends) {
+          delete existingDraft.friends[friendId];
+        } else {
+          softError(
+            new ErrorWithFields({
+              message:
+                "deleteFriendRecord called with friend ID that doesn't exist; ignoring",
+              fields: {
+                allFriendIds: Object.keys(existingDraft.friends),
+                friendId,
+              },
+            })
+          );
+        }
       });
     },
     [updateTermScheduleData]
@@ -219,6 +229,6 @@ export default function useVersionActions({
     deleteVersion,
     renameVersion,
     cloneVersion,
-    updateFriends,
+    deleteFriendRecord,
   };
 }
