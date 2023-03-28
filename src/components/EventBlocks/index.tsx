@@ -28,6 +28,10 @@ export type EventBlocksProps = {
   deviceHasHover?: boolean;
   daysRef: React.RefObject<HTMLDivElement>;
   timesRef: React.RefObject<HTMLDivElement>;
+  selectedMeeting?: [meetingIndex: number, day: string] | null;
+  onSelectMeeting?: (
+    meeting: [meetingIndex: number, day: string] | null
+  ) => void;
 };
 
 export default function EventBlocks({
@@ -41,6 +45,8 @@ export default function EventBlocks({
   deviceHasHover = true,
   daysRef,
   timesRef,
+  selectedMeeting,
+  onSelectMeeting,
 }: EventBlocksProps): React.ReactElement | null {
   const [tempStart, setTempStart] = useState<number>(event.period.start);
 
@@ -64,7 +70,7 @@ export default function EventBlocks({
     ref: React.RefObject<HTMLDivElement>
   ): void => {
     if (!ref.current) return;
-
+    if (!deviceHasHover) return;
     // Save style of the block
     savedStyleRef.current = ref.current.style.cssText;
     savedClassListRef.current = ref.current.className;
@@ -221,6 +227,8 @@ export default function EventBlocks({
       includeDetailsPopover={!dragging && includeDetailsPopover}
       includeContent={includeContent}
       canBeTabFocused={canBeTabFocused}
+      onSelectMeeting={onSelectMeeting}
+      selectedMeeting={selectedMeeting}
       deviceHasHover={deviceHasHover}
       handleMouseDown={handleMouseDown}
     />
