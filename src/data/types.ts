@@ -190,7 +190,7 @@ export type RawFriendScheduleData = Record<
       string,
       {
         name: string;
-        schedule: ScheduleData;
+        schedule: Schedule;
       }
     >;
   }
@@ -205,7 +205,7 @@ export type FriendScheduleData = Record<
       string,
       {
         name: string;
-        schedule: ScheduleData;
+        schedule: Schedule;
       }
     >;
   }
