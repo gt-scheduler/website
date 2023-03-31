@@ -19,16 +19,23 @@ import {
 } from '../types';
 import ics from '../vendor/ics';
 
+/* Converts a string of the form "930" to 750. strings of the
+  mentioned format are returned by crawler v2 */
 export const stringToTime = (string: string): number => {
-  const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
-  if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = regexResult as unknown as [
-    string,
-    string,
-    string,
-    string
+  if (
+    string === 'null' ||
+    string.length < 3 ||
+    string.length > 4 ||
+    Number.isNaN(parseInt(string, 10))
+  ) {
+    return 0;
+  }
+
+  const [hour, minute] = [
+    string.substring(0, string.length - 2),
+    string.substring(string.length - 2, string.length),
   ];
-  return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
+  return parseInt(hour, 10) * 60 + parseInt(minute, 10);
 };
 
 export const timeToString = (
@@ -427,6 +434,7 @@ const LOCATION_ABBREVIATIONS: Record<string, string> = {
   'Engr Science & Mech': 'ESM',
   'Engineering Sci and Mechanics': 'ESM',
   'Ford Environmental Sci & Tech': 'ES&T',
+  'Ford Environmental Sci &amp; Tech': 'ES&T',
   'Howey (Physics)': 'Howey',
   'Howey Physics': 'Howey',
   'Instr Center': 'IC',
@@ -441,6 +449,7 @@ const LOCATION_ABBREVIATIONS: Record<string, string> = {
   'Sustainable Education': 'SEB',
   'U A Whitaker Biomedical Engr': 'Whitaker',
   'West Village Dining Commons': 'West Village',
+  'Guggenheim Aerospace': 'Guggenheim',
 };
 
 export function abbreviateLocation(location: string): string {
