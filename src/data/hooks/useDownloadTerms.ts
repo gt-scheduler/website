@@ -6,7 +6,8 @@ import { LoadingState, NonEmptyArray } from '../../types';
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
-const CRAWLER_INDEX_URL = 'https://gt-scheduler.github.io/crawler/index.json';
+const CRAWLER_INDEX_URL =
+  'https://gt-scheduler.github.io/crawler-v2/index.json';
 
 /**
  * Downloads the list of terms that the crawler has valid data for.

@@ -1,4 +1,5 @@
 import { Immutable } from 'immer';
+import { decode } from 'html-entities';
 
 import { Course, Section, SortingOption } from '.';
 import {
@@ -85,6 +86,7 @@ export default class Oscar {
       caches.finalTimes === undefined
         ? []
         : caches.finalTimes.map((finalTime, i) => {
+            if (finalTime === 'TBA') return null;
             const finalSegments = finalTime.split(' - ');
             if (finalSegments.length !== 2) {
               softError(
@@ -121,7 +123,7 @@ export default class Oscar {
           })
         );
         // We need some fallback here
-        segments = ['Jan 1, 1970', 'Jan 2, 1970'];
+        segments = ['1/1/1970', '1/2/1970'];
       }
 
       const [from, to] = segments.map((v) => new Date(v)) as [Date, Date];
@@ -138,7 +140,7 @@ export default class Oscar {
           });
 
     this.scheduleTypes = caches.scheduleTypes;
-    this.campuses = caches.campuses;
+    this.campuses = caches.campuses.map((campus: string) => decode(campus));
     this.attributes = caches.attributes;
     this.gradeBases = caches.gradeBases;
     this.locations = caches.locations;
@@ -399,6 +401,7 @@ export const EMPTY_OSCAR = new Oscar(
       locations: [],
       finalDates: [],
       finalTimes: [],
+      fullCourseNames: {},
     },
     // This converts the Date to the expected string
     // that it serializes to in the crawler
