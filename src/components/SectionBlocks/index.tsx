@@ -57,7 +57,7 @@ export default function SectionBlocks({
 
         return (
           <TimeBlocks
-            key={`${section.course.id}-${section.id}-${i}`}
+            key={`timeblocks-${section.crn}`}
             className={className}
             id={section.course.id}
             meetingIndex={i}

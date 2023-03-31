@@ -12,8 +12,8 @@ import { db, isAuthEnabled, friendsCollection } from '../firebase';
 import { FriendData, defaultFriendData } from '../types';
 
 type HookResult = {
-  rawFriendData: Immutable<FriendData> | null;
-  setFriendScheduleData: (
+  rawFriendData: Immutable<FriendData>;
+  setFriendData: (
     next: ((current: FriendData | null) => FriendData | null) | FriendData
   ) => void;
 };
@@ -185,7 +185,7 @@ export default function useRawFriendDataFromFirebase(
     type: 'loaded',
     result: {
       rawFriendData: castImmutable(friendData.data),
-      setFriendScheduleData: setFriendDataPersistent,
+      setFriendData: setFriendDataPersistent,
     },
   };
 }
