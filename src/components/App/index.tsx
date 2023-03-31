@@ -15,6 +15,7 @@ import { AppSkeleton, SkeletonContent, AppContent } from './content';
 import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import MaintenanceModal from '../MaintenanceModal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -68,6 +69,7 @@ export default function App(): React.ReactElement {
 
             {/* Display a popup when first visiting the site */}
             {/* Include <InformationModal /> here */}
+            <MaintenanceModal />
           </ErrorBoundary>
         </TooltipProvider>
       </AppCSSRoot>

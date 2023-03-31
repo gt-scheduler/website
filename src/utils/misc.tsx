@@ -404,3 +404,52 @@ export function lexicographicCompare(a: string, b: string): number {
 
   return -1;
 }
+
+// Edit this map to control how locations are abbreviated.
+// Prefer adding new entries to this map over changing the location strings,
+// since old schedules can still be opened in the app.
+//
+// When adding new entries, consider also updating the crawler's coordinate
+// mapping in https://github.com/gt-scheduler/crawler/blob/main/src/steps/parse.ts
+// (search for `courseLocations`).
+//
+// Initial locations were loosely based on:
+// https://github.com/gt-scheduler/crawler/blob/main/src/steps/parse.ts
+const LOCATION_ABBREVIATIONS: Record<string, string> = {
+  '760 Spring St NW': '760 Spring St',
+  '760 Spring Street': '760 Spring St',
+  'Clough Commons': 'CULC',
+  'Clough UG Learning Commons': 'CULC',
+  'Coll of Computing': 'CCB',
+  'College of Computing': 'CCB',
+  'D. M. Smith': 'DM Smith',
+  'D.M. Smith': 'DM Smith',
+  'Engr Science & Mech': 'ESM',
+  'Engineering Sci and Mechanics': 'ESM',
+  'Ford Environmental Sci & Tech': 'ES&T',
+  'Howey (Physics)': 'Howey',
+  'Howey Physics': 'Howey',
+  'Instr Center': 'IC',
+  'Instructional Center': 'IC',
+  'J. Erskine Love Manufacturing': 'Love (MRDC II)',
+  'Klaus Advanced Computing': 'Klaus',
+  'Manufacture Rel Discip Complex': 'MRDC',
+  'Molecular Sciences & Engr': 'MoSE',
+  'Molecular Sciences & Engineering': 'MoSE',
+  'Paper Tricentennial': 'Paper',
+  'Scheller College of Business': 'Scheller',
+  'Sustainable Education': 'SEB',
+  'U A Whitaker Biomedical Engr': 'Whitaker',
+  'West Village Dining Commons': 'West Village',
+};
+
+export function abbreviateLocation(location: string): string {
+  for (const [full, abbrev] of Object.entries(LOCATION_ABBREVIATIONS)) {
+    if (location.startsWith(full)) {
+      const withoutFull = location.substring(full.length).trim();
+      return `${abbrev} ${withoutFull}`;
+    }
+  }
+
+  return location;
+}
