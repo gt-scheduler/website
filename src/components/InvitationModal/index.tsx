@@ -27,7 +27,7 @@ export function InvitationModalContent(): React.ReactElement {
     ['ReallyLongNameThatWillNotFitInRowAbove@example.com', 'Accepted'],
     ['goodEmail@gmail.com', 'Accepted'],
     ['user12@example.com', 'Pending'],
-    ['user22@example.coSm', 'Accepted'],
+    ['user22@example.com', 'Accepted'],
     ['2ReallyLongNameThatWillNotFitInRowAbove@example.com', 'Accepted'],
     ['2goodEmail@gmail.com', 'Accepted'],
   ]);
@@ -184,34 +184,28 @@ export function InvitationModalContent(): React.ReactElement {
         <p>
           Users Invited to View <strong>Primary</strong>
         </p>
-        {emails.length !== 0 ? (
-          <div className="shared-emails" key="email">
-            {emails.map((element) => (
-              <div className="email-and-status" id={element[0]}>
-                <div className="individual-shared-email" id={element[1]}>
-                  {element[0]}
-                  <Button className="button-remove">
-                    <FontAwesomeIcon className="circle" icon={faCircle} />
-                    <FontAwesomeIcon className="remove" icon={faClose} />
-                  </Button>
-                  <ReactTooltip
-                    anchorId={element[0]}
-                    className="status-tooltip"
-                    variant="dark"
-                    place="top"
-                    offset={2}
-                  >
-                    Status: {element[1]}
-                  </ReactTooltip>
-                </div>
+        <div className="shared-emails" key="email">
+          {emails.map((element) => (
+            <div className="email-and-status" id={element[0]}>
+              <div className="individual-shared-email" id={element[1]}>
+                {element[0]}
+                <Button className="button-remove">
+                  <FontAwesomeIcon className="circle" icon={faCircle} />
+                  <FontAwesomeIcon className="remove" icon={faClose} />
+                </Button>
+                <ReactTooltip
+                  anchorId={element[0]}
+                  className="status-tooltip"
+                  variant="dark"
+                  place="top"
+                  offset={2}
+                >
+                  Status: {element[1]}
+                </ReactTooltip>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="no-invited-users">
-            Invite another user to view your schedule!
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

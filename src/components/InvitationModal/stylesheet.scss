@@ -1,5 +1,4 @@
 @import "../../variables";
-
 .invitation-modal-content {
     text-align: center;
 
@@ -123,7 +122,7 @@
             position: relative;
 
             &.active {
-                background-color: $color-neutral;
+                background-color:  $color-neutral;
             }
 
             &:hover {
@@ -146,11 +145,6 @@
     .invited-users {
         padding-top: 15px;
         justify-content: center;
-    }
-
-    .no-invited-users {
-        opacity: 0.5;
-        font-size: 14px;
     }
 
     .shared-emails {
