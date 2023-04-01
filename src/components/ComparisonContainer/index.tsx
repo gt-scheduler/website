@@ -9,7 +9,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 import { classes } from '../../utils/misc';
-import { ScheduleContext } from '../../contexts';
+import {
+  ScheduleContext,
+  FriendContext,
+  FriendContextData,
+} from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import { AutoFocusInput } from '../Select';
@@ -18,7 +22,7 @@ import { Palette } from '..';
 import './stylesheet.scss';
 
 export type SharedSchedule = {
-  id: string;
+  email: string;
   name: string;
   schedules: {
     id: string;
@@ -40,19 +44,32 @@ export type EditInfo = {
   type: string;
 } | null;
 
+export type PaletteInfo = {
+  id: string;
+  owner: string;
+} | null;
+
 export default function ComparisonContainer(): React.ReactElement {
   const [compare, setCompare] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
+  const [paletteInfo, setPaletteInfo] = useState<PaletteInfo>(null);
+  const [tooltipY, setTooltipY] = useState(0);
+  const [hover, setHover] = useState(false);
 
-  const [{ allVersionNames }, { deleteVersion, renameVersion }] =
+  const [{ allVersionNames, term }, { deleteVersion, renameVersion }] =
     useContext(ScheduleContext);
+
+  const [
+    { friends },
+    { updateFriendTermData, updateFriendInfo, renameFriend },
+  ] = useContext(FriendContext);
 
   const [sharedSchedules, setSharedSchedules] = useState<SharedSchedule[]>([
     {
-      id: 'friend1@gatech.edu',
+      email: 'friend1@gatech.edu',
       name: 'SuperLongFriendNameThatShouldBreakEverythingIncludingModalSoIHaveToMakeThisSuperLongYay',
       schedules: [
         { id: '1', name: 'Main', color: '#760000' },
@@ -64,7 +81,7 @@ export default function ComparisonContainer(): React.ReactElement {
       ],
     },
     {
-      id: 'friend2@gatech.edu',
+      email: 'friend2@gatech.edu',
       name: 'friend2',
       schedules: [
         { id: '3', name: 'Primary', color: '#007600' },
@@ -87,7 +104,7 @@ export default function ComparisonContainer(): React.ReactElement {
       ],
     },
     {
-      id: 'friend3@yahoo.com',
+      email: 'friend3@yahoo.com',
       name: 'friend3@yahoo.com',
       schedules: [{ id: '12', name: 'Preferred', color: '#562738' }],
     },
@@ -103,9 +120,9 @@ export default function ComparisonContainer(): React.ReactElement {
         } else if (editInfo?.type === 'User') {
           setSharedSchedules(
             sharedSchedules.map((friend) => {
-              if (friend.id === editInfo?.id) {
+              if (friend.email === editInfo?.id) {
                 return {
-                  id: friend.id,
+                  email: friend.email,
                   name: editValue.trim(),
                   schedules: friend.schedules,
                 };
@@ -116,9 +133,9 @@ export default function ComparisonContainer(): React.ReactElement {
         } else {
           setSharedSchedules(
             sharedSchedules.map((friend) => {
-              if (friend.id === editInfo?.owner) {
+              if (friend.email === editInfo?.owner) {
                 return {
-                  id: friend.id,
+                  email: friend.email,
                   name: friend.name,
                   schedules: friend.schedules.map((schedule) => {
                     if (schedule.id === editInfo?.id) {
@@ -150,7 +167,9 @@ export default function ComparisonContainer(): React.ReactElement {
 
   const handleRemoveFriend = useCallback(
     (id: string) => {
-      setSharedSchedules(sharedSchedules.filter((friend) => friend.id !== id));
+      setSharedSchedules(
+        sharedSchedules.filter((friend) => friend.email !== id)
+      );
     },
     [sharedSchedules]
   );
@@ -160,9 +179,9 @@ export default function ComparisonContainer(): React.ReactElement {
       setSharedSchedules(
         sharedSchedules
           .map((friend) => {
-            if (friend.id === owner) {
+            if (friend.email === owner) {
               return {
-                id: friend.id,
+                email: friend.email,
                 name: friend.name,
                 schedules: friend.schedules.filter(
                   (schedule) => schedule.id !== id
@@ -192,9 +211,9 @@ export default function ComparisonContainer(): React.ReactElement {
     (color: string, id: string, owner?: string) => {
       setSharedSchedules(
         sharedSchedules.map((friend) => {
-          if (friend.id === owner) {
+          if (friend.email === owner) {
             return {
-              id: friend.id,
+              email: friend.email,
               name: friend.name,
               schedules: friend.schedules.map((schedule) => {
                 if (schedule.id === id) {
@@ -211,6 +230,7 @@ export default function ComparisonContainer(): React.ReactElement {
           return friend;
         })
       );
+      setPaletteInfo(null);
     },
     [sharedSchedules]
   );
@@ -276,23 +296,23 @@ export default function ComparisonContainer(): React.ReactElement {
               <p className="content-title">Shared with me</p>
               {sharedSchedules.map((friend) => {
                 return (
-                  <div key={friend.id} className="friend">
+                  <div key={friend.email} className="friend">
                     <ScheduleRow
                       // change id later on
-                      id={friend.id}
+                      id={friend.email}
                       type="User"
                       hasCheck={false}
                       name={friend.name}
                       handleEditSchedule={(): void => {
                         setEditInfo({
-                          id: friend.id,
+                          id: friend.email,
                           type: 'User',
                         });
                         setEditValue(friend.name);
                       }}
                       handleRemoveSchedule={(): void => {
                         setDeleteConfirm({
-                          id: friend.id,
+                          id: friend.email,
                           type: 'User',
                           name: friend.name,
                         });
@@ -312,7 +332,7 @@ export default function ComparisonContainer(): React.ReactElement {
                           key={schedule.id}
                           id={schedule.id}
                           type="Schedule"
-                          owner={friend.id}
+                          owner={friend.email}
                           onClick={(): void =>
                             handleToggleSchedule(schedule.id)
                           }
@@ -323,7 +343,7 @@ export default function ComparisonContainer(): React.ReactElement {
                           handleEditSchedule={(): void => {
                             setEditInfo({
                               id: schedule.id,
-                              owner: friend.id,
+                              owner: friend.email,
                               type: 'Schedule',
                             });
                             setEditValue(schedule.name);
@@ -333,7 +353,7 @@ export default function ComparisonContainer(): React.ReactElement {
                               id: schedule.id,
                               type: 'Schedule',
                               name: schedule.name,
-                              owner: friend.id,
+                              owner: friend.email,
                             });
                           }}
                           hasPalette
@@ -342,10 +362,12 @@ export default function ComparisonContainer(): React.ReactElement {
                             setFriendScheduleColor(
                               color,
                               schedule.id,
-                              friend.id
+                              friend.email
                             );
                           }}
                           color={schedule.color}
+                          paletteInfo={paletteInfo}
+                          setPaletteInfo={setPaletteInfo}
                         />
                       );
                     })}
@@ -365,14 +387,21 @@ export default function ComparisonContainer(): React.ReactElement {
         <div
           className={classes('comparison-overlay', 'left', compare && 'open')}
           id="comparison-overlay-left"
+          onMouseEnter={(e: React.MouseEvent): void => {
+            setHover(true);
+            setTooltipY(e.clientY);
+          }}
         />
         <ReactTooltip
+          key={tooltipY}
           className="overlay-tooltip"
           variant="dark"
           anchorId="comparison-overlay-left"
-          delayShow={20}
+          isOpen={hover}
+          setIsOpen={setHover}
+          delayShow={40}
           delayHide={100}
-          offset={-150}
+          offset={70 - tooltipY}
           // key={deviceHasHover ? 0 : 1}
           // events={deviceHasHover ? ['hover'] : []}
         >
@@ -406,6 +435,8 @@ type ScheduleRowProps = {
   hasTooltip?: boolean;
   setFriendScheduleColor?: (color: string) => void;
   color?: string;
+  paletteInfo?: PaletteInfo;
+  setPaletteInfo?: (info: PaletteInfo) => void;
   editOnChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editOnKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   editInfo?: EditInfo;
@@ -429,6 +460,8 @@ function ScheduleRow({
   hasTooltip = false,
   setFriendScheduleColor,
   color,
+  paletteInfo,
+  setPaletteInfo,
   editOnChange,
   editOnKeyDown,
   editInfo,
@@ -438,7 +471,6 @@ function ScheduleRow({
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
   const [divHover, setDivHover] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const edit =
     hasEdit &&
@@ -446,6 +478,12 @@ function ScheduleRow({
     editInfo.type === type &&
     editInfo.id === id &&
     editInfo.owner === owner;
+
+  const palette =
+    hasPalette &&
+    paletteInfo != null &&
+    paletteInfo.id === id &&
+    paletteInfo.owner === owner;
 
   return (
     <div className="schedule-row">
@@ -500,10 +538,19 @@ function ScheduleRow({
             <div className="spacing" />
           </>
         )}
-        {(divHover || edit) && hasPalette && (
+        {(divHover || edit) && hasPalette && setPaletteInfo && (
           <Button
             className="icon"
-            onClick={(): void => setPaletteOpen(!paletteOpen)}
+            onClick={(): void =>
+              setPaletteInfo(
+                palette
+                  ? null
+                  : {
+                      id,
+                      owner: owner ?? '',
+                    }
+              )
+            }
             key={`${id}-palette`}
           >
             <FontAwesomeIcon icon={faPalette} size="xs" />
@@ -528,12 +575,12 @@ function ScheduleRow({
           </Button>
         )}
       </div>
-      {hasPalette && paletteOpen && setFriendScheduleColor && (
+      {hasPalette && palette && setFriendScheduleColor && setPaletteInfo && (
         <Palette
           className="palette"
           onSelectColor={setFriendScheduleColor}
           color={color ?? null}
-          onMouseLeave={(): void => undefined}
+          onMouseLeave={(): void => setPaletteInfo(null)}
         />
       )}
     </div>
