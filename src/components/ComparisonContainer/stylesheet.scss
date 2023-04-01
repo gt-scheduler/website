@@ -144,6 +144,7 @@
             outline: none;
             border: 1px solid var(--theme-fg);
             margin-left: 8px;
+            min-width: 0px;
 
             &.check {
               margin-left: 4px;
@@ -184,11 +185,15 @@
             }
           }
         }
+
         .palette {
-          margin: 0px 12px 0px 24px;
+          margin: 0px 12px;
           height: 50px;
           border-radius: 4px;
           overflow: hidden;
+          &.indented {
+            margin-left: 24px;
+          }
         }
       }
     }
