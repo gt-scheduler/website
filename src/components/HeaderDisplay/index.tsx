@@ -202,6 +202,8 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
               state.renameVersion(version.id, newName);
               return true;
             },
+            id: `${version.id}-edit`,
+            tooltip: 'Rename Schedule',
           });
 
           // Add the duplicate button
@@ -211,6 +213,8 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
             onClick: () => {
               state.cloneVersion(version.id, `Copy of ${version.name}`);
             },
+            id: `${version.id}-copy`,
+            tooltip: 'Create a Copy',
           });
 
           // Add the delete action
@@ -222,6 +226,8 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
                 // Display a confirmation dialog before deleting the version
                 setDeleteConfirm(version);
               },
+              id: `${version.id}-delete`,
+              tooltip: 'Delete Schedule',
             });
           }
 
