@@ -189,7 +189,6 @@ export default function Course({
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
                   onClick: (): void => prereqControl(false, !expanded),
-                  id: `${course.id}-expansion`,
                 },
                 hasPrereqs ? prereqAction : infoAction,
                 {
