@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 
+import { Section } from '../../data/beans';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { SectionBlocks, EventBlocks } from '..';
@@ -35,8 +36,7 @@ export default function Calendar({
   capture = false,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, desiredCourses }] =
-    useContext(ScheduleContext);
+  const [{ pinnedCrns, oscar, events }] = useContext(ScheduleContext);
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
@@ -234,33 +234,19 @@ export default function Calendar({
     }
   });
 
-  // Filter for hidden courses
-  const filteredCourses = oscar.courses.filter((course) => {
-    if (desiredCourses.includes(course.id)) {
-      return course;
-    }
-    return '';
-  });
-
-  const finalFilteredCourses = filteredCourses.filter((course) => {
-    let match;
-
-    pinnedCrns.forEach((courseCrn) => {
-      course.sections.forEach((section) => {
-        if (courseCrn === section.crn) {
-          section.meetings.forEach((meeting) => {
-            if (meeting.days.includes('S') || meeting.period === undefined) {
-              match = course;
-            }
-          });
-          return '';
-        }
-        return '';
-      });
-      return '';
-    });
-    return match;
-  });
+  // Filter for hidden sections (i.e., TBA and weekend sections)
+  const hiddenSections: Section[] = crns
+    .map((crn) => oscar.findSection(crn))
+    .filter(
+      (section) =>
+        section !== undefined &&
+        section.meetings.some(
+          (meeting) =>
+            meeting.period === undefined ||
+            meeting.days.includes('S') ||
+            meeting.days.includes('U')
+        )
+    ) as Section[];
 
   return (
     <div
@@ -356,29 +342,14 @@ export default function Calendar({
             />
           ))}
       </div>
-      {finalFilteredCourses.length !== 0 ? (
-        <div className="hidden-courses">
-          *Other Courses/Events not shown in view:{' '}
-          {finalFilteredCourses.map((course) => {
-            let sectionId = '';
-            pinnedCrns.filter((crn) => {
-              course.sections.every((section) => {
-                if (section.crn === crn) {
-                  if (sectionId !== '') {
-                    sectionId = sectionId.concat(`, ${section.id}`);
-                  } else {
-                    sectionId = section.id;
-                  }
-                }
-                return 'i';
-              });
-              return 'j';
-            });
-            return `${course.id}(${sectionId}), `;
-          })}
+      {!preview && hiddenSections.length > 0 && (
+        <div className="hidden-sections">
+          *Sections not shown in view:{' '}
+          {hiddenSections
+            .map((section) => `${section.course.id} (${section.id})`)
+            .join(', ')
+            .trim()}
         </div>
-      ) : (
-        <div />
       )}
     </div>
   );
