@@ -83,9 +83,11 @@ export default function Instructor({
           !['TBA', 'Not Assigned'].includes(name)
             ? {
                 icon: faGraduationCap,
+                tooltip: 'View Instructor Ratings',
                 href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
                   simplifyName(name)
                 )}`,
+                id: `${simplifyName(name, '-').toLowerCase()}-rmp`,
               }
             : null,
           {

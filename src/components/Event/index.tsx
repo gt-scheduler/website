@@ -66,10 +66,14 @@ export default function Event({
               },
               {
                 icon: faPalette,
+                tooltip: `Edit Color`,
+                id: `${event.id}-color`,
                 onClick: (): void => setPaletteShown(!paletteShown),
               },
               {
                 icon: faTrash,
+                tooltip: `Remove Event`,
+                id: `${event.id}-remove`,
                 onClick: (): void => handleRemoveEvent(event.id),
               },
             ]}
