@@ -17,7 +17,7 @@ import useScreenWidth from '../../hooks/useScreenWidth';
  */
 export default function Scheduler(): React.ReactElement {
   // Testing compare panel
-  const compare = true;
+  const compare = false;
 
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 

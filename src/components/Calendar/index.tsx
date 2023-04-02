@@ -47,6 +47,8 @@ export default function Calendar({
   const [{ pinnedCrns, oscar, events }] = useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
+
+  // Test pinned schedules
   const pinnedFriendSchedules = [
     'sv_dQBXHJ9aSAJJsxzHHtJH',
     'sv_tguQqWIfpNIn4PCqZjFx',
