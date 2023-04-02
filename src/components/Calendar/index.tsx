@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 
+import { Section } from '../../data/beans';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { SectionBlocks, EventBlocks } from '..';
@@ -233,6 +234,20 @@ export default function Calendar({
     }
   });
 
+  // Filter for hidden sections (i.e., TBA and weekend sections)
+  const hiddenSections: Section[] = crns
+    .map((crn) => oscar.findSection(crn))
+    .filter(
+      (section) =>
+        section !== undefined &&
+        section.meetings.some(
+          (meeting) =>
+            meeting.period === undefined ||
+            meeting.days.includes('S') ||
+            meeting.days.includes('U')
+        )
+    ) as Section[];
+
   return (
     <div
       className={classes(
@@ -327,6 +342,15 @@ export default function Calendar({
             />
           ))}
       </div>
+      {!preview && hiddenSections.length > 0 && (
+        <div className="hidden-sections">
+          *Sections not shown in view:{' '}
+          {hiddenSections
+            .map((section) => `${section.course.id} (${section.id})`)
+            .join(', ')
+            .trim()}
+        </div>
+      )}
     </div>
   );
 }
