@@ -12,9 +12,11 @@ import ErrorHeader from '../ErrorHeader';
 import { AppNavigation } from './navigation';
 import AppDataLoader from '../AppDataLoader';
 import { AppSkeleton, SkeletonContent, AppContent } from './content';
+import Maintenance from './maintenance';
 import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import MaintenanceModal from '../MaintenanceModal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -27,48 +29,64 @@ export default function App(): React.ReactElement {
   // Add the current theme as a class on the body element
   useBodyClass(themeContextValue[0]);
 
+  const date = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  );
+
+  const websiteDown =
+    date.getFullYear() === 2023 &&
+    date.getMonth() + 1 === 3 &&
+    (date.getDate() === 15 || date.getDate() === 16);
+
   return (
     <ThemeContext.Provider value={themeContextValue}>
       <AppCSSRoot>
         <TooltipProvider>
-          <ErrorBoundary
-            fallback={(error, errorInfo): React.ReactElement => (
-              <AppSkeleton>
-                <SkeletonContent>
-                  <ErrorHeader />
-                  <ErrorDisplay
-                    errorDetails={
-                      <ReactErrorDetails error={error} errorInfo={errorInfo} />
-                    }
-                  >
-                    <div>
-                      There was en error somewhere in the core application logic
-                      and it can&apos;t continue.
-                    </div>
-                    <div>
-                      Try refreshing the page to see if it fixes the issue.
-                    </div>
-                  </ErrorDisplay>
-                </SkeletonContent>
-              </AppSkeleton>
-            )}
-          >
-            <AppNavigation>
-              {/* AppDataLoader is in charge of ensuring that there are valid values
-                for the Terms and Term contexts before rendering its children.
-                If any data is still loading,
-                then it displays an "app skeleton" with a spinner.
-                If there was an error while loading
-                then it displays an error screen. */}
-              <AppDataLoader>
-                <AppContent />
-              </AppDataLoader>
-            </AppNavigation>
-            <Feedback />
-
-            {/* Display a popup when first visiting the site */}
-            {/* Include <InformationModal /> here */}
-          </ErrorBoundary>
+          {websiteDown ? (
+            <Maintenance />
+          ) : (
+            <ErrorBoundary
+              fallback={(error, errorInfo): React.ReactElement => (
+                <AppSkeleton>
+                  <SkeletonContent>
+                    <ErrorHeader />
+                    <ErrorDisplay
+                      errorDetails={
+                        <ReactErrorDetails
+                          error={error}
+                          errorInfo={errorInfo}
+                        />
+                      }
+                    >
+                      <div>
+                        There was en error somewhere in the core application
+                        logic and it can&apos;t continue.
+                      </div>
+                      <div>
+                        Try refreshing the page to see if it fixes the issue.
+                      </div>
+                    </ErrorDisplay>
+                  </SkeletonContent>
+                </AppSkeleton>
+              )}
+            >
+              <AppNavigation>
+                {/* AppDataLoader is in charge of ensuring that there are valid values
+                  for the Terms and Term contexts before rendering its children.
+                  If any data is still loading,
+                  then it displays an "app skeleton" with a spinner.
+                  If there was an error while loading
+                  then it displays an error screen. */}
+                <AppDataLoader>
+                  <AppContent />
+                </AppDataLoader>
+              </AppNavigation>
+              <Feedback />
+              {/* Display a popup when first visiting the site */}
+              {/* Include <InformationModal /> here */}
+              <MaintenanceModal />
+            </ErrorBoundary>
+          )}
         </TooltipProvider>
       </AppCSSRoot>
     </ThemeContext.Provider>
