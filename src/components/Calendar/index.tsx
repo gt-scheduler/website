@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
-import { SectionBlocks, EventBlocks } from '..';
+import { SectionBlocks, EventBlocks, CompareBlocks } from '..';
 import { ScheduleContext, FriendContext } from '../../contexts';
 import { makeSizeInfoKey } from '../TimeBlocks';
 import { EventBlockPosition } from '../EventBlocks';
@@ -29,6 +29,13 @@ type CommmonMeetingObject = {
   event: boolean;
 };
 
+type FriendCrnData = {
+  friend: string;
+  scheduleId: string;
+  scheduleName: string;
+  crn: string;
+};
+
 export default function Calendar({
   className,
   overlayCrns,
@@ -37,21 +44,33 @@ export default function Calendar({
   compare = false,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, colorMap }] = useContext(ScheduleContext);
+  const [{ pinnedCrns, oscar, events }] = useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
   const pinnedFriendSchedules = [
     'sv_dQBXHJ9aSAJJsxzHHtJH',
     'sv_tguQqWIfpNIn4PCqZjFx',
+    'sv_mPkP5h4TVn1TQsdJJ0Bc',
+    'sv_ws5IuoDiUUpXM83Zli4c',
+    'sv_0iQZLfoNTVEOtfLVGUHf',
   ];
 
-  const friendScheudles = Object.values(friends).flatMap((friend) =>
-    Object.entries(friend.versions)
-      .filter((schedule) => pinnedFriendSchedules.includes(schedule[0]))
-      .map((schedule) => [friend.name, schedule[1].name, schedule[1].schedule])
+  const friendSchedules: FriendCrnData[] = Object.values(friends).flatMap(
+    (friend) =>
+      Object.entries(friend.versions)
+        .filter((schedule) => pinnedFriendSchedules.includes(schedule[0]))
+        .flatMap((schedule) =>
+          schedule[1].schedule.pinnedCrns.map((crn) => {
+            return {
+              friend: friend.name,
+              scheduleName: schedule[1].name,
+              scheduleId: schedule[0],
+              crn,
+            } as FriendCrnData;
+          })
+        )
   );
-  console.log(friendScheudles);
-  console.log(friends);
+
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
   const crnSizeInfo: Record<
@@ -99,30 +118,43 @@ export default function Calendar({
       });
   };
 
-  const crns = compare
-    ? []
-    : Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
-
   // Find section using crn and convert the meetings into
   // an array of CommonMeetingObject
-  const crnMeetings: (CommmonMeetingObject | null)[] = crns
-    .flatMap((crn) => {
-      const section = oscar.findSection(crn);
-      if (section == null) return null;
-      const temp = section.meetings
-        .filter((m) => m.period)
-        .map((meeting) => {
-          return {
-            id: crn,
-            days: meeting.days,
-            period: meeting.period,
-            event: false,
-          } as CommmonMeetingObject;
-        });
+  const crnMeetings: (CommmonMeetingObject | null)[] = compare
+    ? friendSchedules.flatMap((crn) => {
+        const section = oscar.findSection(crn.crn);
+        if (section == null) return null;
+        const temp = section.meetings
+          .filter((m) => m.period)
+          .map((meeting) => {
+            return {
+              id: `${crn.scheduleId}-${crn.crn}`,
+              days: meeting.days,
+              period: meeting.period,
+              event: false,
+            } as CommmonMeetingObject;
+          });
 
-      return temp;
-    })
-    .filter((m) => m != null);
+        return temp;
+      })
+    : Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]))
+        .flatMap((crn) => {
+          const section = oscar.findSection(crn);
+          if (section == null) return null;
+          const temp = section.meetings
+            .filter((m) => m.period)
+            .map((meeting) => {
+              return {
+                id: crn,
+                days: meeting.days,
+                period: meeting.period,
+                event: false,
+              } as CommmonMeetingObject;
+            });
+
+          return temp;
+        })
+        .filter((m) => m != null);
 
   const meetings: CommmonMeetingObject[] =
     crnMeetings as CommmonMeetingObject[];
@@ -283,35 +315,39 @@ export default function Calendar({
         </div>
       )}
       <div className="meetings">
-        {pinnedCrnsByFirstMeeting.map((crn) => (
-          <SectionBlocks
-            key={crn}
-            crn={crn}
-            capture={capture}
-            includeDetailsPopover={!isAutosized && !capture}
-            includeContent={!preview}
-            sizeInfo={crnSizeInfo[crn] ?? {}}
-            selectedMeeting={
-              selectedMeeting !== null && selectedMeeting[0] === crn
-                ? [selectedMeeting[1], selectedMeeting[2]]
-                : null
-            }
-            onSelectMeeting={(meeting: [number, string] | null): void => {
-              if (meeting === null) {
-                setSelectedMeeting(null);
-              } else {
-                setSelectedMeeting([crn, meeting[0], meeting[1]]);
+        {!compare &&
+          pinnedCrnsByFirstMeeting.map((crn) => (
+            <SectionBlocks
+              className="testingsection"
+              key={crn}
+              crn={crn}
+              capture={capture}
+              includeDetailsPopover={!isAutosized && !capture}
+              includeContent={!preview}
+              sizeInfo={crnSizeInfo[crn] ?? {}}
+              selectedMeeting={
+                selectedMeeting !== null && selectedMeeting[0] === crn
+                  ? [selectedMeeting[1], selectedMeeting[2]]
+                  : null
               }
-            }}
-            deviceHasHover={deviceHasHover}
-            canBeTabFocused={!isAutosized && !capture}
-          />
-        ))}
-        {overlayCrns &&
+              onSelectMeeting={(meeting: [number, string] | null): void => {
+                if (meeting === null) {
+                  setSelectedMeeting(null);
+                } else {
+                  setSelectedMeeting([crn, meeting[0], meeting[1]]);
+                }
+              }}
+              deviceHasHover={deviceHasHover}
+              canBeTabFocused={!isAutosized && !capture}
+            />
+          ))}
+        {!compare &&
+          overlayCrns &&
           overlayCrns
             .filter((crn) => !pinnedCrns.includes(crn))
             .map((crn) => (
               <SectionBlocks
+                className="testingoverlay"
                 key={crn}
                 crn={crn}
                 overlay={!preview}
@@ -321,7 +357,8 @@ export default function Calendar({
                 sizeInfo={crnSizeInfo[crn] ?? {}}
               />
             ))}
-        {events &&
+        {!compare &&
+          events &&
           events.map((event) => (
             <EventBlocks
               key={event.id}
@@ -346,10 +383,40 @@ export default function Calendar({
               }}
             />
           ))}
-        {/* {compare && friendScheudles.map(schedule => {
-          console.log(schedule[2])
-          return <div/>
-        })} */}
+        {compare &&
+          friendSchedules.map((crn) => (
+            <CompareBlocks
+              className="testing"
+              key={`${crn.scheduleId}-${crn.crn}`}
+              crn={crn.crn}
+              owner={crn.friend}
+              scheduleId={crn.scheduleId}
+              scheduleName={crn.scheduleName}
+              capture={capture}
+              includeDetailsPopover={!isAutosized && !capture}
+              includeContent={!preview}
+              sizeInfo={crnSizeInfo[`${crn.scheduleId}-${crn.crn}`] ?? {}}
+              selectedMeeting={
+                selectedMeeting !== null &&
+                selectedMeeting[0] === `${crn.scheduleId}-${crn.crn}`
+                  ? [selectedMeeting[1], selectedMeeting[2]]
+                  : null
+              }
+              onSelectMeeting={(meeting: [number, string] | null): void => {
+                if (meeting === null) {
+                  setSelectedMeeting(null);
+                } else {
+                  setSelectedMeeting([
+                    `${crn.scheduleId}-${crn.crn}`,
+                    meeting[0],
+                    meeting[1],
+                  ]);
+                }
+              }}
+              deviceHasHover={deviceHasHover}
+              canBeTabFocused={!isAutosized && !capture}
+            />
+          ))}
       </div>
     </div>
   );

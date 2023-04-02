@@ -24,6 +24,7 @@ export { default as Tab } from './Tab';
 export { default as TimeBlocks } from './TimeBlocks';
 export { default as SectionBlocks } from './SectionBlocks';
 export { default as EventBlocks } from './EventBlocks';
+export { default as CompareBlocks } from './CompareBlocks';
 export { default as Attribution } from './Attribution';
 export { default as Event } from './Event';
 export { default as CourseNavMenu } from './CourseNavMenu';

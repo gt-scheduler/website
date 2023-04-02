@@ -56,7 +56,6 @@ export default function ComparisonContainer(): React.ReactElement {
   const [paletteInfo, setPaletteInfo] = useState<string>();
   const [tooltipY, setTooltipY] = useState(0);
   const [hover, setHover] = useState(false);
-  // const [colorMap, setColorMap] = useState<Record<string, string>>({});
 
   const [
     { allVersionNames, colorMap },

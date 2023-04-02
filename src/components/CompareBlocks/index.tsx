@@ -18,8 +18,8 @@ export interface CompareBlockPosition extends TimeBlockPosition {
 export type CompareBlocksProps = {
   className?: string;
   owner: string;
-  schedule: string;
-  color: string;
+  scheduleId: string;
+  scheduleName: string;
   crn: string;
   overlay?: boolean;
   capture: boolean;
@@ -37,8 +37,8 @@ export type CompareBlocksProps = {
 export default function CompareBlocks({
   className,
   owner,
-  schedule,
-  color,
+  scheduleId,
+  scheduleName,
   crn,
   overlay = false,
   capture,
@@ -100,7 +100,7 @@ export default function CompareBlocks({
               },
               {
                 name: 'Schedule',
-                content: schedule,
+                content: scheduleName,
               },
               {
                 name: 'Course Name',
@@ -136,7 +136,7 @@ export default function CompareBlocks({
             deviceHasHover={deviceHasHover}
             selectedMeeting={selectedMeeting}
             onSelectMeeting={onSelectMeeting}
-            schedule={schedule}
+            schedule={scheduleId}
           />
         );
       })}
