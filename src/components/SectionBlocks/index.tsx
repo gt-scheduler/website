@@ -18,6 +18,7 @@ export interface SectionBlockPosition extends TimeBlockPosition {
 export type SectionBlocksProps = {
   className?: string;
   crn: string;
+  schedule?: string;
   overlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
@@ -34,6 +35,7 @@ export type SectionBlocksProps = {
 export default function SectionBlocks({
   className,
   crn,
+  schedule,
   overlay = false,
   capture,
   sizeInfo,
@@ -122,6 +124,7 @@ export default function SectionBlocks({
             deviceHasHover={deviceHasHover}
             selectedMeeting={selectedMeeting}
             onSelectMeeting={onSelectMeeting}
+            schedule={schedule}
           />
         );
       })}
