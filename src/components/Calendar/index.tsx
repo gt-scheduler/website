@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { SectionBlocks, EventBlocks } from '..';
-import { ScheduleContext } from '../../contexts';
+import { ScheduleContext, FriendContext } from '../../contexts';
 import { makeSizeInfoKey } from '../TimeBlocks';
 import { EventBlockPosition } from '../EventBlocks';
 import { SectionBlockPosition } from '../SectionBlocks';
@@ -17,6 +17,7 @@ export type CalendarProps = {
   overlayCrns: string[];
   preview?: boolean;
   capture?: boolean;
+  compare?: boolean;
   isAutosized?: boolean;
 };
 
@@ -33,10 +34,24 @@ export default function Calendar({
   overlayCrns,
   preview = false,
   capture = false,
+  compare = false,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events }] = useContext(ScheduleContext);
+  const [{ pinnedCrns, oscar, events, colorMap }] = useContext(ScheduleContext);
 
+  const [{ friends }] = useContext(FriendContext);
+  const pinnedFriendSchedules = [
+    'sv_dQBXHJ9aSAJJsxzHHtJH',
+    'sv_tguQqWIfpNIn4PCqZjFx',
+  ];
+
+  const friendScheudles = Object.values(friends).flatMap((friend) =>
+    Object.entries(friend.versions)
+      .filter((schedule) => pinnedFriendSchedules.includes(schedule[0]))
+      .map((schedule) => [friend.name, schedule[1].name, schedule[1].schedule])
+  );
+  console.log(friendScheudles);
+  console.log(friends);
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
   const crnSizeInfo: Record<
@@ -84,7 +99,9 @@ export default function Calendar({
       });
   };
 
-  const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
+  const crns = compare
+    ? []
+    : Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
 
   // Find section using crn and convert the meetings into
   // an array of CommonMeetingObject
@@ -110,17 +127,19 @@ export default function Calendar({
   const meetings: CommmonMeetingObject[] =
     crnMeetings as CommmonMeetingObject[];
 
-  // Add events to meetings array
-  meetings.push(
-    ...events.map((event) => {
-      return {
-        id: event.id,
-        days: event.days,
-        period: event.period,
-        event: true,
-      } as CommmonMeetingObject;
-    })
-  );
+  if (!compare) {
+    // Add events to meetings array
+    meetings.push(
+      ...events.map((event) => {
+        return {
+          id: event.id,
+          days: event.days,
+          period: event.period,
+          event: true,
+        } as CommmonMeetingObject;
+      })
+    );
+  }
 
   // Sort meetings by meeting length
   meetings.sort(
@@ -327,6 +346,10 @@ export default function Calendar({
               }}
             />
           ))}
+        {/* {compare && friendScheudles.map(schedule => {
+          console.log(schedule[2])
+          return <div/>
+        })} */}
       </div>
     </div>
   );

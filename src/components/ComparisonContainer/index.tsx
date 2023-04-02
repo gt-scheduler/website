@@ -1,4 +1,3 @@
-import { original } from 'immer';
 import React, {
   useState,
   useContext,
@@ -15,12 +14,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 
-import { classes } from '../../utils/misc';
-import {
-  ScheduleContext,
-  FriendContext,
-  FriendContextData,
-} from '../../contexts';
+import { classes, getRandomColor } from '../../utils/misc';
+import { ScheduleContext, FriendContext } from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import { AutoFocusInput } from '../Select';
@@ -61,38 +56,38 @@ export default function ComparisonContainer(): React.ReactElement {
   const [paletteInfo, setPaletteInfo] = useState<string>();
   const [tooltipY, setTooltipY] = useState(0);
   const [hover, setHover] = useState(false);
-  const [colorMap, setColorMap] = useState<Record<string, string>>({});
-
-  const [{ allVersionNames }, { deleteVersion, renameVersion }] =
-    useContext(ScheduleContext);
+  // const [colorMap, setColorMap] = useState<Record<string, string>>({});
 
   const [
-    { friends },
-    { updateFriendTermData, updateFriendInfo, renameFriend },
-  ] = useContext(FriendContext);
-  console.log(friends);
+    { allVersionNames, colorMap },
+    { deleteVersion, renameVersion, patchSchedule },
+  ] = useContext(ScheduleContext);
+
+  const [{ friends }, { updateFriendTermData, renameFriend }] =
+    useContext(FriendContext);
 
   useEffect(() => {
     const newColorMap = { ...colorMap };
     allVersionNames.forEach((version) => {
       if (!(version.id in newColorMap)) {
-        newColorMap[version.id] = '#FF99FF';
+        newColorMap[version.id] = getRandomColor();
       }
     });
     Object.entries(friends).forEach((friend) => {
       if (!(friend[0] in newColorMap)) {
-        newColorMap[friend[0]] = '#FF99FF';
+        newColorMap[friend[0]] = getRandomColor();
       }
       Object.keys(friend[1].versions).forEach((schedule) => {
         if (!(schedule in newColorMap)) {
-          newColorMap[schedule] = '#FF99FF';
+          newColorMap[schedule] = getRandomColor();
         }
       });
     });
-    setColorMap(newColorMap);
-  }, [friends, allVersionNames]);
+    if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
+      patchSchedule({ colorMap: newColorMap });
+    }
+  }, [friends, allVersionNames, colorMap, patchSchedule]);
 
-  // placeholder callbacks
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
@@ -116,13 +111,25 @@ export default function ComparisonContainer(): React.ReactElement {
 
   const handleRemoveFriend = useCallback(
     (id: string) => {
-      const newColorMap = { ...colorMap };
-      delete newColorMap[id];
-      updateFriendTermData((draft) => {
-        delete draft.accessibleSchedules[id];
-      });
+      const friend = friends[id];
+      if (friend) {
+        const newColorMap = { ...colorMap };
+        Object.keys(friend.versions).forEach((schedule) => {
+          delete newColorMap[schedule];
+        });
+        setSelected(
+          selected.filter(
+            (selectedId: string) =>
+              !Object.keys(friend.versions).includes(selectedId)
+          )
+        );
+        patchSchedule({ colorMap: newColorMap });
+        updateFriendTermData((draft) => {
+          delete draft.accessibleSchedules[id];
+        });
+      }
     },
-    [friends]
+    [friends, selected, colorMap, patchSchedule, updateFriendTermData]
   );
 
   const handleRemoveSchedule = useCallback(
@@ -132,13 +139,17 @@ export default function ComparisonContainer(): React.ReactElement {
           delete draft.accessibleSchedules[owner];
         } else {
           draft.accessibleSchedules[owner] =
-          draft.accessibleSchedules[owner]?.filter(
-            (schedule) => schedule !== id
-          ) ?? [];
+            draft.accessibleSchedules[owner]?.filter(
+              (schedule) => schedule !== id
+            ) ?? [];
         }
       });
+      const newColorMap = { ...colorMap };
+      delete newColorMap[id];
+      patchSchedule({ colorMap: newColorMap });
+      setSelected(selected.filter((selectedId: string) => selectedId !== id));
     },
-    [friends]
+    [selected, colorMap, updateFriendTermData, patchSchedule]
   );
 
   const handleToggleSchedule = useCallback(
@@ -156,9 +167,9 @@ export default function ComparisonContainer(): React.ReactElement {
     (color: string, id: string) => {
       const newColorMap = { ...colorMap };
       newColorMap[id] = color;
-      setColorMap(newColorMap);
+      patchSchedule({ colorMap: newColorMap });
     },
-    [colorMap]
+    [colorMap, patchSchedule]
   );
 
   return (

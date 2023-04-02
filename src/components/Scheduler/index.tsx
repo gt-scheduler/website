@@ -16,6 +16,9 @@ import useScreenWidth from '../../hooks/useScreenWidth';
  * Wraps around the root top-level component of the Scheduler tab
  */
 export default function Scheduler(): React.ReactElement {
+  // Testing compare panel
+  const compare = true;
+
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   // Store the current set of CRNs that are shown on the Calendar overlay
@@ -51,7 +54,11 @@ export default function Scheduler(): React.ReactElement {
           {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">
-              <Calendar className="calendar" overlayCrns={overlayCrns} />
+              <Calendar
+                className="calendar"
+                overlayCrns={overlayCrns}
+                compare={compare}
+              />
             </div>
           )}
           {(!mobile || tabIndex === 3) && <ComparisonPanel />}
