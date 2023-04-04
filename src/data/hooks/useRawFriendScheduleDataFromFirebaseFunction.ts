@@ -121,6 +121,11 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
             friends: termFriendData,
             term: currentTerm,
           });
+          /* eslint-disable max-len */
+          // This request should be made with content type is application/x-www-form-urlencoded.
+          // This is done to prevent a pre-flight CORS request made to the firebase function.
+          // Refer: https://github.com/gt-scheduler/website/pull/187#issuecomment-1496439246
+          /* eslint-enable max-len */
           const promise = axios({
             method: 'POST',
             url,
