@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosPromise } from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { Immutable } from 'immer';
 
@@ -116,16 +116,19 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const test = {
+          const requestData = JSON.stringify({
             IDToken: await auth.currentUser?.getIdToken(),
             friends: termFriendData,
             term: currentTerm,
-          };
-          const promise = axios.post<RawFriendScheduleData>(url, test, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
           });
+          const promise = axios({
+            method: 'POST',
+            url,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            data: `data=${requestData}`,
+          }) as AxiosPromise<RawFriendScheduleData>;
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;
