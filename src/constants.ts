@@ -68,6 +68,10 @@ const CAMPUSES: Record<string, string> = {
   Video: 'Video',
   Online: 'Online',
   'MBA Evening Program': 'MBA Evening',
+  'GT, Peking University, & Emory': 'Peking & Emory',
+  'Georgia Tech-Savannah': 'Savannah',
+  'Georgia Tech - Korea': 'Korea',
+  'Georgia Tech - Shanghai': 'Shanghai',
 };
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
