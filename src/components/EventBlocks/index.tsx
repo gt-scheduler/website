@@ -149,7 +149,7 @@ export default function EventBlocks({
     // math which calculates the new start time by calculating mouse
     // position proportional to calendar size, then we find new time
     // by rounding to nearest 5
-    const start =
+    let start =
       Math.round(
         ((Math.round(
           e.pageY -
@@ -174,10 +174,14 @@ export default function EventBlocks({
       tempDaysRef.current = [day];
     }
 
-    if (start >= OPEN && end <= CLOSE) {
-      setTempStart(start);
-      tempStartRef.current = start;
+    if (start < OPEN) {
+      start = OPEN;
+    } else if (end > CLOSE) {
+      start = CLOSE - (event.period.end - event.period.start);
     }
+
+    setTempStart(start);
+    tempStartRef.current = start;
   };
 
   return (
