@@ -1,0 +1,55 @@
+.InformationModal {
+  align-items: center;
+  .information-content {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    p {
+      margin: 0px;
+      width: 270px;
+    }
+    .information-images {
+      display: flex;
+      .information-image {
+        width: auto;
+        height: 275px;
+        margin-left: 16px;
+        display: block;
+        border: #505050 3px solid;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+.InformationModal.mobile {
+  align-items: center;
+  .information-content {
+    display: block;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    p {
+      margin: 0px;
+      width: 270px;
+      text-align: center;
+    }
+    .information-images {
+      display: flex;
+      .information-spacer {
+        flex: 1;
+      }
+      .information-image {
+        width: auto;
+        height: 200px;
+        margin: 16px 0px 0px 0px;
+        display: block;
+        border: #505050 3px solid;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+    }
+  }
+}
