@@ -128,11 +128,6 @@ export default function EventBlocks({
 
       patchSchedule({ events: newEvents });
 
-      const day: string =
-        event.days.length === 1 && tempDaysRef.current[0]
-          ? tempDaysRef.current[0]
-          : meetingDay;
-
       // Clean up the event listeners once done dragging
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', documentMouseUp);
