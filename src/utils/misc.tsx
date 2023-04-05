@@ -10,6 +10,7 @@ import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
+  DateRange,
   Event,
   ICS,
   Meeting,
@@ -243,6 +244,8 @@ export async function sleep({
   });
 }
 
+// Object that stores the estimated date range for a semester.
+// Used to estimate the date range of recurring events.
 const termDates: Record<string, { from: string; to: string }> = {
   Spring: {
     from: '05 Jan',
@@ -258,7 +261,7 @@ const termDates: Record<string, { from: string; to: string }> = {
   },
 };
 
-const getDateRange = (term: string): { from: Date; to: Date } => {
+const getDateRange = (term: string): DateRange => {
   const [sem, year] = getSemesterName(term).split(' ');
   const defaultRange = { from: new Date(), to: new Date() };
   if (!sem || !year) return defaultRange;
