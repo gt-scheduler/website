@@ -75,7 +75,7 @@ export default function EventAdd({
       const parsedEnd = parseTime(end);
       if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1260) {
+      } else if (parsedStart < 480 || parsedEnd > 1320) {
         setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
@@ -93,7 +93,7 @@ export default function EventAdd({
       const parsedEnd = parseTime(newEnd);
       if (parsedStart !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1260) {
+      } else if (parsedStart < 480 || parsedEnd > 1320) {
         setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
@@ -101,6 +101,8 @@ export default function EventAdd({
   );
 
   const onSubmit = useCallback((): void => {
+    const roundedStart = Math.floor(parseTime(start) / 5) * 5;
+    const roundedEnd = Math.floor(parseTime(end) / 5) * 5;
     if (event) {
       const newEvents = castDraft(events).map((existingEvent) =>
         existingEvent.id === event.id
@@ -108,8 +110,8 @@ export default function EventAdd({
               ...existingEvent,
               name: eventName,
               period: {
-                start: parseTime(start),
-                end: parseTime(end),
+                start: roundedStart,
+                end: roundedEnd,
               },
               days: selectedTags,
             }
@@ -129,8 +131,8 @@ export default function EventAdd({
         id: eventId,
         name: eventName,
         period: {
-          start: parseTime(start),
-          end: parseTime(end),
+          start: roundedStart,
+          end: roundedEnd,
         },
         days: selectedTags,
       };
