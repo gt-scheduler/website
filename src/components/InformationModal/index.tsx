@@ -4,6 +4,7 @@ import useLocalStorageState from 'use-local-storage-state';
 import { classes } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import Modal from '../Modal';
+
 import './stylesheet.scss';
 
 import useScreenWidth from '../../hooks/useScreenWidth';
