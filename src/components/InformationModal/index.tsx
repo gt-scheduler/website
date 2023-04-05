@@ -5,9 +5,9 @@ import { classes } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import Modal from '../Modal';
 
-import './stylesheet.scss';
-
 import useScreenWidth from '../../hooks/useScreenWidth';
+
+import './stylesheet.scss';
 
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
