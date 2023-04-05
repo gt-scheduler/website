@@ -56,13 +56,13 @@ export function InformationModalContent(): React.ReactElement {
         <div className="information-images">
           <img
             className="information-image"
-            alt="GT Scheduler Logo"
+            alt="Event Blocks Example"
             src="/event_blocks.png"
           />
           <div className="information-spacer" />
           <img
             className="information-image"
-            alt="GT Scheduler Logo"
+            alt="Drag and Drop Example"
             src="/drag_event_blocks.png"
           />
         </div>

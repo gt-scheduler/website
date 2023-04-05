@@ -31,3 +31,7 @@
     z-index: 1;
   }
 }
+
+.mobile .Event {
+  width: calc(100vw - 16px);
+}

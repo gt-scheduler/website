@@ -12,4 +12,5 @@
 .popover tbody tr td {
   max-width: calc(max(200px, 15vw));
   overflow-wrap: break-word;
+  overflow: hidden;
 }
