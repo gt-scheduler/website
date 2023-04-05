@@ -332,6 +332,18 @@ export default function Calendar({
               deviceHasHover={deviceHasHover}
               daysRef={daysRef}
               timesRef={timesRef}
+              selectedMeeting={
+                selectedMeeting !== null && selectedMeeting[0] === event.id
+                  ? [selectedMeeting[1], selectedMeeting[2]]
+                  : null
+              }
+              onSelectMeeting={(meeting: [number, string] | null): void => {
+                if (meeting === null) {
+                  setSelectedMeeting(null);
+                } else {
+                  setSelectedMeeting([event.id, meeting[0], meeting[1]]);
+                }
+              }}
             />
           ))}
       </div>

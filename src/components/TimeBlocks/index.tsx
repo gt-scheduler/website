@@ -59,15 +59,9 @@ export type TimeBlocksProps = {
   ) => void;
   handleMouseDown?: (
     e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
-  ) => void;
-  handleMouseUp?: (
-    e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
-  ) => void;
-  handleMouseMove?: (
-    e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
+    ref: React.RefObject<HTMLDivElement>,
+    meetingIndex: number,
+    meetingDay: string
   ) => void;
 };
 
@@ -95,8 +89,6 @@ export default function TimeBlocks({
   selectedMeeting,
   onSelectMeeting,
   handleMouseDown,
-  handleMouseUp,
-  handleMouseMove,
 }: TimeBlocksProps): React.ReactElement | null {
   const [{ colorMap }] = useContext(ScheduleContext);
   const color = colorMap[id];
@@ -147,8 +139,8 @@ export default function TimeBlocks({
             // Only the first day for a meeting can be tab focused
             canBeTabFocused={canBeTabFocused && i === 0}
             handleMouseDown={handleMouseDown}
-            handleMouseUp={handleMouseUp}
-            handleMouseMove={handleMouseMove}
+            meetingIndex={meetingIndex}
+            meetingDay={day}
           />
         );
       })}
@@ -173,16 +165,12 @@ type MeetingDayBlockProps = {
   deviceHasHover: boolean;
   handleMouseDown?: (
     e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
+    ref: React.RefObject<HTMLDivElement>,
+    meetingIndex: number,
+    meetingDay: string
   ) => void;
-  handleMouseUp?: (
-    e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
-  ) => void;
-  handleMouseMove?: (
-    e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
-  ) => void;
+  meetingIndex: number;
+  meetingDay: string;
 };
 
 function MeetingDayBlock({
@@ -201,8 +189,8 @@ function MeetingDayBlock({
   onSelect,
   deviceHasHover,
   handleMouseDown,
-  handleMouseUp,
-  handleMouseMove,
+  meetingIndex,
+  meetingDay,
 }: MeetingDayBlockProps): React.ReactElement {
   const tooltipId = useId();
   const contentClassName = getContentClassName(color);
@@ -216,6 +204,7 @@ function MeetingDayBlock({
   });
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
+
   return (
     <div ref={outerRef}>
       <BlockElement
@@ -266,17 +255,7 @@ function MeetingDayBlock({
         ref={blockElementRef}
         onMouseDown={(e): void => {
           if (handleMouseDown) {
-            handleMouseDown(e, blockElementRef);
-          }
-        }}
-        onMouseUp={(e): void => {
-          if (handleMouseUp) {
-            handleMouseUp(e, blockElementRef);
-          }
-        }}
-        onMouseMove={(e): void => {
-          if (handleMouseMove) {
-            handleMouseMove(e, blockElementRef);
+            handleMouseDown(e, blockElementRef, meetingIndex, meetingDay);
           }
         }}
       >

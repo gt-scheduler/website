@@ -67,7 +67,9 @@ export default function EventBlocks({
   // Start dragging a block. This event handler is passed down to each block
   const handleMouseDown = (
     e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>
+    ref: React.RefObject<HTMLDivElement>,
+    meetingIndex: number,
+    meetingDay: string
   ): void => {
     if (!ref.current) return;
     if (!deviceHasHover) return;
@@ -125,6 +127,11 @@ export default function EventBlocks({
       });
 
       patchSchedule({ events: newEvents });
+
+      const day: string =
+        event.days.length === 1 && tempDaysRef.current[0]
+          ? tempDaysRef.current[0]
+          : meetingDay;
 
       // Clean up the event listeners once done dragging
       document.removeEventListener('mousemove', mouseMoveHandler);
