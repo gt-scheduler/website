@@ -44,9 +44,12 @@ export default function EventBlocks({
 }: EventBlocksProps): React.ReactElement | null {
   const [tempStart, setTempStart] = useState<number>(event.period.start);
 
+  // Store these in refs since the event handlers won't be re generated
+  // once the event handlers are set inside handleMouseDown
   const tempStartRef = useRef<number>(event.period.start);
   const tempDaysRef = useRef<string[]>([...event.days]);
 
+  // Save original style of the block
   const savedStyleRef = useRef<string>();
   const savedClassListRef = useRef<string>();
 
@@ -55,20 +58,26 @@ export default function EventBlocks({
 
   const [{ events }, { patchSchedule }] = useContext(ScheduleContext);
 
+  // Start dragging a block. This event handler is passed down to each block
   const handleMouseDown = (
     e: React.MouseEvent,
     ref: React.RefObject<HTMLDivElement>
   ): void => {
     if (!ref.current) return;
+
+    // Save style of the block
     savedStyleRef.current = ref.current.style.cssText;
     savedClassListRef.current = ref.current.className;
 
+    // Create a clone of the block to take the original blocks place
     const cloneMeeting = ref.current.cloneNode(true) as HTMLDivElement;
     cloneMeeting.classList.add('meeting--clone');
     cloneMeeting.id = 'meeting--clone';
 
     setDragging(true);
 
+    // Reset some of the block styling to account for theme and add
+    // dragging class
     if (ref.current) {
       ref.current.classList.remove('light-content', 'dark-content');
       ref.current.classList.add(`${theme}-content`);
@@ -77,6 +86,7 @@ export default function EventBlocks({
       ref.current.style.width = '20%';
     }
 
+    // Disabled eslint because it doesn't like the parameter
     // eslint-disable-next-line
     const mouseMoveHandler = (e_: MouseEvent): void => handleMouseMove(e_, ref);
 
@@ -92,6 +102,7 @@ export default function EventBlocks({
 
       setDragging(false);
 
+      // Update the event time in firestore/local storage once done dragging
       const newEvents = castDraft(events).map((existingEvent: Event) => {
         if (existingEvent.id === event.id) {
           return {
@@ -109,6 +120,7 @@ export default function EventBlocks({
 
       patchSchedule({ events: newEvents });
 
+      // Clean up the event listeners once done dragging
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', documentMouseUp);
     };
@@ -116,25 +128,33 @@ export default function EventBlocks({
     // eslint-disable-next-line
     const documentMouseUp = (e_: any): void => handleMouseUp(e_, ref);
 
+    // Add event listeners to enable dragging
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', documentMouseUp);
   };
 
+  // Calculates and updates the position of the block while dragging
   const handleMouseMove = (
     e: MouseEvent,
     ref: React.RefObject<HTMLDivElement>
   ): void => {
     if (!ref.current || !timesRef.current || !daysRef.current) return;
-    const start = Math.round(
-      (Math.round(
-        e.pageY -
-          timesRef.current.getBoundingClientRect().y -
-          ref.current.offsetHeight / 2
-      ) /
-        timesRef.current.getBoundingClientRect().height) *
-        (CLOSE - OPEN) +
-        OPEN
-    );
+
+    // math which calculates the new start time by calculating mouse
+    // position proportional to calendar size, then we find new time
+    // by rounding to nearest 5
+    const start =
+      Math.round(
+        ((Math.round(
+          e.pageY -
+            timesRef.current.getBoundingClientRect().y -
+            ref.current.offsetHeight / 2
+        ) /
+          timesRef.current.getBoundingClientRect().height) *
+          (CLOSE - OPEN) +
+          OPEN) /
+          5
+      ) * 5;
     const end = start + event.period.end - event.period.start;
     const left = e.pageX - daysRef.current.getBoundingClientRect().x;
     const day =
