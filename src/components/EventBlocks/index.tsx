@@ -202,7 +202,7 @@ export default function EventBlocks({
                 content: periodToString({
                   start: tempStart ?? event.period.start,
                   end:
-                    (tempStart ?? event.period.start) +
+                    (tempStartRef.current ?? event.period.start) +
                     (event.period.end - event.period.start),
                 }),
               },
