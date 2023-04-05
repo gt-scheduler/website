@@ -4,7 +4,7 @@ import { DelayFactory } from 'exponential-backoff/dist/delay/delay.factory';
 import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
-import { Immutable } from 'immer';
+import { Immutable, castImmutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
@@ -18,6 +18,7 @@ import {
   Theme,
 } from '../types';
 import ics from '../vendor/ics';
+import { getSemesterName } from './semesters';
 
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -242,13 +243,41 @@ export async function sleep({
   });
 }
 
+const termDates: Record<string, { from: string; to: string }> = {
+  Spring: {
+    from: '05 Jan',
+    to: '10 May',
+  },
+  Summer: {
+    from: '15 May',
+    to: '15 Aug',
+  },
+  Fall: {
+    from: '15 Aug',
+    to: '15 Dec',
+  },
+};
+
+const getDateRange = (term: string): { from: Date; to: Date } => {
+  const [sem, year] = getSemesterName(term).split(' ');
+  const defaultRange = { from: new Date(), to: new Date() };
+  if (!sem || !year) return defaultRange;
+  const range = termDates[sem];
+  if (!range) return defaultRange;
+  const from = new Date(`${range.from} ${year}`);
+  const to = new Date(`${range.to} ${year}`);
+  return { from, to };
+};
+
 /**
  * Exports the current schedule to a `.ics` file,
  * which allows for importing into a third-party calendar application.
  */
 export function exportCoursesToCalendar(
   oscar: Oscar,
-  pinnedCrns: readonly string[]
+  pinnedCrns: readonly string[],
+  events: Immutable<Event[]>,
+  term: string
 ): void {
   const cal = ics('gt-scheduler') as ICS | undefined;
   if (cal == null) {
@@ -295,6 +324,35 @@ export function exportCoursesToCalendar(
       };
       cal.addEvent(subject, description, location, begin, end, rrule);
     });
+  });
+
+  const range = getDateRange(term);
+  events.forEach((event) => {
+    if (!event.period || !event.days.length) return;
+    const { from, to } = range;
+    const subject = event.name;
+    const begin = new Date(from.getTime());
+    while (
+      !event.days.includes(
+        ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
+      )
+    ) {
+      begin.setDate(begin.getDate() + 1);
+    }
+    begin.setHours(event.period.start / 60, event.period.start % 60);
+    const end = new Date(begin.getTime());
+    end.setHours(event.period.end / 60, event.period.end % 60);
+    const rrule = {
+      freq: 'WEEKLY',
+      until: to,
+      byday: event.days
+        .map(
+          (day) =>
+            ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
+        )
+        .filter((day) => !!day),
+    };
+    cal.addEvent(subject, '', '', begin, end, rrule);
   });
   cal.download('gt-scheduler');
 }
