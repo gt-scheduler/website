@@ -59,9 +59,7 @@ export type TimeBlocksProps = {
   ) => void;
   handleMouseDown?: (
     e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>,
-    meetingIndex: number,
-    meetingDay: string
+    ref: React.RefObject<HTMLDivElement>
   ) => void;
 };
 
@@ -139,8 +137,6 @@ export default function TimeBlocks({
             // Only the first day for a meeting can be tab focused
             canBeTabFocused={canBeTabFocused && i === 0}
             handleMouseDown={handleMouseDown}
-            meetingIndex={meetingIndex}
-            meetingDay={day}
           />
         );
       })}
@@ -165,12 +161,8 @@ type MeetingDayBlockProps = {
   deviceHasHover: boolean;
   handleMouseDown?: (
     e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>,
-    meetingIndex: number,
-    meetingDay: string
+    ref: React.RefObject<HTMLDivElement>
   ) => void;
-  meetingIndex: number;
-  meetingDay: string;
 };
 
 function MeetingDayBlock({
@@ -189,8 +181,6 @@ function MeetingDayBlock({
   onSelect,
   deviceHasHover,
   handleMouseDown,
-  meetingIndex,
-  meetingDay,
 }: MeetingDayBlockProps): React.ReactElement {
   const tooltipId = useId();
   const contentClassName = getContentClassName(color);
@@ -255,7 +245,7 @@ function MeetingDayBlock({
         ref={blockElementRef}
         onMouseDown={(e): void => {
           if (handleMouseDown) {
-            handleMouseDown(e, blockElementRef, meetingIndex, meetingDay);
+            handleMouseDown(e, blockElementRef);
           }
         }}
       >

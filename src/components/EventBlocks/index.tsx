@@ -67,9 +67,7 @@ export default function EventBlocks({
   // Start dragging a block. This event handler is passed down to each block
   const handleMouseDown = (
     e: React.MouseEvent,
-    ref: React.RefObject<HTMLDivElement>,
-    meetingIndex: number,
-    meetingDay: string
+    ref: React.RefObject<HTMLDivElement>
   ): void => {
     if (!ref.current) return;
     if (!deviceHasHover) return;
