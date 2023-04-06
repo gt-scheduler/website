@@ -283,6 +283,7 @@ export function exportCoursesToCalendar(
   term: string
 ): void {
   const cal = ics('gt-scheduler') as ICS | undefined;
+
   if (cal == null) {
     window.alert('This browser does not support calendar export');
     softError(
@@ -294,68 +295,65 @@ export function exportCoursesToCalendar(
     return;
   }
 
-  pinnedCrns.forEach((crn) => {
-    const section = oscar.findSection(crn);
-    if (section == null) return;
-
-    section.meetings.forEach((meeting) => {
-      if (!meeting.period || !meeting.days.length) return;
-      const { from, to } = meeting.dateRange;
-      const subject = section.course.id;
-      const description = section.course.title;
-      const location = meeting.where;
-      const begin = new Date(from.getTime());
-      while (
-        !meeting.days.includes(
-          ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
-        )
-      ) {
-        begin.setDate(begin.getDate() + 1);
-      }
-      begin.setHours(meeting.period.start / 60, meeting.period.start % 60);
-      const end = new Date(begin.getTime());
-      end.setHours(meeting.period.end / 60, meeting.period.end % 60);
-      const rrule = {
-        freq: 'WEEKLY',
-        until: to,
-        byday: meeting.days
-          .map(
-            (day) =>
-              ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
-          )
-          .filter((day) => !!day),
-      };
-      cal.addEvent(subject, description, location, begin, end, rrule);
-    });
-  });
-
-  const range = getDateRange(term);
-  events.forEach((event) => {
-    if (!event.period || !event.days.length) return;
-    const { from, to } = range;
-    const subject = event.name;
+  const addEventsToCalendar = (
+    period: Period,
+    days: string[],
+    dateRange: DateRange,
+    subject: string,
+    description = '',
+    location = ''
+  ): void => {
+    const { from, to } = dateRange;
     const begin = new Date(from.getTime());
     while (
-      !event.days.includes(
-        ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
-      )
+      !days.includes(['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-')
     ) {
       begin.setDate(begin.getDate() + 1);
     }
-    begin.setHours(event.period.start / 60, event.period.start % 60);
+    begin.setHours(period.start / 60, period.start % 60);
     const end = new Date(begin.getTime());
-    end.setHours(event.period.end / 60, event.period.end % 60);
+    end.setHours(period.end / 60, period.end % 60);
     const rrule = {
       freq: 'WEEKLY',
       until: to,
-      byday: event.days
+      byday: days
         .map(
           (day) =>
             ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
         )
         .filter((day) => !!day),
     };
-    cal.addEvent(subject, '', '', begin, end, rrule);
+    cal.addEvent(subject, description, location, begin, end, rrule);
+  };
+
+  pinnedCrns.forEach((crn) => {
+    const section = oscar.findSection(crn);
+    if (section == null) return;
+
+    section.meetings.forEach((meeting) => {
+      if (!meeting.period || !meeting.days.length) return;
+      const subject = section.course.id;
+      const description = section.course.title;
+      const location = meeting.where;
+      addEventsToCalendar(
+        meeting.period,
+        meeting.days,
+        meeting.dateRange,
+        subject,
+        description,
+        location
+      );
+    });
+  });
+
+  const range = getDateRange(term);
+  events.forEach((event) => {
+    addEventsToCalendar(
+      { ...event.period },
+      [...event.days],
+      range,
+      event.name
+    );
   });
   cal.download('gt-scheduler');
 }

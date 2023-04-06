@@ -101,6 +101,9 @@ export default function EventAdd({
   );
 
   const onSubmit = useCallback((): void => {
+    const parsedStart = parseTime(start);
+    const parsedEnd = parseTime(end);
+
     if (event) {
       const newEvents = castDraft(events).map((existingEvent) =>
         existingEvent.id === event.id
@@ -108,8 +111,8 @@ export default function EventAdd({
               ...existingEvent,
               name: eventName,
               period: {
-                start: parseTime(start),
-                end: parseTime(end),
+                start: parsedStart,
+                end: parsedEnd,
               },
               days: selectedTags,
             }
@@ -129,8 +132,8 @@ export default function EventAdd({
         id: eventId,
         name: eventName,
         period: {
-          start: parseTime(start),
-          end: parseTime(end),
+          start: parsedStart,
+          end: parsedEnd,
         },
         days: selectedTags,
       };
