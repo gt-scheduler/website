@@ -11,6 +11,10 @@ import './stylesheet.scss';
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
 const MODAL_LOCAL_STORAGE_KEY = '2023-04-05-spr2023-new-features-announcement';
+const OUTDATED_LOCAL_STORAGE_KEY = [
+  '2021-10-27-spr2022-schedule-versions-account-sync',
+  '2023-03-05-spr2023-oscar-migration',
+];
 
 /**
  * Inner content of the information modal.
@@ -36,7 +40,7 @@ export function InformationModalContent(): React.ReactElement {
       >
         New Feature: Recurring Events
       </h1>
-      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 5, 2023</h4>
+      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 6, 2023</h4>
       <div className="information-content">
         <p>
           Hello <span style={{ color: '#EDA91F' }}>Yellow Jackets!</span> We are
@@ -83,6 +87,10 @@ export default function InformationModal(): React.ReactElement {
     storageSync: true,
   });
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
+
+  OUTDATED_LOCAL_STORAGE_KEY.forEach((key) =>
+    window.localStorage.removeItem(key)
+  );
 
   useEffect(() => {
     if (!hasSeen) {

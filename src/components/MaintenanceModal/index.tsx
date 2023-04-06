@@ -15,13 +15,13 @@ const MODAL_LOCAL_STORAGE_KEY = '2023-03-05-spr2023-oscar-migration';
  * Additionally, make sure to change `MODAL_LOCAL_STORAGE_KEY`
  * with another unique value that has never been used before.
  */
-export function MigrationModalContent(): React.ReactElement {
+export function MaintenanceModalContent(): React.ReactElement {
   return (
     <>
       <img alt="GT Scheduler Logo" src="/mascot.png" />
       <h2>Scheduled Maintenance March 15 - March 16</h2>
       <h4>March 5, 2023</h4>
-      <p className="migration-content">
+      <p className="maintenance-content">
         The Registrar’s Office announced that the old version of the
         self-service registration system on OSCAR will sunset on March 16, 2023.
         <br />
@@ -80,7 +80,7 @@ export default function MaintenanceModal(): React.ReactElement {
 
   return (
     <Modal
-      className="MigrationModal"
+      className="MaintenanceModal"
       show={show}
       onHide={(): void => setShow(false)}
       buttons={[
@@ -97,7 +97,7 @@ export default function MaintenanceModal(): React.ReactElement {
       setCheckbox={setCheckbox}
       checkboxContent={`Don't show this again`}
     >
-      <MigrationModalContent />
+      <MaintenanceModalContent />
     </Modal>
   );
 }
