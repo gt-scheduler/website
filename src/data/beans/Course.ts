@@ -139,8 +139,10 @@ export default class Course {
         );
         // if no matching section id letters found, match by profs
         if (!lecture.associatedLabs.length) {
-          lecture.associatedLabs = onlyLabs.filter((lab) =>
-            matchLabFromInstructors(lab, lecture)
+          lecture.associatedLabs = onlyLabs.filter(
+            (lab) =>
+              matchLabFromInstructors(lab, lecture) &&
+              !hasConflictBetween(lab, lecture)
           );
         }
       }
@@ -149,8 +151,10 @@ export default class Course {
           matchLabFromId(lab, lecture)
         );
         if (!lab.associatedLectures.length) {
-          lab.associatedLectures = onlyLectures.filter((lecture) =>
-            matchLabFromInstructors(lab, lecture)
+          lab.associatedLectures = onlyLectures.filter(
+            (lecture) =>
+              matchLabFromInstructors(lab, lecture) &&
+              !hasConflictBetween(lecture, lab)
           );
         }
       }
