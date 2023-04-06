@@ -12,6 +12,7 @@ import ErrorHeader from '../ErrorHeader';
 import { AppNavigation } from './navigation';
 import AppDataLoader from '../AppDataLoader';
 import { AppSkeleton, SkeletonContent, AppContent } from './content';
+import Maintenance from './maintenance';
 import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
@@ -27,6 +28,15 @@ export default function App(): React.ReactElement {
 
   // Add the current theme as a class on the body element
   useBodyClass(themeContextValue[0]);
+
+  const date = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  );
+
+  const websiteDown =
+    date.getFullYear() === 2023 &&
+    date.getMonth() + 1 === 3 &&
+    (date.getDate() === 15 || date.getDate() === 16);
 
   return (
     <ThemeContext.Provider value={themeContextValue}>

@@ -10,6 +10,7 @@ import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
+  DateRange,
   Event,
   ICS,
   Meeting,
@@ -18,17 +19,25 @@ import {
   Theme,
 } from '../types';
 import ics from '../vendor/ics';
+import { getSemesterName } from './semesters';
 
+/* Converts a string of the form "930" to 750. strings of the
+  mentioned format are returned by crawler v2 */
 export const stringToTime = (string: string): number => {
-  const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
-  if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = regexResult as unknown as [
-    string,
-    string,
-    string,
-    string
+  if (
+    string === 'null' ||
+    string.length < 3 ||
+    string.length > 4 ||
+    Number.isNaN(parseInt(string, 10))
+  ) {
+    return 0;
+  }
+
+  const [hour, minute] = [
+    string.substring(0, string.length - 2),
+    string.substring(string.length - 2, string.length),
   ];
-  return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
+  return parseInt(hour, 10) * 60 + parseInt(minute, 10);
 };
 
 export const timeToString = (
@@ -242,15 +251,46 @@ export async function sleep({
   });
 }
 
+// Object that stores the estimated date range for a semester.
+// Used to estimate the date range of recurring events.
+const termDates: Record<string, { from: string; to: string }> = {
+  Spring: {
+    from: '05 Jan',
+    to: '10 May',
+  },
+  Summer: {
+    from: '15 May',
+    to: '15 Aug',
+  },
+  Fall: {
+    from: '15 Aug',
+    to: '15 Dec',
+  },
+};
+
+const getDateRange = (term: string): DateRange => {
+  const [sem, year] = getSemesterName(term).split(' ');
+  const defaultRange = { from: new Date(), to: new Date() };
+  if (!sem || !year) return defaultRange;
+  const range = termDates[sem];
+  if (!range) return defaultRange;
+  const from = new Date(`${range.from} ${year}`);
+  const to = new Date(`${range.to} ${year}`);
+  return { from, to };
+};
+
 /**
  * Exports the current schedule to a `.ics` file,
  * which allows for importing into a third-party calendar application.
  */
 export function exportCoursesToCalendar(
   oscar: Oscar,
-  pinnedCrns: readonly string[]
+  pinnedCrns: readonly string[],
+  events: Immutable<Event[]>,
+  term: string
 ): void {
   const cal = ics('gt-scheduler') as ICS | undefined;
+
   if (cal == null) {
     window.alert('This browser does not support calendar export');
     softError(
@@ -262,39 +302,65 @@ export function exportCoursesToCalendar(
     return;
   }
 
+  const addEventsToCalendar = (
+    period: Period,
+    days: string[],
+    dateRange: DateRange,
+    subject: string,
+    description = '',
+    location = ''
+  ): void => {
+    const { from, to } = dateRange;
+    const begin = new Date(from.getTime());
+    while (
+      !days.includes(['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-')
+    ) {
+      begin.setDate(begin.getDate() + 1);
+    }
+    begin.setHours(period.start / 60, period.start % 60);
+    const end = new Date(begin.getTime());
+    end.setHours(period.end / 60, period.end % 60);
+    const rrule = {
+      freq: 'WEEKLY',
+      until: to,
+      byday: days
+        .map(
+          (day) =>
+            ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
+        )
+        .filter((day) => !!day),
+    };
+    cal.addEvent(subject, description, location, begin, end, rrule);
+  };
+
   pinnedCrns.forEach((crn) => {
     const section = oscar.findSection(crn);
     if (section == null) return;
 
     section.meetings.forEach((meeting) => {
       if (!meeting.period || !meeting.days.length) return;
-      const { from, to } = meeting.dateRange;
       const subject = section.course.id;
       const description = section.course.title;
       const location = meeting.where;
-      const begin = new Date(from.getTime());
-      while (
-        !meeting.days.includes(
-          ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
-        )
-      ) {
-        begin.setDate(begin.getDate() + 1);
-      }
-      begin.setHours(meeting.period.start / 60, meeting.period.start % 60);
-      const end = new Date(begin.getTime());
-      end.setHours(meeting.period.end / 60, meeting.period.end % 60);
-      const rrule = {
-        freq: 'WEEKLY',
-        until: to,
-        byday: meeting.days
-          .map(
-            (day) =>
-              ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
-          )
-          .filter((day) => !!day),
-      };
-      cal.addEvent(subject, description, location, begin, end, rrule);
+      addEventsToCalendar(
+        meeting.period,
+        meeting.days,
+        meeting.dateRange,
+        subject,
+        description,
+        location
+      );
     });
+  });
+
+  const range = getDateRange(term);
+  events.forEach((event) => {
+    addEventsToCalendar(
+      { ...event.period },
+      [...event.days],
+      range,
+      event.name
+    );
   });
   cal.download('gt-scheduler');
 }
@@ -403,4 +469,55 @@ export function lexicographicCompare(a: string, b: string): number {
   }
 
   return -1;
+}
+
+// Edit this map to control how locations are abbreviated.
+// Prefer adding new entries to this map over changing the location strings,
+// since old schedules can still be opened in the app.
+//
+// When adding new entries, consider also updating the crawler's coordinate
+// mapping in https://github.com/gt-scheduler/crawler/blob/main/src/steps/parse.ts
+// (search for `courseLocations`).
+//
+// Initial locations were loosely based on:
+// https://github.com/gt-scheduler/crawler/blob/main/src/steps/parse.ts
+const LOCATION_ABBREVIATIONS: Record<string, string> = {
+  '760 Spring St NW': '760 Spring St',
+  '760 Spring Street': '760 Spring St',
+  'Clough Commons': 'CULC',
+  'Clough UG Learning Commons': 'CULC',
+  'Coll of Computing': 'CCB',
+  'College of Computing': 'CCB',
+  'D. M. Smith': 'DM Smith',
+  'D.M. Smith': 'DM Smith',
+  'Engr Science & Mech': 'ESM',
+  'Engineering Sci and Mechanics': 'ESM',
+  'Ford Environmental Sci & Tech': 'ES&T',
+  'Ford Environmental Sci &amp; Tech': 'ES&T',
+  'Howey (Physics)': 'Howey',
+  'Howey Physics': 'Howey',
+  'Instr Center': 'IC',
+  'Instructional Center': 'IC',
+  'J. Erskine Love Manufacturing': 'Love (MRDC II)',
+  'Klaus Advanced Computing': 'Klaus',
+  'Manufacture Rel Discip Complex': 'MRDC',
+  'Molecular Sciences & Engr': 'MoSE',
+  'Molecular Sciences & Engineering': 'MoSE',
+  'Paper Tricentennial': 'Paper',
+  'Scheller College of Business': 'Scheller',
+  'Sustainable Education': 'SEB',
+  'U A Whitaker Biomedical Engr': 'Whitaker',
+  'West Village Dining Commons': 'West Village',
+  'Guggenheim Aerospace': 'Guggenheim',
+};
+
+export function abbreviateLocation(location: string): string {
+  for (const [full, abbrev] of Object.entries(LOCATION_ABBREVIATIONS)) {
+    if (location.startsWith(full)) {
+      const withoutFull = location.substring(full.length).trim();
+      return `${abbrev} ${withoutFull}`;
+    }
+  }
+
+  return location;
 }

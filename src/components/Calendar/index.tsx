@@ -52,6 +52,9 @@ export default function Calendar({
     Record<string, Record<string, EventBlockPosition>>
   > = {};
 
+  const daysRef = React.useRef<HTMLDivElement>(null);
+  const timesRef = React.useRef<HTMLDivElement>(null);
+
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
   const updateJoinedRowSizes = (
@@ -258,7 +261,7 @@ export default function Calendar({
       )}
     >
       {!preview && (
-        <div className="times">
+        <div className="times" ref={timesRef}>
           {new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
             const time = OPEN + i * 60;
             return (
@@ -270,7 +273,7 @@ export default function Calendar({
         </div>
       )}
       {!preview && (
-        <div className="days">
+        <div className="days" ref={daysRef}>
           {DAYS.map((day) => (
             <div className="day" key={day}>
               <span className="label">{day}</span>
@@ -327,6 +330,9 @@ export default function Calendar({
               includeContent={!preview}
               canBeTabFocused={!isAutosized && !capture}
               deviceHasHover={deviceHasHover}
+              daysRef={daysRef}
+              timesRef={timesRef}
+              key={`${event.id}-${event.period.start}-${event.days.join()}`}
               selectedMeeting={
                 selectedMeeting !== null && selectedMeeting[0] === event.id
                   ? [selectedMeeting[1], selectedMeeting[2]]
