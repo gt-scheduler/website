@@ -10,6 +10,7 @@ import { Oscar, Section } from '../data/beans';
 import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
+  DateRange,
   Event,
   ICS,
   Meeting,
@@ -18,6 +19,7 @@ import {
   Theme,
 } from '../types';
 import ics from '../vendor/ics';
+import { getSemesterName } from './semesters';
 
 export const stringToTime = (string: string): number => {
   const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
@@ -242,15 +244,46 @@ export async function sleep({
   });
 }
 
+// Object that stores the estimated date range for a semester.
+// Used to estimate the date range of recurring events.
+const termDates: Record<string, { from: string; to: string }> = {
+  Spring: {
+    from: '05 Jan',
+    to: '10 May',
+  },
+  Summer: {
+    from: '15 May',
+    to: '15 Aug',
+  },
+  Fall: {
+    from: '15 Aug',
+    to: '15 Dec',
+  },
+};
+
+const getDateRange = (term: string): DateRange => {
+  const [sem, year] = getSemesterName(term).split(' ');
+  const defaultRange = { from: new Date(), to: new Date() };
+  if (!sem || !year) return defaultRange;
+  const range = termDates[sem];
+  if (!range) return defaultRange;
+  const from = new Date(`${range.from} ${year}`);
+  const to = new Date(`${range.to} ${year}`);
+  return { from, to };
+};
+
 /**
  * Exports the current schedule to a `.ics` file,
  * which allows for importing into a third-party calendar application.
  */
 export function exportCoursesToCalendar(
   oscar: Oscar,
-  pinnedCrns: readonly string[]
+  pinnedCrns: readonly string[],
+  events: Immutable<Event[]>,
+  term: string
 ): void {
   const cal = ics('gt-scheduler') as ICS | undefined;
+
   if (cal == null) {
     window.alert('This browser does not support calendar export');
     softError(
@@ -262,39 +295,65 @@ export function exportCoursesToCalendar(
     return;
   }
 
+  const addEventsToCalendar = (
+    period: Period,
+    days: string[],
+    dateRange: DateRange,
+    subject: string,
+    description = '',
+    location = ''
+  ): void => {
+    const { from, to } = dateRange;
+    const begin = new Date(from.getTime());
+    while (
+      !days.includes(['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-')
+    ) {
+      begin.setDate(begin.getDate() + 1);
+    }
+    begin.setHours(period.start / 60, period.start % 60);
+    const end = new Date(begin.getTime());
+    end.setHours(period.end / 60, period.end % 60);
+    const rrule = {
+      freq: 'WEEKLY',
+      until: to,
+      byday: days
+        .map(
+          (day) =>
+            ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
+        )
+        .filter((day) => !!day),
+    };
+    cal.addEvent(subject, description, location, begin, end, rrule);
+  };
+
   pinnedCrns.forEach((crn) => {
     const section = oscar.findSection(crn);
     if (section == null) return;
 
     section.meetings.forEach((meeting) => {
       if (!meeting.period || !meeting.days.length) return;
-      const { from, to } = meeting.dateRange;
       const subject = section.course.id;
       const description = section.course.title;
       const location = meeting.where;
-      const begin = new Date(from.getTime());
-      while (
-        !meeting.days.includes(
-          ['-', 'M', 'T', 'W', 'R', 'F', '-'][begin.getDay()] ?? '-'
-        )
-      ) {
-        begin.setDate(begin.getDate() + 1);
-      }
-      begin.setHours(meeting.period.start / 60, meeting.period.start % 60);
-      const end = new Date(begin.getTime());
-      end.setHours(meeting.period.end / 60, meeting.period.end % 60);
-      const rrule = {
-        freq: 'WEEKLY',
-        until: to,
-        byday: meeting.days
-          .map(
-            (day) =>
-              ({ M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR' }[day] ?? null)
-          )
-          .filter((day) => !!day),
-      };
-      cal.addEvent(subject, description, location, begin, end, rrule);
+      addEventsToCalendar(
+        meeting.period,
+        meeting.days,
+        meeting.dateRange,
+        subject,
+        description,
+        location
+      );
     });
+  });
+
+  const range = getDateRange(term);
+  events.forEach((event) => {
+    addEventsToCalendar(
+      { ...event.period },
+      [...event.days],
+      range,
+      event.name
+    );
   });
   cal.download('gt-scheduler');
 }
