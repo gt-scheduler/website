@@ -6,8 +6,10 @@ import {
   ScheduleData,
   Version1ScheduleDataOrNewer,
   Version2ScheduleDataOrNewer,
+  Version3ScheduleDataOrNewer,
 } from '../types';
 import migrate1To2 from './1to2';
+import migrate2To3 from './2to3';
 import migrateCookiesTo1, { defaultVersion1ScheduleData } from './cookiesTo1';
 
 /**
@@ -48,5 +50,12 @@ export default function migrateScheduleData(
     scheduleDataVersion2OrNewer = scheduleDataVersion1OrNewer;
   }
 
-  return scheduleDataVersion2OrNewer;
+  let scheduleDataVersion3OrNewer: Version3ScheduleDataOrNewer;
+  if (scheduleDataVersion2OrNewer.version === 2) {
+    scheduleDataVersion3OrNewer = migrate2To3(scheduleDataVersion2OrNewer);
+  } else {
+    scheduleDataVersion3OrNewer = scheduleDataVersion2OrNewer;
+  }
+
+  return scheduleDataVersion3OrNewer;
 }

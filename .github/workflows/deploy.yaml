@@ -53,3 +53,4 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build
           CLEAN: true
+          CLEAN-EXCLUDE: pr-preview/

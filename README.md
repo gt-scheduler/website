@@ -77,6 +77,10 @@ With that, you're able to make changes to the code and have them be re-built and
 >
 > See https://github.com/facebook/create-react-app/discussions/11767 for more details.
 
+### Secrets (only for BoG Developers)
+- `yarn run secrets:linux` - obtain app secrets for Linux and MacOS; ask Engineering Manager for password
+- `yarn run secrets:windows` - obtain app secrets for Windows; ask Engineering Manager for password
+
 ### Linting
 
 The project uses pre-commit hooks using [Husky](https://typicode.github.io/husky/#/) and [`lint-staged`](https://www.npmjs.com/package/lint-staged) to run linting (via [ESLint](https://eslint.org/)) and formatting (via [Prettier](https://prettier.io/)). These can be run manually from the command line to format/lint the code on-demand, using the following commands:

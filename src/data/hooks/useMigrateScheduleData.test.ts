@@ -94,6 +94,7 @@ describe('useMigrateScheduleData', () => {
                   '94424',
                 ],
                 excludedCrns: ['95199'],
+                events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
@@ -101,7 +102,7 @@ describe('useMigrateScheduleData', () => {
           },
         },
       },
-      version: 2,
+      version: 3,
     };
 
     // The migrated data should have been passed to `setRawScheduleData`
@@ -150,6 +151,7 @@ describe('useMigrateScheduleData', () => {
                       '94424',
                     ],
                     excludedCrns: ['95199'],
+                    events: [],
                     colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                     sortingOptionIndex: 0,
                   },
@@ -157,7 +159,7 @@ describe('useMigrateScheduleData', () => {
               },
             },
           },
-          version: 2,
+          version: 3,
         },
       })
     );
@@ -180,6 +182,7 @@ describe('useMigrateScheduleData', () => {
                   '94424',
                 ],
                 excludedCrns: ['95199'],
+                events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
@@ -187,7 +190,7 @@ describe('useMigrateScheduleData', () => {
           },
         },
       },
-      version: 2,
+      version: 3,
     };
 
     // The callback shouldn't have been invoked,

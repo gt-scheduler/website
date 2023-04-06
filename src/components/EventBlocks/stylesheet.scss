@@ -1,0 +1,19 @@
+@import '../../variables';
+
+.mobile .TimeBlocks:not(.capture) .meeting .meeting-wrapper {
+  .ids {
+    .event-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+
+.popover tbody tr td {
+  max-width: calc(max(200px, 15vw));
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
