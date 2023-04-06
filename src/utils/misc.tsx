@@ -21,16 +21,23 @@ import {
 import ics from '../vendor/ics';
 import { getSemesterName } from './semesters';
 
+/* Converts a string of the form "930" to 750. strings of the
+  mentioned format are returned by crawler v2 */
 export const stringToTime = (string: string): number => {
-  const regexResult = /(\d{1,2}):(\d{2}) (a|p)m/.exec(string);
-  if (regexResult === null) return 0;
-  const [, hour, minute, ampm] = regexResult as unknown as [
-    string,
-    string,
-    string,
-    string
+  if (
+    string === 'null' ||
+    string.length < 3 ||
+    string.length > 4 ||
+    Number.isNaN(parseInt(string, 10))
+  ) {
+    return 0;
+  }
+
+  const [hour, minute] = [
+    string.substring(0, string.length - 2),
+    string.substring(string.length - 2, string.length),
   ];
-  return ((ampm === 'p' ? 12 : 0) + (+hour % 12)) * 60 + +minute;
+  return parseInt(hour, 10) * 60 + parseInt(minute, 10);
 };
 
 export const timeToString = (
@@ -462,4 +469,55 @@ export function lexicographicCompare(a: string, b: string): number {
   }
 
   return -1;
+}
+
+// Edit this map to control how locations are abbreviated.
+// Prefer adding new entries to this map over changing the location strings,
+// since old schedules can still be opened in the app.
+//
+// When adding new entries, consider also updating the crawler's coordinate
+// mapping in https://github.com/gt-scheduler/crawler/blob/main/src/steps/parse.ts
+// (search for `courseLocations`).
+//
+// Initial locations were loosely based on:
+// https://github.com/gt-scheduler/crawler/blob/main/src/steps/parse.ts
+const LOCATION_ABBREVIATIONS: Record<string, string> = {
+  '760 Spring St NW': '760 Spring St',
+  '760 Spring Street': '760 Spring St',
+  'Clough Commons': 'CULC',
+  'Clough UG Learning Commons': 'CULC',
+  'Coll of Computing': 'CCB',
+  'College of Computing': 'CCB',
+  'D. M. Smith': 'DM Smith',
+  'D.M. Smith': 'DM Smith',
+  'Engr Science & Mech': 'ESM',
+  'Engineering Sci and Mechanics': 'ESM',
+  'Ford Environmental Sci & Tech': 'ES&T',
+  'Ford Environmental Sci &amp; Tech': 'ES&T',
+  'Howey (Physics)': 'Howey',
+  'Howey Physics': 'Howey',
+  'Instr Center': 'IC',
+  'Instructional Center': 'IC',
+  'J. Erskine Love Manufacturing': 'Love (MRDC II)',
+  'Klaus Advanced Computing': 'Klaus',
+  'Manufacture Rel Discip Complex': 'MRDC',
+  'Molecular Sciences & Engr': 'MoSE',
+  'Molecular Sciences & Engineering': 'MoSE',
+  'Paper Tricentennial': 'Paper',
+  'Scheller College of Business': 'Scheller',
+  'Sustainable Education': 'SEB',
+  'U A Whitaker Biomedical Engr': 'Whitaker',
+  'West Village Dining Commons': 'West Village',
+  'Guggenheim Aerospace': 'Guggenheim',
+};
+
+export function abbreviateLocation(location: string): string {
+  for (const [full, abbrev] of Object.entries(LOCATION_ABBREVIATIONS)) {
+    if (location.startsWith(full)) {
+      const withoutFull = location.substring(full.length).trim();
+      return `${abbrev} ${withoutFull}`;
+    }
+  }
+
+  return location;
 }

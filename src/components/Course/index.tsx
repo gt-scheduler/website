@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   faAngleDown,
   faAngleUp,
-  faInfoCircle,
   faShareAlt,
   faPalette,
   faPlus,
@@ -36,7 +35,7 @@ export default function Course({
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, term, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -110,11 +109,7 @@ export default function Course({
   const color = colorMap[course.id];
   const contentClassName = color != null && getContentClassName(color);
 
-  const hasPrereqs = oscar.version > 1;
-  let prereqs: CrawlerPrerequisites | null = null;
-  if (hasPrereqs) {
-    prereqs = course.prereqs ?? [];
-  }
+  const prereqs: CrawlerPrerequisites | null = course.prereqs ?? [];
 
   const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
@@ -152,14 +147,6 @@ export default function Course({
     id: `${course.id}-prerequisites`,
   };
 
-  const infoAction = {
-    icon: faInfoCircle,
-    href:
-      `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
-      `course_detail?cat_term_in=${term}&subj_code_in=` +
-      `${course.subject}&crse_numb_in=${course.number}`,
-  };
-
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
   );
@@ -181,16 +168,13 @@ export default function Course({
         ].join(' ')}
         actions={
           isSearching
-            ? [
-                { icon: faPlus, onClick: onAddCourse },
-                hasPrereqs ? prereqAction : infoAction,
-              ]
+            ? [{ icon: faPlus, onClick: onAddCourse }, prereqAction]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
                   onClick: (): void => prereqControl(false, !expanded),
                 },
-                hasPrereqs ? prereqAction : infoAction,
+                prereqAction,
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
