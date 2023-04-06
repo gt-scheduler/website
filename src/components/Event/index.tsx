@@ -102,6 +102,7 @@ export default function Event({
         <EventAdd
           className="event-add"
           event={event}
+          key={`${event.id}-${event.period.start}-${event.days.join()}`}
           setFormShown={setFormShown}
         />
       )}
