@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes } from '../../utils/misc';
@@ -11,6 +12,7 @@ export type Action = {
   icon: FontAwesomeProps['icon'];
   styling?: React.CSSProperties;
   id?: string;
+  tooltip?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 } & Omit<ButtonProps, 'children'>;
@@ -40,19 +42,34 @@ export default function ActionRow({
             .flatMap((action) => (action != null ? [action] : []))
             .map(
               (
-                { icon, styling, id, onMouseEnter, onMouseLeave, ...rest },
+                {
+                  icon,
+                  styling,
+                  id,
+                  tooltip,
+                  onMouseEnter,
+                  onMouseLeave,
+                  ...rest
+                },
                 i
               ) => (
-                <Button className="action" {...rest} key={i}>
-                  <FontAwesomeIcon
-                    fixedWidth
-                    style={styling}
-                    icon={icon}
-                    id={id}
-                    onMouseEnter={onMouseEnter}
-                    onMouseLeave={onMouseLeave}
-                  />
-                </Button>
+                <>
+                  <Button className="action" {...rest} key={i}>
+                    <FontAwesomeIcon
+                      fixedWidth
+                      style={styling}
+                      icon={icon}
+                      id={id}
+                      onMouseEnter={onMouseEnter}
+                      onMouseLeave={onMouseLeave}
+                    />
+                  </Button>
+                  {tooltip && (
+                    <ReactTooltip anchorId={id} variant="dark" place="left">
+                      {tooltip}
+                    </ReactTooltip>
+                  )}
+                </>
               )
             )}
         </div>

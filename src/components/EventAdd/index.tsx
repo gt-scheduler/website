@@ -75,6 +75,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(end);
       if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
+      } else if (parsedStart < 480 || parsedEnd > 1260) {
+        setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
     [end, parseTime]
@@ -91,6 +93,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(newEnd);
       if (parsedStart !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
+      } else if (parsedStart < 480 || parsedEnd > 1260) {
+        setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
     [start, parseTime]

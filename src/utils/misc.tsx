@@ -112,11 +112,11 @@ export const classes = (
 
 export const isMobile = (): boolean => window.innerWidth < 1024;
 
-export const simplifyName = (name: string): string => {
+export const simplifyName = (name: string, delimiter?: string): string => {
   const tokens = name.split(' ');
   const firstName = tokens.shift();
   const lastName = tokens.pop();
-  return [firstName, lastName].join(' ');
+  return [firstName, lastName].join(delimiter ?? ' ');
 };
 
 export function unique<T>(array: T[]): T[] {

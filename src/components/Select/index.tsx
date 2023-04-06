@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCaretDown,
@@ -60,6 +61,8 @@ export interface EditAction<Id extends string | number> {
   type: 'edit';
   icon: IconDefinition;
   onCommit: (newLabel: string, id: Id) => boolean;
+  id?: string;
+  tooltip?: string;
 }
 
 /**
@@ -69,6 +72,8 @@ export interface ButtonAction<Id extends string | number> {
   type: 'button';
   icon: IconDefinition;
   onClick: (id: Id) => void;
+  id?: string;
+  tooltip?: string;
 }
 
 /**
@@ -203,19 +208,34 @@ export default function Select<Id extends string | number>({
               {actions.map((action, i) => (
                 <React.Fragment key={i}>
                   {action.type === 'button' ? (
-                    <Button
-                      className="option__action-button"
-                      onClick={(e): void => {
-                        e.stopPropagation();
+                    <>
+                      <Button
+                        className="option__action-button"
+                        onClick={(e): void => {
+                          e.stopPropagation();
 
-                        // Abandon any in-progress edit
-                        if (inputId !== null) abandonEdit();
+                          // Abandon any in-progress edit
+                          if (inputId !== null) abandonEdit();
 
-                        action.onClick(optionId);
-                      }}
-                    >
-                      <FontAwesomeIcon fixedWidth icon={action.icon} />
-                    </Button>
+                          action.onClick(optionId);
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          fixedWidth
+                          id={action.id}
+                          icon={action.icon}
+                        />
+                      </Button>
+                      {action.tooltip && (
+                        <ReactTooltip
+                          anchorId={action.id}
+                          variant="dark"
+                          place="left"
+                        >
+                          {action.tooltip}
+                        </ReactTooltip>
+                      )}
+                    </>
                   ) : (
                     <>
                       {optionId === inputId ? (
@@ -240,18 +260,33 @@ export default function Select<Id extends string | number>({
                           </Button>
                         </>
                       ) : (
-                        <Button
-                          className="option__action-button"
-                          onClick={(e): void => {
-                            e.stopPropagation();
-                            // Start a new edit (ignore any in-progress edits)
-                            setInputId(optionId);
-                            setInputValue(optionLabel);
-                            setInputEditAction(action);
-                          }}
-                        >
-                          <FontAwesomeIcon fixedWidth icon={action.icon} />
-                        </Button>
+                        <>
+                          <Button
+                            className="option__action-button"
+                            onClick={(e): void => {
+                              e.stopPropagation();
+                              // Start a new edit (ignore any in-progress edits)
+                              setInputId(optionId);
+                              setInputValue(optionLabel);
+                              setInputEditAction(action);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              fixedWidth
+                              icon={action.icon}
+                              id={action.id}
+                            />
+                          </Button>
+                          {action.tooltip && (
+                            <ReactTooltip
+                              anchorId={action.id}
+                              variant="dark"
+                              place="left"
+                            >
+                              {action.tooltip}
+                            </ReactTooltip>
+                          )}
+                        </>
                       )}
                     </>
                   )}
