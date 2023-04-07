@@ -150,7 +150,6 @@ type PrerequisiteClauseDisplayProps = {
  * an operator at the end of each item's text to indicate that each item
  * is part of a larger prereq set.
  */
-
 function PrerequisiteClauseDisplay({
   clause,
 }: PrerequisiteClauseDisplayProps): React.ReactElement {
