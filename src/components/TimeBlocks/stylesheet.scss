@@ -71,6 +71,19 @@
       }
     }
 
+    &--clone {
+      & {
+        opacity: 0.5;
+      }
+    }
+
+    &--dragging {
+      & {
+        background-color: transparent;
+        border: 2px solid var(--meeting-color, $color-neutral);
+      }
+    }
+
     :hover {
       cursor: pointer;
     }
@@ -127,24 +140,10 @@
   .meeting {
     .meeting-wrapper {
       padding: 2px;
+      height: 100%;
 
       span {
         white-space: normal;
-      }
-
-      .ids {
-        .course-id {
-          flex: 1;
-        }
-
-        .section-id {
-          display: none;
-        }
-      }
-
-      .where,
-      .instructors {
-        display: none;
       }
     }
   }

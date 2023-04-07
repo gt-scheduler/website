@@ -2,16 +2,10 @@ import React, { useContext, useId } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { useRootClose } from 'react-overlays';
 
-import {
-  abbreviateLocation,
-  classes,
-  getContentClassName,
-  periodToString,
-} from '../../utils/misc';
+import { classes, getContentClassName } from '../../utils/misc';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
-import { Meeting, Period } from '../../types';
-import { Section } from '../../data/beans';
+import { Period } from '../../types';
 
 import './stylesheet.scss';
 
@@ -19,14 +13,30 @@ export interface TimeBlockPosition {
   rowIndex: number;
   rowSize: number;
   period: Period;
-  crn: string;
 }
+
+export type TimeBlockContent = {
+  className: string;
+  content: string;
+};
+
+export type TimeBlockPopover = {
+  name: string;
+  content?: string;
+};
 
 export type SizeInfo = Record<string, Record<string, TimeBlockPosition>>;
 
 export type TimeBlocksProps = {
   className?: string;
-  crn: string;
+  id: string;
+  meetingIndex: number;
+  period: Period;
+  tempStart?: number;
+  days: string[] | readonly string[];
+  contentHeader: TimeBlockContent[];
+  contentBody: TimeBlockContent[];
+  popover: TimeBlockPopover[];
   overlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
@@ -47,6 +57,10 @@ export type TimeBlocksProps = {
   onSelectMeeting?: (
     meeting: [meetingIndex: number, day: string] | null
   ) => void;
+  handleMouseDown?: (
+    e: React.MouseEvent,
+    ref: React.RefObject<HTMLDivElement>
+  ) => void;
 };
 
 export function makeSizeInfoKey(period: Period): string {
@@ -55,7 +69,14 @@ export function makeSizeInfoKey(period: Period): string {
 
 export default function TimeBlocks({
   className,
-  crn,
+  id,
+  meetingIndex,
+  period,
+  tempStart,
+  days,
+  contentHeader,
+  contentBody,
+  popover,
   overlay = false,
   capture,
   sizeInfo,
@@ -65,13 +86,11 @@ export default function TimeBlocks({
   deviceHasHover = true,
   selectedMeeting,
   onSelectMeeting,
+  handleMouseDown,
 }: TimeBlocksProps): React.ReactElement | null {
-  const [{ oscar, colorMap }] = useContext(ScheduleContext);
-
-  const section = oscar.findSection(crn);
-  if (section == null) return null;
-
-  const color = colorMap[section.course.id];
+  const [{ colorMap }] = useContext(ScheduleContext);
+  const color = colorMap[id];
+  const sizeInfoKey = makeSizeInfoKey(period);
 
   return (
     <div
@@ -82,47 +101,44 @@ export default function TimeBlocks({
         className
       )}
     >
-      {section.meetings.map((meeting, i) => {
-        const { period } = meeting;
-        if (period == null) return;
+      {days.map((day, i) => {
+        const sizeInfoDay = sizeInfo[day];
+        if (sizeInfoDay == null) return;
+        const sizeInfoPeriodDay = sizeInfoDay[sizeInfoKey];
+        if (sizeInfoPeriodDay == null) return;
 
-        const sizeInfoKey = makeSizeInfoKey(period);
-        return meeting.days.map((day, j) => {
-          const sizeInfoDay = sizeInfo[day];
-          if (sizeInfoDay == null) return;
-          const sizeInfoPeriodDay = sizeInfoDay[sizeInfoKey];
-          if (sizeInfoPeriodDay == null) return;
-
-          return (
-            <MeetingDayBlock
-              color={color}
-              day={day}
-              period={period}
-              section={section}
-              meeting={meeting}
-              sizeInfo={sizeInfoPeriodDay}
-              includeDetailsPopover={includeDetailsPopover}
-              includeContent={includeContent}
-              isSelected={
-                selectedMeeting != null &&
-                selectedMeeting[0] === i &&
-                selectedMeeting[1] === day
+        return (
+          <MeetingDayBlock
+            color={color}
+            day={day}
+            period={period}
+            tempStart={tempStart}
+            contentHeader={contentHeader}
+            contentBody={contentBody}
+            popover={popover}
+            sizeInfo={sizeInfoPeriodDay}
+            includeDetailsPopover={includeDetailsPopover}
+            includeContent={includeContent}
+            isSelected={
+              selectedMeeting != null &&
+              selectedMeeting[0] === meetingIndex &&
+              selectedMeeting[1] === day
+            }
+            onSelect={(newIsSelected: boolean): void => {
+              if (onSelectMeeting == null) return;
+              if (newIsSelected) {
+                onSelectMeeting([meetingIndex, day]);
+              } else {
+                onSelectMeeting(null);
               }
-              onSelect={(newIsSelected: boolean): void => {
-                if (onSelectMeeting == null) return;
-                if (newIsSelected) {
-                  onSelectMeeting([i, day]);
-                } else {
-                  onSelectMeeting(null);
-                }
-              }}
-              key={`${day}-${sizeInfoKey}`}
-              deviceHasHover={deviceHasHover}
-              // Only the first day for a meeting can be tab focused
-              canBeTabFocused={canBeTabFocused && j === 0}
-            />
-          );
-        });
+            }}
+            key={`${day}-${sizeInfoKey}`}
+            deviceHasHover={deviceHasHover}
+            // Only the first day for a meeting can be tab focused
+            canBeTabFocused={canBeTabFocused && i === 0}
+            handleMouseDown={handleMouseDown}
+          />
+        );
       })}
     </div>
   );
@@ -132,8 +148,10 @@ type MeetingDayBlockProps = {
   color: string | undefined;
   day: string;
   period: Period;
-  section: Section;
-  meeting: Meeting;
+  tempStart?: number;
+  contentHeader: TimeBlockContent[];
+  contentBody: TimeBlockContent[];
+  popover: TimeBlockPopover[];
   sizeInfo: TimeBlockPosition;
   canBeTabFocused: boolean;
   includeDetailsPopover: boolean;
@@ -141,14 +159,20 @@ type MeetingDayBlockProps = {
   isSelected: boolean;
   onSelect: (newIsSelected: boolean) => void;
   deviceHasHover: boolean;
+  handleMouseDown?: (
+    e: React.MouseEvent,
+    ref: React.RefObject<HTMLDivElement>
+  ) => void;
 };
 
 function MeetingDayBlock({
   color,
   day,
   period,
-  section,
-  meeting,
+  tempStart,
+  contentHeader,
+  contentBody,
+  popover,
   sizeInfo,
   canBeTabFocused = false,
   includeDetailsPopover,
@@ -156,19 +180,21 @@ function MeetingDayBlock({
   isSelected,
   onSelect,
   deviceHasHover,
+  handleMouseDown,
 }: MeetingDayBlockProps): React.ReactElement {
   const tooltipId = useId();
   const contentClassName = getContentClassName(color);
   const outerRef = React.useRef<HTMLDivElement>(null);
+  const blockElementRef = React.useRef(null);
   const handleRootClose = (): void => {
     if (isSelected) onSelect(false);
   };
   useRootClose(outerRef, handleRootClose, {
     disabled: !isSelected,
   });
-
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
+
   return (
     <div ref={outerRef}>
       <BlockElement
@@ -176,16 +202,20 @@ function MeetingDayBlock({
           'meeting',
           contentClassName,
           'default',
-          day,
+          // day,
           isSelected && 'meeting--selected'
         )}
         style={{
-          top: `${((period.start - OPEN) / (CLOSE - OPEN)) * 100}%`,
-          height: `${((period.end - period.start) / (CLOSE - OPEN)) * 100}%`,
-          width: `${20 / sizeInfo.rowSize}%`,
+          top: `${
+            (((tempStart ?? period.start) - OPEN) / (CLOSE - OPEN)) * 100
+          }%`,
           left: `${
             DAYS.indexOf(day) * 20 + sizeInfo.rowIndex * (20 / sizeInfo.rowSize)
           }%`,
+          height: `${
+            (Math.max(15, period.end - period.start) / (CLOSE - OPEN)) * 100
+          }%`,
+          width: `${20 / sizeInfo.rowSize}%`,
           ...({
             '--meeting-color': color,
           } as React.CSSProperties),
@@ -212,18 +242,29 @@ function MeetingDayBlock({
             : undefined
         }
         tabIndex={canBeTabFocused ? 0 : -1}
+        ref={blockElementRef}
+        onMouseDown={(e): void => {
+          if (handleMouseDown) {
+            handleMouseDown(e, blockElementRef);
+          }
+        }}
       >
         {includeContent && (
           <div className="meeting-wrapper">
             <div className="ids">
-              <span className="course-id">{section.course.id}</span>
-              <span className="section-id">&nbsp;{section.id}</span>
+              {contentHeader.map((content) => {
+                return (
+                  <span className={content.className}>
+                    {content.content}&nbsp;
+                  </span>
+                );
+              })}
             </div>
-            <span className="period">{periodToString(period)}</span>
-            <span className="where">{abbreviateLocation(meeting.where)}</span>
-            <span className="instructors">
-              {meeting.instructors.join(', ')}
-            </span>
+            {contentBody.map((content) => {
+              return (
+                <span className={content.className}>{content.content}</span>
+              );
+            })}
           </div>
         )}
       </BlockElement>
@@ -258,14 +299,7 @@ function MeetingDayBlock({
           // "selected" styles stop applying while the tooltip is still open.
           events={deviceHasHover ? ['hover'] : []}
         >
-          <DetailsPopoverContent
-            title={section.course.title}
-            instructors={meeting.instructors}
-            location={meeting.where}
-            crn={section.crn}
-            credits={section.credits}
-            deliveryMode={section.deliveryMode ?? null}
-          />
+          <DetailsPopoverContent popover={popover} />
         </ReactTooltip>
       )}
     </div>
@@ -273,63 +307,25 @@ function MeetingDayBlock({
 }
 
 type DetailsPopoverContentProps = {
-  title: string;
-  instructors: string[];
-  location: string;
-  crn: string;
-  credits: number;
-  deliveryMode: string | null;
+  popover: TimeBlockPopover[];
 };
 
 function DetailsPopoverContent({
-  title,
-  instructors,
-  location,
-  crn,
-  credits,
-  deliveryMode,
+  popover,
 }: DetailsPopoverContentProps): React.ReactElement {
   return (
-    <table>
+    <table className="popover">
       <tbody>
-        <tr>
-          <td>
-            <b>Course Name</b>
-          </td>
-          <td>{title}</td>
-        </tr>
-        <tr>
-          <td>
-            <b>Instructors</b>
-          </td>
-          <td>{instructors.join(', ')}</td>
-        </tr>
-        <tr>
-          <td>
-            <b>Location</b>
-          </td>
-          <td>{location}</td>
-        </tr>
-        <tr>
-          <td>
-            <b>CRN</b>
-          </td>
-          <td>{crn}</td>
-        </tr>
-        <tr>
-          <td>
-            <b>Credit Hours</b>
-          </td>
-          <td>{credits}</td>
-        </tr>
-        {deliveryMode && (
-          <tr>
-            <td>
-              <b>Delivery Type</b>
-            </td>
-            <td>deliveryMode</td>
-          </tr>
-        )}
+        {popover.map((popoverInfo) => {
+          return popoverInfo.content ? (
+            <tr>
+              <td>
+                <b>{popoverInfo.name}</b>
+              </td>
+              <td>{popoverInfo.content}</td>
+            </tr>
+          ) : undefined;
+        })}
       </tbody>
     </table>
   );

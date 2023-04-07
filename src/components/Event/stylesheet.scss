@@ -1,0 +1,37 @@
+@import "../../variables";
+
+.Event {
+  @include card;
+  display: flex;
+  flex-direction: column;
+
+  .event-row {
+    padding: 4px;
+    display: flex;
+
+    > * {
+      font-size: .8em;
+      white-space: nowrap;
+
+      &:first-child {
+        flex: 1;
+        margin-right: 8px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .palette {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+  }
+}
+
+.mobile .Event {
+  width: calc(100vw - 16px);
+}

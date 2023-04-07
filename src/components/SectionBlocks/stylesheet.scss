@@ -1,0 +1,18 @@
+@import '../../variables';
+
+.mobile .TimeBlocks:not(.capture) .meeting .meeting-wrapper {
+  .ids {
+    .course-id {
+      flex: 1;
+    }
+
+    .section-id {
+      display: none;
+    }
+  }
+
+  .where,
+  .instructors {
+    display: none;
+  }
+}
