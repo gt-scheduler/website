@@ -182,6 +182,7 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
+                infoAction,
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
