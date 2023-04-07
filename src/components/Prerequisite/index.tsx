@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import {
-  faAngleUp,
-  faAngleDown,
-  faInfoCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
