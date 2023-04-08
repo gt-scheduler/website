@@ -80,24 +80,28 @@ export default function useRawScheduleDataFromFirebase(
         | AnyScheduleData
     ): void => {
       let nextScheduleData;
-      if (typeof next === 'function') {
-        let currentScheduleData;
-        if (scheduleData.type === 'exists') {
-          currentScheduleData = scheduleData.data;
+      setScheduleData((state: ScheduleDataState) => {
+        if (typeof next === 'function') {
+          let currentScheduleData;
+          if (state.type === 'exists') {
+            currentScheduleData = state.data;
+          } else {
+            currentScheduleData = null;
+          }
+          nextScheduleData = next(currentScheduleData);
         } else {
-          currentScheduleData = null;
+          nextScheduleData = next;
         }
-        nextScheduleData = next(currentScheduleData);
-      } else {
-        nextScheduleData = next;
-      }
-      if (nextScheduleData === null) return;
+        if (nextScheduleData === null) return state;
 
-      // Eagerly set the schedule data here as well.
-      // It would be okay to wait until Firebase updates the state for us,
-      // (which it will do, even before the network calls are made),
-      // but this allows a window where state can react based on stale state.
-      setScheduleData({ type: 'exists', data: nextScheduleData });
+        // Eagerly set the schedule data here as well.
+        // It would be okay to wait until Firebase updates the state for us,
+        // (which it will do, even before the network calls are made),
+        // but this allows a window where state can react based on stale state.
+        return { type: 'exists', data: nextScheduleData };
+      });
+
+      if (nextScheduleData === undefined) return;
 
       schedulesCollection
         .doc(account.id)
@@ -114,7 +118,7 @@ export default function useRawScheduleDataFromFirebase(
           );
         });
     },
-    [account.id, scheduleData]
+    [account.id]
   );
 
   // Perform a transaction if the type is non-existent,
