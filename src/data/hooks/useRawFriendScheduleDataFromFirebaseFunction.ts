@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosPromise } from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { Immutable } from 'immer';
 
@@ -101,16 +101,24 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const test = {
+          const requestData = JSON.stringify({
             IDToken: await auth.currentUser?.getIdToken(),
             friends: termFriendData,
             term: currentTerm,
-          };
-          const promise = axios.post<RawFriendScheduleData>(url, test, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
           });
+          /* eslint-disable max-len */
+          // This request should be made with content type is application/x-www-form-urlencoded.
+          // This is done to prevent a pre-flight CORS request made to the firebase function.
+          // Refer: https://github.com/gt-scheduler/website/pull/187#issuecomment-1496439246
+          /* eslint-enable max-len */
+          const promise = axios({
+            method: 'POST',
+            url,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            data: `data=${requestData}`,
+          }) as AxiosPromise<RawFriendScheduleData>;
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;
