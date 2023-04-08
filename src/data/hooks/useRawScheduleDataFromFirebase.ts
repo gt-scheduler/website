@@ -101,7 +101,7 @@ export default function useRawScheduleDataFromFirebase(
         return { type: 'exists', data: nextScheduleData };
       });
 
-      if (nextScheduleData === undefined) return;
+      if (nextScheduleData === undefined || nextScheduleData === null) return;
 
       schedulesCollection
         .doc(account.id)
