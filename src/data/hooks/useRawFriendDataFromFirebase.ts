@@ -79,25 +79,28 @@ export default function useRawFriendDataFromFirebase(
       next: ((current: FriendData | null) => FriendData | null) | FriendData
     ): void => {
       let nextFriendData;
-      if (typeof next === 'function') {
-        let currentFriendData;
-        if (friendData.type === 'exists') {
-          currentFriendData = friendData.data;
+      setFriendData((state: FriendDataState) => {
+        if (typeof next === 'function') {
+          let currentFriendData;
+          if (state.type === 'exists') {
+            currentFriendData = state.data;
+          } else {
+            currentFriendData = null;
+          }
+          nextFriendData = next(currentFriendData);
         } else {
-          currentFriendData = null;
+          nextFriendData = next;
         }
-        nextFriendData = next(currentFriendData);
-      } else {
-        nextFriendData = next;
-      }
-      if (nextFriendData === null) return;
+        if (nextFriendData === null) return state;
 
-      // Eagerly set the friend data here as well.
-      // It would be okay to wait until Firebase updates the state for us,
-      // (which it will do, even before the network calls are made),
-      // but this allows a window where state can react based on stale state.
-      setFriendData({ type: 'exists', data: nextFriendData });
+        // Eagerly set the friend data here as well.
+        // It would be okay to wait until Firebase updates the state for us,
+        // (which it will do, even before the network calls are made),
+        // but this allows a window where state can react based on stale state.
+        return { type: 'exists', data: nextFriendData };
+      });
 
+      if (nextFriendData === undefined) return;
       friendsCollection
         .doc(account.id)
         .set(nextFriendData)
@@ -113,7 +116,7 @@ export default function useRawFriendDataFromFirebase(
           );
         });
     },
-    [account.id, friendData]
+    [account.id]
   );
 
   // Perform a transaction if the type is non-existent,

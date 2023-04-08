@@ -1,5 +1,5 @@
 import axios, { AxiosPromise } from 'axios';
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Immutable } from 'immer';
 
 import { auth } from '../firebase';
@@ -13,6 +13,7 @@ import {
 import Cancellable from '../../utils/cancellable';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import { FriendIds, RawFriendScheduleData } from '../types';
+import useDeepCompareEffect from '../../hooks/useDeepCompareEffect';
 
 interface HookResult {
   friendScheduleData: RawFriendScheduleData;
@@ -49,7 +50,7 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
   const loadedFriendScheduleRef = useRef<HookResult | null>(null);
 
   // Fetch the current term's friend schedules information
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     if (Object.keys(termFriendData).length === 0) {
       const res = {
         friendScheduleData: {},
