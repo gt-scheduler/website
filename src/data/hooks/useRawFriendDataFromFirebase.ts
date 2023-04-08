@@ -100,7 +100,7 @@ export default function useRawFriendDataFromFirebase(
         return { type: 'exists', data: nextFriendData };
       });
 
-      if (nextFriendData === undefined) return;
+      if (nextFriendData === undefined || nextFriendData === null) return;
       friendsCollection
         .doc(account.id)
         .set(nextFriendData)
