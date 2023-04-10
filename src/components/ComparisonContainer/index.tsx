@@ -48,17 +48,14 @@ export type EditInfo = {
 } | null;
 
 export default function ComparisonContainer(): React.ReactElement {
-  const [compare, setCompare] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
-  const [tooltipY, setTooltipY] = useState(0);
-  const [hover, setHover] = useState(false);
 
   const [
-    { allVersionNames, colorMap },
+    { allVersionNames, currentVersion, colorMap },
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -174,23 +171,12 @@ export default function ComparisonContainer(): React.ReactElement {
   return (
     <div className="comparison-container">
       <div className="comparison-body">
-        <div className="comparison-header">
-          <p className="header-title">Compare Schedules</p>
-          <p className="header-text">{compare ? 'On' : 'Off'}</p>
-          <label className="switch" htmlFor="comparison-checkbox">
-            <input
-              type="checkbox"
-              id="comparison-checkbox"
-              onClick={(): void => setCompare(!compare)}
-            />
-            <div className="slider round" />
-          </label>
-        </div>
-        {compare && (
-          <div className="comparison-content">
-            <div className="my-schedules">
-              <p className="content-title">My Schedules</p>
-              {allVersionNames.map((version) => {
+        <div className="comparison-content">
+          <div className="my-schedule">
+            <p className="content-title">My Schedule</p>
+            {allVersionNames
+              .filter((version) => version.id === currentVersion)
+              .map((version) => {
                 return (
                   <ScheduleRow
                     key={version.id}
@@ -234,129 +220,96 @@ export default function ComparisonContainer(): React.ReactElement {
                   />
                 );
               })}
-            </div>
-            <div className="shared-schedules">
-              <p className="content-title">Shared with me</p>
-              {Object.entries(friends).map((friend) => {
-                return (
-                  <div key={friend[0]} className="friend">
-                    <ScheduleRow
-                      // change id later on
-                      id={friend[0]}
-                      type="User"
-                      hasCheck={false}
-                      email={friend[1].email}
-                      name={friend[1].name}
-                      handleEditSchedule={(): void => {
-                        setEditInfo({
-                          id: friend[0],
-                          type: 'User',
-                        });
-                        setEditValue(friend[1].name);
-                      }}
-                      handleRemoveSchedule={(): void => {
-                        setDeleteConfirm({
-                          id: friend[0],
-                          type: 'User',
-                          name: friend[1].name,
-                        });
-                      }}
-                      hasTooltip
-                      editOnChange={(
-                        e: React.ChangeEvent<HTMLInputElement>
-                      ): void => setEditValue(e.target.value)}
-                      editOnKeyDown={handleEdit}
-                      editInfo={editInfo}
-                      setEditInfo={setEditInfo}
-                      editValue={editValue}
-                    />
-                    {Object.entries(friend[1].versions).map((schedule) => {
-                      return (
-                        <ScheduleRow
-                          key={schedule[0]}
-                          id={schedule[0]}
-                          type="Schedule"
-                          owner={friend[0]}
-                          onClick={(): void =>
-                            handleToggleSchedule(schedule[0])
-                          }
-                          checkboxColor={
-                            selected.includes(schedule[0])
-                              ? colorMap[schedule[0]]
-                              : ''
-                          }
-                          name={schedule[1].name}
-                          handleEditSchedule={(): void => {
-                            setEditInfo({
-                              id: schedule[0],
-                              owner: friend[0],
-                              type: 'Schedule',
-                            });
-                            setEditValue(schedule[1].name);
-                          }}
-                          handleRemoveSchedule={(): void => {
-                            setDeleteConfirm({
-                              id: schedule[0],
-                              type: 'Schedule',
-                              name: schedule[1].name,
-                              owner: friend[0],
-                              ownerName: friend[1].name,
-                            });
-                          }}
-                          hasPalette
-                          hasEdit={false}
-                          setFriendScheduleColor={(color: string): void => {
-                            setFriendScheduleColor(color, schedule[0]);
-                          }}
-                          color={colorMap[schedule[0]]}
-                          paletteInfo={paletteInfo}
-                          setPaletteInfo={setPaletteInfo}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-            <ComparisonModal
-              deleteConfirm={deleteConfirm}
-              setDeleteConfirm={setDeleteConfirm}
-              deleteVersion={deleteVersion}
-              handleRemoveFriend={handleRemoveFriend}
-              handleRemoveSchedule={handleRemoveSchedule}
-            />
           </div>
-        )}
-        <div
-          className={classes('comparison-overlay', 'left', compare && 'open')}
-          id="comparison-overlay-left"
-          onMouseEnter={(e: React.MouseEvent): void => {
-            setHover(true);
-            setTooltipY(e.clientY);
-          }}
-        />
-        <ReactTooltip
-          key={tooltipY}
-          className="overlay-tooltip"
-          variant="dark"
-          anchorId="comparison-overlay-left"
-          isOpen={hover}
-          setIsOpen={setHover}
-          delayShow={40}
-          delayHide={100}
-          offset={70 - tooltipY}
-          // key={deviceHasHover ? 0 : 1}
-          // events={deviceHasHover ? ['hover'] : []}
-        >
-          <p>
-            Turn off Compare Schedule
-            <br />
-            to access courses and events
-          </p>
-        </ReactTooltip>
-        {/* <div
-          className={classes('comparison-overlay', 'right', !compare && 'open')}
-        /> */}
+          <div className="shared-schedules">
+            <p className="content-title">Shared with me</p>
+            {Object.entries(friends).map((friend) => {
+              return (
+                <div key={friend[0]} className="friend">
+                  <ScheduleRow
+                    // change id later on
+                    id={friend[0]}
+                    type="User"
+                    hasCheck={false}
+                    email={friend[1].email}
+                    name={friend[1].name}
+                    handleEditSchedule={(): void => {
+                      setEditInfo({
+                        id: friend[0],
+                        type: 'User',
+                      });
+                      setEditValue(friend[1].name);
+                    }}
+                    handleRemoveSchedule={(): void => {
+                      setDeleteConfirm({
+                        id: friend[0],
+                        type: 'User',
+                        name: friend[1].name,
+                      });
+                    }}
+                    hasTooltip
+                    editOnChange={(
+                      e: React.ChangeEvent<HTMLInputElement>
+                    ): void => setEditValue(e.target.value)}
+                    editOnKeyDown={handleEdit}
+                    editInfo={editInfo}
+                    setEditInfo={setEditInfo}
+                    editValue={editValue}
+                  />
+                  {Object.entries(friend[1].versions).map((schedule) => {
+                    return (
+                      <ScheduleRow
+                        key={schedule[0]}
+                        id={schedule[0]}
+                        type="Schedule"
+                        owner={friend[0]}
+                        onClick={(): void => handleToggleSchedule(schedule[0])}
+                        checkboxColor={
+                          selected.includes(schedule[0])
+                            ? colorMap[schedule[0]]
+                            : ''
+                        }
+                        name={schedule[1].name}
+                        handleEditSchedule={(): void => {
+                          setEditInfo({
+                            id: schedule[0],
+                            owner: friend[0],
+                            type: 'Schedule',
+                          });
+                          setEditValue(schedule[1].name);
+                        }}
+                        handleRemoveSchedule={(): void => {
+                          setDeleteConfirm({
+                            id: schedule[0],
+                            type: 'Schedule',
+                            name: schedule[1].name,
+                            owner: friend[0],
+                            ownerName: friend[1].name,
+                          });
+                        }}
+                        hasPalette
+                        hasEdit={false}
+                        setFriendScheduleColor={(color: string): void => {
+                          setFriendScheduleColor(color, schedule[0]);
+                        }}
+                        color={colorMap[schedule[0]]}
+                        paletteInfo={paletteInfo}
+                        setPaletteInfo={setPaletteInfo}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <ComparisonModal
+            deleteConfirm={deleteConfirm}
+            setDeleteConfirm={setDeleteConfirm}
+            deleteVersion={deleteVersion}
+            handleRemoveFriend={handleRemoveFriend}
+            handleRemoveSchedule={handleRemoveSchedule}
+          />
+        </div>
       </div>
     </div>
   );

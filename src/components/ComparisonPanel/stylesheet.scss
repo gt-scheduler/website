@@ -70,13 +70,116 @@
     width: 256px;
     transition: width 0.15s;
 
+    .comparison-header {
+      display: flex;
+      align-items: center;
+      margin: 11px 12px 7px 12px;
+
+      p {
+        margin: 0px;
+        overflow: hidden;
+
+        &.header-title{
+          flex: 1;
+          font-size: 16px;
+        }
+
+        &.header-text{
+          font-size: 12px;
+          margin-right: 4px;
+        }
+      }
+
+      .switch {
+        display: inline-block;
+        height: 19px;
+        position: relative;
+        width: 43px;
+      }
+      
+      .switch input {
+        display: none;
+      }
+      
+      .slider {
+        background-color: #505050;
+        bottom: 0;
+        cursor: pointer;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transition: .4s;
+        border-radius: 19px;
+      }
+      
+      .slider:before {
+        background-color: #ffffff;
+        bottom: 2px;
+        content: "";
+        height: 15px;
+        left: 2px;
+        position: absolute;
+        transition: .4s;
+        width: 15px;
+        border-radius: 50%;
+      }
+      
+      input.checked + .slider {
+        background-color: #589BD5;
+      }
+      
+      input.checked + .slider:before {
+        transform: translateX(24px);
+      }
+    }
+
+    .comparison-overlay {
+      background-color: var(--theme-bg);
+  
+      pointer-events: none;
+      opacity: 0;
+      transition-duration: 0.15s, $theme-switch-transition-duration, $theme-switch-transition-duration;
+      transition-property: opacity, color, background-color;
+
+      &.left {
+        position: fixed;
+        top: 64px;
+        left: 0px;
+        width: 320px;
+        bottom: 41px;
+      }
+
+      &.right {
+        position: absolute;
+        top: 100px;
+        width: 256px;
+        height: 360px;
+      }
+  
+      &.open {
+        pointer-events: all;
+        opacity: 0.4;
+      }
+    }
+
+    .overlay-tooltip {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 4px;
+      font-size: 12px;
+      text-align: center;
+      p {
+        margin: 0px;
+      }
+    }
+
     &.closed {
       width: 0px;
     }
 
     .comparison-container {
-      max-height: 400px;
-      border-bottom: 1px solid $color-border;
+      max-height: calc(100% - 37px);
+      // border-bottom: 1px solid $color-border;
     }
 
     .combination {
