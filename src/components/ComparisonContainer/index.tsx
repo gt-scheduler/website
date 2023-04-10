@@ -175,7 +175,7 @@ export default function ComparisonContainer({
         handleCompareSchedules(undefined, selected.concat([id]), undefined);
       }
     },
-    [selected]
+    [selected, handleCompareSchedules]
   );
 
   const setFriendScheduleColor = useCallback(

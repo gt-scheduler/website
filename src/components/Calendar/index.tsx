@@ -48,7 +48,7 @@ export default function Calendar({
   pinSelf = true,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, currentVersion, colorMap }] =
+  const [{ pinnedCrns, oscar, events, currentVersion }] =
     useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);

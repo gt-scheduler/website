@@ -46,7 +46,7 @@ export default function ComparisonPanel({
     } else {
       setSignedInModal(true);
     }
-  }, [type, compare]);
+  }, [type, compare, handleCompareSchedules]);
 
   return (
     <div className="comparison-panel">
