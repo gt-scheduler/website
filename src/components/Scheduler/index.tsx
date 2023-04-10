@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -16,9 +16,6 @@ import useScreenWidth from '../../hooks/useScreenWidth';
  * Wraps around the root top-level component of the Scheduler tab
  */
 export default function Scheduler(): React.ReactElement {
-  // Testing compare panel
-  const compare = false;
-
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   // Store the current set of CRNs that are shown on the Calendar overlay
@@ -31,6 +28,29 @@ export default function Scheduler(): React.ReactElement {
   const overlayContextValue = useMemo<OverlayCrnsContextValue>(
     () => [overlayCrns, setOverlayCrns],
     [overlayCrns, setOverlayCrns]
+  );
+
+  const [compare, setCompare] = useState(false);
+  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
+  const [pinSelf, setPinSelf] = useState(false);
+
+  const handleCompareSchedules = useCallback(
+    (
+      newCompare?: boolean,
+      newPinnedSchedules?: string[],
+      newPinSelf?: boolean
+    ) => {
+      if (newCompare !== undefined) {
+        setCompare(newCompare);
+      }
+      if (newPinnedSchedules !== undefined) {
+        setPinnedSchedules(newPinnedSchedules);
+      }
+      if (newPinSelf !== undefined) {
+        setPinSelf(newPinSelf);
+      }
+    },
+    []
   );
 
   return (
@@ -58,10 +78,18 @@ export default function Scheduler(): React.ReactElement {
                 className="calendar"
                 overlayCrns={overlayCrns}
                 compare={compare}
+                pinnedFriendSchedules={pinnedSchedules}
+                pinSelf={!compare || pinSelf}
               />
             </div>
           )}
-          {(!mobile || tabIndex === 3) && <ComparisonPanel />}
+          {(!mobile || tabIndex === 3) && (
+            <ComparisonPanel
+              handleCompareSchedules={handleCompareSchedules}
+              pinnedSchedules={pinnedSchedules}
+              pinSelf={pinSelf}
+            />
+          )}
         </div>
       </OverlayCrnsContext.Provider>
     </>

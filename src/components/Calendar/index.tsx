@@ -18,6 +18,8 @@ export type CalendarProps = {
   preview?: boolean;
   capture?: boolean;
   compare?: boolean;
+  pinnedFriendSchedules?: string[];
+  pinSelf?: boolean;
   isAutosized?: boolean;
 };
 
@@ -42,21 +44,14 @@ export default function Calendar({
   preview = false,
   capture = false,
   compare = false,
+  pinnedFriendSchedules = [],
+  pinSelf = true,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, currentVersion }] =
+  const [{ pinnedCrns, oscar, events, currentVersion, colorMap }] =
     useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
-
-  // Test pinned schedules
-  const pinnedFriendSchedules = [
-    'sv_dQBXHJ9aSAJJsxzHHtJH',
-    'sv_tguQqWIfpNIn4PCqZjFx',
-    'sv_mPkP5h4TVn1TQsdJJ0Bc',
-    'sv_ws5IuoDiUUpXM83Zli4c',
-    'sv_0iQZLfoNTVEOtfLVGUHf',
-  ];
 
   const friendSchedules: FriendCrnData[] = Object.values(friends).flatMap(
     (friend) =>
@@ -121,7 +116,9 @@ export default function Calendar({
       });
   };
 
-  const crns = Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]));
+  const crns = pinSelf
+    ? Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]))
+    : [];
 
   // Find section using crn and convert the meetings into
   // an array of CommonMeetingObject

@@ -8,7 +8,21 @@ import Modal from '../Modal';
 
 import './stylesheet.scss';
 
-export default function ComparisonPanel(): React.ReactElement {
+export type ComparisonPanelProps = {
+  handleCompareSchedules: (
+    compare?: boolean,
+    pinnedSchedules?: string[],
+    pinSelf?: boolean
+  ) => void;
+  pinnedSchedules: string[];
+  pinSelf: boolean;
+};
+
+export default function ComparisonPanel({
+  handleCompareSchedules,
+  pinnedSchedules,
+  pinSelf,
+}: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
   const [tooltipY, setTooltipY] = useState(0);
@@ -28,6 +42,7 @@ export default function ComparisonPanel(): React.ReactElement {
   const handleTogglePanel = useCallback(() => {
     if (type === 'signedIn') {
       setCompare(!compare);
+      handleCompareSchedules(!compare, undefined, undefined);
     } else {
       setSignedInModal(true);
     }
@@ -83,7 +98,11 @@ export default function ComparisonPanel(): React.ReactElement {
           </label>
         </div>
         {compare ? (
-          <ComparisonContainer />
+          <ComparisonContainer
+            handleCompareSchedules={handleCompareSchedules}
+            pinnedSchedules={pinnedSchedules}
+            pinSelf={pinSelf}
+          />
         ) : (
           <div className="combination">
             <CombinationContainer />

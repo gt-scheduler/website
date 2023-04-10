@@ -47,12 +47,27 @@ export type EditInfo = {
   type: string;
 } | null;
 
-export default function ComparisonContainer(): React.ReactElement {
-  const [selected, setSelected] = useState<string[]>([]);
+export type ComparisonContainerProps = {
+  handleCompareSchedules: (
+    compare?: boolean,
+    pinnedSchedules?: string[],
+    pinSelf?: boolean
+  ) => void;
+  pinnedSchedules: string[];
+  pinSelf: boolean;
+};
+
+export default function ComparisonContainer({
+  handleCompareSchedules,
+  pinnedSchedules,
+  pinSelf,
+}: ComparisonContainerProps): React.ReactElement {
+  const [selected, setSelected] = useState<string[]>(pinnedSchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
+  const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
 
   const [
     { allVersionNames, currentVersion, colorMap },
@@ -64,11 +79,9 @@ export default function ComparisonContainer(): React.ReactElement {
 
   useEffect(() => {
     const newColorMap = { ...colorMap };
-    allVersionNames.forEach((version) => {
-      if (!(version.id in newColorMap)) {
-        newColorMap[version.id] = getRandomColor();
-      }
-    });
+    if (!(currentVersion in newColorMap)) {
+      newColorMap[currentVersion] = getRandomColor();
+    }
     Object.entries(friends).forEach((friend) => {
       if (!(friend[0] in newColorMap)) {
         newColorMap[friend[0]] = getRandomColor();
@@ -82,7 +95,7 @@ export default function ComparisonContainer(): React.ReactElement {
     if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
       patchSchedule({ colorMap: newColorMap });
     }
-  }, [friends, allVersionNames, colorMap, patchSchedule]);
+  }, [friends, currentVersion, colorMap, patchSchedule]);
 
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -152,8 +165,14 @@ export default function ComparisonContainer(): React.ReactElement {
     (id: string) => {
       if (selected.includes(id)) {
         setSelected(selected.filter((selectedId: string) => selectedId !== id));
+        handleCompareSchedules(
+          undefined,
+          selected.filter((selectedId: string) => selectedId !== id),
+          undefined
+        );
       } else {
         setSelected(selected.concat([id]));
+        handleCompareSchedules(undefined, selected.concat([id]), undefined);
       }
     },
     [selected]
@@ -182,10 +201,15 @@ export default function ComparisonContainer(): React.ReactElement {
                     key={version.id}
                     id={version.id}
                     type="Version"
-                    onClick={(): void => handleToggleSchedule(version.id)}
-                    checkboxColor={
-                      selected.includes(version.id) ? colorMap[version.id] : ''
-                    }
+                    onClick={(): void => {
+                      setScheduleSelected(!scheduleSelected);
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        !scheduleSelected
+                      );
+                    }}
+                    checkboxColor={scheduleSelected ? colorMap[version.id] : ''}
                     name={version.name}
                     // placeholder functions
                     handleEditSchedule={(): void => {
