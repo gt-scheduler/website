@@ -27,7 +27,7 @@ export default function InviteBackLink(): React.ReactElement {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (id) {
+    if (id && navigate) {
       handleInvite(id)
         .then(() => {
           setTimeout(() => {
