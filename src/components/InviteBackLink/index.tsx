@@ -20,31 +20,34 @@ const handleInvite = async (inviteId: string | undefined): Promise<void> =>
     }
   );
 
+const LOADING = 0;
+const SUCCESS = 1;
+const ERROR = 2;
+
 export default function InviteBackLink(): React.ReactElement {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(true);
+  const [state, setState] = useState(LOADING);
 
   useEffect(() => {
     if (id && navigate) {
       handleInvite(id)
         .then(() => {
+          setState(SUCCESS);
           setTimeout(() => {
             navigate('/');
           }, 5000);
         })
         .catch(() => {
-          setSuccess(false);
+          setState(ERROR);
           setTimeout(() => {
             navigate('/');
           }, 10000);
-        })
-        .finally(() => setLoading(false));
+        });
     }
   }, [id, navigate]);
 
-  if (loading) {
+  if (state === LOADING) {
     return (
       <div className="Loading">
         <Spinner size="normal" style={{ opacity: 0.6 }} />
@@ -56,7 +59,7 @@ export default function InviteBackLink(): React.ReactElement {
 
   return (
     <div className="EmailInviteConfirmation">
-      {success ? (
+      {state === SUCCESS ? (
         <h1>Congratulations on Adding a New Schedule to your View!</h1>
       ) : (
         <h1>We&apos;ve Encountered an Error, Please Try Again</h1>
