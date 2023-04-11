@@ -24,7 +24,7 @@ export default function InviteBackLink(): React.ReactElement {
   const navigate = useNavigate();
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(true);
 
   useEffect(() => {
     if (id && navigate) {
