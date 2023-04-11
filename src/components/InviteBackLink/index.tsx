@@ -7,6 +7,13 @@ import Spinner from '../Spinner';
 
 import './stylesheet.scss';
 
+// eslint-disable-next-line no-shadow
+enum LoadingState {
+  LOADING,
+  SUCCESS,
+  ERROR,
+}
+
 const handleInvite = async (inviteId: string | undefined): Promise<void> =>
   // The link should be changed to prod link, or we can choose the link based
   // on environment
@@ -20,26 +27,22 @@ const handleInvite = async (inviteId: string | undefined): Promise<void> =>
     }
   );
 
-const LOADING = 0;
-const SUCCESS = 1;
-const ERROR = 2;
-
 export default function InviteBackLink(): React.ReactElement {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [state, setState] = useState(LOADING);
+  const [state, setState] = useState(LoadingState.LOADING);
 
   useEffect(() => {
     if (id && navigate) {
       handleInvite(id)
         .then(() => {
-          setState(SUCCESS);
+          setState(LoadingState.SUCCESS);
           setTimeout(() => {
             navigate('/');
           }, 5000);
         })
         .catch(() => {
-          setState(ERROR);
+          setState(LoadingState.ERROR);
           setTimeout(() => {
             navigate('/');
           }, 10000);
@@ -47,7 +50,7 @@ export default function InviteBackLink(): React.ReactElement {
     }
   }, [id, navigate]);
 
-  if (state === LOADING) {
+  if (state === LoadingState.LOADING) {
     return (
       <div className="Loading">
         <Spinner size="normal" style={{ opacity: 0.6 }} />
@@ -59,7 +62,7 @@ export default function InviteBackLink(): React.ReactElement {
 
   return (
     <div className="EmailInviteConfirmation">
-      {state === SUCCESS ? (
+      {state === LoadingState.SUCCESS ? (
         <h1>Congratulations on Adding a New Schedule to your View!</h1>
       ) : (
         <h1>We&apos;ve Encountered an Error, Please Try Again</h1>
