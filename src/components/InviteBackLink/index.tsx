@@ -80,7 +80,12 @@ export default function InviteBackLink(): React.ReactElement {
       </button>
 
       <a className="footer" href="https://bitsofgood.org/">
-        <img alt="Bits of Good Logo" src="/bitsOfGood.png" />
+        <img
+          alt="Bits of Good Logo"
+          height={44}
+          width={243}
+          src="/bitsOfGood.svg"
+        />
       </a>
     </div>
   );
