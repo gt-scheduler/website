@@ -417,10 +417,10 @@ function ScheduleRow({
             style={{ backgroundColor: checkboxColor }}
           />
         )}
-        {hasEdit && setEditInfo && editValue && edit && (
+        {setEditInfo && edit && (
           <AutoFocusInput
             className={classes('edit-input', hasCheck && 'check')}
-            value={editValue}
+            value={editValue ?? ''}
             onChange={editOnChange}
             placeholder={name}
             onKeyDown={editOnKeyDown}
