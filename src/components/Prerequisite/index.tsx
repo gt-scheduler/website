@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
-import { faAngleUp, faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import React, { useContext, useState } from 'react';
+import {
+  faAngleUp,
+  faAngleDown,
+  faInfoCircle,
+} from '@fortawesome/free-solid-svg-icons';
 
+import { ScheduleContext } from '../../contexts';
 import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
 import { Course } from '../../data/beans';
@@ -83,12 +88,22 @@ export default function Prerequisite({
     }
   }
 
+  const [{ term }] = useContext(ScheduleContext);
+
   return (
     <div className={classes('hover-container', 'nested')}>
       <ActionRow
         className={classes('hover-container')}
         label="Prerequisites"
-        actions={[]}
+        actions={[
+          {
+            icon: faInfoCircle,
+            href:
+              `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
+              `course_detail?cat_term_in=${term}&subj_code_in=` +
+              `${course.subject}&crse_numb_in=${course.number}`,
+          },
+        ]}
       />
       <div className={classes('nested')}>{content}</div>
     </div>
