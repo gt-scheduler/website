@@ -4,7 +4,6 @@ import { useCallback } from 'react';
 import { softError, ErrorWithFields } from '../../log';
 import {
   defaultSchedule,
-  FriendShareData,
   generateScheduleVersionId,
   TermScheduleData,
 } from '../types';

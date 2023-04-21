@@ -1,5 +1,4 @@
 import React, {
-  ChangeEvent,
   KeyboardEvent,
   useCallback,
   useContext,
@@ -9,7 +8,6 @@ import React, {
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { faCircle, faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { castDraft } from 'immer';
 import axios, { AxiosError } from 'axios';
 
 import { ApiErrorResponse } from '../../data/types';
@@ -18,6 +16,7 @@ import { classes } from '../../utils/misc';
 import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -33,43 +32,24 @@ export function InvitationModalContent(): React.ReactElement {
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
 
-  const handleChangeSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeSearch = useCallback(() => {
     setValidMessage('');
     setValidClassName('');
   }, []);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    switch (e.key) {
-      case 'Enter':
-        verifyEmail();
-        break;
-      default:
-        return;
-    }
-    e.preventDefault();
-  }, []);
-
-  const sendInvitation = async (): Promise<void> => {
+  const sendInvitation = useCallback(async (): Promise<void> => {
     const IdToken = await (accountContext as SignedIn).getToken();
-    return axios.post(
-      'http://127.0.0.1:5001/gt-scheduler-web-dev/us-central1/createFriendInvitation',
-      {
-        term,
-        friendEmail: input.current?.value,
-        IDToken: IdToken,
-        version: currentVersion,
-      }
-    );
-  };
+    return axios.post(`${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`, {
+      term,
+      friendEmail: input.current?.value,
+      IDToken: IdToken,
+      version: currentVersion,
+    });
+  }, [accountContext, currentVersion, term]);
 
   // verify email with a regex and send invitation if valid
-  const verifyEmail = (): void => {
-    console.log(input.current?.value);
-    if (
-      // eslint-disable-next-line
-      input.current &&
-      /^\S+@\S+\.\S+$/.test(input.current.value)
-    ) {
+  const verifyEmail = useCallback((): void => {
+    if (input.current && /^\S+@\S+\.\S+$/.test(input.current.value)) {
       sendInvitation()
         .then(() => {
           setValidMessage('Successfully sent!');
@@ -79,7 +59,6 @@ export function InvitationModalContent(): React.ReactElement {
           }
         })
         .catch((err) => {
-          console.log(err);
           setValidClassName('invalid-email');
           const error = err as AxiosError;
           if (error.response) {
@@ -93,7 +72,21 @@ export function InvitationModalContent(): React.ReactElement {
       setValidMessage('Invalid Email');
       setValidClassName('invalid-email');
     }
-  };
+  }, [sendInvitation]);
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      switch (e.key) {
+        case 'Enter':
+          verifyEmail();
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+    },
+    [verifyEmail]
+  );
 
   // delete friend from record of friends
   const handleDelete = (friendId: string): void => {
