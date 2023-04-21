@@ -177,6 +177,7 @@ export default function useVersionActions({
         }
         draft.versions[newId] = {
           name: newName,
+          friends: {},
           schedule: castDraft(existingDraft.schedule),
           createdAt: new Date().toISOString(),
         };
