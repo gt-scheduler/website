@@ -59,7 +59,7 @@ export default function SectionBlocks({
 
         return (
           <TimeBlocks
-            key={`${section.course.id}-${section.id}-${i}`}
+            key={`${section.course.id}-${period.start}`}
             className={className}
             id={section.course.id}
             meetingIndex={i}
