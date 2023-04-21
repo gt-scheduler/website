@@ -155,7 +155,7 @@ export default function useVersionActions({
 
   const cloneVersion = useCallback(
     (id: string, newName: string): void => {
-      const newId = addNewVersion(newName, false);
+      const newId = generateScheduleVersionId();
       updateTermScheduleData((draft) => {
         const existingDraft = draft.versions[id];
         if (existingDraft === undefined) {
@@ -175,13 +175,15 @@ export default function useVersionActions({
           );
           return;
         }
-        const newDraft = draft.versions[newId];
-        if (newDraft !== undefined) {
-          newDraft.schedule = castDraft(existingDraft.schedule);
-        }
+        draft.versions[newId] = {
+          name: newName,
+          schedule: castDraft(existingDraft.schedule),
+          createdAt: new Date().toISOString(),
+        };
+        setVersion(newId);
       });
     },
-    [updateTermScheduleData, addNewVersion]
+    [updateTermScheduleData, setVersion]
   );
 
   const deleteFriendRecord = useCallback(

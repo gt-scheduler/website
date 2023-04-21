@@ -39,7 +39,7 @@ export default function CourseContainer(): React.ReactElement {
       )}
       <Button
         className="updated-at"
-        href="https://github.com/gt-scheduler/crawler"
+        href="https://github.com/gt-scheduler/crawler-v2"
       >
         Course data fetched {ago(oscar.updatedAt)}
       </Button>

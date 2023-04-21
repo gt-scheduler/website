@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { decode } from 'html-entities';
 
 import { Oscar, Section } from '.';
 import {
@@ -85,7 +86,7 @@ export default class Course {
     this.subject = subject;
     this.number = number;
 
-    this.title = title;
+    this.title = decode(title);
     this.sections = Object.entries(sections).flatMap<Section>(
       ([sectionId, sectionData]) => {
         if (sectionData == null) return [];
@@ -138,8 +139,10 @@ export default class Course {
         );
         // if no matching section id letters found, match by profs
         if (!lecture.associatedLabs.length) {
-          lecture.associatedLabs = onlyLabs.filter((lab) =>
-            matchLabFromInstructors(lab, lecture)
+          lecture.associatedLabs = onlyLabs.filter(
+            (lab) =>
+              matchLabFromInstructors(lab, lecture) &&
+              !hasConflictBetween(lab, lecture)
           );
         }
       }
@@ -148,8 +151,10 @@ export default class Course {
           matchLabFromId(lab, lecture)
         );
         if (!lab.associatedLectures.length) {
-          lab.associatedLectures = onlyLectures.filter((lecture) =>
-            matchLabFromInstructors(lab, lecture)
+          lab.associatedLectures = onlyLectures.filter(
+            (lecture) =>
+              matchLabFromInstructors(lab, lecture) &&
+              !hasConflictBetween(lecture, lab)
           );
         }
       }
@@ -368,7 +373,7 @@ export default class Course {
         }
 
         // Normalize the instructor name from "LN, FN" to "FN LN"
-        let instructorName = rawInstructorName;
+        let instructorName = decode(rawInstructorName);
         const nameSegments = instructorName.split(', ');
         if (nameSegments.length === 2) {
           const [lastName, firstName] = nameSegments as [string, string];

@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
-import ReactMapGL, { Marker, NavigationControl } from 'react-map-gl';
-import { ViewState } from 'react-map-gl/src/mapbox/mapbox';
+import ReactMapGL, { Marker, NavigationControl, ViewState } from 'react-map-gl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin } from '@fortawesome/free-solid-svg-icons';
 
