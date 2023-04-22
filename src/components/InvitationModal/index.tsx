@@ -17,6 +17,7 @@ import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
 
@@ -89,8 +90,31 @@ export function InvitationModalContent(): React.ReactElement {
   );
 
   // delete friend from record of friends
-  const handleDelete = (friendId: string): void => {
+  const handleDelete = async (friendId: string): Promise<void> => {
     deleteFriendRecord(currentVersion, friendId);
+    axios
+      .delete(`${CLOUD_FUNCTION_BASE_URL}/deleteFriendInvitation`, {
+        data: JSON.stringify({
+          IDToken: await (accountContext as SignedIn).getToken(),
+          friendId,
+          term,
+          version: currentVersion,
+        }),
+      })
+      .catch((err) => {
+        softError(
+          new ErrorWithFields({
+            message: 'delete friend record failed',
+            source: err,
+            fields: {
+              user: (accountContext as SignedIn).id,
+              friend: friendId,
+              term,
+              version: currentVersion,
+            },
+          })
+        );
+      });
   };
 
   return (
@@ -143,8 +167,10 @@ export function InvitationModalContent(): React.ReactElement {
                 {currentFriends[friend]?.email}
                 <Button
                   className="button-remove"
-                  onClick={(): void => {
-                    handleDelete(friend);
+                  // eslint-disable-next-line max-len
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  onClick={async (): Promise<void> => {
+                    await handleDelete(friend);
                   }}
                 >
                   <FontAwesomeIcon className="circle" icon={faCircle} />
