@@ -28,6 +28,21 @@
         }
       }
 
+      .no-shared-schedules {
+        margin: 8px 12px;
+
+        p {
+          font-size: 13px;
+          font-weight: 400;
+          font-style: italic;
+          white-space: pre-wrap;
+        }
+
+        & > p {
+          margin: 0px 0px 6px;
+        }
+      }
+
       .schedule-row {
         .checkbox-container {
           display: flex;

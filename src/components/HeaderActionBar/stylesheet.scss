@@ -5,6 +5,12 @@
   align-items: stretch;
   justify-content: flex-end;
 
+  .invite-button > .circle {   
+    margin: 4px 0px 0px 8px;
+    width: 8px;
+    color: #FF7337;
+  }
+
   @media (max-width: $desktop-breakpoint) {
     flex: 1;
     margin-left: 0;

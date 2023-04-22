@@ -226,9 +226,7 @@ export function InvitationModalContent(): React.ReactElement {
             ))}
           </div>
         ) : (
-          <div className="no-invited-users">
-            Invite friends to view your schedule!
-          </div>
+          <div className="no-invited-users">No friends have been invited</div>
         )}{' '}
       </div>
       <RemoveInvitationModal
