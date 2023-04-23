@@ -28,8 +28,8 @@ export default function ComparisonPanel({
   const [tooltipY, setTooltipY] = useState(0);
   const [signedInModal, setSignedInModal] = useState(false);
   const [compare, setCompare] = useState(false);
-  const [hoverCompare, setHoverCompare] = useState(false);
-  const [tooltipYCompare, setTooltipYCompare] = useState(0);
+  // const [hoverCompare, setHoverCompare] = useState(false);
+  // const [tooltipYCompare, setTooltipYCompare] = useState(0);
   const tooltipId = useId();
 
   const { type } = useContext(AccountContext);
@@ -97,18 +97,17 @@ export default function ComparisonPanel({
             <div className="slider round" />
           </label>
         </div>
-        {compare ? (
+        {compare && (
           <ComparisonContainer
             handleCompareSchedules={handleCompareSchedules}
             pinnedSchedules={pinnedSchedules}
             pinSelf={pinSelf}
           />
-        ) : (
-          <div className="combination">
-            <CombinationContainer />
-          </div>
         )}
-        <div
+        <div className="combination">
+          <CombinationContainer compare={compare} />
+        </div>
+        {/* <div
           className={classes('comparison-overlay', 'left', compare && 'open')}
           id="comparison-overlay-left"
           onMouseEnter={(e: React.MouseEvent): void => {
@@ -134,7 +133,7 @@ export default function ComparisonPanel({
             <br />
             to access courses and events
           </p>
-        </ReactTooltip>
+        </ReactTooltip> */}
         <Modal
           className="not-signed-in-modal"
           show={signedInModal}

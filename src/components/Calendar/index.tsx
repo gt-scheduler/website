@@ -7,7 +7,7 @@ import { ScheduleContext, FriendContext } from '../../contexts';
 import { makeSizeInfoKey } from '../TimeBlocks';
 import { EventBlockPosition } from '../EventBlocks';
 import { SectionBlockPosition } from '../SectionBlocks';
-import { Period } from '../../types';
+import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
@@ -38,6 +38,14 @@ type FriendCrnData = {
   crn: string;
 };
 
+type FriendEventData = {
+  friend: string;
+  scheduleId: string;
+  scheduleName: string;
+  id: string;
+  event: Event;
+};
+
 export default function Calendar({
   className,
   overlayCrns,
@@ -52,22 +60,6 @@ export default function Calendar({
     useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
-
-  const friendSchedules: FriendCrnData[] = Object.values(friends).flatMap(
-    (friend) =>
-      Object.entries(friend.versions)
-        .filter((schedule) => pinnedFriendSchedules.includes(schedule[0]))
-        .flatMap((schedule) =>
-          schedule[1].schedule.pinnedCrns.map((crn) => {
-            return {
-              friend: friend.name,
-              scheduleName: schedule[1].name,
-              scheduleId: schedule[0],
-              crn,
-            } as FriendCrnData;
-          })
-        )
-  );
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
   // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
@@ -141,29 +133,10 @@ export default function Calendar({
     })
     .filter((m) => m != null);
 
-  if (compare) {
-    friendSchedules.forEach((crn) => {
-      const section = oscar.findSection(crn.crn);
-      if (section == null) return;
-      const temp = section.meetings
-        .filter((m) => m.period)
-        .forEach((meeting) => {
-          crnMeetings.push({
-            id: `${crn.scheduleId}-${crn.crn}`,
-            days: meeting.days,
-            period: meeting.period,
-            event: false,
-          } as CommmonMeetingObject);
-        });
-
-      return temp;
-    });
-  }
-
   const meetings: CommmonMeetingObject[] =
     crnMeetings as CommmonMeetingObject[];
 
-  if (!compare) {
+  if (!compare || pinSelf) {
     // Add events to meetings array
     meetings.push(
       ...events.map((event) => {
@@ -182,6 +155,60 @@ export default function Calendar({
     (a, b) =>
       a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
   );
+
+  const friendSchedules: FriendCrnData[] = [];
+  const friendEvents: FriendEventData[] = [];
+  if (compare) {
+    Object.values(friends).forEach((friend) =>
+      Object.entries(friend.versions)
+        .filter((schedule) => pinnedFriendSchedules.includes(schedule[0]))
+        .forEach((schedule) => {
+          const friendMeetings: CommmonMeetingObject[] = [];
+          schedule[1].schedule.pinnedCrns.forEach((crn) => {
+            friendSchedules.push({
+              friend: friend.name,
+              scheduleName: schedule[1].name,
+              scheduleId: schedule[0],
+              crn,
+            } as FriendCrnData);
+
+            const section = oscar.findSection(crn);
+            if (section == null) return;
+            section.meetings
+              .filter((m) => m.period)
+              .forEach((meeting) => {
+                friendMeetings.push({
+                  id: `${schedule[0]}-${crn}`,
+                  days: meeting.days,
+                  period: meeting.period,
+                  event: false,
+                } as CommmonMeetingObject);
+              });
+          });
+          schedule[1].schedule.events.forEach((event) => {
+            friendEvents.push({
+              friend: friend.name,
+              scheduleName: schedule[1].name,
+              scheduleId: schedule[0],
+              id: event.id,
+              event,
+            } as FriendEventData);
+            friendMeetings.push({
+              id: `${schedule[0]}-${event.id}`,
+              days: event.days,
+              period: event.period,
+              event: true,
+            } as CommmonMeetingObject);
+          });
+          friendMeetings.sort(
+            (a, b) =>
+              a.period.end - a.period.start - (b.period.end - b.period.start) ??
+              0
+          );
+          meetings.push(...friendMeetings);
+        })
+    );
+  }
 
   // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
   // next time block's rowSize and rowIndex (1 more than
@@ -344,13 +371,13 @@ export default function Calendar({
             canBeTabFocused={!isAutosized && !capture}
           />
         ))}
-        {!compare &&
-          overlayCrns &&
+        {overlayCrns &&
           overlayCrns
             .filter((crn) => !pinnedCrns.includes(crn))
             .map((crn) => (
               <SectionBlocks
                 key={crn}
+                schedule={compare ? currentVersion : undefined}
                 crn={crn}
                 overlay={!preview}
                 includeContent={!preview}
@@ -359,11 +386,11 @@ export default function Calendar({
                 sizeInfo={crnSizeInfo[crn] ?? {}}
               />
             ))}
-        {!compare &&
-          events &&
+        {events &&
           events.map((event) => (
             <EventBlocks
               key={event.id}
+              scheduleId={compare ? currentVersion : undefined}
               event={event}
               capture={capture}
               sizeInfo={eventSizeInfo[event.id] ?? {}}
@@ -416,6 +443,39 @@ export default function Calendar({
               }}
               deviceHasHover={deviceHasHover}
               canBeTabFocused={!isAutosized && !capture}
+            />
+          ))}
+        {compare &&
+          friendEvents.map((event) => (
+            <EventBlocks
+              key={`${event.scheduleId}-${event.id}`}
+              event={event.event}
+              owner={event.friend}
+              scheduleId={event.scheduleId}
+              scheduleName={event.scheduleName}
+              capture={capture}
+              sizeInfo={eventSizeInfo[`${event.scheduleId}-${event.id}`] ?? {}}
+              includeDetailsPopover={!isAutosized && !capture}
+              includeContent={!preview}
+              canBeTabFocused={!isAutosized && !capture}
+              deviceHasHover={deviceHasHover}
+              selectedMeeting={
+                selectedMeeting !== null &&
+                selectedMeeting[0] === `${event.scheduleId}-${event.id}`
+                  ? [selectedMeeting[1], selectedMeeting[2]]
+                  : null
+              }
+              onSelectMeeting={(meeting: [number, string] | null): void => {
+                if (meeting === null) {
+                  setSelectedMeeting(null);
+                } else {
+                  setSelectedMeeting([
+                    `${event.scheduleId}-${event.id}`,
+                    meeting[0],
+                    meeting[1],
+                  ]);
+                }
+              }}
             />
           ))}
       </div>

@@ -18,6 +18,9 @@ export interface EventBlockPosition extends TimeBlockPosition {
 export type EventBlocksProps = {
   className?: string;
   event: Immutable<Event>;
+  owner?: string;
+  scheduleName?: string;
+  scheduleId?: string;
   capture: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
@@ -33,6 +36,9 @@ export type EventBlocksProps = {
 export default function EventBlocks({
   className,
   event,
+  owner,
+  scheduleName,
+  scheduleId,
   capture,
   sizeInfo,
   includeDetailsPopover,
@@ -42,6 +48,18 @@ export default function EventBlocks({
   selectedMeeting,
   onSelectMeeting,
 }: EventBlocksProps): React.ReactElement | null {
+  const popover = scheduleName
+    ? [
+        {
+          name: 'Owner',
+          content: owner,
+        },
+        {
+          name: 'Schedule',
+          content: scheduleName,
+        },
+      ]
+    : [];
   return (
     <TimeBlocks
       className={className}
@@ -65,7 +83,7 @@ export default function EventBlocks({
             ]
           : []
       }
-      popover={[
+      popover={popover.concat([
         {
           name: 'Name',
           content: event.name,
@@ -77,7 +95,7 @@ export default function EventBlocks({
             periodToString(event.period),
           ].join(' '),
         },
-      ]}
+      ])}
       capture={capture}
       sizeInfo={sizeInfo}
       includeDetailsPopover={includeDetailsPopover}
@@ -86,6 +104,7 @@ export default function EventBlocks({
       deviceHasHover={deviceHasHover}
       selectedMeeting={selectedMeeting}
       onSelectMeeting={onSelectMeeting}
+      schedule={scheduleId}
     />
   );
 }
