@@ -15,6 +15,7 @@ import { ScheduleContext } from '../../contexts';
 import { Event as EventData } from '../../types';
 
 import './stylesheet.scss';
+import Select from '../Select';
 
 export type EventAddProps = {
   className?: string;
@@ -65,9 +66,7 @@ export default function EventAdd({
   }, []);
 
   const handleStartChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>): void => {
-      const newStart = e.target.value;
-
+    (newStart: string): void => {
       setError('');
       setStart(newStart);
 
@@ -75,7 +74,10 @@ export default function EventAdd({
       const parsedEnd = parseTime(end);
       if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1320) {
+      } else if (
+        parsedStart !== -1 &&
+        (parsedStart < 480 || parsedEnd > 1320)
+      ) {
         setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
@@ -83,17 +85,18 @@ export default function EventAdd({
   );
 
   const handleEndChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>): void => {
-      const newEnd = e.target.value;
-
+    (newEnd: string): void => {
       setError('');
       setEnd(newEnd);
 
       const parsedStart = parseTime(start);
       const parsedEnd = parseTime(newEnd);
-      if (parsedStart !== -1 && parsedEnd <= parsedStart) {
+      if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1320) {
+      } else if (
+        parsedStart !== -1 &&
+        (parsedStart < 480 || parsedEnd > 1320)
+      ) {
         setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
@@ -237,12 +240,7 @@ export default function EventAdd({
                 </div>
               </td>
               <td className="input">
-                <input
-                  type="time"
-                  value={start}
-                  onChange={handleStartChange}
-                  onKeyDown={handleKeyDown}
-                />
+                <TimeInput onChange={handleStartChange} value={start} />
               </td>
             </tr>
             <tr>
@@ -252,12 +250,7 @@ export default function EventAdd({
                 </div>
               </td>
               <td className="input">
-                <input
-                  type="time"
-                  value={end}
-                  onChange={handleEndChange}
-                  onKeyDown={handleKeyDown}
-                />
+                <TimeInput onChange={handleEndChange} value={end} />
               </td>
             </tr>
             <tr>
@@ -276,5 +269,151 @@ export default function EventAdd({
         </table>
       </form>
     </div>
+  );
+}
+
+export type TimeInputProps = {
+  value: string;
+  onChange: (newTime: string) => void;
+};
+
+function TimeInput(props: TimeInputProps): React.ReactElement {
+  const { value } = props;
+
+  function getTime(): [string, string, boolean] {
+    console.log(value);
+
+    let hour = '';
+    let minute = '';
+    let morning = true;
+    if (value) {
+      const split = value.split(':');
+      hour = split[0]!;
+      minute = split[1]!;
+
+      let parsedHour = parseInt(hour, 10);
+      if (parsedHour % 12 === 0) {
+        parsedHour += 12;
+      }
+      if (parsedHour >= 12) {
+        morning = false;
+      }
+      if (!morning) {
+        hour = (parsedHour - 12).toString().padStart(2, '0');
+      }
+    }
+    return [hour, minute, morning];
+  }
+
+  const [hour, setHour] = useState(getTime()[0]);
+  const [minute, setMinute] = useState(getTime()[1]);
+  const [morning, setMorning] = useState(getTime()[2]);
+  const { onChange } = props;
+
+  useEffect(() => {
+    const [newHour, newMinute, newMorning] = getTime();
+    setHour(newHour);
+    setMinute(newMinute);
+    setMorning(newMorning);
+  }, [props]);
+
+  function getTimeString(): string {
+    if (!hour || !minute) {
+      return '';
+    }
+    const time = parseInt(hour, 10) * 60 + parseInt(minute, 10);
+    return timeToString(time, false, true);
+  }
+
+  function handleHourChange(e: ChangeEvent<HTMLInputElement>): void {
+    const re = /^[0-9\b]+$/;
+
+    // if value is not blank, then test the regex
+    if (e.target.value === '' || re.test(e.target.value)) {
+      setHour(e.target.value);
+    }
+  }
+
+  function formatHour(): void {
+    if (hour === '') {
+      return;
+    }
+
+    const parsed = parseInt(hour, 10);
+    if (parsed < 1) {
+      setHour('01');
+    } else if (parsed > 12) {
+      setHour('12');
+    } else {
+      setHour(parsed.toString().padStart(2, '0'));
+    }
+    onChange(getTimeString());
+  }
+
+  function handleMinuteChange(e: ChangeEvent<HTMLInputElement>): void {
+    const re = /^[0-9\b]+$/;
+
+    // if value is not blank, then test the regex
+    if (e.target.value === '' || re.test(e.target.value)) {
+      setMinute(e.target.value);
+    }
+  }
+
+  function formatMinute(): void {
+    if (minute === '') {
+      return;
+    }
+
+    const parsed = parseInt(minute, 10);
+    if (parsed < 0) {
+      setMinute('00');
+    } else if (parsed > 59) {
+      setMinute('59');
+    } else {
+      setMinute(parsed.toString().padStart(2, '0'));
+    }
+    onChange(getTimeString());
+  }
+
+  const handleMorningChange = useCallback((newId: string): void => {
+    if (newId === 'am') {
+      setMorning(true);
+    } else {
+      setMorning(false);
+    }
+    onChange(getTimeString());
+  }, []);
+
+  return (
+    <>
+      <input
+        className="time"
+        type="text"
+        maxLength={2}
+        placeholder="--"
+        value={hour}
+        onChange={handleHourChange}
+        onBlur={formatHour}
+      />
+      <div className="colon">:</div>
+      <input
+        className="time"
+        type="text"
+        maxLength={2}
+        placeholder="--"
+        value={minute}
+        onChange={handleMinuteChange}
+        onBlur={formatMinute}
+      />
+      <Select
+        onChange={handleMorningChange}
+        current={morning ? 'am' : 'pm'}
+        options={[
+          { id: 'am', label: 'AM' },
+          { id: 'pm', label: 'PM' },
+        ]}
+        className="ampm"
+      />
+    </>
   );
 }
