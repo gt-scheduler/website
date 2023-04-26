@@ -13,9 +13,9 @@ import { classes, getRandomColor } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
 import { Event as EventData } from '../../types';
+import Select from '../Select';
 
 import './stylesheet.scss';
-import Select from '../Select';
 
 export type EventAddProps = {
   className?: string;
@@ -358,7 +358,7 @@ function TimeInput(props: TimeInputProps): React.ReactElement {
 
   const [hour, setHour] = useState(initHour);
   const [minute, setMinute] = useState(initMinute);
-  const [morning, setMorning] = useState(initMorning);
+  const [morning] = useState(initMorning);
 
   const { onChange } = props;
 
@@ -399,9 +399,12 @@ function TimeInput(props: TimeInputProps): React.ReactElement {
     onChange(getTime());
   }
 
-  const handleMorningChange = useCallback((newId: string): void => {
-    onChange(getTime(newId === 'am'));
-  }, []);
+  const handleMorningChange = useCallback(
+    (newId: string): void => {
+      onChange(getTime(newId === 'am'));
+    },
+    [getTime, onChange]
+  );
 
   return (
     <>
