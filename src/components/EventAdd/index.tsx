@@ -9,7 +9,7 @@ import React, {
 import { Immutable, castDraft } from 'immer';
 
 import Button from '../Button';
-import { classes, getRandomColor, timeToString } from '../../utils/misc';
+import { classes, getRandomColor } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
 import { Event as EventData } from '../../types';
@@ -23,6 +23,12 @@ export type EventAddProps = {
   setFormShown?: (next: boolean) => void;
 };
 
+export type Time = {
+  hour: number;
+  minute: number;
+  morning: boolean;
+};
+
 export default function EventAdd({
   className,
   event,
@@ -33,12 +39,24 @@ export default function EventAdd({
   const [selectedTags, setSelectedTags] = useState(
     event?.days ? [...event.days] : []
   );
-  const [start, setStart] = useState(
-    event?.period.start ? timeToString(event.period.start, false, true) : ''
-  );
-  const [end, setEnd] = useState(
-    event?.period.end ? timeToString(event.period.end, false, true) : ''
-  );
+  const [start, setStart] = useState<Time>({
+    hour: event?.period.start
+      ? Math.floor(event.period.start / 60) % 12
+        ? Math.floor(event.period.start / 60) % 12
+        : 12
+      : -1,
+    minute: event?.period.start ? event.period.start % 60 : -1,
+    morning: event?.period.start ? event.period.start < 720 : true,
+  });
+  const [end, setEnd] = useState<Time>({
+    hour: event?.period.end
+      ? Math.floor(event.period.end / 60) % 12
+        ? Math.floor(event.period.end / 60) % 12
+        : 12
+      : -1,
+    minute: event?.period.end ? event.period.end % 60 : -1,
+    morning: event?.period.end ? event.period.end < 720 : true,
+  });
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
 
@@ -46,8 +64,10 @@ export default function EventAdd({
     if (
       eventName.length > 0 &&
       selectedTags.length > 0 &&
-      start !== '' &&
-      end !== '' &&
+      start.hour !== -1 &&
+      start.minute !== -1 &&
+      end.minute !== -1 &&
+      end.hour !== -1 &&
       !error
     ) {
       setSubmitDisabled(false);
@@ -56,17 +76,23 @@ export default function EventAdd({
     }
   }, [eventName, selectedTags, start, end, error]);
 
-  const parseTime = useCallback((time: string): number => {
-    const split = time.split(':').map((str) => Number(str));
-
-    if (typeof split[0] !== 'undefined' && typeof split[1] !== 'undefined') {
-      return split[0] * 60 + split[1];
+  const parseTime = useCallback((time: Time): number => {
+    if (time.hour === -1 || time.minute === -1) {
+      return -1; // invalid time
     }
-    return -1; // invalid time string
+
+    let { hour } = time;
+    if (hour === 12) {
+      hour = 0;
+    }
+    if (!time.morning) {
+      hour += 12;
+    }
+    return hour * 60 + time.minute;
   }, []);
 
   const handleStartChange = useCallback(
-    (newStart: string): void => {
+    (newStart: Time): void => {
       setError('');
       setStart(newStart);
 
@@ -85,7 +111,7 @@ export default function EventAdd({
   );
 
   const handleEndChange = useCallback(
-    (newEnd: string): void => {
+    (newEnd: Time): void => {
       setError('');
       setEnd(newEnd);
 
@@ -148,8 +174,16 @@ export default function EventAdd({
 
       setEventName('');
       setSelectedTags([]);
-      setStart('');
-      setEnd('');
+      setStart({
+        minute: -1,
+        hour: -1,
+        morning: true,
+      });
+      setEnd({
+        minute: -1,
+        hour: -1,
+        morning: true,
+      });
     }
   }, [
     event,
@@ -235,22 +269,42 @@ export default function EventAdd({
             </tr>
             <tr>
               <td>
-                <div className={classes('label', start !== '' && 'active')}>
+                <div
+                  className={classes(
+                    'label',
+                    parseTime(start) !== -1 && 'active'
+                  )}
+                >
                   Start
                 </div>
               </td>
               <td className="input">
-                <TimeInput onChange={handleStartChange} value={start} />
+                <TimeInput
+                  onChange={handleStartChange}
+                  value={start}
+                  key={`${start.hour}-${start.minute}-${
+                    start.morning ? 'AM' : 'PM'
+                  }`}
+                />
               </td>
             </tr>
             <tr>
               <td>
-                <div className={classes('label', end !== '' && 'active')}>
+                <div
+                  className={classes(
+                    'label',
+                    parseTime(end) !== -1 && 'active'
+                  )}
+                >
                   End
                 </div>
               </td>
               <td className="input">
-                <TimeInput onChange={handleEndChange} value={end} />
+                <TimeInput
+                  onChange={handleEndChange}
+                  value={end}
+                  key={`${end.hour}-${end.minute}-${end.morning ? 'AM' : 'PM'}`}
+                />
               </td>
             </tr>
             <tr>
@@ -273,56 +327,50 @@ export default function EventAdd({
 }
 
 export type TimeInputProps = {
-  value: string;
-  onChange: (newTime: string) => void;
+  value: Time;
+  onChange: (newTime: Time) => void;
 };
 
 function TimeInput(props: TimeInputProps): React.ReactElement {
   const { value } = props;
 
-  function getTime(): [string, string, boolean] {
-    console.log(value);
+  let initHour = '';
+  let initMinute = '';
+  const initMorning = value.morning;
 
-    let hour = '';
-    let minute = '';
-    let morning = true;
-    if (value) {
-      const split = value.split(':');
-      hour = split[0]!;
-      minute = split[1]!;
-
-      let parsedHour = parseInt(hour, 10);
-      if (parsedHour % 12 === 0) {
-        parsedHour += 12;
-      }
-      if (parsedHour >= 12) {
-        morning = false;
-      }
-      if (!morning) {
-        hour = (parsedHour - 12).toString().padStart(2, '0');
-      }
+  if (value.hour !== -1) {
+    let { hour } = value;
+    if (hour !== -1 && hour < 1) {
+      hour = 1;
+    } else if (hour > 12) {
+      hour = 12;
     }
-    return [hour, minute, morning];
+    initHour = hour.toString().padStart(2, '0');
   }
 
-  const [hour, setHour] = useState(getTime()[0]);
-  const [minute, setMinute] = useState(getTime()[1]);
-  const [morning, setMorning] = useState(getTime()[2]);
+  if (value.minute !== -1) {
+    let { minute } = value;
+    if (minute > 59) {
+      minute = 59;
+    }
+    initMinute = minute.toString().padStart(2, '0');
+  }
+
+  const [hour, setHour] = useState(initHour);
+  const [minute, setMinute] = useState(initMinute);
+  const [morning, setMorning] = useState(initMorning);
+
   const { onChange } = props;
 
-  useEffect(() => {
-    const [newHour, newMinute, newMorning] = getTime();
-    setHour(newHour);
-    setMinute(newMinute);
-    setMorning(newMorning);
-  }, [props]);
-
-  function getTimeString(): string {
-    if (!hour || !minute) {
-      return '';
-    }
-    const time = parseInt(hour, 10) * 60 + parseInt(minute, 10);
-    return timeToString(time, false, true);
+  function getTime(actualMorning?: boolean): Time {
+    const hourNum = hour ? parseInt(hour, 10) : -1;
+    const minuteNum = minute ? parseInt(minute, 10) : -1;
+    const usedMorning = actualMorning === undefined ? morning : actualMorning;
+    return {
+      hour: hourNum,
+      minute: minuteNum,
+      morning: usedMorning,
+    };
   }
 
   function handleHourChange(e: ChangeEvent<HTMLInputElement>): void {
@@ -335,19 +383,7 @@ function TimeInput(props: TimeInputProps): React.ReactElement {
   }
 
   function formatHour(): void {
-    if (hour === '') {
-      return;
-    }
-
-    const parsed = parseInt(hour, 10);
-    if (parsed < 1) {
-      setHour('01');
-    } else if (parsed > 12) {
-      setHour('12');
-    } else {
-      setHour(parsed.toString().padStart(2, '0'));
-    }
-    onChange(getTimeString());
+    onChange(getTime());
   }
 
   function handleMinuteChange(e: ChangeEvent<HTMLInputElement>): void {
@@ -360,28 +396,11 @@ function TimeInput(props: TimeInputProps): React.ReactElement {
   }
 
   function formatMinute(): void {
-    if (minute === '') {
-      return;
-    }
-
-    const parsed = parseInt(minute, 10);
-    if (parsed < 0) {
-      setMinute('00');
-    } else if (parsed > 59) {
-      setMinute('59');
-    } else {
-      setMinute(parsed.toString().padStart(2, '0'));
-    }
-    onChange(getTimeString());
+    onChange(getTime());
   }
 
   const handleMorningChange = useCallback((newId: string): void => {
-    if (newId === 'am') {
-      setMorning(true);
-    } else {
-      setMorning(false);
-    }
-    onChange(getTimeString());
+    onChange(getTime(newId === 'am'));
   }, []);
 
   return (

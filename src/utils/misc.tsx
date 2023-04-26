@@ -47,8 +47,7 @@ export const timeToString = (
 ): string => {
   const hour = (time / 60) | 0;
   const minute = time % 60;
-  const h0 = hour > 12 ? hour - 12 : hour;
-  const h = h0 === 0 && ampm ? h0 + 12 : h0;
+  const h = hour % 12 ? hour % 12 : 12;
   const hh = leadingZero ? `${hour}`.padStart(2, '0') : h;
   const mm = `${minute}`.padStart(2, '0');
   const A = `${hour < 12 ? 'a' : 'p'}m`;
