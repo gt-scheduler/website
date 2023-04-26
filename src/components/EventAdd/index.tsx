@@ -362,16 +362,19 @@ function TimeInput(props: TimeInputProps): React.ReactElement {
 
   const { onChange } = props;
 
-  function getTime(actualMorning?: boolean): Time {
-    const hourNum = hour ? parseInt(hour, 10) : -1;
-    const minuteNum = minute ? parseInt(minute, 10) : -1;
-    const usedMorning = actualMorning === undefined ? morning : actualMorning;
-    return {
-      hour: hourNum,
-      minute: minuteNum,
-      morning: usedMorning,
-    };
-  }
+  const getTime = useCallback(
+    (actualMorning?: boolean): Time => {
+      const hourNum = hour ? parseInt(hour, 10) : -1;
+      const minuteNum = minute ? parseInt(minute, 10) : -1;
+      const usedMorning = actualMorning === undefined ? morning : actualMorning;
+      return {
+        hour: hourNum,
+        minute: minuteNum,
+        morning: usedMorning,
+      };
+    },
+    [hour, minute, morning]
+  );
 
   function handleHourChange(e: ChangeEvent<HTMLInputElement>): void {
     const re = /^[0-9\b]+$/;
