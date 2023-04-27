@@ -59,6 +59,7 @@ export default function EventAdd({
   });
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
+  const [renderCounter, setRenderCounter] = useState(0);
 
   useEffect(() => {
     if (
@@ -94,6 +95,22 @@ export default function EventAdd({
   const handleStartChange = useCallback(
     (newStart: Time): void => {
       setError('');
+
+      if (newStart.hour !== -1) {
+        if (newStart.hour !== -1 && newStart.hour < 1) {
+          newStart.hour = 1;
+        } else if (newStart.hour > 12) {
+          newStart.hour = 12;
+        }
+      }
+
+      if (newStart.minute !== -1) {
+        if (newStart.minute > 59) {
+          newStart.minute = 59;
+        }
+      }
+      const tempRender = renderCounter + 1;
+      setRenderCounter(tempRender);
       setStart(newStart);
 
       const parsedStart = parseTime(newStart);
@@ -107,12 +124,27 @@ export default function EventAdd({
         setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
-    [end, parseTime]
+    [end, parseTime, renderCounter]
   );
 
   const handleEndChange = useCallback(
     (newEnd: Time): void => {
       setError('');
+
+      if (newEnd.hour !== -1) {
+        if (newEnd.hour !== -1 && newEnd.hour < 1) {
+          newEnd.hour = 1;
+        } else if (newEnd.hour > 12) {
+          newEnd.hour = 12;
+        }
+      }
+
+      if (newEnd.minute !== -1) {
+        if (newEnd.minute > 59) {
+          newEnd.minute = 59;
+        }
+      }
+      setRenderCounter(renderCounter + 1);
       setEnd(newEnd);
 
       const parsedStart = parseTime(start);
@@ -126,7 +158,7 @@ export default function EventAdd({
         setError('Event must be between 08:00 AM and 10:00 PM.');
       }
     },
-    [start, parseTime]
+    [start, parseTime, renderCounter]
   );
 
   const onSubmit = useCallback((): void => {
@@ -284,7 +316,7 @@ export default function EventAdd({
                   value={start}
                   key={`${start.hour}-${start.minute}-${
                     start.morning ? 'AM' : 'PM'
-                  }`}
+                  }-${renderCounter}`}
                 />
               </td>
             </tr>
@@ -303,7 +335,9 @@ export default function EventAdd({
                 <TimeInput
                   onChange={handleEndChange}
                   value={end}
-                  key={`${end.hour}-${end.minute}-${end.morning ? 'AM' : 'PM'}`}
+                  key={`${end.hour}-${end.minute}-${
+                    end.morning ? 'AM' : 'PM'
+                  }-${renderCounter}`}
                 />
               </td>
             </tr>
@@ -334,27 +368,11 @@ export type TimeInputProps = {
 function TimeInput(props: TimeInputProps): React.ReactElement {
   const { value } = props;
 
-  let initHour = '';
-  let initMinute = '';
+  const initHour =
+    value.hour === -1 ? '' : value.hour.toString().padStart(2, '0');
+  const initMinute =
+    value.minute === -1 ? '' : value.minute.toString().padStart(2, '0');
   const initMorning = value.morning;
-
-  if (value.hour !== -1) {
-    let { hour } = value;
-    if (hour !== -1 && hour < 1) {
-      hour = 1;
-    } else if (hour > 12) {
-      hour = 12;
-    }
-    initHour = hour.toString().padStart(2, '0');
-  }
-
-  if (value.minute !== -1) {
-    let { minute } = value;
-    if (minute > 59) {
-      minute = 59;
-    }
-    initMinute = minute.toString().padStart(2, '0');
-  }
 
   const [hour, setHour] = useState(initHour);
   const [minute, setMinute] = useState(initMinute);
