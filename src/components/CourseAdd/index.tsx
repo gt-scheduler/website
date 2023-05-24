@@ -77,7 +77,7 @@ export default function CourseAdd({
     { patchSchedule },
   ] = useContext(ScheduleContext);
   const [keyword, setKeyword] = useState('');
-  const [inputToggle, setInputToggle] = useState(true);
+  const [inputCRNToggle, setInputCRNToggle] = useState(false);
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
     campus: [],
@@ -85,27 +85,31 @@ export default function CourseAdd({
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleCRNInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.trim();
-    setKeyword(input);
-  }, []);
-
   const handleChangeKeyword = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       let input = e.target.value.trim();
-      const results = /^([A-Z]+)(\d.*)$/i.exec(input);
-      if (results != null) {
-        const [, subject, number] = results as unknown as [
-          string,
-          string,
-          string
-        ];
-        input = `${subject} ${number}`;
+
+      if (!inputCRNToggle) {
+        const results = /^([A-Z]+)(\d.*)$/i.exec(input);
+        if (results != null) {
+          const [, subject, number] = results as unknown as [
+            string,
+            string,
+            string
+          ];
+          input = `${subject} ${number}`;
+        }
       }
+
       setKeyword(input);
     },
     []
   );
+
+  const handleInputToggle = useCallback(() => {
+    setInputCRNToggle(!inputCRNToggle);
+    setKeyword('');
+  }, [inputCRNToggle, keyword]);
 
   const courses = useMemo(() => {
     const results = /^([A-Z]+) ?((\d.*)?)$/i.exec(keyword.toUpperCase());
@@ -152,17 +156,22 @@ export default function CourseAdd({
     [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchSchedule]
   );
 
-  const findCourseByCRn = useCallback(() => {
+  const handleAddCoursebyCRN = useCallback(() => {
     let i = 0;
     while (i < oscar.courses.length) {
       const course = oscar.courses[i];
-      if (course) {
-        if (course.sections.some((section) => section.crn === keyword)) {
-          return course;
-        }
+      if (
+        course &&
+        course.sections.some((section) => section.crn === keyword)
+      ) {
+        patchSchedule({
+          pinnedCrns: [...pinnedCrns, keyword],
+        });
+        handleAddCourse(course);
+        return;
       }
-      i++;
     }
+    i++;
     return null;
   }, [keyword]);
 
@@ -170,16 +179,11 @@ export default function CourseAdd({
     (e: KeyboardEvent<HTMLInputElement>) => {
       switch (e.key) {
         case 'Enter': {
-          if (inputToggle) {
-            const course = findCourseByCRn();
-            if (course != null) {
-              patchSchedule({
-                pinnedCrns: [...pinnedCrns, keyword],
-              });
-              handleAddCourse(course);
-            }
+          let course = null;
+          if (inputCRNToggle) {
+            handleAddCoursebyCRN();
           } else {
-            const course = courses[activeIndex];
+            course = courses[activeIndex];
             if (course != null) {
               handleAddCourse(course);
             }
@@ -235,6 +239,9 @@ export default function CourseAdd({
             fixedWidth
             icon={faPlus}
           />
+          <div className="input-type" onClick={handleInputToggle}>
+            {inputCRNToggle ? 'CRN' : 'ID'}
+          </div>
           <div className="keyword-wrapper">
             {activeCourse && (
               <div className={classes('keyword', 'autocomplete')}>
@@ -245,26 +252,29 @@ export default function CourseAdd({
               type="text"
               ref={inputRef}
               value={keyword}
-              onChange={inputToggle ? handleCRNInput : handleChangeKeyword}
+              onChange={handleChangeKeyword}
               className="keyword"
-              placeholder={inputToggle ? 'CRNS' : 'XX 0000'}
+              placeholder={inputCRNToggle ? '00000' : 'XX 0000'}
               onKeyDown={handleKeyDown}
             />
           </div>
         </div>
-        {[
-          ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
-          ['Campus', 'campus', CAMPUSES] as const,
-        ].map(([name, property, labels]) => (
-          <CourseFilter
-            key={property}
-            name={name}
-            labels={labels}
-            selectedTags={filter[property]}
-            onReset={(): void => handleResetFilter(property)}
-            onToggle={(tag): void => handleToggleFilter(property, tag)}
-          />
-        ))}
+
+        {inputCRNToggle
+          ? ''
+          : [
+              ['Delivery Mode', 'deliveryMode', DELIVERY_MODES] as const,
+              ['Campus', 'campus', CAMPUSES] as const,
+            ].map(([name, property, labels]) => (
+              <CourseFilter
+                key={property}
+                name={name}
+                labels={labels}
+                selectedTags={filter[property]}
+                onReset={(): void => handleResetFilter(property)}
+                onToggle={(tag): void => handleToggleFilter(property, tag)}
+              />
+            ))}
       </div>
       {courses.length > 0 ? (
         courses.map((course) => (
