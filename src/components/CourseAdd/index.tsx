@@ -72,15 +72,23 @@ function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
 export default function CourseAdd({
   className,
 }: CourseAddProps): React.ReactElement {
-  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
-    useContext(ScheduleContext);
+  const [
+    { oscar, desiredCourses, excludedCrns, colorMap, pinnedCrns },
+    { patchSchedule },
+  ] = useContext(ScheduleContext);
   const [keyword, setKeyword] = useState('');
+  const [inputToggle, setInputToggle] = useState(true);
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
     campus: [],
   });
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleCRNInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.trim();
+    setKeyword(input);
+  }, []);
 
   const handleChangeKeyword = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -144,14 +152,39 @@ export default function CourseAdd({
     [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchSchedule]
   );
 
+  const findCourseByCRn = useCallback(() => {
+    let i = 0;
+    while (i < oscar.courses.length) {
+      const course = oscar.courses[i];
+      if (course) {
+        if (course.sections.some((section) => section.crn === keyword)) {
+          return course;
+        }
+      }
+      i++;
+    }
+    return null;
+  }, [keyword]);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       switch (e.key) {
         case 'Enter': {
-          const course = courses[activeIndex];
-          if (course != null) {
-            handleAddCourse(course);
+          if (inputToggle) {
+            const course = findCourseByCRn();
+            if (course != null) {
+              patchSchedule({
+                pinnedCrns: [...pinnedCrns, keyword],
+              });
+              handleAddCourse(course);
+            }
+          } else {
+            const course = courses[activeIndex];
+            if (course != null) {
+              handleAddCourse(course);
+            }
           }
+
           break;
         }
         case 'ArrowDown':
@@ -212,9 +245,9 @@ export default function CourseAdd({
               type="text"
               ref={inputRef}
               value={keyword}
-              onChange={handleChangeKeyword}
+              onChange={inputToggle ? handleCRNInput : handleChangeKeyword}
               className="keyword"
-              placeholder="XX 0000"
+              placeholder={inputToggle ? 'CRNS' : 'XX 0000'}
               onKeyDown={handleKeyDown}
             />
           </div>
