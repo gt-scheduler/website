@@ -52,6 +52,7 @@ jobs:
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./build/
+          token: ${{ secrets.GH_ACTIONS_BOT_FINE_GRAINED_TOKEN }}
 
 
   test:
