@@ -92,8 +92,8 @@ export default function EventBlocks({
       ref.current.style.width = '20%';
 
       // Align to the block to the start of the day column
-      const oldLeftPercentValue = parseFloat(ref.current.style.left);
-      if (!Number.isNaN(oldLeftPercentValue)) {
+      if (ref.current.style.left.includes('%')) {
+        const oldLeftPercentValue = parseFloat(ref.current.style.left);
         ref.current.style.left = `${
           Math.floor(oldLeftPercentValue / 20) * 20
         }%`;
