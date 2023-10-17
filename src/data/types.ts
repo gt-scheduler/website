@@ -142,3 +142,8 @@ export interface Version3Schedule {
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
 }
+
+export interface Term {
+  term: string;
+  finalized: boolean;
+}
