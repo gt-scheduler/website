@@ -66,10 +66,14 @@ export default function Event({
               },
               {
                 icon: faPalette,
+                tooltip: `Edit Color`,
+                id: `${event.id}-color`,
                 onClick: (): void => setPaletteShown(!paletteShown),
               },
               {
                 icon: faTrash,
+                tooltip: `Remove Event`,
+                id: `${event.id}-remove`,
                 onClick: (): void => handleRemoveEvent(event.id),
               },
             ]}
@@ -98,6 +102,7 @@ export default function Event({
         <EventAdd
           className="event-add"
           event={event}
+          key={`${event.id}-${event.period.start}-${event.days.join()}`}
           setFormShown={setFormShown}
         />
       )}

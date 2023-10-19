@@ -88,13 +88,15 @@ export default function HeaderActionBar({
       onClick: onCopyCrns,
     });
   }
-  exportActions.push({
-    label: 'Share Schedule',
-    icon: faShare,
-    onClick: (): void => {
-      setInvitationOpen(true);
-    },
-  });
+  if (accountState.type === 'signedIn') {
+    exportActions.push({
+      label: 'Share Schedule',
+      icon: faShare,
+      onClick: (): void => {
+        setInvitationOpen(true);
+      },
+    });
+  }
 
   // On small mobile screens and on large desktop,
   // left-anchor the "Export" dropdown.
