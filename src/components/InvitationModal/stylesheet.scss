@@ -169,7 +169,7 @@
       justify-content: center;
       border-radius: 16px;
       width: max-content;
-      max-width: 100%;
+      max-width: calc(100% - 8px);
       min-width: min-content;
       font-size: 0.9em;
       cursor: pointer;
@@ -178,12 +178,20 @@
         background-color: rgba($color-neutral, 0.5);
         opacity: 0.75;
       }
+
+      .email-text {
+        margin: 0px;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 
   .email-and-status {
     display: flex;
     flex-direction: column;
+    max-width: 100%;
   }
 
   .Pending {
@@ -250,6 +258,32 @@
       }
 
       background-color: transparent;
+    }
+  }
+
+  #Pending {
+    border-color: rgba(205, 165, 24, 0.5);
+    border-style: solid;
+    border-width: 1.5px;
+  }
+
+  #Accepted {
+    border-color: rgba(34, 181, 49, 0.5);
+    border-style: solid;
+    border-width: 1.5px;
+  }
+}
+
+.mobile.invitation-modal-content {
+  .email-input-block {
+    flex-direction: column;
+    align-items: center;
+    .email-input {
+      max-width: 100%;
+      margin-bottom: 6px;
+      .email {
+        max-width: 100%;
+      }
     }
   }
 }

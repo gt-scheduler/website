@@ -12,11 +12,12 @@ import axios, { AxiosError } from 'axios';
 
 import { ApiErrorResponse } from '../../data/types';
 import { ScheduleContext } from '../../contexts';
+import { DESKTOP_BREAKPOINT, CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import useScreenWidth from '../../hooks/useScreenWidth';
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
-import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -27,6 +28,7 @@ export function InvitationModalContent(): React.ReactElement {
   const [{ currentFriends, currentVersion, term }, { deleteFriendRecord }] =
     useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   const input = useRef<HTMLInputElement>(null);
   const [validMessage, setValidMessage] = useState('');
@@ -39,12 +41,21 @@ export function InvitationModalContent(): React.ReactElement {
 
   const sendInvitation = useCallback(async (): Promise<void> => {
     const IdToken = await (accountContext as SignedIn).getToken();
-    return axios.post(`${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`, {
+    const data = JSON.stringify({
       term,
       friendEmail: input.current?.value,
       IDToken: IdToken,
       version: currentVersion,
     });
+    return axios.post(
+      `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`,
+      `data=${data}`,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
   }, [accountContext, currentVersion, term]);
 
   // verify email with a regex and send invitation if valid
@@ -94,7 +105,7 @@ export function InvitationModalContent(): React.ReactElement {
   };
 
   return (
-    <div className="invitation-modal-content">
+    <div className={classes('invitation-modal-content', mobile && 'mobile')}>
       <div className="top-block">
         <h2>Share Schedule</h2>
         <p>
@@ -140,7 +151,7 @@ export function InvitationModalContent(): React.ReactElement {
                   currentFriends[friend]?.status
                 )}
               >
-                {currentFriends[friend]?.email}
+                <p className="email-text">{currentFriends[friend]?.email}</p>
                 <Button
                   className="button-remove"
                   onClick={(): void => {
