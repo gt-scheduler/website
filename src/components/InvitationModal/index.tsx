@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
-import { faCircle, faClose } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faClose, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios, { AxiosError } from 'axios';
 
@@ -25,6 +25,9 @@ import './stylesheet.scss';
  * Inner content of the invitation modal.
  */
 export function InvitationModalContent(): React.ReactElement {
+  const [removeInvitationOpen, setRemoveInvitationOpen] = useState(false);
+  const [currentFriendId, setCurrentFriendId] = useState('');
+
   const [{ currentFriends, currentVersion, term }, { deleteFriendRecord }] =
     useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
@@ -63,11 +66,11 @@ export function InvitationModalContent(): React.ReactElement {
     if (input.current && /^\S+@\S+\.\S+$/.test(input.current.value)) {
       sendInvitation()
         .then(() => {
-          setValidMessage('Successfully sent!');
-          setValidClassName('valid-email');
           if (input.current) {
             input.current.value = '';
           }
+          setValidMessage('Successfully sent!');
+          setValidClassName('valid-email');
         })
         .catch((err) => {
           setValidClassName('invalid-email');
@@ -99,10 +102,21 @@ export function InvitationModalContent(): React.ReactElement {
     [verifyEmail]
   );
 
-  // delete friend from record of friends
-  const handleDelete = (friendId: string): void => {
-    deleteFriendRecord(currentVersion, friendId);
-  };
+  function showRemoveInvitation(friendId: string): void {
+    setRemoveInvitationOpen(true);
+    setCurrentFriendId(friendId);
+  }
+
+  // delete friend from record of friends and close modal
+  const hideRemoveInvitation = useCallback(
+    (confirm: boolean) => {
+      setRemoveInvitationOpen(false);
+      if (confirm) {
+        deleteFriendRecord(currentVersion, currentFriendId);
+      }
+    },
+    [deleteFriendRecord, currentFriendId, currentVersion]
+  );
 
   return (
     <div className={classes('invitation-modal-content', mobile && 'mobile')}>
@@ -139,41 +153,73 @@ export function InvitationModalContent(): React.ReactElement {
         <p>
           Users Invited to View <strong>Primary</strong>
         </p>
-        <div className="shared-emails" key="email">
-          {Object.keys(currentFriends ?? {}).map((friend) => (
-            <div
-              className="email-and-status"
-              id={currentFriends[friend]?.email}
-            >
-              <div
-                className={classes(
-                  'individual-shared-email',
-                  currentFriends[friend]?.status
-                )}
-              >
-                <p className="email-text">{currentFriends[friend]?.email}</p>
-                <Button
-                  className="button-remove"
-                  onClick={(): void => {
-                    handleDelete(friend);
-                  }}
+        {Object.keys(currentFriends).length !== 0 ? (
+          <div className="shared-emails" key="email">
+            {Object.entries(currentFriends).map(([friendId, friend]) => (
+              <div className="email-and-status" id={friend.email}>
+                <div
+                  className={classes('individual-shared-email', friend.status)}
                 >
-                  <FontAwesomeIcon className="circle" icon={faCircle} />
-                  <FontAwesomeIcon className="remove" icon={faClose} />
-                </Button>
-                <ReactTooltip
-                  anchorId={currentFriends[friend]?.email}
-                  className="status-tooltip"
-                  variant="dark"
-                  place="top"
-                  offset={2}
-                >
-                  Status: {currentFriends[friend]?.status}
-                </ReactTooltip>
+                  <p className="email-text">{friend.email}</p>
+                  <Button
+                    className="button-remove"
+                    onClick={(): void => {
+                      showRemoveInvitation(friendId);
+                    }}
+                  >
+                    <FontAwesomeIcon className="circle" icon={faCircle} />
+                    <FontAwesomeIcon className="remove" icon={faClose} />
+                  </Button>
+                  <ReactTooltip
+                    anchorId={friend.email}
+                    className="status-tooltip"
+                    variant="dark"
+                    place="top"
+                    offset={2}
+                  >
+                    Status: {friend.status}
+                  </ReactTooltip>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-invited-users">
+            Invite friends to view your schedule!
+          </div>
+        )}{' '}
+      </div>
+      <RemoveInvitationModal
+        showRemove={removeInvitationOpen}
+        onHideRemove={hideRemoveInvitation}
+        currentInvitee={currentFriends[currentFriendId]?.email ?? ''}
+      />
+    </div>
+  );
+}
+
+export type RemoveInvitationModalContentProps = {
+  currentInvitee: string;
+};
+
+export function RemoveInvitationModalContent({
+  currentInvitee,
+}: RemoveInvitationModalContentProps): React.ReactElement {
+  return (
+    <div className="remove-invitation-modal-content">
+      <div>
+        <h2>Remove Access</h2>
+        <p>
+          Are you sure you want to remove the following user from having access
+          schedule: <b>Primary</b>?
+        </p>
+        <p>
+          User: <b>{currentInvitee}</b>
+        </p>
+        <p>
+          This user will only gain access to this schedule if you send them
+          another invitation
+        </p>
       </div>
     </div>
   );
@@ -194,14 +240,47 @@ export default function InvitationModal({
   return (
     <Modal
       show={show}
-      className="invatation-modal"
+      className="invitation-modal"
       onHide={onHide}
+      buttons={[]}
+      width={550}
+    >
+      <Button className="remove-close-button" onClick={onHide}>
+        <FontAwesomeIcon icon={faXmark} size="xl" />
+      </Button>
+      <InvitationModalContent />
+    </Modal>
+  );
+}
+
+export type RemoveInvitationModalProps = {
+  showRemove: boolean;
+  onHideRemove: (confirm: boolean) => void;
+  currentInvitee: string;
+};
+
+function RemoveInvitationModal({
+  showRemove,
+  onHideRemove,
+  currentInvitee,
+}: RemoveInvitationModalProps): React.ReactElement {
+  return (
+    <Modal
+      show={showRemove}
+      className="remove-invitation-modal"
+      onHide={(): void => onHideRemove(false)}
       buttons={[
-        { label: 'Cancel', onClick: (): void => onHide(), cancel: true },
+        { label: 'Remove', onClick: () => onHideRemove(true), cancel: true },
       ]}
       width={550}
     >
-      <InvitationModalContent />
+      <Button
+        className="remove-close-button"
+        onClick={(): void => onHideRemove(false)}
+      >
+        <FontAwesomeIcon icon={faXmark} size="xl" />
+      </Button>
+      <RemoveInvitationModalContent currentInvitee={currentInvitee} />
     </Modal>
   );
 }
