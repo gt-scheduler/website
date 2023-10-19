@@ -14,19 +14,19 @@ enum LoadingState {
   ERROR,
 }
 
-const handleInvite = async (inviteId: string | undefined): Promise<void> =>
-  // The link should be changed to prod link, or we can choose the link based
-  // on environment
-  axios.post(
-    `http://127.0.0.1:5001/gt-scheduler-web-dev/us-central1/handleFriendInvitation`,
-    { inviteId }
-  );
-// .then((res) => {
-//   console.log(res);
-// })
-// .catch((err) => {
-//   console.error(err);
-// });
+const url = `${CLOUD_FUNCTION_BASE_URL}/handleFriendInvitation`;
+
+const handleInvite = async (inviteId: string | undefined): Promise<void> => {
+  const requestData = JSON.stringify({ inviteId });
+  await axios({
+    method: 'POST',
+    url,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    data: `data=${requestData}`,
+  });
+};
 
 export default function InviteBackLink(): React.ReactElement {
   const navigate = useNavigate();
