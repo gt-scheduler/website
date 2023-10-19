@@ -100,24 +100,16 @@ export default function Section({
         {
           icon: faChair,
           id: sectionTooltipId,
-          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
           icon: faBan,
           id: excludeTooltipId,
+          tooltip: 'Exclude from Combinations',
           onClick: (): void => excludeSection(section),
         },
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
-      <ReactTooltip
-        anchorId={excludeTooltipId}
-        className="popover"
-        variant="dark"
-        place="left"
-      >
-        Exclude from Combinations
-      </ReactTooltip>
       <div className="section-details">
         <div className="delivery-mode">
           {section.deliveryMode != null

@@ -1,4 +1,4 @@
-import { Immutable } from 'immer';
+import { castImmutable, Immutable } from 'immer';
 
 import { Event } from '../types';
 import { generateRandomId } from '../utils/misc';
@@ -41,6 +41,23 @@ export const defaultScheduleData: Immutable<ScheduleData> = {
 
 export const defaultFriendData: Immutable<FriendData> = {
   terms: {},
+  info: {},
+};
+
+export const defaultFriendInfo: Immutable<{
+  name: string;
+  email: string;
+}> = castImmutable({
+  name: '',
+  email: '',
+});
+
+export const defaultFriendTermData: Immutable<FriendTermData> = {
+  accessibleSchedules: {},
+};
+
+export const defaultFriendScheduleData: Immutable<FriendScheduleData> = {
+  //
 };
 
 export const defaultTermScheduleData: Immutable<TermScheduleData> = {
@@ -134,8 +151,14 @@ export interface Version3TermScheduleData {
 
 export interface Version3ScheduleVersion {
   name: string;
+  friends: Record<string, FriendShareData>;
   createdAt: string;
   schedule: Version3Schedule;
+}
+
+export interface FriendShareData {
+  status: 'Pending' | 'Accepted';
+  email: string;
 }
 
 export interface Version3Schedule {
@@ -147,10 +170,53 @@ export interface Version3Schedule {
   sortingOptionIndex: number;
 }
 
-export interface FriendData {
-  terms: Record<string, FriendTermData>;
-}
+export type FriendIds = Record<string, string[]>;
 
 export interface FriendTermData {
-  accessibleSchedules: Record<string, string[]>;
+  accessibleSchedules: FriendIds;
 }
+
+export type ApiErrorResponse = {
+  message: string;
+};
+
+export type FriendInfo = Record<
+  string,
+  {
+    name: string;
+    email: string;
+  }
+>;
+
+export interface FriendData {
+  terms: Record<string, FriendTermData>;
+  info: FriendInfo;
+}
+
+export type RawFriendScheduleData = Record<
+  string,
+  {
+    versions: Record<
+      string,
+      {
+        name: string;
+        schedule: Schedule;
+      }
+    >;
+  }
+>;
+
+export type FriendScheduleData = Record<
+  string,
+  {
+    name: string;
+    email: string;
+    versions: Record<
+      string,
+      {
+        name: string;
+        schedule: Schedule;
+      }
+    >;
+  }
+>;

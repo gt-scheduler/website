@@ -15,6 +15,7 @@ import { AppSkeleton, SkeletonContent, AppContent } from './content';
 import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import InformationModal from '../InformationModal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -31,6 +32,9 @@ export default function App(): React.ReactElement {
     <ThemeContext.Provider value={themeContextValue}>
       <AppCSSRoot>
         <TooltipProvider>
+          {/* To bring the website down for maintenance purposes, 
+            insert <Maintenance /> here and disable everything below.
+            See https://github.com/gt-scheduler/website/pull/194 for reference. */}
           <ErrorBoundary
             fallback={(error, errorInfo): React.ReactElement => (
               <AppSkeleton>
@@ -67,7 +71,8 @@ export default function App(): React.ReactElement {
             <Feedback />
 
             {/* Display a popup when first visiting the site */}
-            {/* Include <InformationModal /> here */}
+            {/* Include <InformationModal /> or <MaintenanceModal /> here */}
+            <InformationModal />
           </ErrorBoundary>
         </TooltipProvider>
       </AppCSSRoot>
