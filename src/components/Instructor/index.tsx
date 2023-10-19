@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useId, useState } from 'react';
-import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
   faAngleDown,
   faAngleUp,
@@ -83,14 +82,17 @@ export default function Instructor({
           !['TBA', 'Not Assigned'].includes(name)
             ? {
                 icon: faGraduationCap,
+                tooltip: 'View Instructor Ratings',
                 href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
                   simplifyName(name)
                 )}`,
+                id: `${simplifyName(name, '-').toLowerCase()}-rmp`,
               }
             : null,
           {
             icon: faBan,
             id: excludeTooltipId,
+            tooltip: 'Exclude from Combinations',
             onClick: (): void => excludeSections(sections),
           },
         ]}
@@ -100,9 +102,6 @@ export default function Instructor({
           <span className="gpa">Instructor GPA: {gpa || 'N/A'}</span>
         </div>
       </ActionRow>
-      <ReactTooltip anchorId={excludeTooltipId} variant="dark" place="left">
-        Exclude from Combinations
-      </ReactTooltip>
       {expanded && (
         <div className={classes('section-container', 'nested')}>
           {includedSections.map((section) => {

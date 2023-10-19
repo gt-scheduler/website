@@ -1,7 +1,316 @@
-@import "../../variables";
+@import '../../variables';
 
 .invitation-modal {
-    .remove-close-button {
+  .remove-close-button {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    padding: 15px;
+    color: #808080;
+    border-radius: 50px;
+  }
+
+  .invitation-modal-content {
+    text-align: center;
+    overflow-y: hidden;
+
+    @include light {
+      background-color: $theme-light-background;
+      color: $modal-foreground-color-light;
+    }
+
+    @include dark {
+      background-color: $theme-dark-background;
+      color: white;
+    }
+
+    //Style for email input
+    .top-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 15px 5px 15px;
+
+      p {
+        font-size: 0.9em;
+      }
+
+      .email-input-block {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        padding-top: 5px;
+        padding-bottom: 5px;
+
+        .email-input {
+          display: flex;
+          flex-direction: column;
+          position: relative;
+
+          .valid-email {
+            text-align: start;
+            color: rgba(34, 181, 49, 0.75);
+            font-size: 12px;
+            font-weight: bold;
+            padding-top: 3px;
+            opacity: 1;
+          }
+
+          .invalid-email {
+            text-align: start;
+            color: rgba(255, 0, 0, 0.5);
+            font-size: 12px;
+            font-weight: bold;
+            padding-top: 3px;
+            opacity: 1;
+          }
+
+          .email:has(+ .invalid-email) {
+            border: 1px solid rgba(255, 0, 0, 0.5);
+          }
+        }
+
+        input[type='email'] {
+          width: 282px;
+          height: 24px;
+          padding: 15px;
+          border-radius: 6px;
+          background-color: rgb(35, 35, 35);
+          border: 1px solid rgb(35, 35, 35);
+          outline: none;
+
+          &:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+          }
+
+          @include light {
+            background-color: rgba($color-neutral, 0.5);
+            border: 1px solid rgba($color-neutral, 0.5);
+          }
+        }
+
+        .send-button {
+          width: 86px;
+          height: 24px;
+          font-size: 14px;
+          color: white;
+          border-radius: 6px;
+          background-color: #c56e5b;
+          border: none;
+          margin-top: 4px;
+
+          &:hover {
+            background-color: #e2944b;
+          }
+        }
+      }
+    }
+
+    //Style for search dropdown
+
+    #recent-invites {
+      width: 282px;
+      max-height: 96px;
+      overflow-y: scroll;
+      border-radius: 4px;
+      background-color: rgb(51, 51, 51);
+      text-align: start;
+      position: absolute;
+      z-index: 2;
+      margin-top: 30px;
+
+      @include light {
+        background-color: $color-background-light;
+      }
+
+      .search-option {
+        width: 282px;
+        height: 32px;
+        align-content: flex-start;
+        padding: 5px;
+        padding-left: 15px;
+        position: relative;
+
+        &.active {
+          background-color: $color-neutral;
+        }
+
+        &:hover {
+          background-color: $color-border;
+        }
+      }
+    }
+
+    .divider {
+      height: 1.5px;
+      display: flex;
+      align-items: stretch !important;
+      border: none;
+      background-color: rgb(80, 80, 80);
+    }
+
+    //Style for Invited Users
+
+    .invited-users {
+      padding-top: 15px;
+      justify-content: center;
+    }
+
+    .no-invited-users {
+      opacity: 0.5;
+      font-size: 14px;
+    }
+
+    .shared-emails {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      padding-left: 25px;
+      padding-right: 25px;
+      height: 100px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+
+      @include light {
+        color: #333333;
+      }
+
+      .individual-shared-email {
+        @include card;
+        background-color: rgb(67, 67, 67);
+        padding: 4px 8px;
+        height: 26px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        border-radius: 16px;
+        width: max-content;
+        max-width: 100%;
+        min-width: min-content;
+        font-size: 0.9em;
+        cursor: pointer;
+
+        @include light {
+          background-color: rgba($color-neutral, 0.5);
+          opacity: 0.75;
+        }
+
+        .email-text {
+          line-height: 100%;
+        }
+      }
+    }
+
+    .email-and-status {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .Pending {
+      border-color: rgba(205, 165, 24, 0.5);
+      border-style: solid;
+      border-width: 1.5px;
+    }
+
+    .Accepted {
+      border-color: rgba(34, 181, 49, 0.5);
+      border-style: solid;
+      border-width: 1.5px;
+    }
+
+    .status-tooltip {
+      background-color: rgba(0, 0, 0, 1);
+      border-radius: 4px;
+    }
+
+    .button-remove {
+      width: 10px;
+      height: 10px;
+      background-color: transparent;
+      position: relative;
+      align-self: center;
+
+      .circle {
+        width: 12px;
+        height: 12px;
+        padding: 10px;
+        position: absolute;
+        position: absolute;
+        color: white;
+
+        @include light {
+          color: rgba(128, 128, 128, 0.5);
+        }
+      }
+
+      .remove {
+        width: 10px;
+        height: 10px;
+        padding: 15px;
+        color: rgb(67, 67, 67);
+        position: relative;
+        display: inline-flex;
+
+        @include light {
+          color: #e5e5e5;
+        }
+      }
+
+      &:hover {
+        .circle {
+          color: rgba(255, 255, 255, 0.25);
+
+          @include light {
+            color: #333333;
+          }
+        }
+
+        background-color: transparent;
+      }
+    }
+  }
+
+  .mobile.invitation-modal-content {
+    .email-input-block {
+      flex-direction: column;
+      align-items: center;
+      .email-input {
+        max-width: 100%;
+        margin-bottom: 6px;
+        .email {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.modal-positioner {
+  .remove-invitation-modal {
+    overflow-y: hidden;
+
+    .modal__content {
+      padding: 0px;
+      padding-top: 20px !important;
+      padding-bottom: 20px !important;
+      text-align: center;
+
+      .remove-invitation-modal-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+        text-align: center;
+        padding-top: 15px;
+        padding-left: 50px;
+        padding-right: 50px;
+        height: 200px;
+      }
+
+      .remove-close-button {
         width: 16px;
         height: 16px;
         position: absolute;
@@ -10,315 +319,15 @@
         padding: 15px;
         color: #808080;
         border-radius: 50px;
+      }
     }
 
-    .invitation-modal-content {
-        text-align: center;
-        overflow-y: hidden;
+    .modal__button--cancel {
+      background-color: #c56e5b !important;
 
-        @include light {
-            background-color: $theme-light-background;
-            color: $modal-foreground-color-light;
-        }
-
-        @include dark {
-            background-color: $theme-dark-background;
-            color: white;
-        }
-
-        //Style for email input
-        .top-block {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 10px 15px 5px 15px;
-
-            p {
-                font-size: .9em;
-            }
-
-            .email-input-block {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-evenly;
-                padding-top: 5px;
-                padding-bottom: 5px;
-
-                .email-input {
-                    display: flex;
-                    flex-direction: column;
-                    position: relative;
-
-                    .valid-email {
-                        text-align: start;
-                        color: rgba(34, 181, 49, 0.75);
-                        font-size: 12px;
-                        font-weight: bold;
-                        padding-top: 3px;
-                        opacity: 1;
-
-                    }
-
-                    .invalid-email {
-                        text-align: start;
-                        color: rgba(255, 0, 0, 0.5);
-                        font-size: 12px;
-                        font-weight: bold;
-                        padding-top: 3px;
-                        opacity: 1;
-                    }
-
-                    .email:has(+.invalid-email) {
-                        border: 1px solid rgba(255, 0, 0, 0.5);
-                    }
-                }
-
-                input[type=email] {
-                    width: 282px;
-                    height: 24px;
-                    padding: 15px;
-                    border-radius: 6px;
-                    background-color: rgb(35, 35, 35);
-                    border: 1px solid rgb(35, 35, 35);
-                    outline: none;
-
-                    &:focus {
-                        border-color: rgba(255, 255, 255, 0.5);
-                    }
-
-                    @include light {
-                        background-color: rgba($color-neutral, 0.5);
-                        border: 1px solid rgba($color-neutral, 0.5);
-                    }
-                }
-
-                .send-button {
-                    width: 86px;
-                    height: 24px;
-                    font-size: 14px;
-                    color: white;
-                    border-radius: 6px;
-                    background-color: #C56E5B;
-                    border: none;
-                    margin-top: 4px;
-
-                    &:hover {
-                        background-color: #E2944B;
-                    }
-                }
-
-            }
-        }
-
-        //Style for search dropdown
-
-        #recent-invites {
-            width: 282px;
-            max-height: 96px;
-            overflow-y: scroll;
-            border-radius: 4px;
-            background-color: rgb(51, 51, 51);
-            text-align: start;
-            position: absolute;
-            z-index: 2;
-            margin-top: 30px;
-
-            @include light {
-                background-color: $color-background-light;
-            }
-
-            .search-option {
-                width: 282px;
-                height: 32px;
-                align-content: flex-start;
-                padding: 5px;
-                padding-left: 15px;
-                position: relative;
-
-                &.active {
-                    background-color: $color-neutral;
-                }
-
-                &:hover {
-                    background-color: $color-border;
-                }
-            }
-
-        }
-
-        .divider {
-            height: 1.5px;
-            display: flex;
-            align-items: stretch !important;
-            border: none;
-            background-color: rgb(80, 80, 80);
-        }
-
-        //Style for Invited Users
-
-        .invited-users {
-            padding-top: 15px;
-            justify-content: center;
-        }
-
-        .no-invited-users {
-            opacity: 0.5;
-            font-size: 14px;
-        }
-
-        .shared-emails {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            padding-left: 25px;
-            padding-right: 25px;
-            height: 100px;
-            overflow-y: scroll;
-            overflow-x: hidden;
-
-            @include light {
-                color: #333333;
-            }
-
-            .individual-shared-email {
-                @include card;
-                background-color: rgb(67, 67, 67);
-                padding: 4px 8px;
-                height: 26px;
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                border-radius: 16px;
-                width: max-content;
-                max-width: 100%;
-                min-width: min-content;
-                font-size: .9em;
-                cursor: pointer;
-
-                @include light {
-                    background-color: rgba($color-neutral, 0.5);
-                    opacity: 0.75;
-                }
-            }
-        }
-
-        .email-and-status {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .status-tooltip {
-            background-color: rgba(0, 0, 0, 1);
-            border-radius: 4px;
-        }
-
-        .email-text {
-            padding-top: 0.5px;
-        }
-
-        .button-remove {
-            width: 10px;
-            height: 10px;
-            background-color: transparent;
-            position: relative;
-            align-self: center;
-
-            .circle {
-                width: 12px;
-                height: 12px;
-                padding: 10px;
-                position: absolute;
-                position: absolute;
-                color: white;
-
-                @include light {
-                    color: rgba(128, 128, 128, 0.5);
-                }
-            }
-
-            .remove {
-                width: 10px;
-                height: 10px;
-                padding: 15px;
-                color: rgb(67, 67, 67);
-                position: relative;
-                display: inline-flex;
-
-                @include light {
-                    color: #e5e5e5;
-                }
-            }
-
-            &:hover {
-                .circle {
-                    color: rgba(255, 255, 255, 0.25);
-
-                    @include light {
-                        color: #333333;
-                    }
-                }
-
-                background-color: transparent;
-            }
-        }
-
-        #Pending {
-            border-color: rgba(205, 165, 24, 0.5);
-            border-style: solid;
-            border-width: 1.5px;
-        }
-
-        #Accepted {
-            border-color: rgba(34, 181, 49, 0.5);
-            border-style: solid;
-            border-width: 1.5px;
-        }
+      &:hover {
+        background-color: #e2944b !important;
+      }
     }
-}
-
-.modal-positioner {
-    .remove-invitation-modal {
-        overflow-y: hidden;
-
-        .modal__content {
-            padding: 0px;
-            padding-top: 20px !important;
-            padding-bottom: 20px !important;
-            text-align: center;
-
-            .remove-invitation-modal-content {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                flex-wrap: wrap;
-                text-align: center;
-                padding-top: 15px;
-                padding-left: 50px;
-                padding-right: 50px;
-                height: 200px;
-            }
-
-            .remove-close-button {
-                width: 16px;
-                height: 16px;
-                position: absolute;
-                right: 12px;
-                top: 12px;
-                padding: 15px;
-                color: #808080;
-                border-radius: 50px;
-            }
-        }
-
-        .modal__button--cancel {
-            background-color: #C56E5B !important;
-
-            &:hover {
-                background-color: #E2944B !important;
-            }
-        }
-    }
-
-    background-color: $modal-backdrop-color -5%;
+  }
 }

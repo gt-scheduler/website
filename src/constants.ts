@@ -1,7 +1,7 @@
 import { firebaseConfig } from './data/firebase';
 
 const OPEN = 8 * 60;
-const CLOSE = 21 * 60;
+const CLOSE = 22 * 60;
 const DAYS = ['M', 'T', 'W', 'R', 'F'];
 
 const PNG_SCALE_FACTOR = 2;
@@ -68,6 +68,10 @@ const CAMPUSES: Record<string, string> = {
   Video: 'Video',
   Online: 'Online',
   'MBA Evening Program': 'MBA Evening',
+  'GT, Peking University, & Emory': 'Peking & Emory',
+  'Georgia Tech-Savannah': 'Savannah',
+  'Georgia Tech - Korea': 'Korea',
+  'Georgia Tech - Shanghai': 'Shanghai',
 };
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
