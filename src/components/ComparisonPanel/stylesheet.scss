@@ -1,0 +1,90 @@
+@import '../../variables';
+
+.comparison-panel {
+  display: flex;
+  flex-direction: row;
+
+  .drawer {
+    width: 13px;
+    border-width: 0px 1px 0px 1px;
+    border-color: $color-border;
+    border-style: solid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:hover {
+      background: $color-border;
+    }
+    
+    .drawer-line {
+      flex: 1;
+      width: 5px;
+      border-width: 0px 1px 0px 1px;
+      border-color: $color-border;
+      border-style: solid;
+    }
+
+    .icon {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      transform: scale(0.9, 1.5);
+
+      .arrow {
+        position: absolute;
+        height: 10px;
+        width: 10px;
+        right: -8px;
+        border-width: 0px 2px 2px 0px;
+        border-color: $color-border;
+        border-style: solid;
+        transform: rotate(135deg);
+
+        &.right {
+          left: -8px;
+          transform: rotate(-45deg);
+        }
+      }
+    }
+
+    .tooltip {
+      background: black;
+      border-radius: 4px;
+      z-index: 10;
+
+      p {
+        margin: 0px;
+        font-size: 12px;
+        font-weight: 400;
+      }
+    }
+  }
+
+  .panel {
+    display: flex;
+    flex: 0 0 1;
+    flex-direction: column;
+    overflow: hidden;
+    align-items: stretch;
+    width: 256px;
+    transition: width 0.15s;
+
+    &.closed {
+      width: 0px;
+    }
+
+    .comparison-container {
+      max-height: 400px;
+      border-bottom: 1px solid $color-border;
+    }
+
+    .combination {
+      flex: 1;
+
+      .CombinationContainer {
+        height: 100%;
+      }
+    }
+  }
+}

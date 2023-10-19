@@ -1,7 +1,13 @@
 import React, { useMemo, useState } from 'react';
 
 import { classes } from '../../utils/misc';
-import { Button, Calendar, CombinationContainer, CourseContainer } from '..';
+import {
+  Button,
+  Calendar,
+  CombinationContainer,
+  ComparisonPanel,
+  CourseContainer,
+} from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
@@ -42,12 +48,13 @@ export default function Scheduler(): React.ReactElement {
       <OverlayCrnsContext.Provider value={overlayContextValue}>
         <div className="main">
           {(!mobile || tabIndex === 0) && <CourseContainer />}
-          {(!mobile || tabIndex === 1) && <CombinationContainer />}
+          {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">
               <Calendar className="calendar" overlayCrns={overlayCrns} />
             </div>
           )}
+          {(!mobile || tabIndex === 3) && <ComparisonPanel />}
         </div>
       </OverlayCrnsContext.Provider>
     </>
