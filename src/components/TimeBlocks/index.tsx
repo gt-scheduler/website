@@ -252,17 +252,22 @@ function MeetingDayBlock({
         {includeContent && (
           <div className="meeting-wrapper">
             <div className="ids">
-              {contentHeader.map((content) => {
+              {contentHeader.map((content, i) => {
                 return (
-                  <span className={content.className}>
+                  <span
+                    className={content.className}
+                    key={`content-header-${i}`}
+                  >
                     {content.content}&nbsp;
                   </span>
                 );
               })}
             </div>
-            {contentBody.map((content) => {
+            {contentBody.map((content, i) => {
               return (
-                <span className={content.className}>{content.content}</span>
+                <span className={content.className} key={`content-body-${i}`}>
+                  {content.content}
+                </span>
               );
             })}
           </div>
@@ -316,9 +321,9 @@ function DetailsPopoverContent({
   return (
     <table className="popover">
       <tbody>
-        {popover.map((popoverInfo) => {
+        {popover.map((popoverInfo, i) => {
           return popoverInfo.content ? (
-            <tr>
+            <tr key={`popover-content-${i}`}>
               <td>
                 <b>{popoverInfo.name}</b>
               </td>

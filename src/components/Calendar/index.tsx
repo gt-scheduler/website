@@ -323,6 +323,7 @@ export default function Calendar({
         {events &&
           events.map((event) => (
             <EventBlocks
+              key={`${event.id}-${event.period.start}-${event.days.join()}`}
               event={event}
               capture={capture}
               sizeInfo={eventSizeInfo[event.id] ?? {}}
@@ -332,7 +333,6 @@ export default function Calendar({
               deviceHasHover={deviceHasHover}
               daysRef={daysRef}
               timesRef={timesRef}
-              key={`${event.id}-${event.period.start}-${event.days.join()}`}
               selectedMeeting={
                 selectedMeeting !== null && selectedMeeting[0] === event.id
                   ? [selectedMeeting[1], selectedMeeting[2]]

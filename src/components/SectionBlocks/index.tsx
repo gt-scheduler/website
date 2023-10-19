@@ -57,9 +57,9 @@ export default function SectionBlocks({
 
         return (
           <TimeBlocks
+            key={`${section.course.id}-${period.start}`}
             className={className}
             id={section.course.id}
-            key={`${section.course.id}-${period.start}`}
             meetingIndex={i}
             period={period}
             days={meeting.days.filter((day) => day !== 'S' && day !== 'U')}
