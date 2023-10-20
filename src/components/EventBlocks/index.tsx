@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Immutable, castDraft } from 'immer';
 
 import { daysToString, periodToString } from '../../utils/misc';
@@ -72,6 +72,10 @@ export default function EventBlocks({
   // once the event handlers are set inside handleMouseDown
   const tempStartRef = useRef<number>(event.period.start);
   const tempDaysRef = useRef<string[]>([...event.days]);
+
+  useEffect(() => {
+    setTempStart(event.period.start);
+  }, [event.period.start]);
 
   // Save original style of the block
   const savedStyleRef = useRef<string>();
