@@ -26,13 +26,13 @@ export type HookResult = Pick<
 export default function useHeaderActionBarProps(
   captureRef: React.RefObject<HTMLDivElement>
 ): HookResult {
-  const [{ oscar, pinnedCrns }] = useContext(ScheduleContext);
+  const [{ oscar, pinnedCrns, events, term }] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
   const accountState = useContext(AccountContext);
 
   const handleExport = useCallback(() => {
     try {
-      exportCoursesToCalendar(oscar, pinnedCrns);
+      exportCoursesToCalendar(oscar, pinnedCrns, events, term);
     } catch (err) {
       softError(
         new ErrorWithFields({
@@ -44,7 +44,7 @@ export default function useHeaderActionBarProps(
         })
       );
     }
-  }, [oscar, pinnedCrns]);
+  }, [oscar, pinnedCrns, events, term]);
 
   const handleDownload = useCallback(() => {
     const captureElement = captureRef.current;
@@ -85,9 +85,9 @@ export default function useHeaderActionBarProps(
     onCopyCrns: handleCopyCrns,
     enableCopyCrns: pinnedCrns.length > 0,
     onExportCalendar: handleExport,
-    enableDownloadCalendar: pinnedCrns.length > 0,
+    enableDownloadCalendar: pinnedCrns.length > 0 || events.length > 0,
     onDownloadCalendar: handleDownload,
-    enableExportCalendar: pinnedCrns.length > 0,
+    enableExportCalendar: pinnedCrns.length > 0 || events.length > 0,
     accountState,
   };
 }

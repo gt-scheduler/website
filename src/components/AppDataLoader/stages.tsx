@@ -268,7 +268,6 @@ export function StageLoadRawScheduleDataFromFirebase({
   children,
 }: StageLoadRawScheduleDataFromFirebaseProps): React.ReactElement {
   const loadingState = useRawScheduleDataFromFirebase(accountState);
-
   if (loadingState.type !== 'loaded') {
     return (
       <AppSkeleton {...skeletonProps}>
