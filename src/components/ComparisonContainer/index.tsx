@@ -13,13 +13,21 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+import axios from 'axios';
 
 import { classes, getRandomColor } from '../../utils/misc';
-import { ScheduleContext, FriendContext } from '../../contexts';
+import {
+  ScheduleContext,
+  FriendContext,
+  AccountContext,
+  SignedIn,
+} from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import { AutoFocusInput } from '../Select';
 import { Palette } from '..';
+import { ErrorWithFields, softError } from '../../log';
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 
 import './stylesheet.scss';
 
@@ -70,12 +78,14 @@ export default function ComparisonContainer({
   const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
 
   const [
-    { allVersionNames, currentVersion, colorMap },
+    { allVersionNames, currentVersion, colorMap, term },
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
   const [{ friends }, { updateFriendTermData, renameFriend }] =
     useContext(FriendContext);
+
+  const accountContext = useContext(AccountContext);
 
   useEffect(() => {
     const newColorMap = { ...colorMap };
@@ -118,12 +128,50 @@ export default function ComparisonContainer({
     [editInfo, editValue, renameVersion, renameFriend]
   );
 
+  const deleteInvitation = useCallback(
+    async (senderId: string, versions: string[]) => {
+      const data = JSON.stringify({
+        IDToken: await (accountContext as SignedIn).getToken(),
+        senderId,
+        term,
+        versions,
+      });
+      axios
+        .post(
+          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromFriend`,
+          `data=${data}`,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        )
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'delete sender record failed',
+              source: err,
+              fields: {
+                user: (accountContext as SignedIn).id,
+                sender: senderId,
+                term,
+                versions,
+              },
+            })
+          );
+        });
+    },
+    [accountContext, term]
+  );
+
   const handleRemoveFriend = useCallback(
-    (id: string) => {
-      const friend = friends[id];
+    (ownerId: string) => {
+      const friend = friends[ownerId];
       if (friend) {
         const newColorMap = { ...colorMap };
-        Object.keys(friend.versions).forEach((schedule) => {
+
+        const versions = Object.keys(friend.versions);
+        versions.forEach((schedule) => {
           delete newColorMap[schedule];
         });
         setSelected(
@@ -134,21 +182,31 @@ export default function ComparisonContainer({
         );
         patchSchedule({ colorMap: newColorMap });
         updateFriendTermData((draft) => {
-          delete draft.accessibleSchedules[id];
+          delete draft.accessibleSchedules[ownerId];
         });
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        deleteInvitation(ownerId, versions);
       }
     },
-    [friends, selected, colorMap, patchSchedule, updateFriendTermData]
+    [
+      friends,
+      selected,
+      colorMap,
+      patchSchedule,
+      updateFriendTermData,
+      deleteInvitation,
+    ]
   );
 
   const handleRemoveSchedule = useCallback(
-    (id: string, owner: string) => {
+    (id: string, ownerId: string) => {
       updateFriendTermData((draft) => {
-        if (draft.accessibleSchedules[owner]?.length === 1) {
-          delete draft.accessibleSchedules[owner];
+        if (draft.accessibleSchedules[ownerId]?.length === 1) {
+          delete draft.accessibleSchedules[ownerId];
         } else {
-          draft.accessibleSchedules[owner] =
-            draft.accessibleSchedules[owner]?.filter(
+          draft.accessibleSchedules[ownerId] =
+            draft.accessibleSchedules[ownerId]?.filter(
               (schedule) => schedule !== id
             ) ?? [];
         }
@@ -157,8 +215,11 @@ export default function ComparisonContainer({
       delete newColorMap[id];
       patchSchedule({ colorMap: newColorMap });
       setSelected(selected.filter((selectedId: string) => selectedId !== id));
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      deleteInvitation(ownerId, [id]);
     },
-    [selected, colorMap, updateFriendTermData, patchSchedule]
+    [selected, colorMap, updateFriendTermData, patchSchedule, deleteInvitation]
   );
 
   const handleToggleSchedule = useCallback(

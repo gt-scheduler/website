@@ -18,6 +18,7 @@ import { classes } from '../../utils/misc';
 import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
+import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
 
@@ -102,6 +103,44 @@ export function InvitationModalContent(): React.ReactElement {
     [verifyEmail]
   );
 
+  // delete friend from record of friends
+  const handleDelete = useCallback(
+    async (friendId: string): Promise<void> => {
+      deleteFriendRecord(currentVersion, friendId);
+      const data = JSON.stringify({
+        IDToken: await (accountContext as SignedIn).getToken(),
+        friendId,
+        term,
+        version: currentVersion,
+      });
+      axios
+        .post(
+          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromSender`,
+          `data=${data}`,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        )
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'delete friend record failed',
+              source: err,
+              fields: {
+                user: (accountContext as SignedIn).id,
+                friend: friendId,
+                term,
+                version: currentVersion,
+              },
+            })
+          );
+        });
+    },
+    [accountContext, currentVersion, deleteFriendRecord, term]
+  );
+
   function showRemoveInvitation(friendId: string): void {
     setRemoveInvitationOpen(true);
     setCurrentFriendId(friendId);
@@ -112,10 +151,11 @@ export function InvitationModalContent(): React.ReactElement {
     (confirm: boolean) => {
       setRemoveInvitationOpen(false);
       if (confirm) {
-        deleteFriendRecord(currentVersion, currentFriendId);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        handleDelete(currentFriendId);
       }
     },
-    [deleteFriendRecord, currentFriendId, currentVersion]
+    [currentFriendId, handleDelete]
   );
 
   return (
