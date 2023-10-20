@@ -1,0 +1,170 @@
+@import '../../variables';
+
+.comparison-container {
+  .comparison-body {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    height: 100%;
+
+    .comparison-content {
+      position: relative;
+      margin-bottom: 12px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      flex: 1 1 auto;
+
+      p {
+        margin: 0px;
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 14px;
+
+        &.content-title{
+          font-weight: 700;
+          margin: 16px 12px 4px 12px;
+          border-bottom: 1px solid $color-border;
+        }
+      }
+
+      .schedule-row {
+        .checkbox-container {
+          display: flex;
+          align-items: center;
+          position: relative;
+          height: 22px;
+          
+          .checkbox {
+            margin-left: 12px;
+            border: 1px solid;
+            border-radius: 3px;
+            border-color: var(--theme-fg);
+            transition-duration: $theme-switch-transition-duration;
+            transition-property: border-color;
+
+            width: 11px;
+            height: 11px;
+
+            &:hover {
+              cursor: pointer;
+            }
+
+            &.indented {
+              margin-left: 24px;
+            }
+          }
+
+          .name {
+            margin-left: 12px;
+            margin-right: 12px;
+            min-width: 0;
+            flex-shrink: 1;
+
+            &.check {
+              margin-left: 8px;
+            }
+            
+            p {
+              text-overflow: ellipsis;
+            }
+          }
+
+          .edit-input {
+            height: 22px;
+            border-radius: 4px;
+            padding: 4px;
+            flex: 1 1;
+            font-size: 12px;
+            font-weight: 500;
+            outline: none;
+            border: 1px solid var(--theme-fg);
+            margin-left: 8px;
+            min-width: 0px;
+
+            &.check {
+              margin-left: 4px;
+            }
+          }
+
+          .spacing {
+            flex: 1;
+          }
+
+          .tooltip {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+          }
+
+          .icon {
+            width: 27px;
+            height: 100%;
+            padding: 0px;
+            opacity: 0;
+          }
+
+          &:hover {
+            background-color: $color-border;
+
+            .icon {
+              opacity: 1;
+            }
+
+            .name {
+              margin-right: 0px;
+            }
+          }
+
+          &.editing {
+            .icon {
+              opacity: 1;
+            }
+          }
+        }
+
+        .palette {
+          margin: 0px 12px;
+          height: 50px;
+          border-radius: 4px;
+          overflow: hidden;
+          &.indented {
+            margin-left: 24px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.mobile .comparison-container {
+  flex: 1;
+  border-right: none;
+
+  .scroller {
+    width: auto;
+  }
+}
+
+.shared-schedule-modal {
+
+  h2 {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 18px;
+    overflow-wrap: break-word;
+  }
+
+  .cancel-button {
+    width: 26px;
+    height: 26px;
+    position: absolute;
+    top: 11px;
+    right: 11px;
+    border-radius: 50%;
+  }
+}

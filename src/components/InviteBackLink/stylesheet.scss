@@ -1,0 +1,79 @@
+@import '../../variables';
+
+body {
+  background-color: $theme-dark-background;
+  color: $theme-dark-foreground;
+}
+
+.Loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+
+  h4 {
+    font-size: 1.4rem;
+    margin-top: 12px;
+    margin-bottom: 8px;
+  }
+}
+
+.EmailInviteConfirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20vh;
+  padding-left: 32px;
+  padding-right: 32px;
+  font-size: 24px;
+  height: 100%;
+  text-align: center;
+
+  @media (max-width: 720px) {
+    padding-top: 60px;
+  }
+
+  @media (max-width: 450px) {
+    padding-top: 60px;
+    font-size: 18px;
+  }
+
+  @media (max-width: 300px) {
+    font-size: 16px;
+  }
+
+  @media (max-height: 600px) {
+    padding-top: 60px;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 600;
+
+    @media (max-width: 450px) {
+      font-size: 30px;
+    }
+
+    @media (max-width: 300px) {
+      font-size: 24px;
+    }
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 38px;
+  }
+
+  .continue-button {
+    background-color: #fe7c53;
+    color: white;
+    margin-top: 96px;
+    padding: 8px 24px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 600;
+  }
+}
