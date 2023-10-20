@@ -32,7 +32,7 @@ export default function Scheduler(): React.ReactElement {
 
   const [compare, setCompare] = useState(false);
   const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
-  const [pinSelf, setPinSelf] = useState(false);
+  const [pinSelf, setPinSelf] = useState(true);
 
   const handleCompareSchedules = useCallback(
     (

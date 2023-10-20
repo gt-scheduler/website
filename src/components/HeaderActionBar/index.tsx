@@ -140,7 +140,7 @@ export default function HeaderActionBar({
           icon={faShare}
         />
         <div className="header-action-bar__button-text">Invite</div>
-        {seenInviteModal ? null : (
+        {seenInviteModal || type === 'signedOut' ? null : (
           <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
         )}
       </Button>
