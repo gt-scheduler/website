@@ -64,30 +64,40 @@ export function InvitationModalContent(): React.ReactElement {
 
   // verify email with a regex and send invitation if valid
   const verifyEmail = useCallback((): void => {
-    if (input.current && /^\S+@\S+\.\S+$/.test(input.current.value)) {
-      sendInvitation()
-        .then(() => {
-          if (input.current) {
-            input.current.value = '';
-          }
-          setValidMessage('Successfully sent!');
-          setValidClassName('valid-email');
-        })
-        .catch((err) => {
-          setValidClassName('invalid-email');
-          const error = err as AxiosError;
-          if (error.response) {
-            const apiError = error.response.data as ApiErrorResponse;
-            setValidMessage(apiError.message);
-            return;
-          }
-          setValidMessage('Error sending invitation. Please try again later.');
-        });
-    } else {
+    if (!input.current || !/^\S+@\S+\.\S+$/.test(input.current.value)) {
       setValidMessage('Invalid Email');
-      setValidClassName('invalid-email');
+      return setValidClassName('invalid-email');
     }
-  }, [sendInvitation]);
+
+    if (
+      Object.values(currentFriends).findIndex(
+        (friend) =>
+          friend.email === input.current?.value && friend.status === 'Accepted'
+      ) !== -1
+    ) {
+      setValidMessage('Email has already accepted an invite');
+      return setValidClassName('invalid-email');
+    }
+
+    sendInvitation()
+      .then(() => {
+        if (input.current) {
+          input.current.value = '';
+        }
+        setValidMessage('Successfully sent!');
+        setValidClassName('valid-email');
+      })
+      .catch((err) => {
+        setValidClassName('invalid-email');
+        const error = err as AxiosError;
+        if (error.response) {
+          const apiError = error.response.data as ApiErrorResponse;
+          setValidMessage(apiError.message);
+          return;
+        }
+        setValidMessage('Error sending invitation. Please try again later.');
+      });
+  }, [sendInvitation, currentFriends]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
