@@ -16,7 +16,7 @@ export default function Feedback(): React.ReactElement {
   const [feedback, setFeedback] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmit = (): void => {
+  const handleSubmit = (): void => {
     setLoading(true);
     // Add 1 to the rating to move it from [0,4] to [1,5]
     submitFeedback({ rating: (rating ?? 0) + 1, feedback })
@@ -28,6 +28,13 @@ export default function Feedback(): React.ReactElement {
         setSubmit(true);
         setLoading(false);
       });
+  };
+
+  const resetSession = (): void => {
+    setExpanded(false);
+    setSubmit(false);
+    setRating(null);
+    setFeedback('');
   };
 
   return (
@@ -49,7 +56,9 @@ export default function Feedback(): React.ReactElement {
               <FontAwesomeIcon
                 icon={faTimes}
                 className="CloseIcon"
-                onClick={(): void => setExpanded(false)}
+                onClick={(): void =>
+                  submit ? resetSession() : setExpanded(false)
+                }
               />
               <h3 className="FeedbackTitle">Feedback</h3>
               {!submit && (
@@ -85,7 +94,7 @@ export default function Feedback(): React.ReactElement {
                   />
                   <Button
                     className="SubmitButton"
-                    onClick={onSubmit}
+                    onClick={handleSubmit}
                     disabled={rating == null || loading}
                   >
                     Submit
@@ -100,7 +109,7 @@ export default function Feedback(): React.ReactElement {
                   <div>
                     <Button
                       className="SubmitButton"
-                      onClick={(): void => setExpanded(false)}
+                      onClick={(): void => resetSession()}
                     >
                       Close
                     </Button>

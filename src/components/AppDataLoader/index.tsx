@@ -412,12 +412,17 @@ function ContextProvider({
   }, [termScheduleData.versions]);
 
   // Get all version-related actions
-  const { addNewVersion, deleteVersion, renameVersion, cloneVersion } =
-    useVersionActions({
-      updateTermScheduleData,
-      setVersion,
-      currentVersion,
-    });
+  const {
+    addNewVersion,
+    deleteVersion,
+    renameVersion,
+    cloneVersion,
+    deleteFriendRecord,
+  } = useVersionActions({
+    updateTermScheduleData,
+    setVersion,
+    currentVersion,
+  });
 
   // Create a rename friend function.
   const renameFriend = useCallback(
@@ -459,6 +464,7 @@ function ContextProvider({
         oscar,
         currentVersion,
         allVersionNames,
+        currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
       },
       {
@@ -468,6 +474,7 @@ function ContextProvider({
         setCurrentVersion: setVersion,
         addNewVersion,
         deleteVersion,
+        deleteFriendRecord,
         renameVersion,
         cloneVersion,
       },
@@ -477,12 +484,14 @@ function ContextProvider({
       oscar,
       currentVersion,
       allVersionNames,
+      scheduleVersion.friends,
       scheduleVersion.schedule,
       setTerm,
       patchSchedule,
       updateSchedule,
       setVersion,
       addNewVersion,
+      deleteFriendRecord,
       deleteVersion,
       renameVersion,
       cloneVersion,

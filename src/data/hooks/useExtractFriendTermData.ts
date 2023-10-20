@@ -35,6 +35,11 @@ export default function useExtractFriendTermData({
 }> {
   // Ensure that there is a valid term friend data object for the term
   useEffect(() => {
+    if (rawFriendData.terms === undefined) {
+      return updateFriendData((draft) => {
+        draft.terms = { [currentTerm]: castDraft(defaultFriendTermData) };
+      });
+    }
     const currentFriendTermData = rawFriendData.terms[currentTerm];
     const correctedFriendTermData =
       currentFriendTermData === undefined ||
@@ -84,7 +89,9 @@ export default function useExtractFriendTermData({
     [updateFriendData, currentTerm]
   );
 
-  const currentFriendTermData = rawFriendData.terms[currentTerm];
+  const currentFriendTermData = rawFriendData.terms
+    ? rawFriendData.terms[currentTerm]
+    : undefined;
 
   if (
     currentFriendTermData === undefined ||

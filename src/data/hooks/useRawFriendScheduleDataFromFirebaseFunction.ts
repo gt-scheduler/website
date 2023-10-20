@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import { Immutable } from 'immer';
 
 import { auth } from '../firebase';
+import useRateLimiter from '../../hooks/useRateLimiter';
 import { ErrorWithFields, softError } from '../../log';
 import { LoadingState } from '../../types';
 import {
@@ -21,6 +22,13 @@ interface HookResult {
 }
 
 const url = `${CLOUD_FUNCTION_BASE_URL}/fetchFriendSchedules`;
+
+export const RATE_LIMITER_BUCKET_STORAGE_KEY =
+  process.env.NODE_ENV === 'production' && !process.env['REACT_APP_PREVIEW']
+    ? 'rate-limiter-bucket'
+    : 'rate-limiter-bucket-dev';
+const RATE_LIMITER_CAPACITY = 10;
+const RATE_LIMITER_INTERVAL_SEC = 10;
 
 // Number of minutes between re-fetches of the friend schedules
 const REFRESH_INTERVAL_MIN = 5;
@@ -44,6 +52,13 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
   const [state, setState] = useState<LoadingState<HookResult>>({
     type: 'loading',
   });
+
+  const { hasReachedLimit, refreshBucket, decrementBucketCount } =
+    useRateLimiter(
+      RATE_LIMITER_BUCKET_STORAGE_KEY,
+      RATE_LIMITER_CAPACITY,
+      RATE_LIMITER_INTERVAL_SEC
+    );
 
   // Keep a ref of the latest loaded schedules
   // to check if it is any newer than the current one.
@@ -190,25 +205,55 @@ export default function useRawFriendScheduleDataFromFirebaseFunction({
       }
     }
 
-    loadAndRefresh().catch((err) => {
-      softError(
-        new ErrorWithFields({
-          message: 'error loading and refreshing friend schedules',
-          source: err,
-          fields: {
-            url,
-            term: currentTerm,
-            termFriendData,
-          },
-        })
-      );
-    });
+    refreshBucket();
+    if (hasReachedLimit) {
+      const err = new ErrorWithFields({
+        message: 'error loading and refreshing friend schedules',
+        source: new Error('Exceeded rate limit'),
+        fields: {
+          url,
+          term: currentTerm,
+          termFriendData,
+          hasReachedLimit,
+        },
+      });
+      softError(err);
+      setState({
+        type: 'error',
+        error: err,
+        stillLoading: false,
+        overview: String(err),
+      });
+    } else {
+      decrementBucketCount();
+      loadAndRefresh().catch((err) => {
+        softError(
+          new ErrorWithFields({
+            message: 'error loading and refreshing friend schedules',
+            source: err,
+            fields: {
+              url,
+              term: currentTerm,
+              termFriendData,
+              hasReachedLimit,
+            },
+          })
+        );
+      });
+    }
 
     // Cancel the background load when this cleans up
     return (): void => {
       loadOperation.cancel();
     };
-  }, [currentTerm, termFriendData, setState]);
+  }, [
+    currentTerm,
+    termFriendData,
+    setState,
+    hasReachedLimit,
+    refreshBucket,
+    decrementBucketCount,
+  ]);
 
   // If we are about to start a new background load
   // after the term changed, then don't return the already fetched

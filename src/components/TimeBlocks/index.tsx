@@ -32,6 +32,7 @@ export type TimeBlocksProps = {
   id: string;
   meetingIndex: number;
   period: Period;
+  tempStart?: number;
   days: string[] | readonly string[];
   contentHeader: TimeBlockContent[];
   contentBody: TimeBlockContent[];
@@ -57,6 +58,10 @@ export type TimeBlocksProps = {
   onSelectMeeting?: (
     meeting: [meetingIndex: number, day: string] | null
   ) => void;
+  handleMouseDown?: (
+    e: React.MouseEvent,
+    ref: React.RefObject<HTMLDivElement>
+  ) => void;
 };
 
 export function makeSizeInfoKey(period: Period): string {
@@ -68,6 +73,7 @@ export default function TimeBlocks({
   id,
   meetingIndex,
   period,
+  tempStart,
   days,
   contentHeader,
   contentBody,
@@ -82,6 +88,7 @@ export default function TimeBlocks({
   selectedMeeting,
   onSelectMeeting,
   schedule,
+  handleMouseDown,
 }: TimeBlocksProps): React.ReactElement | null {
   const [{ colorMap }] = useContext(ScheduleContext);
   const color = colorMap[schedule ?? id];
@@ -107,6 +114,7 @@ export default function TimeBlocks({
             color={color}
             day={day}
             period={period}
+            tempStart={tempStart}
             contentHeader={contentHeader}
             contentBody={contentBody}
             popover={popover}
@@ -130,6 +138,7 @@ export default function TimeBlocks({
             deviceHasHover={deviceHasHover}
             // Only the first day for a meeting can be tab focused
             canBeTabFocused={canBeTabFocused && i === 0}
+            handleMouseDown={handleMouseDown}
           />
         );
       })}
@@ -141,6 +150,7 @@ type MeetingDayBlockProps = {
   color: string | undefined;
   day: string;
   period: Period;
+  tempStart?: number;
   contentHeader: TimeBlockContent[];
   contentBody: TimeBlockContent[];
   popover: TimeBlockPopover[];
@@ -151,12 +161,17 @@ type MeetingDayBlockProps = {
   isSelected: boolean;
   onSelect: (newIsSelected: boolean) => void;
   deviceHasHover: boolean;
+  handleMouseDown?: (
+    e: React.MouseEvent,
+    ref: React.RefObject<HTMLDivElement>
+  ) => void;
 };
 
 function MeetingDayBlock({
   color,
   day,
   period,
+  tempStart,
   contentHeader,
   contentBody,
   popover,
@@ -167,19 +182,21 @@ function MeetingDayBlock({
   isSelected,
   onSelect,
   deviceHasHover,
+  handleMouseDown,
 }: MeetingDayBlockProps): React.ReactElement {
   const tooltipId = useId();
   const contentClassName = getContentClassName(color);
   const outerRef = React.useRef<HTMLDivElement>(null);
+  const blockElementRef = React.useRef(null);
   const handleRootClose = (): void => {
     if (isSelected) onSelect(false);
   };
   useRootClose(outerRef, handleRootClose, {
     disabled: !isSelected,
   });
-
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
+
   return (
     <div ref={outerRef}>
       <BlockElement
@@ -187,18 +204,20 @@ function MeetingDayBlock({
           'meeting',
           contentClassName,
           'default',
-          day,
+          // day,
           isSelected && 'meeting--selected'
         )}
         style={{
-          top: `${((period.start - OPEN) / (CLOSE - OPEN)) * 100}%`,
+          top: `${
+            (((tempStart ?? period.start) - OPEN) / (CLOSE - OPEN)) * 100
+          }%`,
+          left: `${
+            DAYS.indexOf(day) * 20 + sizeInfo.rowIndex * (20 / sizeInfo.rowSize)
+          }%`,
           height: `${
             (Math.max(15, period.end - period.start) / (CLOSE - OPEN)) * 100
           }%`,
           width: `${20 / sizeInfo.rowSize}%`,
-          left: `${
-            DAYS.indexOf(day) * 20 + sizeInfo.rowIndex * (20 / sizeInfo.rowSize)
-          }%`,
           ...({
             '--meeting-color': color,
           } as React.CSSProperties),
@@ -225,6 +244,12 @@ function MeetingDayBlock({
             : undefined
         }
         tabIndex={canBeTabFocused ? 0 : -1}
+        ref={blockElementRef}
+        onMouseDown={(e): void => {
+          if (handleMouseDown) {
+            handleMouseDown(e, blockElementRef);
+          }
+        }}
       >
         {includeContent && (
           <div className="meeting-wrapper">

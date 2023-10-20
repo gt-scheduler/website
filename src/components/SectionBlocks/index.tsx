@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { periodToString } from '../../utils/misc';
+import { abbreviateLocation, periodToString } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { Period } from '../../types';
 import { TimeBlocks } from '..';
@@ -64,7 +64,7 @@ export default function SectionBlocks({
             id={section.course.id}
             meetingIndex={i}
             period={period}
-            days={meeting.days}
+            days={meeting.days.filter((day) => day !== 'S' && day !== 'U')}
             contentHeader={[
               {
                 className: 'course-id',
@@ -82,7 +82,7 @@ export default function SectionBlocks({
               },
               {
                 className: 'where',
-                content: meeting.where,
+                content: abbreviateLocation(meeting.where),
               },
               {
                 className: 'instructors',
@@ -96,7 +96,7 @@ export default function SectionBlocks({
               },
               {
                 name: 'Instructors',
-                content: meeting.instructors.join(', '),
+                content: meeting.instructors.join(', ') || 'TBA',
               },
               {
                 name: 'Location',
