@@ -247,84 +247,100 @@ export default function ComparisonContainer({
           </div>
           <div className="shared-schedules">
             <p className="content-title">Shared with me</p>
-            {Object.entries(friends).map((friend) => {
-              return (
-                <div key={friend[0]} className="friend">
-                  <ScheduleRow
-                    // change id later on
-                    id={friend[0]}
-                    type="User"
-                    hasCheck={false}
-                    email={friend[1].email}
-                    name={friend[1].name}
-                    handleEditSchedule={(): void => {
-                      setEditInfo({
-                        id: friend[0],
-                        type: 'User',
-                      });
-                      setEditValue(friend[1].name);
-                    }}
-                    handleRemoveSchedule={(): void => {
-                      setDeleteConfirm({
-                        id: friend[0],
-                        type: 'User',
-                        name: friend[1].name,
-                      });
-                    }}
-                    hasTooltip
-                    editOnChange={(
-                      e: React.ChangeEvent<HTMLInputElement>
-                    ): void => setEditValue(e.target.value)}
-                    editOnKeyDown={handleEdit}
-                    editInfo={editInfo}
-                    setEditInfo={setEditInfo}
-                    editValue={editValue}
-                  />
-                  {Object.entries(friend[1].versions).map((schedule) => {
-                    return (
-                      <ScheduleRow
-                        key={schedule[0]}
-                        id={schedule[0]}
-                        type="Schedule"
-                        owner={friend[0]}
-                        onClick={(): void => handleToggleSchedule(schedule[0])}
-                        checkboxColor={
-                          selected.includes(schedule[0])
-                            ? colorMap[schedule[0]]
-                            : ''
-                        }
-                        name={schedule[1].name}
-                        handleEditSchedule={(): void => {
-                          setEditInfo({
-                            id: schedule[0],
-                            owner: friend[0],
-                            type: 'Schedule',
-                          });
-                          setEditValue(schedule[1].name);
-                        }}
-                        handleRemoveSchedule={(): void => {
-                          setDeleteConfirm({
-                            id: schedule[0],
-                            type: 'Schedule',
-                            name: schedule[1].name,
-                            owner: friend[0],
-                            ownerName: friend[1].name,
-                          });
-                        }}
-                        hasPalette
-                        hasEdit={false}
-                        setFriendScheduleColor={(color: string): void => {
-                          setFriendScheduleColor(color, schedule[0]);
-                        }}
-                        color={colorMap[schedule[0]]}
-                        paletteInfo={paletteInfo}
-                        setPaletteInfo={setPaletteInfo}
-                      />
-                    );
-                  })}
-                </div>
-              );
-            })}
+            {Object.keys(friends).length !== 0 ? (
+              Object.entries(friends).map(([friendId, friend]) => {
+                return (
+                  <div key={friendId} className="friend">
+                    <ScheduleRow
+                      // change id later on
+                      id={friendId}
+                      type="User"
+                      hasCheck={false}
+                      email={friend.email}
+                      name={friend.name}
+                      handleEditSchedule={(): void => {
+                        setEditInfo({
+                          id: friendId,
+                          type: 'User',
+                        });
+                        setEditValue(friend.name);
+                      }}
+                      handleRemoveSchedule={(): void => {
+                        setDeleteConfirm({
+                          id: friendId,
+                          type: 'User',
+                          name: friend.name,
+                        });
+                      }}
+                      hasTooltip
+                      editOnChange={(
+                        e: React.ChangeEvent<HTMLInputElement>
+                      ): void => setEditValue(e.target.value)}
+                      editOnKeyDown={handleEdit}
+                      editInfo={editInfo}
+                      setEditInfo={setEditInfo}
+                      editValue={editValue}
+                    />
+                    {Object.entries(friend.versions).map(
+                      ([scheduleId, schedule]) => {
+                        return (
+                          <ScheduleRow
+                            key={scheduleId}
+                            id={scheduleId}
+                            type="Schedule"
+                            owner={friendId}
+                            onClick={(): void =>
+                              handleToggleSchedule(scheduleId)
+                            }
+                            checkboxColor={
+                              selected.includes(scheduleId)
+                                ? colorMap[scheduleId]
+                                : ''
+                            }
+                            name={schedule.name}
+                            handleEditSchedule={(): void => {
+                              setEditInfo({
+                                id: scheduleId,
+                                owner: friendId,
+                                type: 'Schedule',
+                              });
+                              setEditValue(schedule.name);
+                            }}
+                            handleRemoveSchedule={(): void => {
+                              setDeleteConfirm({
+                                id: scheduleId,
+                                type: 'Schedule',
+                                name: schedule.name,
+                                owner: friendId,
+                                ownerName: friend.name,
+                              });
+                            }}
+                            hasPalette
+                            hasEdit={false}
+                            setFriendScheduleColor={(color: string): void => {
+                              setFriendScheduleColor(color, scheduleId);
+                            }}
+                            color={colorMap[scheduleId]}
+                            paletteInfo={paletteInfo}
+                            setPaletteInfo={setPaletteInfo}
+                          />
+                        );
+                      }
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="no-shared-schedules">
+                <p className="info">
+                  No schedules are currently shared with you.
+                </p>
+                <p className="info">
+                  Accept invitations from other users to see their schedules on
+                  this view.
+                </p>
+              </div>
+            )}
           </div>
           <ComparisonModal
             deleteConfirm={deleteConfirm}
