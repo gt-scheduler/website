@@ -1,4 +1,10 @@
-import React, { useState, useContext, useCallback, useId } from 'react';
+import React, {
+  useState,
+  useContext,
+  useCallback,
+  useId,
+  useEffect,
+} from 'react';
 import {
   faPencil,
   faCircleXmark,
@@ -8,8 +14,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 
-import { classes } from '../../utils/misc';
-import { ScheduleContext } from '../../contexts';
+import { classes, getRandomColor } from '../../utils/misc';
+import { ScheduleContext, FriendContext } from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import { AutoFocusInput } from '../Select';
@@ -18,7 +24,7 @@ import { Palette } from '..';
 import './stylesheet.scss';
 
 export type SharedSchedule = {
-  id: string;
+  email: string;
   name: string;
   schedules: {
     id: string;
@@ -32,6 +38,7 @@ export type DeleteInfo = {
   type: string;
   name: string;
   owner?: string;
+  ownerName?: string;
 } | null;
 
 export type EditInfo = {
@@ -40,60 +47,56 @@ export type EditInfo = {
   type: string;
 } | null;
 
-export default function ComparisonContainer(): React.ReactElement {
-  const [compare, setCompare] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
+export type ComparisonContainerProps = {
+  handleCompareSchedules: (
+    compare?: boolean,
+    pinnedSchedules?: string[],
+    pinSelf?: boolean
+  ) => void;
+  pinnedSchedules: string[];
+  pinSelf: boolean;
+};
+
+export default function ComparisonContainer({
+  handleCompareSchedules,
+  pinnedSchedules,
+  pinSelf,
+}: ComparisonContainerProps): React.ReactElement {
+  const [selected, setSelected] = useState<string[]>(pinnedSchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
+  const [paletteInfo, setPaletteInfo] = useState<string>();
+  const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
 
-  const [{ allVersionNames }, { deleteVersion, renameVersion }] =
-    useContext(ScheduleContext);
+  const [
+    { allVersionNames, currentVersion, colorMap },
+    { deleteVersion, renameVersion, patchSchedule },
+  ] = useContext(ScheduleContext);
 
-  const [sharedSchedules, setSharedSchedules] = useState<SharedSchedule[]>([
-    {
-      id: 'friend1@gatech.edu',
-      name: 'SuperLongFriendNameThatShouldBreakEverythingIncludingModalSoIHaveToMakeThisSuperLongYay',
-      schedules: [
-        { id: '1', name: 'Main', color: '#760000' },
-        {
-          id: '2',
-          name: 'SuperLongScheduleNameThatBreaksEverythingIncludingModalSoIHaveToMakeThisSuperLongYay',
-          color: '#760076',
-        },
-      ],
-    },
-    {
-      id: 'friend2@gatech.edu',
-      name: 'friend2',
-      schedules: [
-        { id: '3', name: 'Primary', color: '#007600' },
-        { id: '4', name: 'New Name', color: '#000076' },
-        { id: '5', name: 'Alternative', color: '#007676' },
-        { id: '6', name: 'Primary', color: '#007600' },
-        { id: '7', name: 'New Name', color: '#000076' },
-        { id: '8', name: 'Alternative', color: '#007676' },
-        { id: '9', name: 'Primary', color: '#007600' },
-        { id: '10', name: 'New Name', color: '#000076' },
-        { id: '11', name: 'Alternative', color: '#007676' },
-        { id: '12', name: 'Alternative', color: '#007676' },
-        { id: '13', name: 'Primary', color: '#007600' },
-        { id: '14', name: 'New Name', color: '#000076' },
-        { id: '15', name: 'Alternative', color: '#007676' },
-        { id: '16', name: 'Primary', color: '#007600' },
-        { id: '17', name: 'New Name', color: '#000076' },
-        { id: '18', name: 'Alternative', color: '#007676' },
-        { id: '19', name: 'Alternative', color: '#007676' },
-      ],
-    },
-    {
-      id: 'friend3@yahoo.com',
-      name: 'friend3@yahoo.com',
-      schedules: [{ id: '12', name: 'Preferred', color: '#562738' }],
-    },
-  ]);
+  const [{ friends }, { updateFriendTermData, renameFriend }] =
+    useContext(FriendContext);
 
-  // placeholder callbacks
+  useEffect(() => {
+    const newColorMap = { ...colorMap };
+    if (!(currentVersion in newColorMap)) {
+      newColorMap[currentVersion] = getRandomColor();
+    }
+    Object.entries(friends).forEach((friend) => {
+      if (!(friend[0] in newColorMap)) {
+        newColorMap[friend[0]] = getRandomColor();
+      }
+      Object.keys(friend[1].versions).forEach((schedule) => {
+        if (!(schedule in newColorMap)) {
+          newColorMap[schedule] = getRandomColor();
+        }
+      });
+    });
+    if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
+      patchSchedule({ colorMap: newColorMap });
+    }
+  }, [friends, currentVersion, colorMap, patchSchedule]);
+
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
@@ -101,40 +104,7 @@ export default function ComparisonContainer(): React.ReactElement {
         if (editInfo?.type === 'Version') {
           renameVersion(editInfo?.id, editValue.trim());
         } else if (editInfo?.type === 'User') {
-          setSharedSchedules(
-            sharedSchedules.map((friend) => {
-              if (friend.id === editInfo?.id) {
-                return {
-                  id: friend.id,
-                  name: editValue.trim(),
-                  schedules: friend.schedules,
-                };
-              }
-              return friend;
-            })
-          );
-        } else {
-          setSharedSchedules(
-            sharedSchedules.map((friend) => {
-              if (friend.id === editInfo?.owner) {
-                return {
-                  id: friend.id,
-                  name: friend.name,
-                  schedules: friend.schedules.map((schedule) => {
-                    if (schedule.id === editInfo?.id) {
-                      return {
-                        id: schedule.id,
-                        name: editValue.trim(),
-                        color: schedule.color,
-                      };
-                    }
-                    return schedule;
-                  }),
-                };
-              }
-              return friend;
-            })
-          );
+          renameFriend(editInfo?.id, editValue.trim());
         }
         setEditInfo(null);
         setEditValue('');
@@ -145,105 +115,101 @@ export default function ComparisonContainer(): React.ReactElement {
         setEditValue('');
       }
     },
-    [editInfo, editValue, sharedSchedules, renameVersion]
+    [editInfo, editValue, renameVersion, renameFriend]
   );
 
   const handleRemoveFriend = useCallback(
     (id: string) => {
-      setSharedSchedules(sharedSchedules.filter((friend) => friend.id !== id));
+      const friend = friends[id];
+      if (friend) {
+        const newColorMap = { ...colorMap };
+        Object.keys(friend.versions).forEach((schedule) => {
+          delete newColorMap[schedule];
+        });
+        setSelected(
+          selected.filter(
+            (selectedId: string) =>
+              !Object.keys(friend.versions).includes(selectedId)
+          )
+        );
+        patchSchedule({ colorMap: newColorMap });
+        updateFriendTermData((draft) => {
+          delete draft.accessibleSchedules[id];
+        });
+      }
     },
-    [sharedSchedules]
+    [friends, selected, colorMap, patchSchedule, updateFriendTermData]
   );
 
   const handleRemoveSchedule = useCallback(
-    (id: string, owner?: string) => {
-      setSharedSchedules(
-        sharedSchedules
-          .map((friend) => {
-            if (friend.id === owner) {
-              return {
-                id: friend.id,
-                name: friend.name,
-                schedules: friend.schedules.filter(
-                  (schedule) => schedule.id !== id
-                ),
-              };
-            }
-            return friend;
-          })
-          .filter((friend) => friend.schedules.length !== 0)
-      );
+    (id: string, owner: string) => {
+      updateFriendTermData((draft) => {
+        if (draft.accessibleSchedules[owner]?.length === 1) {
+          delete draft.accessibleSchedules[owner];
+        } else {
+          draft.accessibleSchedules[owner] =
+            draft.accessibleSchedules[owner]?.filter(
+              (schedule) => schedule !== id
+            ) ?? [];
+        }
+      });
+      const newColorMap = { ...colorMap };
+      delete newColorMap[id];
+      patchSchedule({ colorMap: newColorMap });
+      setSelected(selected.filter((selectedId: string) => selectedId !== id));
     },
-    [sharedSchedules]
+    [selected, colorMap, updateFriendTermData, patchSchedule]
   );
 
   const handleToggleSchedule = useCallback(
     (id: string) => {
       if (selected.includes(id)) {
         setSelected(selected.filter((selectedId: string) => selectedId !== id));
+        handleCompareSchedules(
+          undefined,
+          selected.filter((selectedId: string) => selectedId !== id),
+          undefined
+        );
       } else {
         setSelected(selected.concat([id]));
+        handleCompareSchedules(undefined, selected.concat([id]), undefined);
       }
     },
-    [selected]
+    [selected, handleCompareSchedules]
   );
 
   const setFriendScheduleColor = useCallback(
-    (color: string, id: string, owner?: string) => {
-      setSharedSchedules(
-        sharedSchedules.map((friend) => {
-          if (friend.id === owner) {
-            return {
-              id: friend.id,
-              name: friend.name,
-              schedules: friend.schedules.map((schedule) => {
-                if (schedule.id === id) {
-                  return {
-                    id: schedule.id,
-                    name: schedule.name,
-                    color,
-                  };
-                }
-                return schedule;
-              }),
-            };
-          }
-          return friend;
-        })
-      );
+    (color: string, id: string) => {
+      const newColorMap = { ...colorMap };
+      newColorMap[id] = color;
+      patchSchedule({ colorMap: newColorMap });
     },
-    [sharedSchedules]
+    [colorMap, patchSchedule]
   );
 
   return (
     <div className="comparison-container">
       <div className="comparison-body">
-        <div className="comparison-header">
-          <p className="header-title">Compare Schedules</p>
-          <p className="header-text">{compare ? 'On' : 'Off'}</p>
-          <label className="switch" htmlFor="comparison-checkbox">
-            <input
-              type="checkbox"
-              id="comparison-checkbox"
-              onClick={(): void => setCompare(!compare)}
-            />
-            <div className="slider round" />
-          </label>
-        </div>
-        {compare && (
-          <div className="comparison-content">
-            <div className="my-schedules">
-              <p className="content-title">My Schedules</p>
-              {allVersionNames.map((version) => {
+        <div className="comparison-content">
+          <div className="my-schedule">
+            <p className="content-title">My Schedule</p>
+            {allVersionNames
+              .filter((version) => version.id === currentVersion)
+              .map((version) => {
                 return (
                   <ScheduleRow
                     key={version.id}
                     id={version.id}
                     type="Version"
-                    onClick={(): void => handleToggleSchedule(version.id)}
-                    checkboxColor={
-                      selected.includes(version.id) ? '#FFFFFF' : ''
-                    }
+                    onClick={(): void => {
+                      setScheduleSelected(!scheduleSelected);
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        !scheduleSelected
+                      );
+                    }}
+                    checkboxColor={scheduleSelected ? colorMap[version.id] : ''}
                     name={version.name}
                     // placeholder functions
                     handleEditSchedule={(): void => {
@@ -268,123 +234,106 @@ export default function ComparisonContainer(): React.ReactElement {
                     editInfo={editInfo}
                     setEditInfo={setEditInfo}
                     editValue={editValue}
+                    hasPalette
+                    setFriendScheduleColor={(color: string): void => {
+                      setFriendScheduleColor(color, version.id);
+                    }}
+                    color={colorMap[version.id]}
+                    paletteInfo={paletteInfo}
+                    setPaletteInfo={setPaletteInfo}
                   />
                 );
               })}
-            </div>
-            <div className="shared-schedules">
-              <p className="content-title">Shared with me</p>
-              {sharedSchedules.map((friend) => {
-                return (
-                  <div key={friend.id} className="friend">
-                    <ScheduleRow
-                      // change id later on
-                      id={friend.id}
-                      type="User"
-                      hasCheck={false}
-                      name={friend.name}
-                      handleEditSchedule={(): void => {
-                        setEditInfo({
-                          id: friend.id,
-                          type: 'User',
-                        });
-                        setEditValue(friend.name);
-                      }}
-                      handleRemoveSchedule={(): void => {
-                        setDeleteConfirm({
-                          id: friend.id,
-                          type: 'User',
-                          name: friend.name,
-                        });
-                      }}
-                      hasTooltip
-                      editOnChange={(
-                        e: React.ChangeEvent<HTMLInputElement>
-                      ): void => setEditValue(e.target.value)}
-                      editOnKeyDown={handleEdit}
-                      editInfo={editInfo}
-                      setEditInfo={setEditInfo}
-                      editValue={editValue}
-                    />
-                    {friend.schedules.map((schedule) => {
-                      return (
-                        <ScheduleRow
-                          key={schedule.id}
-                          id={schedule.id}
-                          type="Schedule"
-                          owner={friend.id}
-                          onClick={(): void =>
-                            handleToggleSchedule(schedule.id)
-                          }
-                          checkboxColor={
-                            selected.includes(schedule.id) ? schedule.color : ''
-                          }
-                          name={schedule.name}
-                          handleEditSchedule={(): void => {
-                            setEditInfo({
-                              id: schedule.id,
-                              owner: friend.id,
-                              type: 'Schedule',
-                            });
-                            setEditValue(schedule.name);
-                          }}
-                          handleRemoveSchedule={(): void => {
-                            setDeleteConfirm({
-                              id: schedule.id,
-                              type: 'Schedule',
-                              name: schedule.name,
-                              owner: friend.id,
-                            });
-                          }}
-                          hasPalette
-                          hasEdit={false}
-                          setFriendScheduleColor={(color: string): void => {
-                            setFriendScheduleColor(
-                              color,
-                              schedule.id,
-                              friend.id
-                            );
-                          }}
-                          color={schedule.color}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-            <ComparisonModal
-              deleteConfirm={deleteConfirm}
-              setDeleteConfirm={setDeleteConfirm}
-              deleteVersion={deleteVersion}
-              handleRemoveFriend={handleRemoveFriend}
-              handleRemoveSchedule={handleRemoveSchedule}
-            />
           </div>
-        )}
-        <div
-          className={classes('comparison-overlay', 'left', compare && 'open')}
-          id="comparison-overlay-left"
-        />
-        <ReactTooltip
-          className="overlay-tooltip"
-          variant="dark"
-          anchorId="comparison-overlay-left"
-          delayShow={20}
-          delayHide={100}
-          offset={-150}
-          // key={deviceHasHover ? 0 : 1}
-          // events={deviceHasHover ? ['hover'] : []}
-        >
-          <p>
-            Turn off Compare Schedule
-            <br />
-            to access courses and events
-          </p>
-        </ReactTooltip>
-        {/* <div
-          className={classes('comparison-overlay', 'right', !compare && 'open')}
-        /> */}
+          <div className="shared-schedules">
+            <p className="content-title">Shared with me</p>
+            {Object.entries(friends).map((friend) => {
+              return (
+                <div key={friend[0]} className="friend">
+                  <ScheduleRow
+                    // change id later on
+                    id={friend[0]}
+                    type="User"
+                    hasCheck={false}
+                    email={friend[1].email}
+                    name={friend[1].name}
+                    handleEditSchedule={(): void => {
+                      setEditInfo({
+                        id: friend[0],
+                        type: 'User',
+                      });
+                      setEditValue(friend[1].name);
+                    }}
+                    handleRemoveSchedule={(): void => {
+                      setDeleteConfirm({
+                        id: friend[0],
+                        type: 'User',
+                        name: friend[1].name,
+                      });
+                    }}
+                    hasTooltip
+                    editOnChange={(
+                      e: React.ChangeEvent<HTMLInputElement>
+                    ): void => setEditValue(e.target.value)}
+                    editOnKeyDown={handleEdit}
+                    editInfo={editInfo}
+                    setEditInfo={setEditInfo}
+                    editValue={editValue}
+                  />
+                  {Object.entries(friend[1].versions).map((schedule) => {
+                    return (
+                      <ScheduleRow
+                        key={schedule[0]}
+                        id={schedule[0]}
+                        type="Schedule"
+                        owner={friend[0]}
+                        onClick={(): void => handleToggleSchedule(schedule[0])}
+                        checkboxColor={
+                          selected.includes(schedule[0])
+                            ? colorMap[schedule[0]]
+                            : ''
+                        }
+                        name={schedule[1].name}
+                        handleEditSchedule={(): void => {
+                          setEditInfo({
+                            id: schedule[0],
+                            owner: friend[0],
+                            type: 'Schedule',
+                          });
+                          setEditValue(schedule[1].name);
+                        }}
+                        handleRemoveSchedule={(): void => {
+                          setDeleteConfirm({
+                            id: schedule[0],
+                            type: 'Schedule',
+                            name: schedule[1].name,
+                            owner: friend[0],
+                            ownerName: friend[1].name,
+                          });
+                        }}
+                        hasPalette
+                        hasEdit={false}
+                        setFriendScheduleColor={(color: string): void => {
+                          setFriendScheduleColor(color, schedule[0]);
+                        }}
+                        color={colorMap[schedule[0]]}
+                        paletteInfo={paletteInfo}
+                        setPaletteInfo={setPaletteInfo}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <ComparisonModal
+            deleteConfirm={deleteConfirm}
+            setDeleteConfirm={setDeleteConfirm}
+            deleteVersion={deleteVersion}
+            handleRemoveFriend={handleRemoveFriend}
+            handleRemoveSchedule={handleRemoveSchedule}
+          />
+        </div>
       </div>
     </div>
   );
@@ -397,6 +346,7 @@ type ScheduleRowProps = {
   hasCheck?: boolean;
   onClick?: () => void;
   checkboxColor?: string;
+  email?: string;
   name: string;
   handleEditSchedule: () => void;
   handleRemoveSchedule: () => void;
@@ -406,6 +356,8 @@ type ScheduleRowProps = {
   hasTooltip?: boolean;
   setFriendScheduleColor?: (color: string) => void;
   color?: string;
+  paletteInfo?: string;
+  setPaletteInfo?: (info: string) => void;
   editOnChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editOnKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   editInfo?: EditInfo;
@@ -420,6 +372,7 @@ function ScheduleRow({
   hasCheck = true,
   onClick,
   checkboxColor,
+  email,
   name,
   handleEditSchedule,
   handleRemoveSchedule,
@@ -429,6 +382,8 @@ function ScheduleRow({
   hasTooltip = false,
   setFriendScheduleColor,
   color,
+  paletteInfo,
+  setPaletteInfo,
   editOnChange,
   editOnKeyDown,
   editInfo,
@@ -438,7 +393,6 @@ function ScheduleRow({
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
   const [divHover, setDivHover] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const edit =
     hasEdit &&
@@ -446,6 +400,8 @@ function ScheduleRow({
     editInfo.type === type &&
     editInfo.id === id &&
     editInfo.owner === owner;
+
+  const palette = hasPalette && paletteInfo === id;
 
   return (
     <div className="schedule-row">
@@ -461,10 +417,10 @@ function ScheduleRow({
             style={{ backgroundColor: checkboxColor }}
           />
         )}
-        {hasEdit && setEditInfo && editValue && edit && (
+        {setEditInfo && edit && (
           <AutoFocusInput
             className={classes('edit-input', hasCheck && 'check')}
-            value={editValue}
+            value={editValue ?? ''}
             onChange={editOnChange}
             placeholder={name}
             onKeyDown={editOnKeyDown}
@@ -480,7 +436,7 @@ function ScheduleRow({
               onMouseLeave={(): void => setTooltipHover(false)}
             >
               <p>{name}</p>
-              {hasTooltip && id !== name && (
+              {hasTooltip && email !== name && (
                 <ReactTooltip
                   key={id}
                   anchorId={tooltipId}
@@ -493,17 +449,17 @@ function ScheduleRow({
                   // key={deviceHasHover ? 0 : 1}
                   // events={deviceHasHover ? ['hover'] : []}
                 >
-                  <p>{id}</p>
+                  <p>{email}</p>
                 </ReactTooltip>
               )}
             </div>
             <div className="spacing" />
           </>
         )}
-        {(divHover || edit) && hasPalette && (
+        {(divHover || edit) && hasPalette && setPaletteInfo && (
           <Button
             className="icon"
-            onClick={(): void => setPaletteOpen(!paletteOpen)}
+            onClick={(): void => setPaletteInfo(palette ? '' : id)}
             key={`${id}-palette`}
           >
             <FontAwesomeIcon icon={faPalette} size="xs" />
@@ -528,12 +484,12 @@ function ScheduleRow({
           </Button>
         )}
       </div>
-      {hasPalette && paletteOpen && setFriendScheduleColor && (
+      {hasPalette && palette && setFriendScheduleColor && setPaletteInfo && (
         <Palette
-          className="palette"
+          className={classes('palette', type === 'Schedule' && 'indented')}
           onSelectColor={setFriendScheduleColor}
           color={color ?? null}
-          onMouseLeave={(): void => undefined}
+          onMouseLeave={(): void => setPaletteInfo('')}
         />
       )}
     </div>
@@ -545,7 +501,7 @@ type ComparisonModalProps = {
   setDeleteConfirm: (deleteConfirm: DeleteInfo) => void;
   deleteVersion: (id: string) => void;
   handleRemoveFriend: (id: string) => void;
-  handleRemoveSchedule: (id: string, owner?: string) => void;
+  handleRemoveSchedule: (id: string, owner: string) => void;
 };
 
 function ComparisonModal({
@@ -570,7 +526,10 @@ function ComparisonModal({
               } else if (deleteConfirm.type === 'User') {
                 handleRemoveFriend(deleteConfirm.id);
               } else {
-                handleRemoveSchedule(deleteConfirm.id, deleteConfirm.owner);
+                handleRemoveSchedule(
+                  deleteConfirm.id,
+                  deleteConfirm.owner ?? ''
+                );
               }
             }
             setDeleteConfirm(null);
@@ -619,7 +578,7 @@ function ComparisonModal({
           </p>
           <p>
             Schedule: <b>{deleteConfirm?.name}</b> <br />
-            Owner: <b>{deleteConfirm?.owner}</b>
+            Owner: <b>{deleteConfirm?.ownerName}</b>
           </p>
           <p>
             You will not be able to see it unless the owner sends another

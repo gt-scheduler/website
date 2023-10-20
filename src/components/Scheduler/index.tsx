@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -30,6 +30,29 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
+  const [compare, setCompare] = useState(false);
+  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
+  const [pinSelf, setPinSelf] = useState(false);
+
+  const handleCompareSchedules = useCallback(
+    (
+      newCompare?: boolean,
+      newPinnedSchedules?: string[],
+      newPinSelf?: boolean
+    ) => {
+      if (newCompare !== undefined) {
+        setCompare(newCompare);
+      }
+      if (newPinnedSchedules !== undefined) {
+        setPinnedSchedules(newPinnedSchedules);
+      }
+      if (newPinSelf !== undefined) {
+        setPinSelf(newPinSelf);
+      }
+    },
+    []
+  );
+
   return (
     <>
       {mobile && (
@@ -51,10 +74,22 @@ export default function Scheduler(): React.ReactElement {
           {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">
-              <Calendar className="calendar" overlayCrns={overlayCrns} />
+              <Calendar
+                className="calendar"
+                overlayCrns={overlayCrns}
+                compare={compare}
+                pinnedFriendSchedules={pinnedSchedules}
+                pinSelf={!compare || pinSelf}
+              />
             </div>
           )}
-          {(!mobile || tabIndex === 3) && <ComparisonPanel />}
+          {(!mobile || tabIndex === 3) && (
+            <ComparisonPanel
+              handleCompareSchedules={handleCompareSchedules}
+              pinnedSchedules={pinnedSchedules}
+              pinSelf={pinSelf}
+            />
+          )}
         </div>
       </OverlayCrnsContext.Provider>
     </>

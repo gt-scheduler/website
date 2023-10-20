@@ -43,6 +43,7 @@ export type TimeBlocksProps = {
   includeContent: boolean;
   sizeInfo: SizeInfo;
   canBeTabFocused?: boolean;
+  schedule?: string;
   /**
    * Passing through this prop to skip subscribing to a media query per
    * TimeBlocks component instance:
@@ -86,10 +87,11 @@ export default function TimeBlocks({
   deviceHasHover = true,
   selectedMeeting,
   onSelectMeeting,
+  schedule,
   handleMouseDown,
 }: TimeBlocksProps): React.ReactElement | null {
   const [{ colorMap }] = useContext(ScheduleContext);
-  const color = colorMap[id];
+  const color = colorMap[schedule ?? id];
   const sizeInfoKey = makeSizeInfoKey(period);
 
   return (

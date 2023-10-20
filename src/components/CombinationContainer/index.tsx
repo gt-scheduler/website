@@ -20,7 +20,13 @@ import './stylesheet.scss';
 const List = _List as unknown as React.ComponentType<ListProps>;
 const AutoSizer = _AutoSizer as unknown as React.ComponentType<AutoSizerProps>;
 
-export default function CombinationContainer(): React.ReactElement {
+export type ComparisonPanelProps = {
+  compare?: boolean;
+};
+
+export default function CombinationContainer({
+  compare = false,
+}: ComparisonPanelProps): React.ReactElement {
   const [
     {
       oscar,
@@ -99,6 +105,7 @@ export default function CombinationContainer(): React.ReactElement {
                           className="calendar-preview"
                           overlayCrns={crns}
                           isAutosized
+                          compare={compare}
                           preview
                         />
                       </div>
