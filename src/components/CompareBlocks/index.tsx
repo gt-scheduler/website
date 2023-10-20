@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { abbreviateLocation, periodToString } from '../../utils/misc';
+import { periodToString } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { Period } from '../../types';
 import { TimeBlocks } from '..';
@@ -8,17 +8,19 @@ import { TimeBlockPosition, SizeInfo } from '../TimeBlocks';
 
 import './stylesheet.scss';
 
-export interface SectionBlockPosition extends TimeBlockPosition {
+export interface CompareBlockPosition extends TimeBlockPosition {
   rowIndex: number;
   rowSize: number;
   period: Period;
   crn: string;
 }
 
-export type SectionBlocksProps = {
+export type CompareBlocksProps = {
   className?: string;
+  owner: string;
+  scheduleId: string;
+  scheduleName: string;
   crn: string;
-  schedule?: string;
   overlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
@@ -32,10 +34,12 @@ export type SectionBlocksProps = {
   ) => void;
 };
 
-export default function SectionBlocks({
+export default function CompareBlocks({
   className,
+  owner,
+  scheduleId,
+  scheduleName,
   crn,
-  schedule,
   overlay = false,
   capture,
   sizeInfo,
@@ -45,7 +49,7 @@ export default function SectionBlocks({
   deviceHasHover = true,
   selectedMeeting,
   onSelectMeeting,
-}: SectionBlocksProps): React.ReactElement | null {
+}: CompareBlocksProps): React.ReactElement | null {
   const [{ oscar }] = useContext(ScheduleContext);
 
   const section = oscar.findSection(crn);
@@ -64,7 +68,7 @@ export default function SectionBlocks({
             id={section.course.id}
             meetingIndex={i}
             period={period}
-            days={meeting.days.filter((day) => day !== 'S' && day !== 'U')}
+            days={meeting.days}
             contentHeader={[
               {
                 className: 'course-id',
@@ -82,7 +86,7 @@ export default function SectionBlocks({
               },
               {
                 className: 'where',
-                content: abbreviateLocation(meeting.where),
+                content: meeting.where,
               },
               {
                 className: 'instructors',
@@ -91,12 +95,20 @@ export default function SectionBlocks({
             ]}
             popover={[
               {
+                name: 'Owner',
+                content: owner,
+              },
+              {
+                name: 'Schedule',
+                content: scheduleName,
+              },
+              {
                 name: 'Course Name',
                 content: section.course.title,
               },
               {
                 name: 'Instructors',
-                content: meeting.instructors.join(', ') || 'TBA',
+                content: meeting.instructors.join(', '),
               },
               {
                 name: 'Location',
@@ -124,7 +136,7 @@ export default function SectionBlocks({
             deviceHasHover={deviceHasHover}
             selectedMeeting={selectedMeeting}
             onSelectMeeting={onSelectMeeting}
-            schedule={schedule}
+            schedule={scheduleId}
           />
         );
       })}

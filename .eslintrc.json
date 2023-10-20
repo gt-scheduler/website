@@ -61,7 +61,12 @@
       }
     ],
     "no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
-    "prettier/prettier": "warn",
+    "prettier/prettier": [
+      "warn",
+      {
+        "endOfLine": "auto"
+      }
+    ],
     "react/require-default-props": "off",
     "no-await-in-loop": "off",
     "camelcase": "off",
