@@ -13,11 +13,8 @@ export default function RouterComponent(): React.ReactElement {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/invite/:id" element={<InviteBackLink />} />
+        <Route path="/pr-preview/:pr/" element={<App />} />
         <Route path="/pr-preview/:pr/invite/:id" element={<InviteBackLink />} />
-        <Route
-          path="/pr-preview/:pr/*"
-          element={<Navigate to="/pr-preview/:pr/" replace />}
-        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
