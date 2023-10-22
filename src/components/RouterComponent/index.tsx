@@ -10,10 +10,9 @@ export default function RouterComponent(): React.ReactElement {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/invite/:id" element={<InviteBackLink />} />
-        <Route path="/pr-preview/:pr/">
-          <Route path="/" element={<App />} />
-          <Route path="/invite/:id" element={<InviteBackLink />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/pr-preview/:id">
+          <Route path="" element={<App />} />
+          <Route path="invite/:id" element={<InviteBackLink />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

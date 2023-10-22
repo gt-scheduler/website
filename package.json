@@ -34,7 +34,7 @@
     "react-map-gl": "5.2.11",
     "react-overlays": "^5.1.1",
     "react-resize-panel": "^0.3.5",
-    "react-router-dom": "^6.8.1",
+    "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
     "react-tooltip": "^5.5.1",
     "react-transition-group": "^4.4.2",

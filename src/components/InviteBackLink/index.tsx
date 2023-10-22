@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
@@ -30,8 +30,15 @@ const handleInvite = async (inviteId: string | undefined): Promise<void> => {
 
 export default function InviteBackLink(): React.ReactElement {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const { id } = useParams();
   const [state, setState] = useState(LoadingState.LOADING);
+
+  const redirectUrl = useMemo(
+    () => location.pathname.split('/invite')[0] ?? '/',
+    [location]
+  );
 
   useEffect(() => {
     if (id && navigate) {
@@ -39,17 +46,17 @@ export default function InviteBackLink(): React.ReactElement {
         .then(() => {
           setState(LoadingState.SUCCESS);
           setTimeout(() => {
-            navigate('/');
+            navigate(redirectUrl);
           }, 5000);
         })
         .catch(() => {
           setState(LoadingState.ERROR);
           setTimeout(() => {
-            navigate('/');
+            navigate(redirectUrl);
           }, 10000);
         });
     }
-  }, [id, navigate]);
+  }, [id, navigate, redirectUrl]);
 
   if (state === LoadingState.LOADING) {
     return (
@@ -77,7 +84,7 @@ export default function InviteBackLink(): React.ReactElement {
         type="button"
         className="continue-button"
         onClick={(): void => {
-          navigate('/');
+          navigate(redirectUrl);
         }}
       >
         Continue
