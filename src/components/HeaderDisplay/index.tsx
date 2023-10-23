@@ -19,6 +19,7 @@ import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 
 import './stylesheet.scss';
+import { Term } from '../../types';
 
 type VersionState =
   | { type: 'loading' }
@@ -49,7 +50,7 @@ export type HeaderDisplayProps = {
     | { type: 'loading' }
     | {
         type: 'loaded';
-        terms: readonly string[];
+        terms: Term[];
         currentTerm: string;
         onChangeTerm: (next: string) => void;
       };
@@ -108,8 +109,8 @@ export default function HeaderDisplay({
           onChange={termsState.onChangeTerm}
           current={termsState.currentTerm}
           options={termsState.terms.map((currentTerm) => ({
-            id: currentTerm,
-            label: getSemesterName(currentTerm),
+            id: currentTerm.term,
+            label: getSemesterName(currentTerm.term),
           }))}
           className="semester"
         />

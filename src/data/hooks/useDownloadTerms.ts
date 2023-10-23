@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { softError, ErrorWithFields } from '../../log';
-import { LoadingState, NonEmptyArray } from '../../types';
+import { LoadingState, NonEmptyArray, Term } from '../../types';
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
@@ -14,10 +14,8 @@ const CRAWLER_INDEX_URL =
  * Repeatedly attempts to load in the case of errors,
  * and cancels itself once the parent context is unmounted.
  */
-export default function useDownloadTerms(): LoadingState<
-  NonEmptyArray<string>
-> {
-  const [state, setState] = useState<LoadingState<NonEmptyArray<string>>>({
+export default function useDownloadTerms(): LoadingState<NonEmptyArray<Term>> {
+  const [state, setState] = useState<LoadingState<NonEmptyArray<Term>>>({
     type: 'loading',
   });
 
@@ -28,7 +26,7 @@ export default function useDownloadTerms(): LoadingState<
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const promise = axios.get<{ terms: string[] }>(CRAWLER_INDEX_URL);
+          const promise = axios.get<{ terms: Term[] }>(CRAWLER_INDEX_URL);
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;
@@ -45,7 +43,7 @@ export default function useDownloadTerms(): LoadingState<
 
           setState({
             type: 'loaded',
-            result: newTerms as NonEmptyArray<string>,
+            result: newTerms as NonEmptyArray<Term>,
           });
 
           return;

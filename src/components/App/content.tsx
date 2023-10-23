@@ -16,6 +16,7 @@ import {
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
+import { Term } from '../../types';
 
 /**
  * Renders the actual content at the root of the app
@@ -85,7 +86,7 @@ export type AppSkeletonProps = {
   children: React.ReactNode;
   accountState?: AccountContextValue;
   termsState?: {
-    terms: string[];
+    terms: Term[];
     currentTerm: string;
     onChangeTerm: (next: string) => void;
   };
