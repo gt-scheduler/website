@@ -19,6 +19,7 @@ import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 
 import './stylesheet.scss';
+
 import { Term } from '../../types';
 
 type VersionState =
