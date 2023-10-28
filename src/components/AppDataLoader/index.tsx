@@ -30,6 +30,7 @@ import {
   StageExtractScheduleVersion,
   StageSkeletonProps,
 } from './stages';
+import { Term } from '../../types';
 
 export type DataLoaderProps = {
   children: React.ReactNode;
@@ -204,7 +205,7 @@ function GroupLoadScheduleData({
 }
 
 type ContextProviderProps = {
-  terms: string[];
+  terms: Term[];
   currentTerm: string;
   setTerm: (next: string) => void;
   currentVersion: string;
