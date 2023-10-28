@@ -18,6 +18,7 @@ import HeaderActionBar from '../HeaderActionBar';
 import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
+
 import './stylesheet.scss';
 
 type VersionState =
