@@ -1,0 +1,24 @@
+{
+  "terms": [
+    {
+      "term": "202008",
+      "finalized": true
+    },
+    {
+      "term": "202102",
+      "finalized": true
+    },
+    {
+      "term": "202105",
+      "finalized": true
+    },
+    {
+      "term": "202108",
+      "finalized": true
+    },
+    {
+      "term": "202202",
+      "finalized": false
+    }
+  ]
+}
