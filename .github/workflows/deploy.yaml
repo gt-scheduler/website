@@ -45,8 +45,6 @@ jobs:
           environment: production
           sourcemaps: 'build/static/js'
           version: ${{ github.sha }}
-          ignore-missing: true
-        continue-on-error: true
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
