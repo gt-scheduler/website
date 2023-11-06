@@ -54,7 +54,7 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          environment: development
+          environment: production
           sourcemaps: 'build/static/js'
           version: ${{ github.sha }}
           ignore_missing: true
