@@ -57,7 +57,6 @@ jobs:
           environment: production
           sourcemaps: 'build/static/js'
           version: ${{ github.sha }}
-          ignore_missing: true
 
       - name: Stage
         uses: rossjrw/pr-preview-action@v1
