@@ -27,7 +27,14 @@ export default function Header({
   captureRef,
 }: HeaderProps): React.ReactElement {
   const [
-    { term, oscar, pinnedCrns, allVersionNames, currentVersion },
+    {
+      term,
+      oscar,
+      pinnedCrns,
+      allVersionNames,
+      currentVersion,
+      adjustedCredits,
+    },
     {
       setTerm,
       setCurrentVersion,
@@ -40,11 +47,25 @@ export default function Header({
   const terms = useContext(TermsContext);
 
   const totalCredits = useMemo(() => {
+    const adjustedCourses = new Set();
     return pinnedCrns.reduce((credits, crn) => {
       const crnSection = oscar.findSection(crn);
-      return credits + (crnSection != null ? crnSection.credits : 0);
+      if (
+        crnSection !== undefined &&
+        crnSection.adjustableCredits &&
+        !adjustedCourses.has(`${crnSection.course.id}-${term}`)
+      ) {
+        adjustedCourses.add(`${crnSection.course.id}-${term}`);
+        return (
+          credits + (adjustedCredits[`${crnSection.course.id}-${term}`] ?? 1)
+        );
+      }
+      if (!crnSection?.adjustableCredits) {
+        return credits + (crnSection != null ? crnSection.credits : 0);
+      }
+      return credits;
     }, 0);
-  }, [pinnedCrns, oscar]);
+  }, [pinnedCrns, oscar, adjustedCredits, term]);
 
   const headerActionBarProps = useHeaderActionBarProps(captureRef);
 
