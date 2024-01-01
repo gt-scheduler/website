@@ -1,0 +1,21 @@
+.slider {
+  color: white !important;
+
+  .MuiSlider-mark {
+    background-color: transparent;
+  }
+
+  .MuiSlider-thumb {
+    width: 15px;
+    height: 15px;
+
+    &:hover {
+      box-shadow: 0px 0px 0px 8px rgba(255, 255, 255, 0.35);
+    }
+  }
+
+  .MuiSlider-valueLabel {
+    background-color: #222;
+    opacity: 0.9;
+  }
+}
