@@ -278,7 +278,7 @@ export default function Course({
                       place="left"
                       style={{ fontSize: '110%' }}
                     >
-                      Adjust credits
+                      Adjust Credits
                     </ReactTooltip>
                   </div>
                 )}
