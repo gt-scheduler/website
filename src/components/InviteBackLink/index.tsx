@@ -35,8 +35,8 @@ export default function InviteBackLink(): React.ReactElement {
   const { id } = useParams();
   const [state, setState] = useState(LoadingState.LOADING);
 
-  const redirectUrl = useMemo(
-    () => location.pathname.split('/invite')[0] ?? '/',
+  const redirectURL = useMemo(
+    () => location.pathname.split('/#')[0] ?? '/',
     [location]
   );
 
@@ -46,17 +46,17 @@ export default function InviteBackLink(): React.ReactElement {
         .then(() => {
           setState(LoadingState.SUCCESS);
           setTimeout(() => {
-            navigate(redirectUrl);
+            navigate(redirectURL);
           }, 5000);
         })
         .catch(() => {
           setState(LoadingState.ERROR);
           setTimeout(() => {
-            navigate(redirectUrl);
+            navigate(redirectURL);
           }, 10000);
         });
     }
-  }, [id, navigate, redirectUrl]);
+  }, [id, navigate, redirectURL]);
 
   if (state === LoadingState.LOADING) {
     return (
@@ -84,7 +84,7 @@ export default function InviteBackLink(): React.ReactElement {
         type="button"
         className="continue-button"
         onClick={(): void => {
-          navigate(redirectUrl);
+          navigate(redirectURL);
         }}
       >
         Continue
