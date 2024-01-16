@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useRef,
+  useMemo,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { faCircle, faClose, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -38,6 +39,11 @@ export function InvitationModalContent(): React.ReactElement {
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
 
+  const redirectURL = useMemo(
+    () => window.location.href.split('/#')[0] ?? '/',
+    []
+  );
+
   const handleChangeSearch = useCallback(() => {
     setValidMessage('');
     setValidClassName('');
@@ -50,6 +56,7 @@ export function InvitationModalContent(): React.ReactElement {
       friendEmail: input.current?.value,
       IDToken: IdToken,
       version: currentVersion,
+      redirectURL,
     });
     return axios.post(
       `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`,
@@ -60,7 +67,7 @@ export function InvitationModalContent(): React.ReactElement {
         },
       }
     );
-  }, [accountContext, currentVersion, term]);
+  }, [accountContext, currentVersion, term, redirectURL]);
 
   // verify email with a regex and send invitation if valid
   const verifyEmail = useCallback((): void => {
