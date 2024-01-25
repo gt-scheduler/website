@@ -92,44 +92,50 @@ export default function EventAdd({
     return hour * 60 + time.minute;
   }, []);
 
-  const timeChangeHelper = (newTime: Time, isStartTime: boolean): void => {
-    setError('');
-    // validation
-    if (newTime.hour !== -1) {
-      if (newTime.hour !== -1 && newTime.hour < 1) {
-        newTime.hour = 1;
-      } else if (newTime.hour > 12) {
-        newTime.hour = 12;
+  const timeChangeHelper = useCallback(
+    (newTime: Time, isStartTime: boolean): void => {
+      setError('');
+      // validation
+      if (newTime.hour !== -1) {
+        if (newTime.hour !== -1 && newTime.hour < 1) {
+          newTime.hour = 1;
+        } else if (newTime.hour > 12) {
+          newTime.hour = 12;
+        }
       }
-    }
-    if (newTime.minute !== -1) {
-      if (newTime.minute > 59) {
-        newTime.minute = 59;
+      if (newTime.minute !== -1) {
+        if (newTime.minute > 59) {
+          newTime.minute = 59;
+        }
       }
-    }
-    // Updating state
-    if (isStartTime) {
-      setStart(newTime);
-    } else {
-      setEnd(newTime);
-    }
+      // Updating state
+      if (isStartTime) {
+        setStart(newTime);
+      } else {
+        setEnd(newTime);
+      }
 
-    const parsedStart = isStartTime ? parseTime(newTime) : parseTime(start);
-    const parsedEnd = isStartTime ? parseTime(end) : parseTime(newTime);
+      const parsedStart = isStartTime ? parseTime(newTime) : parseTime(start);
+      const parsedEnd = isStartTime ? parseTime(end) : parseTime(newTime);
 
-    if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
-      setError('Start time must be before end time.');
-    } else if (parsedStart !== -1 && (parsedStart < 480 || parsedEnd > 1320)) {
-      setError('Event must be between 08:00 AM and 10:00 PM.');
-    }
-  };
+      if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
+        setError('Start time must be before end time.');
+      } else if (
+        parsedStart !== -1 &&
+        (parsedStart < 480 || parsedEnd > 1320)
+      ) {
+        setError('Event must be between 08:00 AM and 10:00 PM.');
+      }
+    },
+    [parseTime, start, end]
+  );
 
   const handleStartChange = useCallback(
     (newStart: Time): void => {
       setRenderCounter(renderCounter + 1);
       timeChangeHelper(newStart, true);
     },
-    [end, parseTime, renderCounter, timeChangeHelper]
+    [renderCounter, timeChangeHelper]
   );
 
   const handleEndChange = useCallback(
@@ -137,7 +143,7 @@ export default function EventAdd({
       setRenderCounter(renderCounter + 1);
       timeChangeHelper(newEnd, false);
     },
-    [start, parseTime, renderCounter, timeChangeHelper]
+    [renderCounter, timeChangeHelper]
   );
 
   const onSubmit = useCallback((): void => {
