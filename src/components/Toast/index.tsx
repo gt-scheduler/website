@@ -1,32 +1,44 @@
 import React from 'react';
 
-import { Id, ToastContainer, toast } from 'react-toastify';
-
 import './stylesheet.scss';
-import 'react-toastify/dist/ReactToastify.css';
 import { classes } from '../../utils/misc';
+import { faWarning } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export type ToastProps = {
   style?: React.CSSProperties;
   className?: string;
   color?: string;
-  icon?: string;
+  icon?: IconProp;
+  message?: string;
 };
 
 export default function Toast({
   style,
   className,
   color = 'red',
-  icon = '',
+  icon = faWarning,
+  message = '',
 }: ToastProps): React.ReactElement {
-  const notify = (): Id => toast('Wow so easy!');
+  function notify(): void {
+    const x = document.getElementById('toast');
+    x!.className = 'show';
+    setTimeout(function () {
+      x!.className = x!.className.replace('show', '');
+    }, 3000);
+  }
 
   return (
     <div>
       <button type="button" onClick={notify}>
-        Notify!
+        Show Snackbar
       </button>
-      <ToastContainer className={classes('toast', className)} />
+      <div id="toast" style={{ backgroundColor: color }}>
+        <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
+        {message}
+      </div>
+      <div className={classes('toast', className)} />
     </div>
   );
 }

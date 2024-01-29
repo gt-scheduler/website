@@ -1,8 +1,54 @@
 @import '../../variables';
 
-.Toast {
+#toast {
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 12px;
+  column-gap: 15px;
+  visibility: hidden;
+  width: 272px;
+  margin-left: -125px;
+  color: #000000;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  right: 30px;
+  top: 30px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1em;
+  text-align: left;
+}
+
+#toast.show {
+  visibility: visible;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+  from {
+    right: 0;
+    opacity: 0;
+  }
+  to {
+    right: 30px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    right: 30px;
+    opacity: 1;
+  }
+  to {
+    right: 0;
+    opacity: 0;
+  }
+}
+
+.toast-icon {
+  font-size: 2em;
+  color: #000000;
 }
