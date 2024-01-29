@@ -21,11 +21,6 @@
   text-align: left;
 }
 
-#toast.show {
-  visibility: visible;
-  animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
 @keyframes fadein {
   from {
     right: 0;
@@ -50,5 +45,13 @@
 
 .toast-icon {
   font-size: 2em;
-  color: #000000;
+}
+
+.toast-close-icon {
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.toast-message {
+  flex-grow: 1;
 }
