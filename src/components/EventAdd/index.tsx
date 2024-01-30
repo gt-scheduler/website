@@ -3,8 +3,8 @@ import React, {
   KeyboardEvent,
   useCallback,
   useContext,
-  useEffect,
   useState,
+  useMemo,
 } from 'react';
 import { Immutable, castDraft } from 'immer';
 
@@ -57,12 +57,11 @@ export default function EventAdd({
     minute: event?.period.end ? event.period.end % 60 : -1,
     morning: event?.period.end ? event.period.end < 720 : true,
   });
-  const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
   const [renderCounter, setRenderCounter] = useState(0);
 
-  useEffect(() => {
-    if (
+  const submitDisabled: boolean = useMemo(() => {
+    return !(
       eventName.length > 0 &&
       selectedTags.length > 0 &&
       start.hour !== -1 &&
@@ -70,11 +69,7 @@ export default function EventAdd({
       end.minute !== -1 &&
       end.hour !== -1 &&
       !error
-    ) {
-      setSubmitDisabled(false);
-    } else {
-      setSubmitDisabled(true);
-    }
+    );
   }, [eventName, selectedTags, start, end, error]);
 
   const parseTime = useCallback((time: Time): number => {
