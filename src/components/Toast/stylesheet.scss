@@ -1,11 +1,11 @@
 @import '../../variables';
 
-#toast {
+.toast {
   display: flex;
   align-items: center;
   column-gap: 15px;
   visibility: hidden;
-  width: 272px;
+  width: 300px;
   margin-left: -125px;
   color: #000000;
   text-align: center;
@@ -50,8 +50,10 @@
 .toast-close-icon {
   font-size: 1.5em;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .toast-message {
-  flex-grow: 1;
+  flex: 1 0;
+  max-width: 100%;
 }

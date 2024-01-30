@@ -7,24 +7,34 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export type ToastProps = {
-  style?: React.CSSProperties;
   className?: string;
   color?: string;
   icon?: IconProp;
   message?: string;
+  selfDisappearing?: boolean;
 };
 
 export default function Toast({
-  style,
   className,
   color = 'red',
   icon = faWarning,
   message = '',
+  selfDisappearing = false,
 }: ToastProps): React.ReactElement {
   function notify(): void {
-    const x = document.getElementById('toast');
-    x!.style.visibility = 'visible';
-    x!.style.animation = 'fadein 0.5s';
+    const t = document.getElementsByClassName(
+      classes('toast', className)
+    )[0] as HTMLElement;
+    t.style.visibility = 'visible';
+    t.style.animation = 'fadein 0.5s';
+    if (selfDisappearing) {
+      setTimeout(function () {
+        t.style.animation = 'fadeout 0.5s';
+      }, 5000);
+      setTimeout(function () {
+        t.style.visibility = 'hidden';
+      }, 5500);
+    }
   }
 
   return (
@@ -32,23 +42,28 @@ export default function Toast({
       <button type="button" onClick={notify}>
         Show Toast
       </button>
-      <div id="toast" style={{ backgroundColor: color }}>
+      <div
+        className={classes('toast', className)}
+        style={{ backgroundColor: color }}
+      >
         <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
         <div className="toast-message">{message}</div>
         <FontAwesomeIcon
+          style={{ display: selfDisappearing ? 'none' : 'flex' }}
           fixedWidth
           icon={faClose}
           className="toast-close-icon"
           onClick={(): void => {
-            const x = document.getElementById('toast');
-            x!.style.animation = 'fadeout 0.5s';
+            const t = document.getElementsByClassName(
+              classes('toast', className)
+            )[0] as HTMLElement;
+            t.style.animation = 'fadeout 0.5s';
             setTimeout(function () {
-              x!.style.visibility = 'hidden';
+              t.style.visibility = 'hidden';
             }, 500);
           }}
         />
       </div>
-      <div className={classes('toast', className)} />
     </div>
   );
 }
