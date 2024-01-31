@@ -57,20 +57,8 @@ export default function EventAdd({
     minute: event?.period.end ? event.period.end % 60 : -1,
     morning: event?.period.end ? event.period.end < 720 : true,
   });
-  const [error, setError] = useState('');
-  const [renderCounter, setRenderCounter] = useState(0);
 
-  const submitDisabled: boolean = useMemo(() => {
-    return !(
-      eventName.length > 0 &&
-      selectedTags.length > 0 &&
-      start.hour !== -1 &&
-      start.minute !== -1 &&
-      end.minute !== -1 &&
-      end.hour !== -1 &&
-      !error
-    );
-  }, [eventName, selectedTags, start, end, error]);
+  const [renderCounter, setRenderCounter] = useState(0);
 
   const parseTime = useCallback((time: Time): number => {
     if (time.hour === -1 || time.minute === -1) {
@@ -87,9 +75,35 @@ export default function EventAdd({
     return hour * 60 + time.minute;
   }, []);
 
+  const calculateError = (): string => {
+    const parsedStart = parseTime(start);
+    const parsedEnd = parseTime(end);
+
+    if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
+      return 'Start time must be before end time.';
+    }
+    if (parsedStart !== -1 && (parsedStart < 480 || parsedEnd > 1320)) {
+      return 'Event must be between 08:00 AM and 10:00 PM.';
+    }
+    return '';
+  };
+
+  const error = calculateError();
+
+  const submitDisabled: boolean = useMemo(() => {
+    return !(
+      eventName.length > 0 &&
+      selectedTags.length > 0 &&
+      start.hour !== -1 &&
+      start.minute !== -1 &&
+      end.minute !== -1 &&
+      end.hour !== -1 &&
+      !error
+    );
+  }, [eventName, selectedTags, start, end, error]);
+
   const timeChangeHelper = useCallback(
     (newTime: Time, isStartTime: boolean): void => {
-      setError('');
       // validation
       if (newTime.hour !== -1) {
         if (newTime.hour !== -1 && newTime.hour < 1) {
@@ -109,20 +123,8 @@ export default function EventAdd({
       } else {
         setEnd(newTime);
       }
-
-      const parsedStart = isStartTime ? parseTime(newTime) : parseTime(start);
-      const parsedEnd = isStartTime ? parseTime(end) : parseTime(newTime);
-
-      if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
-        setError('Start time must be before end time.');
-      } else if (
-        parsedStart !== -1 &&
-        (parsedStart < 480 || parsedEnd > 1320)
-      ) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
-      }
     },
-    [parseTime, start, end]
+    []
   );
 
   const handleStartChange = useCallback(
