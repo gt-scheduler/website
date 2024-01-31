@@ -14,6 +14,23 @@ export type ToastProps = {
   selfDisappearing?: boolean;
 };
 
+export function notifyToast(className: string): void {
+  const t = document.getElementsByClassName(
+    classes('toast', className)
+  )[0] as HTMLElement;
+  const selfDisappearing = t.getElementsByClassName('toast-close-icon')[0];
+  t.style.visibility = 'visible';
+  t.style.animation = 'fadein 0.5s';
+  if (selfDisappearing) {
+    setTimeout(function () {
+      t.style.animation = 'fadeout 0.5s';
+    }, 5000);
+    setTimeout(function () {
+      t.style.visibility = 'hidden';
+    }, 5500);
+  }
+}
+
 export default function Toast({
   className,
   color = 'red',
@@ -21,49 +38,28 @@ export default function Toast({
   message = '',
   selfDisappearing = false,
 }: ToastProps): React.ReactElement {
-  function notify(): void {
-    const t = document.getElementsByClassName(
-      classes('toast', className)
-    )[0] as HTMLElement;
-    t.style.visibility = 'visible';
-    t.style.animation = 'fadein 0.5s';
-    if (selfDisappearing) {
-      setTimeout(function () {
-        t.style.animation = 'fadeout 0.5s';
-      }, 5000);
-      setTimeout(function () {
-        t.style.visibility = 'hidden';
-      }, 5500);
-    }
-  }
-
   return (
-    <div>
-      <button type="button" onClick={notify}>
-        Show Toast
-      </button>
-      <div
-        className={classes('toast', className)}
-        style={{ backgroundColor: color }}
-      >
-        <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
-        <div className="toast-message">{message}</div>
-        <FontAwesomeIcon
-          style={{ display: selfDisappearing ? 'none' : 'flex' }}
-          fixedWidth
-          icon={faClose}
-          className="toast-close-icon"
-          onClick={(): void => {
-            const t = document.getElementsByClassName(
-              classes('toast', className)
-            )[0] as HTMLElement;
-            t.style.animation = 'fadeout 0.5s';
-            setTimeout(function () {
-              t.style.visibility = 'hidden';
-            }, 500);
-          }}
-        />
-      </div>
+    <div
+      className={classes('toast', className)}
+      style={{ backgroundColor: color }}
+    >
+      <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
+      <div className="toast-message">{message}</div>
+      <FontAwesomeIcon
+        style={{ display: selfDisappearing ? 'none' : 'flex' }}
+        fixedWidth
+        icon={faClose}
+        className="toast-close-icon"
+        onClick={(): void => {
+          const t = document.getElementsByClassName(
+            classes('toast', className)
+          )[0] as HTMLElement;
+          t.style.animation = 'fadeout 0.5s';
+          setTimeout(function () {
+            t.style.visibility = 'hidden';
+          }, 500);
+        }}
+      />
     </div>
   );
 }
