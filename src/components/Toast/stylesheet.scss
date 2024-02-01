@@ -5,20 +5,17 @@
   align-items: center;
   column-gap: 15px;
   visibility: hidden;
-  width: 300px;
-  margin-left: -125px;
-  color: #000000;
-  text-align: center;
-  border-radius: 2px;
-  padding: 16px;
   position: fixed;
-  z-index: 1;
   right: 30px;
   top: 30px;
+  z-index: 1;
+  width: 400px;
+  padding: 16px;
   border-radius: 8px;
+  text-align: left;
+  color: #000000;
   font-weight: bold;
   font-size: 1em;
-  text-align: left;
 }
 
 @keyframes fadein {
@@ -50,10 +47,8 @@
 .toast-close-icon {
   font-size: 1.5em;
   cursor: pointer;
-  flex-shrink: 0;
 }
 
 .toast-message {
   flex: 1 0;
-  max-width: 100%;
 }

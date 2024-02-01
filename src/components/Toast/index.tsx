@@ -33,7 +33,7 @@ export function notifyToast(className: string): void {
 
 export default function Toast({
   className,
-  color = 'red',
+  color = 'orange',
   icon = faWarning,
   message = '',
   selfDisappearing = false,
