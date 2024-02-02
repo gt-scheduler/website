@@ -143,7 +143,7 @@ export function InvitationModalContent(): React.ReactElement {
         .catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'delete friend record failed',
+              message: 'delete friend record from sender failed',
               source: err,
               fields: {
                 user: (accountContext as SignedIn).id,
