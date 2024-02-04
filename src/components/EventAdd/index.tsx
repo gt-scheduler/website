@@ -3,8 +3,8 @@ import React, {
   KeyboardEvent,
   useCallback,
   useContext,
-  useEffect,
   useState,
+  useMemo,
 } from 'react';
 import { Immutable, castDraft } from 'immer';
 
@@ -57,25 +57,8 @@ export default function EventAdd({
     minute: event?.period.end ? event.period.end % 60 : -1,
     morning: event?.period.end ? event.period.end < 720 : true,
   });
-  const [submitDisabled, setSubmitDisabled] = useState(true);
-  const [error, setError] = useState('');
-  const [renderCounter, setRenderCounter] = useState(0);
 
-  useEffect(() => {
-    if (
-      eventName.length > 0 &&
-      selectedTags.length > 0 &&
-      start.hour !== -1 &&
-      start.minute !== -1 &&
-      end.minute !== -1 &&
-      end.hour !== -1 &&
-      !error
-    ) {
-      setSubmitDisabled(false);
-    } else {
-      setSubmitDisabled(true);
-    }
-  }, [eventName, selectedTags, start, end, error]);
+  const [renderCounter, setRenderCounter] = useState(0);
 
   const parseTime = useCallback((time: Time): number => {
     if (time.hour === -1 || time.minute === -1) {
@@ -92,73 +75,72 @@ export default function EventAdd({
     return hour * 60 + time.minute;
   }, []);
 
-  const handleStartChange = useCallback(
-    (newStart: Time): void => {
-      setError('');
+  const calculateError = (): string => {
+    const parsedStart = parseTime(start);
+    const parsedEnd = parseTime(end);
 
-      if (newStart.hour !== -1) {
-        if (newStart.hour !== -1 && newStart.hour < 1) {
-          newStart.hour = 1;
-        } else if (newStart.hour > 12) {
-          newStart.hour = 12;
+    if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
+      return 'Start time must be before end time.';
+    }
+    if (parsedStart !== -1 && (parsedStart < 480 || parsedEnd > 1320)) {
+      return 'Event must be between 08:00 AM and 10:00 PM.';
+    }
+    return '';
+  };
+
+  const error = calculateError();
+
+  const submitDisabled: boolean = useMemo(() => {
+    return !(
+      eventName.length > 0 &&
+      selectedTags.length > 0 &&
+      start.hour !== -1 &&
+      start.minute !== -1 &&
+      end.minute !== -1 &&
+      end.hour !== -1 &&
+      !error
+    );
+  }, [eventName, selectedTags, start, end, error]);
+
+  const timeChangeHelper = useCallback(
+    (newTime: Time, isStartTime: boolean): void => {
+      // validation
+      if (newTime.hour !== -1) {
+        if (newTime.hour !== -1 && newTime.hour < 1) {
+          newTime.hour = 1;
+        } else if (newTime.hour > 12) {
+          newTime.hour = 12;
         }
       }
-
-      if (newStart.minute !== -1) {
-        if (newStart.minute > 59) {
-          newStart.minute = 59;
+      if (newTime.minute !== -1) {
+        if (newTime.minute > 59) {
+          newTime.minute = 59;
         }
       }
-      const tempRender = renderCounter + 1;
-      setRenderCounter(tempRender);
-      setStart(newStart);
-
-      const parsedStart = parseTime(newStart);
-      const parsedEnd = parseTime(end);
-      if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
-        setError('Start time must be before end time.');
-      } else if (
-        parsedStart !== -1 &&
-        (parsedStart < 480 || parsedEnd > 1320)
-      ) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
+      // Updating state
+      if (isStartTime) {
+        setStart(newTime);
+      } else {
+        setEnd(newTime);
       }
     },
-    [end, parseTime, renderCounter]
+    []
+  );
+
+  const handleStartChange = useCallback(
+    (newStart: Time): void => {
+      setRenderCounter(renderCounter + 1);
+      timeChangeHelper(newStart, true);
+    },
+    [renderCounter, timeChangeHelper]
   );
 
   const handleEndChange = useCallback(
     (newEnd: Time): void => {
-      setError('');
-
-      if (newEnd.hour !== -1) {
-        if (newEnd.hour !== -1 && newEnd.hour < 1) {
-          newEnd.hour = 1;
-        } else if (newEnd.hour > 12) {
-          newEnd.hour = 12;
-        }
-      }
-
-      if (newEnd.minute !== -1) {
-        if (newEnd.minute > 59) {
-          newEnd.minute = 59;
-        }
-      }
       setRenderCounter(renderCounter + 1);
-      setEnd(newEnd);
-
-      const parsedStart = parseTime(start);
-      const parsedEnd = parseTime(newEnd);
-      if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
-        setError('Start time must be before end time.');
-      } else if (
-        parsedStart !== -1 &&
-        (parsedStart < 480 || parsedEnd > 1320)
-      ) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
-      }
+      timeChangeHelper(newEnd, false);
     },
-    [start, parseTime, renderCounter]
+    [renderCounter, timeChangeHelper]
   );
 
   const onSubmit = useCallback((): void => {
