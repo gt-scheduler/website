@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pr-preview/pr-273/static/css/main.b852c37a.css",
+    "main.js": "/pr-preview/pr-273/static/js/main.8b18551c.js",
+    "index.html": "/pr-preview/pr-273/index.html",
+    "main.b852c37a.css.map": "/pr-preview/pr-273/static/css/main.b852c37a.css.map",
+    "main.8b18551c.js.map": "/pr-preview/pr-273/static/js/main.8b18551c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b852c37a.css",
+    "static/js/main.8b18551c.js"
+  ]
+}
