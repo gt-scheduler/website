@@ -18,7 +18,7 @@ export function notifyToast(className: string): void {
   const t = document.getElementsByClassName(
     classes('toast', className)
   )[0] as HTMLElement;
-  const selfDisappearing = t.getElementsByClassName('toast-close-icon')[0];
+  const selfDisappearing = !t.getElementsByClassName('toast-close-icon')[0];
   t.style.visibility = 'visible';
   t.style.animation = 'fadein 0.5s';
   if (selfDisappearing) {
@@ -45,21 +45,22 @@ export default function Toast({
     >
       <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
       <div className="toast-message">{message}</div>
-      <FontAwesomeIcon
-        style={{ display: selfDisappearing ? 'none' : 'flex' }}
-        fixedWidth
-        icon={faClose}
-        className="toast-close-icon"
-        onClick={(): void => {
-          const t = document.getElementsByClassName(
-            classes('toast', className)
-          )[0] as HTMLElement;
-          t.style.animation = 'fadeout 0.5s';
-          setTimeout(function () {
-            t.style.visibility = 'hidden';
-          }, 500);
-        }}
-      />
+      {!selfDisappearing && (
+        <FontAwesomeIcon
+          fixedWidth
+          icon={faClose}
+          className="toast-close-icon"
+          onClick={(): void => {
+            const t = document.getElementsByClassName(
+              classes('toast', className)
+            )[0] as HTMLElement;
+            t.style.animation = 'fadeout 0.5s';
+            setTimeout(function () {
+              t.style.visibility = 'hidden';
+            }, 500);
+          }}
+        />
+      )}
     </div>
   );
 }
