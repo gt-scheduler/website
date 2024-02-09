@@ -10,6 +10,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@sentry/react": "^6.12.0",
     "@sentry/tracing": "^6.12.0",
+    "@types/lodash": "^4.14.192",
     "@types/react-map-gl": "^6.1.3",
     "axios": "^0.21.4",
     "cheerio": "^1.0.0-rc.3",
@@ -23,6 +24,7 @@
     "html-entities": "^2.3.3",
     "immer": "^9.0.6",
     "js-cookie": "^3.0.1",
+    "lodash": "^4.17.21",
     "mapbox-gl": "^2.4.1",
     "node-sass": "^6.0.1",
     "normalize.css": "^8.0.1",
@@ -32,6 +34,7 @@
     "react-map-gl": "5.2.11",
     "react-overlays": "^5.1.1",
     "react-resize-panel": "^0.3.5",
+    "react-router-dom": "^6.22.0",
     "react-scripts": "5.0.1",
     "react-tooltip": "^5.5.1",
     "react-transition-group": "^4.4.2",
@@ -84,7 +87,7 @@
     "secrets:linux": "echo Enter Bitwarden Password: && read BW_PASSWORD && (bw logout || exit 0) && export BW_SESSION=`bw login product@bitsofgood.org $BW_PASSWORD --raw` && npm run secrets:get",
     "secrets:windows": "set /p BW_PASSWORD=Enter Bitwarden Password:&& (bw logout || VER>NUL) && npm run secrets:login",
     "secrets:login": "FOR /F %a IN ('bw login product@bitsofgood.org %BW_PASSWORD% --raw') DO SET BW_SESSION=%a && npm run secrets:get",
-    "secrets:get": "bw sync && bw get item gt-scheduler/.env.development.local | fx .notes > \".env\""
+    "secrets:get": "bw sync && bw get item gt-scheduler/website/.env.development.local | fx .notes > \".env\""
   },
   "eslintConfig": {
     "extends": "react-app"

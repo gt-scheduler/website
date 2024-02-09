@@ -20,6 +20,7 @@ export default function CourseNavMenu({
     <div className="courseNavMenu">
       {items.map((item, idx) => (
         <Tab
+          key={`course-nav-button-${idx}`}
           label={item}
           active={idx === currentItem}
           onClick={(): void => onChangeItem(idx)}

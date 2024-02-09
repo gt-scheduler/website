@@ -18,6 +18,10 @@ export interface VersionUIState {
   currentVersion: string;
 }
 
+export interface CompareState {
+  currentVersion: string;
+}
+
 type HookResult = {
   currentTerm: string;
   setTerm: (next: string) => void;

@@ -3,23 +3,26 @@ import {
   faDownload,
   faCalendarAlt,
   faPaste,
-  faAdjust,
   faCaretDown,
+  faShare,
+  faCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
+import useLocalStorageState from 'use-local-storage-state';
 
 import { Button } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
 } from '../../constants';
-import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
-import { AccountContextValue } from '../../contexts/account';
+import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
+import InvitationModal from '../InvitationModal';
+import ShareIcon from '../ShareIcon';
 
 import './stylesheet.scss';
 
@@ -34,6 +37,9 @@ export type HeaderActionBarProps = {
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
 };
+
+// Key to mark when a user has already seen the invite modal.
+const MODAL_LOCAL_STORAGE_KEY = '2023-05-10-spr2023-invite-modal';
 
 /**
  * Displays the icon buttons (with optional text)
@@ -53,11 +59,24 @@ export default function HeaderActionBar({
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
 }: HeaderActionBarProps): React.ReactElement {
-  const [theme, setTheme] = useContext(ThemeContext);
-  const handleThemeChange = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  }, [theme, setTheme]);
+  const { type } = useContext(AccountContext);
+
+  const [invitationOpen, setInvitationOpen] = useState(false);
+  const [seenInviteModal, setSeenInviteModal] = useLocalStorageState<boolean>(
+    MODAL_LOCAL_STORAGE_KEY,
+    {
+      defaultValue: false,
+      storageSync: true,
+    }
+  );
+
+  const openInvitation = useCallback(() => {
+    setInvitationOpen(true);
+    if (!seenInviteModal) {
+      setSeenInviteModal(true);
+    }
+  }, [seenInviteModal, setSeenInviteModal]);
+  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   // Coalesce the export options into the props for a single <DropdownMenu>
   const enableExport =
@@ -103,24 +122,29 @@ export default function HeaderActionBar({
         className="header-action-bar__button"
       >
         <div className="header-action-bar__export-dropdown-content">
-          <FontAwesomeIcon
-            className="header-action-bar__button-icon"
-            fixedWidth
-            icon={faDownload}
-          />
+          <ShareIcon className="header-action-bar__button-icon" />
           <div className="header-action-bar__button-text">Export</div>
           <FontAwesomeIcon fixedWidth icon={faCaretDown} />
         </div>
       </DropdownMenu>
+      <InvitationModal show={invitationOpen} onHide={hideInvitation} />
 
-      <Button onClick={handleThemeChange} className="header-action-bar__button">
+      <Button
+        onClick={openInvitation}
+        disabled={type === 'signedOut'}
+        className={classes('header-action-bar__button', 'invite-button')}
+      >
         <FontAwesomeIcon
           className="header-action-bar__button-icon"
           fixedWidth
-          icon={faAdjust}
+          icon={faShare}
         />
-        <div className="header-action-bar__button-text">Theme</div>
+        <div className="header-action-bar__button-text">Invite</div>
+        {seenInviteModal || type === 'signedOut' ? null : (
+          <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
+        )}
       </Button>
+
       <Button
         href="https://github.com/gt-scheduler/website"
         className="header-action-bar__button"

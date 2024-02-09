@@ -21,7 +21,7 @@ The app is a React single-page application (SPA) (built using [`create-react-app
 To implement its goal of facilitating schedule creation and class exploration, GT Scheduler stores all data **locally in cookies**. Then, it sources any relevant data at runtime from a variety of sources, such as:
 
 - The list of terms (strings like `202008`, which corresponds to Fall 2020) that have been scraped by the [Crawler application](https://api.github.com/repos/gt-scheduler/crawler/): https://gt-scheduler.github.io/crawler/index.json
-- The data for a single term, which is the full output of the Crawler application in a single JSON file: https://gt-scheduler.github.io/crawler/202008.json
+- The data for a single term, which is the full output of the Cralwer application in a single JSON file: https://gt-scheduler.github.io/crawler/202008.json
 - Seating information for a single section, which is requested on demand and sent through our CORS proxy in the [Backend application](https://api.github.com/repos/gt-scheduler/crawler/) to [Oscar](https://oscar.gatech.edu/) (Georgia Tech's registration management system): https://gt-scheduler.azurewebsites.net/proxy/class_section?term=202008&crn=87086
 - Course/instructor GPA information, which is fetched from [Course Critique](https://critique.gatech.edu/)'s API: https://c4citk6s9k.execute-api.us-east-1.amazonaws.com/test/data/course?courseID=CS%201331
 
