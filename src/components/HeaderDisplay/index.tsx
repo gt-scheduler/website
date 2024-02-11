@@ -17,6 +17,7 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
 import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
+import { Term } from '../../types';
 
 import './stylesheet.scss';
 
@@ -49,7 +50,7 @@ export type HeaderDisplayProps = {
     | { type: 'loading' }
     | {
         type: 'loaded';
-        terms: readonly string[];
+        terms: Term[];
         currentTerm: string;
         onChangeTerm: (next: string) => void;
       };
@@ -108,8 +109,8 @@ export default function HeaderDisplay({
           onChange={termsState.onChangeTerm}
           current={termsState.currentTerm}
           options={termsState.terms.map((currentTerm) => ({
-            id: currentTerm,
-            label: getSemesterName(currentTerm),
+            id: currentTerm.term,
+            label: getSemesterName(currentTerm.term),
           }))}
           className="semester"
         />
