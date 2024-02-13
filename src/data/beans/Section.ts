@@ -6,7 +6,12 @@ import { unique } from '../../utils/misc';
 import { DELIVERY_MODES, BACKEND_BASE_URL } from '../../constants';
 import Course from './Course';
 import Oscar from './Oscar';
-import { CrawlerMeeting, Meeting } from '../../types';
+import {
+  CrawlerMeeting,
+  CrawlerPrerequisites,
+  CrawlerSection,
+  Meeting,
+} from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 export type Seating = [
@@ -64,11 +69,15 @@ export default class Section {
 
   term: string;
 
+  title: string;
+
+  prereqs: CrawlerPrerequisites | undefined;
+
   constructor(
     oscar: Oscar,
     course: Course,
     sectionId: string,
-    data: SectionConstructionData
+    data: CrawlerSection
   ) {
     this.term = oscar.term;
     const [
@@ -79,7 +88,12 @@ export default class Section {
       campusIndex,
       attributeIndices,
       gradeBasisIndex,
+      fullName,
+      prerequisites,
     ] = data;
+
+    this.title = decode(fullName);
+    this.prereqs = prerequisites;
 
     this.course = course;
     this.id = sectionId;

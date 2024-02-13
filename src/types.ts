@@ -184,7 +184,30 @@ export type CrawlerSection = [
    * integer index into caches.gradeBases,
    * specifying the grading scheme of the class
    */
-  gradeBaseIndex: number
+  gradeBaseIndex: number,
+  /**
+   * the full, human-readable name of the course (e.g. "Accounting I")
+   */
+  fullName: string,
+  /**
+     * a tree of prerequisite classes and the necessary grades in them
+     * (using boolean expressions in prefix order)
+     *
+     * @example
+     *
+     * ```json
+       [
+         "and",
+         [
+            "or",
+            {"id":"CS 3510", "grade":"C"},
+            {"id":"CS 3511", "grade":"C"}
+         ]
+       ]
+     * ```
+     */
+  // ! Type had `undefined` explicitly added to ensure we check when accessing
+  prerequisites: CrawlerPrerequisites | undefined
 ];
 
 // Prerequisite types:
