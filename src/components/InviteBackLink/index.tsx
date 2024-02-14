@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -6,6 +6,7 @@ import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import Spinner from '../Spinner';
 
 import './stylesheet.scss';
+import { AccountContext, SignedIn } from '../../contexts';
 
 // eslint-disable-next-line no-shadow
 enum LoadingState {
@@ -16,19 +17,26 @@ enum LoadingState {
 
 const url = `${CLOUD_FUNCTION_BASE_URL}/handleFriendInvitation`;
 
-const handleInvite = async (inviteId: string | undefined): Promise<void> => {
-  const requestData = JSON.stringify({ inviteId });
+const handleInvite = async (
+  inviteId: string | undefined,
+  token: string | void
+): Promise<void> => {
   await axios({
     method: 'POST',
     url,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    data: `data=${requestData}`,
+    data: {
+      inviteId,
+      token,
+    },
   });
 };
 
 export default function InviteBackLink(): React.ReactElement {
+  const accountContext = useContext(AccountContext);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,21 +49,27 @@ export default function InviteBackLink(): React.ReactElement {
   );
 
   useEffect(() => {
-    if (id && navigate) {
-      handleInvite(id)
-        .then(() => {
-          setState(LoadingState.SUCCESS);
-          setTimeout(() => {
-            navigate(redirectURL);
-          }, 5000);
-        })
-        .catch(() => {
-          setState(LoadingState.ERROR);
-          setTimeout(() => {
-            navigate(redirectURL);
-          }, 10000);
-        });
-    }
+    const handleInviteAsync = async (): Promise<void> => {
+      const token = await (accountContext as SignedIn).getToken();
+      if (id && navigate) {
+        handleInvite(id, token)
+          .then(() => {
+            setState(LoadingState.SUCCESS);
+            setTimeout(() => {
+              navigate(redirectURL);
+            }, 5000);
+          })
+          .catch(() => {
+            setState(LoadingState.ERROR);
+            setTimeout(() => {
+              navigate(redirectURL);
+            }, 10000);
+          });
+      }
+    };
+    handleInviteAsync().catch((err) => {
+      console.error('Error handling invite', err);
+    });
   }, [id, navigate, redirectURL]);
 
   if (state === LoadingState.LOADING) {
