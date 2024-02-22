@@ -7,7 +7,12 @@ import React, {
   useMemo,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
-import { faCircle, faClose, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleDown,
+  faCircle,
+  faClose,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios, { AxiosError } from 'axios';
 
@@ -22,6 +27,7 @@ import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
+import Select, { DropdownMenu, SelectOption } from '../Select';
 
 /**
  * Inner content of the invitation modal.
@@ -29,9 +35,12 @@ import './stylesheet.scss';
 export function InvitationModalContent(): React.ReactElement {
   const [removeInvitationOpen, setRemoveInvitationOpen] = useState(false);
   const [currentFriendId, setCurrentFriendId] = useState('');
+  const [otherSchedulesVisible, setOtherSchedulesVisible] = useState(false);
 
-  const [{ currentFriends, currentVersion, term }, { deleteFriendRecord }] =
-    useContext(ScheduleContext);
+  const [
+    { currentFriends, currentVersion, term, allVersionNames },
+    { deleteFriendRecord },
+  ] = useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
@@ -204,45 +213,85 @@ export function InvitationModalContent(): React.ReactElement {
             Send Invite
           </button>
         </div>
+        <div className="scheduleCheckboxes">
+          {allVersionNames.slice(0, 3).map((v) => (
+            <div className="checkboxAndLabel">
+              <input
+                className={classes('shareScheduleCheckbox', v.id)}
+                type="checkbox"
+              />
+              <label
+                className="checkboxLabel"
+                htmlFor={classes('shareScheduleCheckbox', v.id)}
+              >
+                {v.name}
+              </label>
+            </div>
+          ))}
+          {allVersionNames.length > 3 ? (
+            <div
+              className="otherSchedules"
+              onClick={(): void =>
+                setOtherSchedulesVisible(!otherSchedulesVisible)
+              }
+            >
+              <p className="other-text">Other</p>
+              <FontAwesomeIcon className="otherIcon" icon={faAngleDown} />
+            </div>
+          ) : (
+            <div />
+          )}
+        </div>
       </div>
       <hr className="divider" />
       <div className="invited-users">
-        <p>
-          Users Invited to View <strong>Primary</strong>
-        </p>
-        {Object.keys(currentFriends).length !== 0 ? (
-          <div className="shared-emails" key="email">
-            {Object.entries(currentFriends).map(([friendId, friend]) => (
-              <div className="email-and-status" id={friend.email}>
-                <div
-                  className={classes('individual-shared-email', friend.status)}
-                >
-                  <p className="email-text">{friend.email}</p>
-                  <Button
-                    className="button-remove"
-                    onClick={(): void => {
-                      showRemoveInvitation(friendId);
-                    }}
-                  >
-                    <FontAwesomeIcon className="circle" icon={faCircle} />
-                    <FontAwesomeIcon className="remove" icon={faClose} />
-                  </Button>
-                  <ReactTooltip
-                    anchorId={friend.email}
-                    className="status-tooltip"
-                    variant="dark"
-                    place="top"
-                    offset={2}
-                  >
-                    Status: {friend.status}
-                  </ReactTooltip>
+        {allVersionNames.map((v) => {
+          return (
+            <div>
+              <p>
+                Users Invited to View <strong>{v.name}</strong>
+              </p>
+              {Object.keys(currentFriends).length !== 0 ? (
+                <div className="shared-emails" key="email">
+                  {Object.entries(currentFriends).map(([friendId, friend]) => (
+                    <div className="email-and-status" id={friend.email}>
+                      <div
+                        className={classes(
+                          'individual-shared-email',
+                          friend.status
+                        )}
+                      >
+                        <p className="email-text">{friend.email}</p>
+                        <Button
+                          className="button-remove"
+                          onClick={(): void => {
+                            showRemoveInvitation(friendId);
+                          }}
+                        >
+                          <FontAwesomeIcon className="circle" icon={faCircle} />
+                          <FontAwesomeIcon className="remove" icon={faClose} />
+                        </Button>
+                        <ReactTooltip
+                          anchorId={friend.email}
+                          className="status-tooltip"
+                          variant="dark"
+                          place="top"
+                          offset={2}
+                        >
+                          Status: {friend.status}
+                        </ReactTooltip>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="no-invited-users">No friends have been invited</div>
-        )}{' '}
+              ) : (
+                <div className="no-invited-users">
+                  No friends have been invited
+                </div>
+              )}{' '}
+            </div>
+          );
+        })}
       </div>
       <RemoveInvitationModal
         showRemove={removeInvitationOpen}
