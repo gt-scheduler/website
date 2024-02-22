@@ -11,6 +11,7 @@ import {
   faAngleDown,
   faCircle,
   faClose,
+  faLink,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -36,6 +37,8 @@ export function InvitationModalContent(): React.ReactElement {
   const [removeInvitationOpen, setRemoveInvitationOpen] = useState(false);
   const [currentFriendId, setCurrentFriendId] = useState('');
   const [otherSchedulesVisible, setOtherSchedulesVisible] = useState(false);
+  const [selectedExpiration, setSelectedExpiration] = useState('Never');
+  const expirationChoices = ['Never', '1 week', '1 day', '1 hour'];
 
   const [
     { currentFriends, currentVersion, term, allVersionNames },
@@ -292,6 +295,24 @@ export function InvitationModalContent(): React.ReactElement {
             </div>
           );
         })}
+      </div>
+      <hr className="divider" />
+      <div className="modal-footer">
+        <button type="button" className="copy-link-button">
+          <FontAwesomeIcon className="copy-link-icon" icon={faLink} />
+          Copy Link
+        </button>
+        <div className="expiration">
+          Link expires:
+          <Select
+            className="expirationSelect"
+            onChange={setSelectedExpiration}
+            current={selectedExpiration}
+            options={expirationChoices.map((v) => {
+              return { id: v, label: v };
+            })}
+          />
+        </div>
       </div>
       <RemoveInvitationModal
         showRemove={removeInvitationOpen}

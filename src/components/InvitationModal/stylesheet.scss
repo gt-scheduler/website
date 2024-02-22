@@ -159,6 +159,7 @@
         .other-text {
           text-decoration: underline;
           margin-right: 5px;
+          margin-bottom: 0px;
         }
       }
     }
@@ -175,7 +176,10 @@
 
     .invited-users {
       padding-top: 15px;
+      margin-bottom: 15px;
       justify-content: center;
+      overflow-y: scroll;
+      height: 200px;
     }
 
     .no-invited-users {
@@ -192,7 +196,7 @@
       row-gap: 8px;
       padding-left: 25px;
       padding-right: 25px;
-      height: 100px;
+      height: 50px;
       overflow-y: scroll;
       overflow-x: hidden;
 
@@ -292,6 +296,42 @@
         }
 
         background-color: transparent;
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 18px 30px;
+
+    .copy-link-button {
+      background: var(--theme-card-bg);
+      border-radius: 10px;
+      padding: 10px 15px;
+      color: white;
+      border: none;
+
+      .copy-link-icon {
+        margin-right: 5px;
+      }
+    }
+
+    .copy-link-button:hover {
+      cursor: pointer;
+    }
+
+    .expiration {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 5px;
+
+      .expirationSelect {
+        border-radius: 30px;
+        height: 20px;
+        background-color: var(--theme-card-bg);
       }
     }
   }
