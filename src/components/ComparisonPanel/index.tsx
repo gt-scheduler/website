@@ -1,10 +1,13 @@
 import React, { useState, useContext, useId, useCallback } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+import { faShare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { CombinationContainer, ComparisonContainer } from '..';
 import { AccountContext } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
+import InvitationModal from '../InvitationModal';
 
 import './stylesheet.scss';
 
@@ -28,9 +31,13 @@ export default function ComparisonPanel({
   const [tooltipY, setTooltipY] = useState(0);
   const [signedInModal, setSignedInModal] = useState(false);
   const [compare, setCompare] = useState(false);
+  const [invitationOpen, setInvitationOpen] = useState(false);
   // const [hoverCompare, setHoverCompare] = useState(false);
   // const [tooltipYCompare, setTooltipYCompare] = useState(0);
   const tooltipId = useId();
+
+  const openInvitation = useCallback(() => setInvitationOpen(true), []);
+  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   const { type } = useContext(AccountContext);
 
@@ -98,11 +105,25 @@ export default function ComparisonPanel({
           </label>
         </div>
         {compare && (
-          <ComparisonContainer
-            handleCompareSchedules={handleCompareSchedules}
-            pinnedSchedules={pinnedSchedules}
-            pinSelf={pinSelf}
-          />
+          <div>
+            <InvitationModal show={invitationOpen} onHide={hideInvitation} />
+            <div className="invite-panel">
+              <button
+                type="button"
+                onClick={openInvitation}
+                className="invite-button"
+                disabled={type === 'signedOut'}
+              >
+                <FontAwesomeIcon fixedWidth icon={faShare} />
+                <div>Share Schedule</div>
+              </button>
+            </div>
+            <ComparisonContainer
+              handleCompareSchedules={handleCompareSchedules}
+              pinnedSchedules={pinnedSchedules}
+              pinSelf={pinSelf}
+            />
+          </div>
         )}
         <div className="combination">
           <CombinationContainer compare={compare} />

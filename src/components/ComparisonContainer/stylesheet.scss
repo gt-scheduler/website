@@ -28,6 +28,22 @@
         }
       }
 
+      .friend-email {
+        display: flex;
+        align-items: center;
+        p {
+          padding: 0px 2px 2px 12px;
+          text-align: center;
+        }
+      }
+
+      .friend-name {
+        p {
+          font-weight: 700;
+          font-size: 14px;
+        }
+      }
+
       .no-shared-schedules {
         margin: 8px 12px;
 

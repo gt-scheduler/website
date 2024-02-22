@@ -134,6 +134,27 @@
       }
     }
 
+    .invite-panel {
+      align-items: center;
+      display: flex;
+      margin: 8px 10px 1px 20px;
+      .invite-button {
+        align-items: center;
+        font-size: 14px;
+        color: white;
+        border-radius: 9px;
+        background-color: #676767;
+        display: flex;
+        padding: 10px 50px 10px 50px;
+        border: none;
+  
+        &:hover {
+          background-color: #929292;
+        }
+      }
+    }
+
+
     .comparison-overlay {
       background-color: var(--theme-bg);
   

@@ -342,6 +342,9 @@ export default function ComparisonContainer({
                       setEditInfo={setEditInfo}
                       editValue={editValue}
                     />
+                    <div className="friend-email">
+                      <p>{friend.email}</p>
+                    </div>
                     {Object.entries(friend.versions).map(
                       ([scheduleId, schedule]) => {
                         return (
@@ -512,7 +515,9 @@ function ScheduleRow({
               onMouseEnter={(): void => setTooltipHover(true)}
               onMouseLeave={(): void => setTooltipHover(false)}
             >
-              <p>{name}</p>
+              <div className={classes(type === 'User' && 'friend-name')}>
+                <p>{name}</p>
+              </div>
               {hasTooltip && email !== name && (
                 <ReactTooltip
                   key={id}
