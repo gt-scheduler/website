@@ -7,11 +7,13 @@ export const UI_STATE_LOCAL_STORAGE_KEY = 'ui-state';
 export interface UIState {
   currentTerm: string;
   versionStates: Record<string, VersionUIState>;
+  currentCompare: boolean
 }
 
 export const defaultUIState: UIState = {
   currentTerm: '',
   versionStates: {},
+  currentCompare: false
 };
 
 export interface VersionUIState {
@@ -19,7 +21,7 @@ export interface VersionUIState {
 }
 
 export interface CompareState {
-  currentVersion: string;
+  currentCompare: boolean;
 }
 
 type HookResult = {
@@ -27,6 +29,8 @@ type HookResult = {
   setTerm: (next: string) => void;
   currentVersion: string;
   setVersion: (next: string) => void;
+  currentCompare: boolean;
+  setCompare: (next: boolean) => void;
 };
 
 /**
@@ -40,7 +44,7 @@ type HookResult = {
  * but still have the app resume to the last viewed schedule when opened again.
  */
 export default function useUIStateFromStorage(): HookResult {
-  const [{ currentTerm, versionStates }, setUIState] = useLocalStorageNoSync(
+  const [{ currentTerm, versionStates, currentCompare }, setUIState] = useLocalStorageNoSync(
     UI_STATE_LOCAL_STORAGE_KEY,
     defaultUIState
   );
@@ -75,10 +79,24 @@ export default function useUIStateFromStorage(): HookResult {
     [setUIState]
   );
 
+  const setCompare = useCallback(
+    (next: boolean) => {
+      setUIState((current) => {
+        return {
+          ...current,
+          currentCompare: next,
+        };
+      });
+    },
+    [setUIState]
+  );
+
   return {
     currentTerm,
     setTerm,
     currentVersion,
     setVersion,
+    currentCompare,
+    setCompare
   };
 }

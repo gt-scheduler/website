@@ -8,6 +8,12 @@ import Modal from '../Modal';
 
 import './stylesheet.scss';
 
+type CompareState =
+    {
+      currentCompare: boolean;
+      setCompare: (next: boolean) => void;
+    };
+
 export type ComparisonPanelProps = {
   handleCompareSchedules: (
     compare?: boolean,
@@ -16,12 +22,14 @@ export type ComparisonPanelProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  compareState: CompareState;
 };
 
 export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  compareState,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
@@ -94,7 +102,7 @@ export default function ComparisonPanel({
               id="comparison-checkbox"
               onClick={(): void => handleTogglePanel()}
             />
-            <div className="slider round" />
+            <div className="slider round" /* onChange={compareState.setCompare} */ />
           </label>
         </div>
         {compare && (
