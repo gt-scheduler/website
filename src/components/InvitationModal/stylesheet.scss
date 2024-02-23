@@ -122,24 +122,19 @@
           align-items: center;
         }
 
-        input[type='checkbox'] {
-          display: inline-block;
-          visibility: visible;
-          background-color: 'white';
-          width: 15px;
-          height: 15px;
-          border: 1px solid;
-          border-radius: 3px;
+        .shareScheduleCheckbox {
+          width: 12px;
+          height: 12px;
+          border: 2px solid;
+          border-radius: 2px;
           border-color: var(--theme-fg);
           margin-right: 8px;
+          padding: 1px;
+          color: $theme-dark-background;
         }
 
-        input[type='checkbox']:hover {
-          cursor: pointer;
-        }
-
-        input[type='checkbox']:checked {
-          background-color: white;
+        .schedule-checked {
+          background-color: var(--theme-fg);
         }
 
         .checkboxLabel {

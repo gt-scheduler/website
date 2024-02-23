@@ -9,6 +9,7 @@ import React, {
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
   faAngleDown,
+  faCheck,
   faCircle,
   faClose,
   faLink,
@@ -29,6 +30,7 @@ import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
 import Select, { DropdownMenu, SelectOption } from '../Select';
+import { getCurrentRawScheduleFromStorage } from '../../data/hooks/useRawScheduleDataFromStorage';
 
 /**
  * Inner content of the invitation modal.
@@ -50,6 +52,7 @@ export function InvitationModalContent(): React.ReactElement {
   const input = useRef<HTMLInputElement>(null);
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
+  const [checkedSchedules, setCheckedSchedules] = useState([currentVersion]);
 
   const redirectURL = useMemo(
     () => window.location.href.split('/#')[0] ?? '/',
@@ -219,9 +222,27 @@ export function InvitationModalContent(): React.ReactElement {
         <div className="scheduleCheckboxes">
           {allVersionNames.slice(0, 3).map((v) => (
             <div className="checkboxAndLabel">
-              <input
-                className={classes('shareScheduleCheckbox', v.id)}
-                type="checkbox"
+              <FontAwesomeIcon
+                className={
+                  checkedSchedules.includes(v.id)
+                    ? classes('shareScheduleCheckbox', v.id, 'schedule-checked')
+                    : classes('shareScheduleCheckbox', v.id)
+                }
+                icon={faCheck}
+                onClick={(): void => {
+                  const newChecked = checkedSchedules;
+                  const c = document.getElementsByClassName(
+                    classes('shareScheduleCheckbox', v.id)
+                  )[0];
+                  if (!newChecked.includes(v.id)) {
+                    newChecked.push(v.id);
+                    c?.classList.add('schedule-checked');
+                  } else {
+                    newChecked.splice(newChecked.indexOf(v.id), 1);
+                    c?.classList.remove('schedule-checked');
+                  }
+                  setCheckedSchedules(newChecked);
+                }}
               />
               <label
                 className="checkboxLabel"
