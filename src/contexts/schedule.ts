@@ -10,6 +10,7 @@ type ExtraData = {
   term: string;
   currentVersion: string;
   currentFriends: Record<string, FriendShareData>;
+  allFriends: Record<string, Record<string, FriendShareData>>;
   allVersionNames: { id: string; name: string }[];
   // `oscar` is included below as a separate type
 };
@@ -41,6 +42,7 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
     currentVersion: '',
     currentFriends: {},
     allVersionNames: [],
+    allFriends: {},
     oscar: EMPTY_OSCAR,
     ...defaultSchedule,
   },
