@@ -349,6 +349,7 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      align-items: center;
       padding-bottom: 5px;
 
       .copy-link-button {
@@ -372,17 +373,84 @@
       }
 
       .expiration {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 5px;
+        position: relative;
 
-        .expirationSelect {
-          border-radius: 30px;
-          height: 20px;
-          background-color: var(--theme-card-bg);
+        .expiration-display {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 5px;
+
+          .current-expiration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: var(--theme-card-bg);
+            margin-left: 5px;
+            border-radius: 30px;
+            padding: 4px 15px;
+            gap: 5px;
+            width: 100px;
+          }
+
+          .current-expiration:hover {
+            cursor: pointer;
+          }
+        }
+
+        .intercept {
+          position: fixed;
+          z-index: 1;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          cursor: default;
+        }
+
+        .expiration-select {
+          @include popup;
+          display: flex;
+          flex-direction: column;
+          width: 100px;
+
+          margin: 0;
+          z-index: 2;
+          right: 0;
+          bottom: 100%;
+          position: absolute;
+          max-width: 150px;
+          overflow-x: auto;
+
+          @include dark {
+            background-color: $theme-dark-background;
+          }
+
+          @include light {
+            background-color: $theme-light-background;
+          }
+
+          .expiration-option {
+            padding: 8px 15px;
+          }
+
+          .expiration-option:hover {
+            cursor: pointer;
+            @include dark {
+              background-color: $theme-dark-card-background;
+            }
+
+            @include light {
+              background-color: $theme-light-card-background;
+            }
+          }
         }
       }
+    }
+
+    .link-message {
+      height: 20px;
     }
 
     .link-success {

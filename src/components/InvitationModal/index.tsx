@@ -31,7 +31,6 @@ import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
-import Select from '../Select';
 
 import './stylesheet.scss';
 
@@ -45,6 +44,8 @@ export function InvitationModalContent(): React.ReactElement {
     friendId: '',
   });
   const [otherSchedulesVisible, setOtherSchedulesVisible] = useState(false);
+  const [expirationDropdownVisible, setExpirationDropdownVisible] =
+    useState(false);
   const [selectedExpiration, setSelectedExpiration] = useState('Never');
   const expirationChoices = useMemo(
     () => ['Never', '1 week', '1 day', '1 hour'],
@@ -484,18 +485,45 @@ export function InvitationModalContent(): React.ReactElement {
             Copy Link
           </button>
           <div className="expiration">
-            Link expires:
-            <Select
-              className="expirationSelect"
-              onChange={setSelectedExpiration}
-              current={selectedExpiration}
-              options={expirationChoices.map((v) => {
-                return { id: v, label: v };
-              })}
-            />
+            <div className="expiration-display">
+              <text>Link expires:</text>
+              <div
+                className="current-expiration"
+                onClick={(): void => {
+                  setExpirationDropdownVisible(!expirationDropdownVisible);
+                }}
+              >
+                <text>{selectedExpiration}</text>
+                <FontAwesomeIcon
+                  className="expiration-dropdown-icon"
+                  icon={expirationDropdownVisible ? faAngleDown : faAngleUp}
+                />
+              </div>
+            </div>
+            {expirationDropdownVisible && (
+              <div
+                className="intercept"
+                onClick={(): void => setExpirationDropdownVisible(false)}
+              />
+            )}
+            <div className="expiration-select">
+              {expirationDropdownVisible &&
+                expirationChoices.map((e) => (
+                  <text
+                    className="expiration-option"
+                    onClick={(): void => {
+                      setSelectedExpiration(e);
+                    }}
+                  >
+                    {e}
+                  </text>
+                ))}
+            </div>
           </div>
         </div>
-        <text className={linkMessageClassName}>{linkMessage}</text>
+        <text className={classes('link-message', linkMessageClassName)}>
+          {linkMessage}
+        </text>
       </div>
       <RemoveInvitationModal
         showRemove={removeInvitationOpen}
