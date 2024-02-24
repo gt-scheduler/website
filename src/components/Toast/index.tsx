@@ -63,10 +63,6 @@ export default function Toast({
               classes('toast', className)
             )[0] as HTMLElement;
             t.style.animation = 'fadeout 0.5s';
-            // setTimeout(function () {
-            //   console.log(t.style)
-            //   t.style.visibility = 'hidden';
-            // }, 500);
           }}
         />
       )}
