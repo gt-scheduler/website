@@ -48,7 +48,12 @@ export function InvitationModalContent(): React.ReactElement {
     useState(false);
   const [selectedExpiration, setSelectedExpiration] = useState('Never');
   const expirationChoices = useMemo(
-    () => ['Never', '1 week', '1 day', '1 hour'],
+    (): Record<string, number> => ({
+      Never: 1000,
+      '1 week': 7,
+      '1 day': 1,
+      '1 hour': 0.0417,
+    }),
     []
   );
 
@@ -114,12 +119,12 @@ export function InvitationModalContent(): React.ReactElement {
           FriendShareData
         >;
         // if friend accepted, don't increment numNotAccepted
-        return Object.keys(versionFriends).filter((f) => {
+        return Object.keys(versionFriends).some((f) => {
           return (
             versionFriends[f]?.email === input.current?.value &&
             versionFriends[f]?.status === 'Accepted'
           );
-        }).length !== 0
+        })
           ? acc
           : acc + 1;
       },
@@ -150,20 +155,31 @@ export function InvitationModalContent(): React.ReactElement {
           return;
         }
         setValidMessage('Error sending invitation. Please try again later.');
+        softError(
+          new ErrorWithFields({
+            message: 'send email invitation failed',
+            source: err,
+            fields: {
+              user: (accountContext as SignedIn).id,
+              friendEmail: input.current?.value,
+              term,
+              versionIds: checkedSchedules,
+            },
+          })
+        );
       });
   }, [sendInvitation, allFriends, checkedSchedules]);
 
   const getInvitationLink = useCallback(async (): Promise<
     AxiosResponse<{ link: string }>
   > => {
-    const expirationToDays = [1000, 7, 1, 0.0417];
     const IdToken = await (accountContext as SignedIn).getToken();
     const data = JSON.stringify({
       IDToken: IdToken,
       term,
       versions: checkedSchedules,
       redirectURL,
-      validFor: expirationToDays[expirationChoices.indexOf(selectedExpiration)],
+      validFor: expirationChoices[selectedExpiration],
     });
     return axios.post(
       `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitationLink`,
@@ -205,10 +221,21 @@ export function InvitationModalContent(): React.ReactElement {
         if (error.response) {
           const apiError = error.response.data as ApiErrorResponse;
           setLinkMessage(apiError.message);
-          console.log(apiError.message);
           return;
         }
         setLinkMessage('Error creating link. Please try again later.');
+        softError(
+          new ErrorWithFields({
+            message: 'invite link creation failed',
+            source: err,
+            fields: {
+              user: (accountContext as SignedIn).id,
+              term,
+              versionIds: checkedSchedules,
+              validFor: selectedExpiration,
+            },
+          })
+        );
       });
   }, [getInvitationLink, checkedSchedules]);
 
@@ -315,48 +342,26 @@ export function InvitationModalContent(): React.ReactElement {
             Send Invite
           </button>
         </div>
-        <div className="scheduleCheckboxes">
+        <div className="share-schedule-checkboxes">
           {allVersionNames.slice(0, 3).map((v) => (
-            <div
-              className="checkboxAndLabel"
-              onClick={(): void => {
-                const newChecked = checkedSchedules;
-                const c = document.getElementsByClassName(
-                  classes('shareScheduleCheckbox', v.id)
-                )[0];
-                if (!newChecked.includes(v.id)) {
-                  newChecked.push(v.id);
-                  c?.classList.add('schedule-checked');
-                } else {
-                  newChecked.splice(newChecked.indexOf(v.id), 1);
-                  c?.classList.remove('schedule-checked');
-                }
-                setCheckedSchedules(newChecked);
-                createLink();
-              }}
-            >
-              <FontAwesomeIcon
-                className={
-                  checkedSchedules.includes(v.id)
-                    ? classes('shareScheduleCheckbox', v.id, 'schedule-checked')
-                    : classes('shareScheduleCheckbox', v.id)
-                }
-                icon={faCheck}
-              />
-              <p className="checkboxLabel">{v.name}</p>
-            </div>
+            <ShareScheduleCheckbox
+              checkedSchedules={checkedSchedules}
+              version={v}
+              setCheckedSchedules={setCheckedSchedules}
+              createLink={createLink}
+              isOther={false}
+            />
           ))}
-          {allVersionNames.length > 3 ? (
-            <div className="other-schedules-container">
+          {allVersionNames.length > 3 && (
+            <div>
               <div
                 className="other-schedules-button"
                 onClick={(): void =>
                   setOtherSchedulesVisible(!otherSchedulesVisible)
                 }
               >
-                <p className="other-text">Other</p>
+                <p className="other-schedules-text">Other</p>
                 <FontAwesomeIcon
-                  className="otherIcon"
                   icon={otherSchedulesVisible ? faAngleUp : faAngleDown}
                 />
               </div>
@@ -366,49 +371,21 @@ export function InvitationModalContent(): React.ReactElement {
                   onClick={(): void => setOtherSchedulesVisible(false)}
                 />
               )}
-              <div className="other-schedules">
+              <div className="other-schedules-list">
                 {otherSchedulesVisible &&
-                  allVersionNames.slice(3).map((v) => (
-                    <div
-                      className={classes(
-                        'checkboxAndLabel',
-                        'otherCheckboxAndLabel'
-                      )}
-                      onClick={(): void => {
-                        const newChecked = checkedSchedules;
-                        const c = document.getElementsByClassName(
-                          classes('shareScheduleCheckbox', v.id)
-                        )[0];
-                        if (!newChecked.includes(v.id)) {
-                          newChecked.push(v.id);
-                          c?.classList.add('schedule-checked');
-                        } else {
-                          newChecked.splice(newChecked.indexOf(v.id), 1);
-                          c?.classList.remove('schedule-checked');
-                        }
-                        setCheckedSchedules(newChecked);
-                        createLink();
-                      }}
-                    >
-                      <FontAwesomeIcon
-                        className={
-                          checkedSchedules.includes(v.id)
-                            ? classes(
-                                'shareScheduleCheckbox',
-                                v.id,
-                                'schedule-checked'
-                              )
-                            : classes('shareScheduleCheckbox', v.id)
-                        }
-                        icon={faCheck}
+                  allVersionNames
+                    .slice(3)
+                    .map((v) => (
+                      <ShareScheduleCheckbox
+                        checkedSchedules={checkedSchedules}
+                        version={v}
+                        setCheckedSchedules={setCheckedSchedules}
+                        createLink={createLink}
+                        isOther
                       />
-                      <p className="checkboxLabel">{v.name}</p>
-                    </div>
-                  ))}
+                    ))}
               </div>
             </div>
-          ) : (
-            <div />
           )}
         </div>
       </div>
@@ -492,7 +469,7 @@ export function InvitationModalContent(): React.ReactElement {
               className="copy-link-icon"
               icon={linkLoading ? faSpinner : faLink}
             />
-            Copy Link
+            <text>Copy Link</text>
           </button>
           <div className="expiration">
             <div className="expiration-display">
@@ -505,7 +482,6 @@ export function InvitationModalContent(): React.ReactElement {
               >
                 <text>{selectedExpiration}</text>
                 <FontAwesomeIcon
-                  className="expiration-dropdown-icon"
                   icon={expirationDropdownVisible ? faAngleDown : faAngleUp}
                 />
               </div>
@@ -518,14 +494,15 @@ export function InvitationModalContent(): React.ReactElement {
             )}
             <div className="expiration-select">
               {expirationDropdownVisible &&
-                expirationChoices.map((e) => (
+                Object.keys(expirationChoices).map((exp) => (
                   <text
                     className="expiration-option"
                     onClick={(): void => {
-                      setSelectedExpiration(e);
+                      setSelectedExpiration(exp);
+                      setExpirationDropdownVisible(false);
                     }}
                   >
-                    {e}
+                    {exp}
                   </text>
                 ))}
             </div>
@@ -645,5 +622,56 @@ function RemoveInvitationModal({
         currentInvitee={currentInvitee}
       />
     </Modal>
+  );
+}
+
+export type ShareScheduleCheckboxProps = {
+  checkedSchedules: string[];
+  setCheckedSchedules: React.Dispatch<React.SetStateAction<string[]>>;
+  version: { id: string; name: string };
+  createLink: () => void;
+  isOther: boolean;
+};
+
+function ShareScheduleCheckbox({
+  checkedSchedules,
+  setCheckedSchedules,
+  version,
+  createLink,
+  isOther,
+}: ShareScheduleCheckboxProps): React.ReactElement {
+  return (
+    <div
+      className={
+        isOther
+          ? classes('checkbox-and-label', 'other-checkbox-and-label')
+          : 'checkbox-and-label'
+      }
+      onClick={(): void => {
+        const newChecked = checkedSchedules;
+        const c = document.getElementsByClassName(
+          classes('share-schedule-checkbox', version.id)
+        )[0];
+        if (!newChecked.includes(version.id)) {
+          newChecked.push(version.id);
+          c?.classList.add('schedule-checked');
+        } else {
+          newChecked.splice(newChecked.indexOf(version.id), 1);
+          c?.classList.remove('schedule-checked');
+        }
+        setCheckedSchedules(newChecked);
+        createLink();
+      }}
+    >
+      <FontAwesomeIcon
+        className={
+          checkedSchedules.includes(version.id)
+            ? classes('share-schedule-checkbox', version.id, 'schedule-checked')
+            : classes('share-schedule-checkbox', version.id)
+        }
+        icon={faCheck}
+      />
+      <p className="checkbox-label">{version.name}</p>
+    </div>
   );
 }
