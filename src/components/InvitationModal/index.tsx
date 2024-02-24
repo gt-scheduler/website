@@ -19,7 +19,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import copy from 'copy-to-clipboard';
 
 import { ApiErrorResponse, FriendShareData } from '../../data/types';
@@ -104,21 +104,27 @@ export function InvitationModalContent(): React.ReactElement {
       setValidMessage('Invalid Email');
       return setValidClassName('invalid-email');
     }
-
-    const numNotAccepted = Object.entries(allFriends).filter(([versionId]) => {
-      if (!checkedSchedules.includes(versionId)) {
-        return true;
-      }
-      const f = allFriends[versionId] as Record<string, FriendShareData>;
-      if (
-        input.current?.value &&
-        Object.keys(f).includes(input.current?.value) &&
-        (f[input.current?.value] as FriendShareData).status === 'Pending'
-      ) {
-        return true;
-      }
-      return false;
-    }).length;
+    const numNotAccepted = Object.entries(allFriends).reduce(
+      (acc, [versionId]) => {
+        if (!checkedSchedules.includes(versionId)) {
+          return acc;
+        }
+        const versionFriends = allFriends[versionId] as Record<
+          string,
+          FriendShareData
+        >;
+        // if friend accepted, don't increment numNotAccepted
+        return Object.keys(versionFriends).filter((f) => {
+          return (
+            versionFriends[f]?.email === input.current?.value &&
+            versionFriends[f]?.status === 'Accepted'
+          );
+        }).length !== 0
+          ? acc
+          : acc + 1;
+      },
+      0
+    );
 
     if (numNotAccepted === 0) {
       setValidMessage(
@@ -147,7 +153,9 @@ export function InvitationModalContent(): React.ReactElement {
       });
   }, [sendInvitation, allFriends, checkedSchedules]);
 
-  const getInvitationLink = useCallback(async (): Promise<string> => {
+  const getInvitationLink = useCallback(async (): Promise<
+    AxiosResponse<{ link: string }>
+  > => {
     const expirationToDays = [1000, 7, 1, 0.0417];
     const IdToken = await (accountContext as SignedIn).getToken();
     const data = JSON.stringify({
@@ -180,13 +188,13 @@ export function InvitationModalContent(): React.ReactElement {
     if (checkedSchedules.length === 0) {
       setLinkMessage('Must check at least one schedule version');
       setLinkMessageClassName('link-failure');
-    } else {
-      setLinkMessage('');
-      setLinkMessageClassName('');
+      return;
     }
+    setLinkMessage('');
+    setLinkMessageClassName('');
     getInvitationLink()
-      .then((link) => {
-        setInvitationLink(link);
+      .then((response) => {
+        setInvitationLink(response.data.link);
         setLinkLoading(false);
         setLinkMessage('');
         setLinkMessageClassName('');
@@ -197,6 +205,7 @@ export function InvitationModalContent(): React.ReactElement {
         if (error.response) {
           const apiError = error.response.data as ApiErrorResponse;
           setLinkMessage(apiError.message);
+          console.log(apiError.message);
           return;
         }
         setLinkMessage('Error creating link. Please try again later.');
@@ -461,11 +470,12 @@ export function InvitationModalContent(): React.ReactElement {
         <div className="link-options">
           <button
             type="button"
-            className="copy-link-button"
+            className={classes(
+              linkLoading ? '' : 'link-generated',
+              'copy-link-button'
+            )}
             onClick={(): void => {
-              if (invitationLink === '') {
-                setLinkMessage('Link still generating');
-                setLinkMessageClassName('link-failure');
+              if (linkLoading) {
                 return;
               }
               try {

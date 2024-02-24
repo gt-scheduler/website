@@ -103,6 +103,7 @@
 
           &:hover {
             background-color: #e2944b;
+            cursor: pointer;
           }
         }
       }
@@ -343,7 +344,7 @@
   .modal-footer {
     display: flex;
     flex-direction: column;
-    padding: 18px 30px 10px 30px;
+    padding: 18px 30px 5px 30px;
 
     .link-options {
       display: flex;
@@ -351,6 +352,10 @@
       justify-content: space-between;
       align-items: center;
       padding-bottom: 5px;
+
+      .link-generated:hover {
+        cursor: pointer;
+      }
 
       .copy-link-button {
         background: var(--theme-card-bg);
@@ -362,14 +367,6 @@
         .copy-link-icon {
           margin-right: 5px;
         }
-
-        .copy-link-button:hover {
-          cursor: pointer;
-        }
-      }
-
-      .copy-link-button:hover {
-        cursor: pointer;
       }
 
       .expiration {
