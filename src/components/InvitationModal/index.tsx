@@ -52,7 +52,7 @@ export function InvitationModalContent(): React.ReactElement {
   );
 
   const [
-    { currentFriends, currentVersion, term, allVersionNames, allFriends },
+    { currentVersion, term, allVersionNames, allFriends },
     { deleteFriendRecord },
   ] = useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
@@ -104,13 +104,25 @@ export function InvitationModalContent(): React.ReactElement {
       return setValidClassName('invalid-email');
     }
 
-    if (
-      Object.values(currentFriends).findIndex(
-        (friend) =>
-          friend.email === input.current?.value && friend.status === 'Accepted'
-      ) !== -1
-    ) {
-      setValidMessage('Email has already accepted an invite');
+    const numNotAccepted = Object.entries(allFriends).filter(([versionId]) => {
+      if (!checkedSchedules.includes(versionId)) {
+        return true;
+      }
+      const f = allFriends[versionId] as Record<string, FriendShareData>;
+      if (
+        input.current?.value &&
+        Object.keys(f).includes(input.current?.value) &&
+        (f[input.current?.value] as FriendShareData).status === 'Pending'
+      ) {
+        return true;
+      }
+      return false;
+    }).length;
+
+    if (numNotAccepted === 0) {
+      setValidMessage(
+        'Email has already accepted an invite for these versions'
+      );
       return setValidClassName('invalid-email');
     }
 
@@ -132,7 +144,7 @@ export function InvitationModalContent(): React.ReactElement {
         }
         setValidMessage('Error sending invitation. Please try again later.');
       });
-  }, [sendInvitation, currentFriends]);
+  }, [sendInvitation, allFriends, checkedSchedules]);
 
   const getInvitationLink = useCallback(async (): Promise<string> => {
     const expirationToDays = [1000, 7, 1, 0.0417];
@@ -180,9 +192,13 @@ export function InvitationModalContent(): React.ReactElement {
       })
       .catch((err) => {
         const error = err as AxiosError;
+        setLinkMessageClassName('link-failure');
         if (error.response) {
           const apiError = error.response.data as ApiErrorResponse;
+          setLinkMessage(apiError.message);
+          return;
         }
+        setLinkMessage('Error creating link. Please try again later.');
       });
   }, [getInvitationLink, checkedSchedules]);
 
