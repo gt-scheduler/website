@@ -122,6 +122,10 @@
           align-items: center;
         }
 
+        .checkboxAndLabel:hover {
+          cursor: pointer;
+        }
+
         .shareScheduleCheckbox {
           width: 12px;
           height: 12px;
@@ -139,6 +143,7 @@
 
         .checkboxLabel {
           font-size: 14px;
+          margin: 0px;
         }
 
         .otherSchedules {
@@ -179,7 +184,7 @@
 
     .no-invited-users {
       font-size: 14px;
-      padding: 10px 0;
+      padding: 10px 0px 25px 0px;
     }
 
     .shared-emails {
@@ -297,37 +302,67 @@
 
   .modal-footer {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 18px 30px;
+    flex-direction: column;
+    padding: 18px 30px 10px 30px;
 
-    .copy-link-button {
-      background: var(--theme-card-bg);
-      border-radius: 10px;
-      padding: 10px 15px;
-      color: white;
-      border: none;
-
-      .copy-link-icon {
-        margin-right: 5px;
-      }
-    }
-
-    .copy-link-button:hover {
-      cursor: pointer;
-    }
-
-    .expiration {
+    .link-options {
       display: flex;
       flex-direction: row;
-      align-items: center;
-      gap: 5px;
+      justify-content: space-between;
+      padding-bottom: 5px;
 
-      .expirationSelect {
-        border-radius: 30px;
-        height: 20px;
-        background-color: var(--theme-card-bg);
+      .copy-link-button {
+        background: var(--theme-card-bg);
+        border-radius: 10px;
+        padding: 10px 15px;
+        color: white;
+        border: none;
+
+        .copy-link-icon {
+          margin-right: 5px;
+        }
+
+        .copy-link-button:hover {
+          cursor: pointer;
+        }
       }
+
+      .copy-link-button:hover {
+        cursor: pointer;
+      }
+
+      .expiration {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 5px;
+
+        .expirationSelect {
+          border-radius: 30px;
+          height: 20px;
+          background-color: var(--theme-card-bg);
+        }
+      }
+    }
+
+    .link-success {
+      align-self: flex-start;
+      text-align: start;
+      color: rgba(34, 181, 49, 0.75);
+      font-size: 12px;
+      font-weight: bold;
+      padding-top: 3px;
+      opacity: 1;
+    }
+
+    .link-failure {
+      align-self: flex-start;
+      text-align: start;
+      color: rgba(255, 0, 0, 0.5);
+      font-size: 12px;
+      font-weight: bold;
+      padding-top: 3px;
+      opacity: 1;
     }
   }
 

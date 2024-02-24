@@ -5,6 +5,7 @@ import React, {
   useState,
   useRef,
   useMemo,
+  useEffect,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
@@ -13,12 +14,14 @@ import {
   faCircle,
   faClose,
   faLink,
+  faSpinner,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios, { AxiosError } from 'axios';
+import copy from 'copy-to-clipboard';
 
-import { ApiErrorResponse } from '../../data/types';
+import { ApiErrorResponse, FriendShareData } from '../../data/types';
 import { ScheduleContext } from '../../contexts';
 import { DESKTOP_BREAKPOINT, CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
@@ -27,10 +30,9 @@ import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
+import Select from '../Select';
 
 import './stylesheet.scss';
-import Select, { DropdownMenu, SelectOption } from '../Select';
-import { getCurrentRawScheduleFromStorage } from '../../data/hooks/useRawScheduleDataFromStorage';
 
 /**
  * Inner content of the invitation modal.
@@ -40,10 +42,13 @@ export function InvitationModalContent(): React.ReactElement {
   const [currentFriendId, setCurrentFriendId] = useState('');
   const [otherSchedulesVisible, setOtherSchedulesVisible] = useState(false);
   const [selectedExpiration, setSelectedExpiration] = useState('Never');
-  const expirationChoices = ['Never', '1 week', '1 day', '1 hour'];
+  const expirationChoices = useMemo(
+    () => ['Never', '1 week', '1 day', '1 hour'],
+    []
+  );
 
   const [
-    { currentFriends, currentVersion, term, allVersionNames },
+    { currentFriends, currentVersion, term, allVersionNames, allFriends },
     { deleteFriendRecord },
   ] = useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
@@ -52,7 +57,11 @@ export function InvitationModalContent(): React.ReactElement {
   const input = useRef<HTMLInputElement>(null);
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
+  const [linkMessage, setLinkMessage] = useState('');
+  const [linkMessageClassName, setLinkMessageClassName] = useState('');
+  const [linkLoading, setLinkLoading] = useState(false);
   const [checkedSchedules, setCheckedSchedules] = useState([currentVersion]);
+  const [invitationLink, setInvitationLink] = useState('');
 
   const redirectURL = useMemo(
     () => window.location.href.split('/#')[0] ?? '/',
@@ -67,11 +76,11 @@ export function InvitationModalContent(): React.ReactElement {
   const sendInvitation = useCallback(async (): Promise<void> => {
     const IdToken = await (accountContext as SignedIn).getToken();
     const data = JSON.stringify({
-      term,
-      friendEmail: input.current?.value,
       IDToken: IdToken,
-      version: currentVersion,
+      term,
+      versions: checkedSchedules,
       redirectURL,
+      friendEmail: input.current?.value,
     });
     return axios.post(
       `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`,
@@ -82,7 +91,7 @@ export function InvitationModalContent(): React.ReactElement {
         },
       }
     );
-  }, [accountContext, currentVersion, term, redirectURL]);
+  }, [accountContext, term, redirectURL, checkedSchedules]);
 
   // verify email with a regex and send invitation if valid
   const verifyEmail = useCallback((): void => {
@@ -120,6 +129,60 @@ export function InvitationModalContent(): React.ReactElement {
         setValidMessage('Error sending invitation. Please try again later.');
       });
   }, [sendInvitation, currentFriends]);
+
+  const getInvitationLink = useCallback(async (): Promise<string> => {
+    const expirationToDays = [1000, 7, 1, 0.0417];
+    const IdToken = await (accountContext as SignedIn).getToken();
+    const data = JSON.stringify({
+      IDToken: IdToken,
+      term,
+      versions: checkedSchedules,
+      redirectURL,
+      validFor: expirationToDays[expirationChoices.indexOf(selectedExpiration)],
+    });
+    return axios.post(
+      `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitationLink`,
+      `data=${data}`,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+  }, [
+    accountContext,
+    term,
+    redirectURL,
+    checkedSchedules,
+    expirationChoices,
+    selectedExpiration,
+  ]);
+
+  const createLink = useCallback((): void => {
+    setLinkLoading(true);
+    if (checkedSchedules.length === 0) {
+      setLinkMessage('Must check at least one schedule version');
+      setLinkMessageClassName('link-failure');
+    } else {
+      setLinkMessage('');
+      setLinkMessageClassName('');
+    }
+    getInvitationLink()
+      .then((link) => {
+        setInvitationLink(link);
+        setLinkLoading(false);
+        setLinkMessage('Link copied!');
+        setLinkMessageClassName('link-success');
+      })
+      .catch((err) => {
+        setLinkMessageClassName('link-failure');
+        const error = err as AxiosError;
+        if (error.response) {
+          const apiError = error.response.data as ApiErrorResponse;
+          setLinkMessage(apiError.message);
+        }
+      });
+  }, [getInvitationLink, checkedSchedules]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -190,6 +253,8 @@ export function InvitationModalContent(): React.ReactElement {
     [currentFriendId, handleDelete]
   );
 
+  useEffect(() => createLink(), [createLink]);
+
   return (
     <div className={classes('invitation-modal-content', mobile && 'mobile')}>
       <div className="top-block">
@@ -207,7 +272,7 @@ export function InvitationModalContent(): React.ReactElement {
               key="email"
               ref={input}
               className="email"
-              placeholder="recipient@example.com"
+              placeholder="recipient  @example.com"
               list="recent-invites"
               onFocus={handleChangeSearch}
               onKeyDown={handleKeyDown}
@@ -221,7 +286,24 @@ export function InvitationModalContent(): React.ReactElement {
         </div>
         <div className="scheduleCheckboxes">
           {allVersionNames.slice(0, 3).map((v) => (
-            <div className="checkboxAndLabel">
+            <div
+              className="checkboxAndLabel"
+              onClick={(): void => {
+                const newChecked = checkedSchedules;
+                const c = document.getElementsByClassName(
+                  classes('shareScheduleCheckbox', v.id)
+                )[0];
+                if (!newChecked.includes(v.id)) {
+                  newChecked.push(v.id);
+                  c?.classList.add('schedule-checked');
+                } else {
+                  newChecked.splice(newChecked.indexOf(v.id), 1);
+                  c?.classList.remove('schedule-checked');
+                }
+                setCheckedSchedules(newChecked);
+                createLink();
+              }}
+            >
               <FontAwesomeIcon
                 className={
                   checkedSchedules.includes(v.id)
@@ -229,27 +311,8 @@ export function InvitationModalContent(): React.ReactElement {
                     : classes('shareScheduleCheckbox', v.id)
                 }
                 icon={faCheck}
-                onClick={(): void => {
-                  const newChecked = checkedSchedules;
-                  const c = document.getElementsByClassName(
-                    classes('shareScheduleCheckbox', v.id)
-                  )[0];
-                  if (!newChecked.includes(v.id)) {
-                    newChecked.push(v.id);
-                    c?.classList.add('schedule-checked');
-                  } else {
-                    newChecked.splice(newChecked.indexOf(v.id), 1);
-                    c?.classList.remove('schedule-checked');
-                  }
-                  setCheckedSchedules(newChecked);
-                }}
               />
-              <label
-                className="checkboxLabel"
-                htmlFor={classes('shareScheduleCheckbox', v.id)}
-              >
-                {v.name}
-              </label>
+              <p className="checkboxLabel">{v.name}</p>
             </div>
           ))}
           {allVersionNames.length > 3 ? (
@@ -275,9 +338,12 @@ export function InvitationModalContent(): React.ReactElement {
               <p>
                 Users Invited to View <strong>{v.name}</strong>
               </p>
-              {Object.keys(currentFriends).length !== 0 ? (
+              {Object.keys(allFriends[v.id] as Record<string, FriendShareData>)
+                .length !== 0 ? (
                 <div className="shared-emails" key="email">
-                  {Object.entries(currentFriends).map(([friendId, friend]) => (
+                  {Object.entries(
+                    allFriends[v.id] as Record<string, FriendShareData>
+                  ).map(([friendId, friend]) => (
                     <div className="email-and-status" id={friend.email}>
                       <div
                         className={classes(
@@ -319,21 +385,43 @@ export function InvitationModalContent(): React.ReactElement {
       </div>
       <hr className="divider" />
       <div className="modal-footer">
-        <button type="button" className="copy-link-button">
-          <FontAwesomeIcon className="copy-link-icon" icon={faLink} />
-          Copy Link
-        </button>
-        <div className="expiration">
-          Link expires:
-          <Select
-            className="expirationSelect"
-            onChange={setSelectedExpiration}
-            current={selectedExpiration}
-            options={expirationChoices.map((v) => {
-              return { id: v, label: v };
-            })}
-          />
+        <div className="link-options">
+          <button
+            type="button"
+            className="copy-link-button"
+            onClick={(): void => {
+              if (invitationLink === '') {
+                setLinkMessage('Link still generating');
+                setLinkMessageClassName('link-failure');
+                return;
+              }
+              try {
+                copy(invitationLink);
+              } catch (err) {
+                setLinkMessage('Error copying link');
+                setLinkMessageClassName('link-failure');
+              }
+            }}
+          >
+            <FontAwesomeIcon
+              className="copy-link-icon"
+              icon={linkLoading ? faSpinner : faLink}
+            />
+            Copy Link
+          </button>
+          <div className="expiration">
+            Link expires:
+            <Select
+              className="expirationSelect"
+              onChange={setSelectedExpiration}
+              current={selectedExpiration}
+              options={expirationChoices.map((v) => {
+                return { id: v, label: v };
+              })}
+            />
+          </div>
         </div>
+        <text className={linkMessageClassName}>{linkMessage}</text>
       </div>
       <RemoveInvitationModal
         showRemove={removeInvitationOpen}

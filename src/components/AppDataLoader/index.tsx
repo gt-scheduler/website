@@ -20,6 +20,7 @@ import {
   FriendTermData,
   FriendInfo,
   FriendScheduleData,
+  FriendShareData,
 } from '../../data/types';
 import { lexicographicCompare } from '../../utils/misc';
 import {
@@ -411,6 +412,18 @@ function ContextProvider({
     return versions;
   }, [termScheduleData.versions]);
 
+  const allFriends = useMemo<
+    Record<string, Record<string, FriendShareData>>
+  >(() => {
+    const f = {} as Record<string, Record<string, FriendShareData>>;
+    Object.entries(termScheduleData.versions).forEach(
+      ([versionId, { friends }]) => {
+        f[versionId] = friends;
+      }
+    );
+    return f;
+  }, [termScheduleData.versions]);
+
   // Get all version-related actions
   const {
     addNewVersion,
@@ -464,6 +477,7 @@ function ContextProvider({
         oscar,
         currentVersion,
         allVersionNames,
+        allFriends,
         currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
       },
@@ -484,6 +498,7 @@ function ContextProvider({
       oscar,
       currentVersion,
       allVersionNames,
+      allFriends,
       scheduleVersion.friends,
       scheduleVersion.schedule,
       setTerm,
