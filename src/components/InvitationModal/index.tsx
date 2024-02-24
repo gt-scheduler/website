@@ -40,7 +40,10 @@ import './stylesheet.scss';
  */
 export function InvitationModalContent(): React.ReactElement {
   const [removeInvitationOpen, setRemoveInvitationOpen] = useState(false);
-  const [currentFriendId, setCurrentFriendId] = useState('');
+  const [toRemoveInfo, setToRemoveInfo] = useState({
+    version: { id: '', name: '' },
+    friendId: '',
+  });
   const [otherSchedulesVisible, setOtherSchedulesVisible] = useState(false);
   const [selectedExpiration, setSelectedExpiration] = useState('Never');
   const expirationChoices = useMemo(
@@ -199,13 +202,13 @@ export function InvitationModalContent(): React.ReactElement {
 
   // delete friend from record of friends
   const handleDelete = useCallback(
-    async (friendId: string): Promise<void> => {
-      deleteFriendRecord(currentVersion, friendId);
+    async (versionId: string, friendId: string): Promise<void> => {
+      deleteFriendRecord(versionId, friendId);
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
         friendId,
         term,
-        version: currentVersion,
+        version: versionId,
       });
       axios
         .post(
@@ -226,18 +229,21 @@ export function InvitationModalContent(): React.ReactElement {
                 user: (accountContext as SignedIn).id,
                 friend: friendId,
                 term,
-                version: currentVersion,
+                version: versionId,
               },
             })
           );
         });
     },
-    [accountContext, currentVersion, deleteFriendRecord, term]
+    [accountContext, deleteFriendRecord, term]
   );
 
-  function showRemoveInvitation(friendId: string): void {
+  function showRemoveInvitation(
+    version: { id: string; name: string },
+    friendId: string
+  ): void {
     setRemoveInvitationOpen(true);
-    setCurrentFriendId(friendId);
+    setToRemoveInfo({ version, friendId });
   }
 
   // delete friend from record of friends and close modal
@@ -246,10 +252,10 @@ export function InvitationModalContent(): React.ReactElement {
       setRemoveInvitationOpen(false);
       if (confirm) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        handleDelete(currentFriendId);
+        handleDelete(toRemoveInfo.version.id, toRemoveInfo.friendId);
       }
     },
-    [currentFriendId, handleDelete]
+    [toRemoveInfo, handleDelete]
   );
 
   useEffect(() => createLink(), [createLink]);
@@ -405,7 +411,7 @@ export function InvitationModalContent(): React.ReactElement {
                         <Button
                           className="button-remove"
                           onClick={(): void => {
-                            showRemoveInvitation(friendId);
+                            showRemoveInvitation(v, friendId);
                           }}
                         >
                           <FontAwesomeIcon className="circle" icon={faCircle} />
@@ -478,17 +484,29 @@ export function InvitationModalContent(): React.ReactElement {
       <RemoveInvitationModal
         showRemove={removeInvitationOpen}
         onHideRemove={hideRemoveInvitation}
-        currentInvitee={currentFriends[currentFriendId]?.email ?? ''}
+        versionName={toRemoveInfo.version.name}
+        currentInvitee={
+          toRemoveInfo.version.id === ''
+            ? ''
+            : (
+                allFriends[toRemoveInfo.version.id] as Record<
+                  string,
+                  FriendShareData
+                >
+              )[toRemoveInfo.friendId]?.email ?? ''
+        }
       />
     </div>
   );
 }
 
 export type RemoveInvitationModalContentProps = {
+  versionName: string;
   currentInvitee: string;
 };
 
 export function RemoveInvitationModalContent({
+  versionName,
   currentInvitee,
 }: RemoveInvitationModalContentProps): React.ReactElement {
   return (
@@ -497,7 +515,7 @@ export function RemoveInvitationModalContent({
         <h2>Remove Access</h2>
         <p>
           Are you sure you want to remove the following user from having access
-          schedule: <b>Primary</b>?
+          schedule: <b>{versionName}</b>?
         </p>
         <p>
           User: <b>{currentInvitee}</b>
@@ -542,12 +560,14 @@ export default function InvitationModal({
 export type RemoveInvitationModalProps = {
   showRemove: boolean;
   onHideRemove: (confirm: boolean) => void;
+  versionName: string;
   currentInvitee: string;
 };
 
 function RemoveInvitationModal({
   showRemove,
   onHideRemove,
+  versionName,
   currentInvitee,
 }: RemoveInvitationModalProps): React.ReactElement {
   return (
@@ -566,7 +586,10 @@ function RemoveInvitationModal({
       >
         <FontAwesomeIcon icon={faXmark} size="xl" />
       </Button>
-      <RemoveInvitationModalContent currentInvitee={currentInvitee} />
+      <RemoveInvitationModalContent
+        versionName={versionName}
+        currentInvitee={currentInvitee}
+      />
     </Modal>
   );
 }
