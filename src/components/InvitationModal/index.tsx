@@ -10,6 +10,7 @@ import React, {
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
   faAngleDown,
+  faAngleUp,
   faCheck,
   faCircle,
   faClose,
@@ -171,15 +172,13 @@ export function InvitationModalContent(): React.ReactElement {
       .then((link) => {
         setInvitationLink(link);
         setLinkLoading(false);
-        setLinkMessage('Link copied!');
-        setLinkMessageClassName('link-success');
+        setLinkMessage('');
+        setLinkMessageClassName('');
       })
       .catch((err) => {
-        setLinkMessageClassName('link-failure');
         const error = err as AxiosError;
         if (error.response) {
           const apiError = error.response.data as ApiErrorResponse;
-          setLinkMessage(apiError.message);
         }
       });
   }, [getInvitationLink, checkedSchedules]);
@@ -272,7 +271,7 @@ export function InvitationModalContent(): React.ReactElement {
               key="email"
               ref={input}
               className="email"
-              placeholder="recipient  @example.com"
+              placeholder="recipient@example.com"
               list="recent-invites"
               onFocus={handleChangeSearch}
               onKeyDown={handleKeyDown}
@@ -316,14 +315,65 @@ export function InvitationModalContent(): React.ReactElement {
             </div>
           ))}
           {allVersionNames.length > 3 ? (
-            <div
-              className="otherSchedules"
-              onClick={(): void =>
-                setOtherSchedulesVisible(!otherSchedulesVisible)
-              }
-            >
-              <p className="other-text">Other</p>
-              <FontAwesomeIcon className="otherIcon" icon={faAngleDown} />
+            <div className="other-schedules-container">
+              <div
+                className="other-schedules-button"
+                onClick={(): void =>
+                  setOtherSchedulesVisible(!otherSchedulesVisible)
+                }
+              >
+                <p className="other-text">Other</p>
+                <FontAwesomeIcon
+                  className="otherIcon"
+                  icon={otherSchedulesVisible ? faAngleUp : faAngleDown}
+                />
+              </div>
+              {otherSchedulesVisible && (
+                <div
+                  className="intercept"
+                  onClick={(): void => setOtherSchedulesVisible(false)}
+                />
+              )}
+              <div className="other-schedules">
+                {otherSchedulesVisible &&
+                  allVersionNames.slice(3).map((v) => (
+                    <div
+                      className={classes(
+                        'checkboxAndLabel',
+                        'otherCheckboxAndLabel'
+                      )}
+                      onClick={(): void => {
+                        const newChecked = checkedSchedules;
+                        const c = document.getElementsByClassName(
+                          classes('shareScheduleCheckbox', v.id)
+                        )[0];
+                        if (!newChecked.includes(v.id)) {
+                          newChecked.push(v.id);
+                          c?.classList.add('schedule-checked');
+                        } else {
+                          newChecked.splice(newChecked.indexOf(v.id), 1);
+                          c?.classList.remove('schedule-checked');
+                        }
+                        setCheckedSchedules(newChecked);
+                        createLink();
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className={
+                          checkedSchedules.includes(v.id)
+                            ? classes(
+                                'shareScheduleCheckbox',
+                                v.id,
+                                'schedule-checked'
+                              )
+                            : classes('shareScheduleCheckbox', v.id)
+                        }
+                        icon={faCheck}
+                      />
+                      <p className="checkboxLabel">{v.name}</p>
+                    </div>
+                  ))}
+              </div>
             </div>
           ) : (
             <div />
@@ -397,6 +447,8 @@ export function InvitationModalContent(): React.ReactElement {
               }
               try {
                 copy(invitationLink);
+                setLinkMessage('Link copied!');
+                setLinkMessageClassName('link-success');
               } catch (err) {
                 setLinkMessage('Error copying link');
                 setLinkMessageClassName('link-failure');

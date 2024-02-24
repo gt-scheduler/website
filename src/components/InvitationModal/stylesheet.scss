@@ -126,6 +126,10 @@
           cursor: pointer;
         }
 
+        .otherCheckboxAndLabel {
+          padding: 10px 15px;
+        }
+
         .shareScheduleCheckbox {
           width: 12px;
           height: 12px;
@@ -134,7 +138,14 @@
           border-color: var(--theme-fg);
           margin-right: 8px;
           padding: 1px;
-          color: $theme-dark-background;
+
+          @include dark {
+            color: $theme-dark-background;
+          }
+
+          @include light {
+            color: $theme-light-background;
+          }
         }
 
         .schedule-checked {
@@ -146,14 +157,43 @@
           margin: 0px;
         }
 
-        .otherSchedules {
+        .other-schedules-button {
           display: flex;
           flex-direction: row;
           align-items: center;
         }
 
-        .otherSchedules:hover {
+        .other-schedules-button:hover {
           cursor: pointer;
+        }
+
+        .intercept {
+          position: fixed;
+          z-index: 1;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          cursor: default;
+        }
+
+        .other-schedules {
+          @include popup;
+
+          margin: 0;
+          padding: 2px 0px;
+          z-index: 2;
+          position: absolute;
+          max-width: 150px;
+          overflow-x: auto;
+
+          @include dark {
+            background-color: $theme-dark-background;
+          }
+
+          @include light {
+            background-color: $theme-light-background;
+          }
         }
 
         .other-text {
