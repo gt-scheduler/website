@@ -168,7 +168,7 @@ export function InvitationModalContent(): React.ReactElement {
           })
         );
       });
-  }, [sendInvitation, allFriends, checkedSchedules]);
+  }, [accountContext, sendInvitation, allFriends, checkedSchedules, term]);
 
   const getInvitationLink = useCallback(async (): Promise<
     AxiosResponse<{ link: string }>
@@ -237,7 +237,13 @@ export function InvitationModalContent(): React.ReactElement {
           })
         );
       });
-  }, [getInvitationLink, checkedSchedules]);
+  }, [
+    accountContext,
+    term,
+    getInvitationLink,
+    checkedSchedules,
+    selectedExpiration,
+  ]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
