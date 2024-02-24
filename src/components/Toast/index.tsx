@@ -18,6 +18,7 @@ export function notifyToast(className: string): void {
   const t = document.getElementsByClassName(
     classes('toast', className)
   )[0] as HTMLElement;
+
   const selfDisappearing = !t.getElementsByClassName('toast-close-icon')[0];
   t.style.visibility = 'visible';
   t.style.animation = 'fadein 0.5s';
@@ -25,9 +26,6 @@ export function notifyToast(className: string): void {
     setTimeout(function () {
       t.style.animation = 'fadeout 0.5s';
     }, 5000);
-    setTimeout(function () {
-      t.style.visibility = 'hidden';
-    }, 5500);
   }
 }
 
@@ -36,12 +34,22 @@ export default function Toast({
   color = 'orange',
   icon = faWarning,
   message = '',
-  selfDisappearing = false,
+  selfDisappearing = true,
 }: ToastProps): React.ReactElement {
+  const handleAnimationEnd = (
+    event: React.AnimationEvent<HTMLDivElement>
+  ): void => {
+    if (event.animationName === 'fadeout') {
+      const t = event.target as HTMLElement;
+      t.style.visibility = 'hidden';
+    }
+  };
+
   return (
     <div
       className={classes('toast', className)}
       style={{ backgroundColor: color }}
+      onAnimationEnd={handleAnimationEnd}
     >
       <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
       <div className="toast-message">{message}</div>
@@ -55,9 +63,10 @@ export default function Toast({
               classes('toast', className)
             )[0] as HTMLElement;
             t.style.animation = 'fadeout 0.5s';
-            setTimeout(function () {
-              t.style.visibility = 'hidden';
-            }, 500);
+            // setTimeout(function () {
+            //   console.log(t.style)
+            //   t.style.visibility = 'hidden';
+            // }, 500);
           }}
         />
       )}
