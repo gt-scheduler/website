@@ -57,7 +57,7 @@ export function InvitationModalContent({
       setValidMessage('');
       setValidClassName('');
     },
-    [emailInput, setEmailInput]
+    [setEmailInput]
   );
 
   const sendInvitation = useCallback(async (): Promise<void> => {
