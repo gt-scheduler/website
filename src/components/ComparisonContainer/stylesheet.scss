@@ -4,7 +4,6 @@
   .comparison-body {
     display: flex;
     flex-direction: column;
-    white-space: nowrap;
     height: 100%;
 
     .comparison-content {
@@ -144,6 +143,57 @@
           overflow: hidden;
           &.indented {
             margin-left: 24px;
+          }
+        }
+      }
+
+      .shareback-panel {
+        display: flex;
+        width: 233px;
+        height: 70px;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 12px;
+        margin-left: 10px;
+        border: 1px solid #7C7C7C;
+        border-radius: 8px;
+        padding: 8px 10px;
+        gap: 6px;
+        
+        p {
+          font-size: 10px;
+          line-height: normal;
+        }
+      
+        .shareback-button {
+          width: 100px;
+          height: 24px;
+          padding: 6px 10px;
+          font-size: 10px;
+          color: #000000;
+          border-radius: 8px;
+          background-color: #FFF;
+          border: 1px solid #7C7C7C;
+          margin-left: 5px;
+      
+          &:hover {
+            background-color: #d1d1d1;
+          }
+        }
+      
+        .dont-shareback-button {
+          width: 100px;
+          height: 24px;
+          padding: 6px 10px;
+          font-size: 10px;
+          color: white;
+          border-radius: 8px;
+          background-color: #333;
+          border: 1px solid #7C7C7C;
+          margin-right: 5px;
+      
+          &:hover {
+            background-color: #7C7C7C;
           }
         }
       }

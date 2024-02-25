@@ -30,6 +30,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 
 import './stylesheet.scss';
+import InvitationModal from '../InvitationModal';
 
 export type SharedSchedule = {
   email: string;
@@ -76,9 +77,10 @@ export default function ComparisonContainer({
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
   const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
+  const [invitationOpen, setInvitationOpen] = useState(false);
 
   const [
-    { allVersionNames, currentVersion, colorMap, term },
+    { currentFriends, allVersionNames, currentVersion, colorMap, term },
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -248,6 +250,20 @@ export default function ComparisonContainer({
     [colorMap, patchSchedule]
   );
 
+  const findNotShared = useCallback(() => {
+    const currentFriendEmails = Object.values(currentFriends).map(
+      (friend) => friend.email
+    );
+    const friendEmails = Object.values(friends).map((friend) => friend.email);
+    const notShared = friendEmails.filter(
+      (email) => !currentFriendEmails.includes(email)
+    );
+    return notShared;
+  }, [currentFriends, friends]);
+
+  const openInvitation = useCallback(() => setInvitationOpen(true), []);
+  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
+
   return (
     <div className="comparison-container">
       <div className="comparison-body">
@@ -388,6 +404,37 @@ export default function ComparisonContainer({
                         );
                       }
                     )}
+                    {findNotShared().indexOf(friend.email) > -1 ? (
+                      <div className="shareback-panel">
+                        <div>
+                          <p>
+                            You have {friend.name}&apos;s schedule. Would you
+                            like to share yours back?
+                          </p>
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            className="dont-shareback-button"
+                          >
+                            Don&apos;t Share
+                          </button>
+
+                          <button
+                            type="button"
+                            className="shareback-button"
+                            onClick={openInvitation}
+                          >
+                            Share
+                          </button>
+                        </div>
+                        <InvitationModal
+                          show={invitationOpen}
+                          onHide={hideInvitation}
+                          inputEmail={friend.email}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 );
               })
