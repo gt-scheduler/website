@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 @import '../../variables';
 
 .comparison-container {
@@ -17,15 +18,21 @@
       p {
         margin: 0px;
         overflow: hidden;
-        font-size: 12px;
-        font-weight: 500;
-        line-height: 14px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: normal;
+        font-family: Roboto;
 
         &.content-title{
           font-weight: 700;
           margin: 16px 12px 4px 12px;
           border-bottom: 1px solid $color-border;
         }
+
+        &.shared-with{
+          margin-bottom: 6px;
+        }
+
       }
 
       .friend-email {
@@ -37,10 +44,16 @@
         }
       }
 
+      .checked {
+        p{
+          font-weight: 700;
+        }
+      }
+
       .friend-name {
         p {
           font-weight: 700;
-          font-size: 14px;
+          font-size: 16px;
         }
       }
 
@@ -67,6 +80,7 @@
           height: 22px;
           
           .checkbox {
+            
             margin-left: 12px;
             border: 1px solid;
             border-radius: 3px;
@@ -74,8 +88,8 @@
             transition-duration: $theme-switch-transition-duration;
             transition-property: border-color;
 
-            width: 11px;
-            height: 11px;
+            width: 12px;
+            height: 12px;
 
             &:hover {
               cursor: pointer;
@@ -151,6 +165,12 @@
               opacity: 1;
             }
           }
+
+          &.schedule-checkbox {
+            margin-top: 8px;
+            margin-bottom: 8px;
+          }
+
         }
 
         .palette {

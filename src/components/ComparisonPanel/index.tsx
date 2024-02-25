@@ -91,6 +91,18 @@ export default function ComparisonPanel({
         </ReactTooltip>
       </div>
       <div className={classes('panel', !expanded && 'closed')}>
+        <InvitationModal show={invitationOpen} onHide={hideInvitation} />
+        <div className="invite-panel">
+          <button
+            type="button"
+            onClick={openInvitation}
+            className="invite-button"
+            disabled={type === 'signedOut'}
+          >
+            <FontAwesomeIcon fixedWidth icon={faShare} />
+            <div>Share Schedule</div>
+          </button>
+        </div>
         <div className="comparison-header">
           <p className="header-title">Compare Schedules</p>
           <p className="header-text">{compare ? 'On' : 'Off'}</p>
@@ -106,18 +118,6 @@ export default function ComparisonPanel({
         </div>
         {compare && (
           <div>
-            <InvitationModal show={invitationOpen} onHide={hideInvitation} />
-            <div className="invite-panel">
-              <button
-                type="button"
-                onClick={openInvitation}
-                className="invite-button"
-                disabled={type === 'signedOut'}
-              >
-                <FontAwesomeIcon fixedWidth icon={faShare} />
-                <div>Share Schedule</div>
-              </button>
-            </div>
             <ComparisonContainer
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinnedSchedules}
