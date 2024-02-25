@@ -1,14 +1,11 @@
 import React from 'react';
-
 import { faWarning, faClose } from '@fortawesome/free-solid-svg-icons';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-import './stylesheet.scss';
-
 import { classes } from '../../utils/misc';
+
+import './stylesheet.scss';
 
 export type ToastProps = {
   className?: string;
