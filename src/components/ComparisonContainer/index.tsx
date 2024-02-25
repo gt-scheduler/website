@@ -28,9 +28,9 @@ import { AutoFocusInput } from '../Select';
 import { Palette } from '..';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import InvitationModal from '../InvitationModal';
 
 import './stylesheet.scss';
-import InvitationModal from '../InvitationModal';
 
 export type SharedSchedule = {
   email: string;
