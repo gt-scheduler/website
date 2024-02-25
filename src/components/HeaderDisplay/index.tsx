@@ -19,6 +19,7 @@ import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
 import Toast, { notifyToast } from '../Toast';
+
 import './stylesheet.scss';
 
 type VersionState =
@@ -101,7 +102,7 @@ export default function HeaderDisplay({
         notifyToast('finalized-term-toast');
       }
     }
-  }, []);
+  });
 
   return (
     <div className="Header">

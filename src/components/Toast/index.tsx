@@ -1,10 +1,14 @@
 import React from 'react';
 
-import './stylesheet.scss';
-import { classes } from '../../utils/misc';
 import { faWarning, faClose } from '@fortawesome/free-solid-svg-icons';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+
+import './stylesheet.scss';
+
+import { classes } from '../../utils/misc';
 
 export type ToastProps = {
   className?: string;
@@ -23,7 +27,7 @@ export function notifyToast(className: string): void {
   t.style.visibility = 'visible';
   t.style.animation = 'fadein 0.5s';
   if (selfDisappearing) {
-    setTimeout(function () {
+    setTimeout(() => {
       t.style.animation = 'fadeout 0.5s';
     }, 5000);
   }
