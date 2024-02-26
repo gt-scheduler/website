@@ -31,13 +31,14 @@ export default function useDownloadTerms(): LoadingState<NonEmptyArray<Term>> {
             return;
           }
 
-          const newTerms = result.value.data.terms.sort((termA, termB) => {
-            if (termA.term < termB.term) {
-              return -1
-            }
-            return 1
-            
-          }).reverse();
+          const newTerms = result.value.data.terms
+            .sort((termA, termB) => {
+              if (termA.term < termB.term) {
+                return -1;
+              }
+              return 1;
+            })
+            .reverse();
 
           // Ensure that there is at least 1 term before continuing
           if (newTerms.length === 0) {
