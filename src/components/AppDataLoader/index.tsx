@@ -42,6 +42,7 @@ import {
   StageExtractFriendInfo,
 } from './stages';
 import { softError, ErrorWithFields } from '../../log';
+import { Term } from '../../types';
 
 export type DataLoaderProps = {
   children: React.ReactNode;
@@ -319,7 +320,7 @@ function GroupLoadFriendScheduleData({
 }
 
 type ContextProviderProps = {
-  terms: string[];
+  terms: Term[];
   currentTerm: string;
   setTerm: (next: string) => void;
   currentVersion: string;
