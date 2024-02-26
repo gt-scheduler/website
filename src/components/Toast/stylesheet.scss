@@ -17,6 +17,11 @@
   font-weight: bold;
   font-size: 1em;
 
+  @media (max-width: 450px) {
+    width: 80%;
+    right: 10%;
+  }
+
   &-icon {
     font-size: 2em;
   }
@@ -44,6 +49,28 @@
   @keyframes fadeout {
     from {
       right: 30px;
+      opacity: 1;
+    }
+    to {
+      right: 0;
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadein-mobile {
+    from {
+      right: 0;
+      opacity: 0;
+    }
+    to {
+      right: 10%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeout-mobile {
+    from {
+      right: 10%;
       opacity: 1;
     }
     to {
