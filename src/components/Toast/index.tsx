@@ -8,6 +8,7 @@ import { classes } from '../../utils/misc';
 import './stylesheet.scss';
 
 export type ToastProps = {
+  id: string;
   className?: string;
   color?: string;
   icon?: IconProp;
@@ -15,10 +16,8 @@ export type ToastProps = {
   selfDisappearing?: boolean;
 };
 
-export function notifyToast(className: string): void {
-  const t = document.getElementsByClassName(
-    classes('toast', className)
-  )[0] as HTMLElement;
+export function notifyToast(id: string): void {
+  const t = document.getElementById(id) as HTMLElement;
 
   const selfDisappearing = !t.getElementsByClassName('toast-close-icon')[0];
   t.style.visibility = 'visible';
@@ -31,6 +30,7 @@ export function notifyToast(className: string): void {
 }
 
 export default function Toast({
+  id,
   className,
   color = 'orange',
   icon = faWarning,
@@ -51,6 +51,7 @@ export default function Toast({
       className={classes('toast', className)}
       style={{ backgroundColor: color }}
       onAnimationEnd={handleAnimationEnd}
+      id={id}
     >
       <FontAwesomeIcon fixedWidth icon={icon} className="toast-icon" />
       <div className="toast-message">{message}</div>

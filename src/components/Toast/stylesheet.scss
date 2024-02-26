@@ -16,39 +16,39 @@
   color: #000000;
   font-weight: bold;
   font-size: 1em;
-}
 
-@keyframes fadein {
-  from {
-    right: 0;
-    opacity: 0;
+  &-icon {
+    font-size: 2em;
   }
-  to {
-    right: 30px;
-    opacity: 1;
+
+  &-close-icon {
+    font-size: 1.5em;
+    cursor: pointer;
   }
-}
 
-@keyframes fadeout {
-  from {
-    right: 30px;
-    opacity: 1;
+  &-message {
+    flex: 1 0;
   }
-  to {
-    right: 0;
-    opacity: 0;
+
+  @keyframes fadein {
+    from {
+      right: 0;
+      opacity: 0;
+    }
+    to {
+      right: 30px;
+      opacity: 1;
+    }
   }
-}
 
-.toast-icon {
-  font-size: 2em;
-}
-
-.toast-close-icon {
-  font-size: 1.5em;
-  cursor: pointer;
-}
-
-.toast-message {
-  flex: 1 0;
+  @keyframes fadeout {
+    from {
+      right: 30px;
+      opacity: 1;
+    }
+    to {
+      right: 0;
+      opacity: 0;
+    }
+  }
 }

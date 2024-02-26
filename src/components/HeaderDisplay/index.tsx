@@ -108,7 +108,7 @@ export default function HeaderDisplay({
     <div className="Header">
       {!skeleton ? (
         <Toast
-          className="finalized-term-toast"
+          id="finalized-term-toast"
           color="orange"
           message={`Note: The schedule for ${
             termsState.type === 'loaded'
