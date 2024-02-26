@@ -1,6 +1,8 @@
 @import '../../variables';
 
 .invitation-modal {
+  padding: 10px 25px;
+
   .remove-close-button {
     width: 16px;
     height: 16px;
@@ -40,7 +42,7 @@
       .email-input-block {
         display: flex;
         flex-direction: row;
-        justify-content: space-evenly;
+        justify-content: space-between;
         padding-top: 5px;
         padding-bottom: 5px;
 
@@ -73,7 +75,7 @@
         }
 
         input[type='email'] {
-          width: 282px;
+          width: 300px;
           height: 24px;
           padding: 15px;
           border-radius: 6px;
@@ -111,7 +113,6 @@
       .share-schedule-checkboxes {
         display: flex;
         flex-direction: row;
-        justify-content: center;
         align-items: center;
         gap: 15px;
         padding-top: 8px;
@@ -184,11 +185,7 @@
       justify-content: flex-start;
       align-content: flex-start;
       row-gap: 8px;
-      padding-left: 25px;
-      padding-right: 25px;
-      height: 50px;
-      overflow-y: scroll;
-      overflow-x: hidden;
+      padding-bottom: 25px;
 
       @include light {
         color: #333333;
@@ -293,14 +290,13 @@
   .modal-footer {
     display: flex;
     flex-direction: column;
-    padding: 18px 30px 5px 30px;
+    padding-top: 18px;
 
     .link-options {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 5px;
 
       .link-generated:hover {
         cursor: pointer;
