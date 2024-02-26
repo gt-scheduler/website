@@ -72,6 +72,7 @@ export default function Header({
         renameVersion,
         cloneVersion,
       }}
+      skeleton={false}
     />
   );
 }
