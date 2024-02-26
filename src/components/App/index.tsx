@@ -16,10 +16,10 @@ import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import InformationModal from '../InformationModal';
+import Maintenance from './maintenance';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
-import Maintenance from './maintenance';
 
 const date = new Date(
   new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
