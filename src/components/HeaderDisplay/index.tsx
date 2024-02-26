@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -18,7 +18,7 @@ import HeaderActionBar from '../HeaderActionBar';
 import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
-import Toast, { notifyToast } from '../Toast';
+import Toast from '../Toast';
 
 import './stylesheet.scss';
 
@@ -92,17 +92,17 @@ export default function HeaderDisplay({
   // (small mobile is < 600 px wide)
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
 
-  useEffect(() => {
-    if (termsState.type === 'loaded' && !skeleton) {
-      const termObject = termsState.terms.filter(
-        (term) => term.term === termsState.currentTerm
-      )[0];
+  // useEffect(() => {
+  //   if (termsState.type === 'loaded' && !skeleton) {
+  //     const termObject = termsState.terms.filter(
+  //       (term) => term.term === termsState.currentTerm
+  //     )[0];
 
-      if (!termObject?.finalized) {
-        notifyToast('finalized-term-toast');
-      }
-    }
-  });
+  //     if (!termObject?.finalized) {
+  //       notifyToast('finalized-term-toast');
+  //     }
+  //   }
+  // });
 
   return (
     <div className="Header">
