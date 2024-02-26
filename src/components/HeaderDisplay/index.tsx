@@ -110,7 +110,7 @@ export default function HeaderDisplay({
         <Toast
           className="finalized-term-toast"
           color="orange"
-          message={`Note: The final exam matrix for ${
+          message={`Note: The schedule for ${
             termsState.type === 'loaded'
               ? getSemesterName(termsState.currentTerm)
               : 'Loading'
