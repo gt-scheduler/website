@@ -16,7 +16,6 @@ import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import InformationModal from '../InformationModal';
-import Maintenance from './maintenance';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
