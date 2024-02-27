@@ -10,6 +10,7 @@ import {
   faCircleXmark,
   faXmark,
   faPalette,
+  faShareFromSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
@@ -29,6 +30,7 @@ import { Palette } from '..';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import InvitationModal from '../InvitationModal';
+import ComparisonContainerShareBack from '../ComparisonContainerShareBack/ComparisonContainerShareBack';
 
 import './stylesheet.scss';
 
@@ -77,10 +79,11 @@ export default function ComparisonContainer({
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
   const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
-  const [invitationOpen, setInvitationOpen] = useState(false);
+  const [invitationModalOpen, setInvitationModalOpen] = useState(false);
+  const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
   const [
-    { currentFriends, allVersionNames, currentVersion, colorMap, term },
+    { allVersionNames, currentVersion, colorMap, term },
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -250,22 +253,15 @@ export default function ComparisonContainer({
     [colorMap, patchSchedule]
   );
 
-  const findNotShared = useCallback(() => {
-    const currentFriendEmails = Object.values(currentFriends).map(
-      (friend) => friend.email
-    );
-    const friendEmails = Object.values(friends).map((friend) => friend.email);
-    const notShared = friendEmails.filter(
-      (email) => !currentFriendEmails.includes(email)
-    );
-    return notShared;
-  }, [currentFriends, friends]);
-
-  const openInvitation = useCallback(() => setInvitationOpen(true), []);
-  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
-
   return (
     <div className="comparison-container">
+      <InvitationModal
+        show={invitationModalOpen}
+        onHide={(): void => {
+          setInvitationModalOpen(false);
+        }}
+        inputEmail={invitationModalEmail}
+      />
       <div className="comparison-body">
         <div className="comparison-content">
           <div className="my-schedule">
@@ -357,6 +353,8 @@ export default function ComparisonContainer({
                       editInfo={editInfo}
                       setEditInfo={setEditInfo}
                       editValue={editValue}
+                      setInvitationModalEmail={setInvitationModalEmail}
+                      setInvitationModalOpen={setInvitationModalOpen}
                     />
                     <div className="friend-email">
                       <p>{friend.email}</p>
@@ -407,37 +405,13 @@ export default function ComparisonContainer({
                         );
                       }
                     )}
-                    {findNotShared().indexOf(friend.email) > -1 ? (
-                      <div className="shareback-panel">
-                        <div>
-                          <p>
-                            You have {friend.name}&apos;s schedule. Would you
-                            like to share yours back?
-                          </p>
-                        </div>
-                        <div>
-                          <button
-                            type="button"
-                            className="dont-shareback-button"
-                          >
-                            Don&apos;t Share
-                          </button>
-
-                          <button
-                            type="button"
-                            className="shareback-button"
-                            onClick={openInvitation}
-                          >
-                            Share
-                          </button>
-                        </div>
-                        <InvitationModal
-                          show={invitationOpen}
-                          onHide={hideInvitation}
-                          inputEmail={friend.email}
-                        />
-                      </div>
-                    ) : null}
+                    <ComparisonContainerShareBack
+                      friendId={friendId}
+                      friendName={friend.name}
+                      friendEmail={friend.email}
+                      setModalEmail={setInvitationModalEmail}
+                      setModalOpen={setInvitationModalOpen}
+                    />
                   </div>
                 );
               })
@@ -477,6 +451,8 @@ type ScheduleRowProps = {
   name: string;
   handleEditSchedule: () => void;
   handleRemoveSchedule: () => void;
+  setInvitationModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setInvitationModalEmail?: React.Dispatch<React.SetStateAction<string>>;
   hasPalette?: boolean;
   hasEdit?: boolean;
   hasDelete?: boolean;
@@ -516,6 +492,8 @@ function ScheduleRow({
   editInfo,
   setEditInfo,
   editValue,
+  setInvitationModalOpen,
+  setInvitationModalEmail,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
@@ -603,6 +581,22 @@ function ScheduleRow({
             <FontAwesomeIcon icon={faPalette} size="xs" />
           </Button>
         )}
+        {(divHover || edit) &&
+          hasEdit &&
+          setInvitationModalOpen !== undefined &&
+          setInvitationModalEmail !== undefined &&
+          email && (
+            <Button
+              className="icon"
+              onClick={(): void => {
+                setInvitationModalEmail(email);
+                setInvitationModalOpen(true);
+              }}
+              key={`${id}-share`}
+            >
+              <FontAwesomeIcon icon={faShareFromSquare} size="xs" />
+            </Button>
+          )}
         {(divHover || edit) && hasEdit && (
           <Button
             className="icon"
