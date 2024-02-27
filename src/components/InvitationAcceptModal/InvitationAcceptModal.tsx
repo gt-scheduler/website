@@ -1,5 +1,7 @@
 import Modal from '../Modal';
+
 import React, { useState } from 'react';
+
 import './stylesheet.scss';
 
 export default function InvitationAcceptModal(): React.ReactElement {
