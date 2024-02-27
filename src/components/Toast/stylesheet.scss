@@ -1,0 +1,81 @@
+@import '../../variables';
+
+.toast {
+  display: flex;
+  align-items: center;
+  column-gap: 15px;
+  visibility: hidden;
+  position: fixed;
+  right: 30px;
+  top: 30px;
+  z-index: 1;
+  width: 400px;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: left;
+  color: #000000;
+  font-weight: bold;
+  font-size: 1em;
+
+  @media (max-width: 450px) {
+    width: 80%;
+    right: 10%;
+  }
+
+  &-icon {
+    font-size: 2em;
+  }
+
+  &-close-icon {
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+
+  &-message {
+    flex: 1 0;
+  }
+
+  @keyframes fadein {
+    from {
+      right: 0;
+      opacity: 0;
+    }
+    to {
+      right: 30px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeout {
+    from {
+      right: 30px;
+      opacity: 1;
+    }
+    to {
+      right: 0;
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadein-mobile {
+    from {
+      right: 0;
+      opacity: 0;
+    }
+    to {
+      right: 10%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeout-mobile {
+    from {
+      right: 10%;
+      opacity: 1;
+    }
+    to {
+      right: 0;
+      opacity: 0;
+    }
+  }
+}

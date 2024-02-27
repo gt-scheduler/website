@@ -323,7 +323,7 @@ export default function ComparisonContainer({
               })}
           </div>
           <div className="shared-schedules">
-            <p className="content-title">Shared with me</p>
+            <p className="content-title shared-with">Shared with me</p>
             {Object.keys(friends).length !== 0 ? (
               Object.entries(friends).map(([friendId, friend]) => {
                 return (
@@ -358,6 +358,9 @@ export default function ComparisonContainer({
                       setEditInfo={setEditInfo}
                       editValue={editValue}
                     />
+                    <div className="friend-email">
+                      <p>{friend.email}</p>
+                    </div>
                     {Object.entries(friend.versions).map(
                       ([scheduleId, schedule]) => {
                         return (
@@ -530,7 +533,11 @@ function ScheduleRow({
   return (
     <div className="schedule-row">
       <div
-        className={classes('checkbox-container', edit && 'editing')}
+        className={classes(
+          'checkbox-container',
+          edit && 'editing',
+          type === 'Schedule' && 'schedule-checkbox'
+        )}
         onMouseEnter={(): void => setDivHover(true)}
         onMouseLeave={(): void => setDivHover(false)}
       >
@@ -559,7 +566,14 @@ function ScheduleRow({
               onMouseEnter={(): void => setTooltipHover(true)}
               onMouseLeave={(): void => setTooltipHover(false)}
             >
-              <p>{name}</p>
+              <div
+                className={classes(
+                  type === 'User' && 'friend-name',
+                  checkboxColor !== '' && 'checked'
+                )}
+              >
+                <p>{name}</p>
+              </div>
               {hasTooltip && email !== name && (
                 <ReactTooltip
                   key={id}
