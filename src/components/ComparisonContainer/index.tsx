@@ -10,6 +10,7 @@ import {
   faCircleXmark,
   faXmark,
   faPalette,
+  faShareFromSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
@@ -28,6 +29,8 @@ import { AutoFocusInput } from '../Select';
 import { Palette } from '..';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import InvitationModal from '../InvitationModal';
+import ComparisonContainerShareBack from '../ComparisonContainerShareBack/ComparisonContainerShareBack';
 
 import './stylesheet.scss';
 
@@ -76,6 +79,8 @@ export default function ComparisonContainer({
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
   const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
+  const [invitationModalOpen, setInvitationModalOpen] = useState(false);
+  const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
   const [
     { allVersionNames, currentVersion, colorMap, term },
@@ -250,6 +255,13 @@ export default function ComparisonContainer({
 
   return (
     <div className="comparison-container">
+      <InvitationModal
+        show={invitationModalOpen}
+        onHide={(): void => {
+          setInvitationModalOpen(false);
+        }}
+        inputEmail={invitationModalEmail}
+      />
       <div className="comparison-body">
         <div className="comparison-content">
           <div className="my-schedule">
@@ -341,6 +353,8 @@ export default function ComparisonContainer({
                       editInfo={editInfo}
                       setEditInfo={setEditInfo}
                       editValue={editValue}
+                      setInvitationModalEmail={setInvitationModalEmail}
+                      setInvitationModalOpen={setInvitationModalOpen}
                     />
                     <div className="friend-email">
                       <p>{friend.email}</p>
@@ -391,6 +405,13 @@ export default function ComparisonContainer({
                         );
                       }
                     )}
+                    <ComparisonContainerShareBack
+                      friendId={friendId}
+                      friendName={friend.name}
+                      friendEmail={friend.email}
+                      setModalEmail={setInvitationModalEmail}
+                      setModalOpen={setInvitationModalOpen}
+                    />
                   </div>
                 );
               })
@@ -430,6 +451,8 @@ type ScheduleRowProps = {
   name: string;
   handleEditSchedule: () => void;
   handleRemoveSchedule: () => void;
+  setInvitationModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setInvitationModalEmail?: React.Dispatch<React.SetStateAction<string>>;
   hasPalette?: boolean;
   hasEdit?: boolean;
   hasDelete?: boolean;
@@ -469,6 +492,8 @@ function ScheduleRow({
   editInfo,
   setEditInfo,
   editValue,
+  setInvitationModalOpen,
+  setInvitationModalEmail,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
@@ -556,6 +581,22 @@ function ScheduleRow({
             <FontAwesomeIcon icon={faPalette} size="xs" />
           </Button>
         )}
+        {(divHover || edit) &&
+          hasEdit &&
+          setInvitationModalOpen !== undefined &&
+          setInvitationModalEmail !== undefined &&
+          email && (
+            <Button
+              className="icon"
+              onClick={(): void => {
+                setInvitationModalEmail(email);
+                setInvitationModalOpen(true);
+              }}
+              key={`${id}-share`}
+            >
+              <FontAwesomeIcon icon={faShareFromSquare} size="xs" />
+            </Button>
+          )}
         {(divHover || edit) && hasEdit && (
           <Button
             className="icon"
