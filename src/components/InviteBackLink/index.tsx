@@ -3,10 +3,10 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { AccountContext, SignedIn } from '../../contexts';
 import Spinner from '../Spinner';
 
 import './stylesheet.scss';
-import { AccountContext, SignedIn } from '../../contexts';
 
 // eslint-disable-next-line no-shadow
 enum LoadingState {
@@ -68,9 +68,9 @@ export default function InviteBackLink(): React.ReactElement {
       }
     };
     handleInviteAsync().catch((err) => {
-      console.error('Error handling invite', err);
+      console.error('Error handling invite', err); // eslint-disable-line no-console
     });
-  }, [id, navigate, redirectURL]);
+  }, [id, navigate, redirectURL, accountContext]);
 
   if (state === LoadingState.LOADING) {
     return (
