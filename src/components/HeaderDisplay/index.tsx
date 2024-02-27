@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -35,6 +35,15 @@ type VersionState =
       cloneVersion: (id: string, newName: string) => void;
     };
 
+type TermsState =
+  | { type: 'loading' }
+  | {
+      type: 'loaded';
+      terms: Term[];
+      currentTerm: string;
+      onChangeTerm: (next: string) => void;
+    };
+
 export type HeaderDisplayProps = {
   totalCredits?: number | null;
   currentTab: number;
@@ -47,14 +56,7 @@ export type HeaderDisplayProps = {
   enableExportCalendar?: boolean;
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
-  termsState:
-    | { type: 'loading' }
-    | {
-        type: 'loaded';
-        terms: Term[];
-        currentTerm: string;
-        onChangeTerm: (next: string) => void;
-      };
+  termsState: TermsState;
   versionsState: VersionState;
   accountState: AccountContextValue | { type: 'loading' };
   skeleton: boolean;
@@ -102,7 +104,7 @@ export default function HeaderDisplay({
         notifyToast('finalized-term-toast');
       }
     }
-  });
+  }, [termsState, skeleton]);
 
   return (
     <div className="Header">

@@ -190,4 +190,25 @@
       }
     }
   }
+  .invite-panel {
+    display: flex;
+    margin: 10px 10px 10px 16px;
+    .invite-button {
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+      border-radius: 10px;
+      background-color: #676767;
+      display: flex;
+      padding: 10px 50px 10px 50px;
+      border: none;
+      gap: 5px;
+
+      &:hover {
+        background-color: #929292;
+      }
+    }
+  }
+
 }
