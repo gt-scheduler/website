@@ -415,7 +415,8 @@ export function InvitationModalContent({
               <p>
                 Users Invited to View <strong>{v.name}</strong>
               </p>
-              {allFriends[v.id] && Object.keys(allFriends[v.id] as Record<string, FriendShareData>)
+              {allFriends[v.id] &&
+              Object.keys(allFriends[v.id] as Record<string, FriendShareData>)
                 .length !== 0 ? (
                 <div className="shared-emails" key="email">
                   {Object.entries(
