@@ -66,14 +66,15 @@ export default function Header({
   }, [pinnedCrns, oscar]);
 
   const headerActionBarProps = useHeaderActionBarProps(captureRef);
-  const termsState = useMemo(() => {
-    return {
+  const termsState = useMemo(
+    () => ({
       type: 'loaded',
       terms,
       currentTerm: term,
       onChangeTerm: setTerm,
-    };
-  }, [setTerm, term, terms]) as TermsState;
+    }),
+    [setTerm, term, terms]
+  ) as TermsState;
 
   const versionsState = useMemo(
     () => ({
