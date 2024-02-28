@@ -12,10 +12,10 @@ import defaultUIState, {
   CompareState,
 } from '../data/hooks/useUIStateFromStorage';
 
-export type FriendContextData = Immutable<{
+export type FriendContextData = {
   friends: FriendScheduleData;
   compare: CompareState;
-}>;
+};
 export type FriendContextSetters = {
   updateFriendTermData: (
     applyDraft: (

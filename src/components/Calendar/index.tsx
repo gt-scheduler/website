@@ -12,15 +12,14 @@ import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
 import './stylesheet.scss';
+import { CompareState } from '../../data/hooks/useUIStateFromStorage';
 
 export type CalendarProps = {
   className?: string;
   overlayCrns: string[];
   preview?: boolean;
   capture?: boolean;
-  compare?: boolean;
-  pinnedFriendSchedules?: string[];
-  pinSelf?: boolean;
+  compare?: CompareState;
   isAutosized?: boolean;
 };
 
@@ -50,11 +49,9 @@ type FriendEventData = {
 export default function Calendar({
   className,
   overlayCrns,
+  compare,
   preview = false,
   capture = false,
-  compare = false,
-  pinnedFriendSchedules = [],
-  pinSelf = true,
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
   const [{ pinnedCrns, oscar, events, currentVersion }] =
@@ -112,7 +109,7 @@ export default function Calendar({
       });
   };
 
-  const crns = pinSelf
+  const crns = compare?.pinSelf
     ? Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]))
     : [];
 
@@ -140,7 +137,7 @@ export default function Calendar({
   const meetings: CommmonMeetingObject[] =
     crnMeetings as CommmonMeetingObject[];
 
-  if (!compare || pinSelf) {
+  if (!compare?.compare || compare?.pinSelf) {
     // Add events to meetings array
     meetings.push(
       ...events.map((event) => {
@@ -165,7 +162,7 @@ export default function Calendar({
   if (compare) {
     Object.values(friends).forEach((friend) =>
       Object.entries(friend.versions)
-        .filter((schedule) => pinnedFriendSchedules.includes(schedule[0]))
+        .filter((schedule) => compare?.pinned.includes(schedule[0]))
         .forEach((schedule) => {
           const friendMeetings: CommmonMeetingObject[] = [];
           schedule[1].schedule.pinnedCrns.forEach((crn) => {

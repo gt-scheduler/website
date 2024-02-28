@@ -57,7 +57,6 @@ export type HeaderDisplayProps = {
       };
   versionsState: VersionState;
   accountState: AccountContextValue | { type: 'loading' };
-  compareState: CompareState;
 };
 
 /**

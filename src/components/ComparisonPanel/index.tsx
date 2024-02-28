@@ -10,25 +10,22 @@ import { CompareState } from '../../data/hooks/useUIStateFromStorage';
 import './stylesheet.scss';
 
 export type ComparisonPanelProps = {
-  handleCompareSchedules: (
-    compare?: boolean,
-    pinnedSchedules?: string[],
-    pinSelf?: boolean
-  ) => void;
-  pinnedSchedules: string[];
-  pinSelf: boolean;
+  compareState: CompareState;
+  setCompare: (next: boolean) => void;
+  setPinned: (next: string[]) => void;
+  setPinSelf: (next: boolean) => void;
 };
 
 export default function ComparisonPanel({
-  handleCompareSchedules,
-  pinnedSchedules,
-  pinSelf,
+  compareState,
+  setCompare,
+  setPinned,
+  setPinSelf,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
   const [tooltipY, setTooltipY] = useState(0);
   const [signedInModal, setSignedInModal] = useState(false);
-  const [compare, setCompare] = useState(false);
   // const [hoverCompare, setHoverCompare] = useState(false);
   // const [tooltipYCompare, setTooltipYCompare] = useState(0);
   const tooltipId = useId();
@@ -42,12 +39,11 @@ export default function ComparisonPanel({
 
   const handleTogglePanel = useCallback(() => {
     if (type === 'signedIn') {
-      setCompare(!compare);
-      handleCompareSchedules(!compare, undefined, undefined);
+      setCompare(!compareState.compare);
     } else {
       setSignedInModal(true);
     }
-  }, [type, compare, handleCompareSchedules]);
+  }, [type, compareState.compare]);
 
   return (
     <div className="comparison-panel">
@@ -87,10 +83,10 @@ export default function ComparisonPanel({
       <div className={classes('panel', !expanded && 'closed')}>
         <div className="comparison-header">
           <p className="header-title">Compare Schedules</p>
-          <p className="header-text">{compare ? 'On' : 'Off'}</p>
+          <p className="header-text">{compareState.compare ? 'On' : 'Off'}</p>
           <label className="switch" htmlFor="comparison-checkbox">
             <input
-              className={classes(compare && 'checked')}
+              className={classes(compareState.compare && 'checked')}
               type="checkbox"
               id="comparison-checkbox"
               onClick={(): void => handleTogglePanel()}
@@ -100,15 +96,14 @@ export default function ComparisonPanel({
             />
           </label>
         </div>
-        {compare && (
+        {compareState.compare && (
           <ComparisonContainer
-            handleCompareSchedules={handleCompareSchedules}
-            pinnedSchedules={pinnedSchedules}
-            pinSelf={pinSelf}
+            pinnedSchedules={compareState.pinned}
+            pinSelf={compareState.pinSelf}
           />
         )}
         <div className="combination">
-          <CombinationContainer compare={compare} />
+          <CombinationContainer compare={compareState} />
         </div>
         {/* <div
           className={classes('comparison-overlay', 'left', compare && 'open')}

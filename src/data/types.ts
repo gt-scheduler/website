@@ -56,7 +56,7 @@ export const defaultFriendTermData: Immutable<FriendTermData> = {
   accessibleSchedules: {},
 };
 
-export const defaultFriendScheduleData: Immutable<FriendScheduleData> = {
+export const defaultFriendScheduleData: FriendScheduleData = {
   //
 };
 

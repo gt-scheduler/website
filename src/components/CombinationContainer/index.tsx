@@ -13,6 +13,7 @@ import Modal from '../Modal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+import { defaultUIState, CompareState } from '../../data/hooks/useUIStateFromStorage';
 
 // Workaround for problem with `react-virtualized` types resolving to wrong
 // version of @types/react:
@@ -21,11 +22,11 @@ const List = _List as unknown as React.ComponentType<ListProps>;
 const AutoSizer = _AutoSizer as unknown as React.ComponentType<AutoSizerProps>;
 
 export type ComparisonPanelProps = {
-  compare?: boolean;
+  compare?: CompareState;
 };
 
 export default function CombinationContainer({
-  compare = false,
+  compare = defaultUIState.currentCompare
 }: ComparisonPanelProps): React.ReactElement {
   const [
     {

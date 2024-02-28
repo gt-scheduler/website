@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useContext } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -8,7 +8,7 @@ import {
   ComparisonPanel,
   CourseContainer,
 } from '..';
-import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
+import { FriendContext, OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
@@ -30,28 +30,7 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const [compare, setCompare] = useState(false);
-  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
-  const [pinSelf, setPinSelf] = useState(true);
-
-  const handleCompareSchedules = useCallback(
-    (
-      newCompare?: boolean,
-      newPinnedSchedules?: string[],
-      newPinSelf?: boolean
-    ) => {
-      if (newCompare !== undefined) {
-        setCompare(newCompare);
-      }
-      if (newPinnedSchedules !== undefined) {
-        setPinnedSchedules(newPinnedSchedules);
-      }
-      if (newPinSelf !== undefined) {
-        setPinSelf(newPinSelf);
-      }
-    },
-    []
-  );
+  let [friendsData, friendsSetters] = useContext(FriendContext);
 
   return (
     <>
@@ -77,18 +56,16 @@ export default function Scheduler(): React.ReactElement {
               <Calendar
                 className="calendar"
                 overlayCrns={overlayCrns}
-                compare={compare}
-                pinnedFriendSchedules={pinnedSchedules}
-                pinSelf={!compare || pinSelf}
+                compare={friendsData.compare}
               />
             </div>
           )}
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
-              handleCompareSchedules={handleCompareSchedules}
-              pinnedSchedules={pinnedSchedules}
-              pinSelf={pinSelf}
-              compareState={compareState}
+              compareState={friendsData.compare}
+              setCompare={friendsSetters.setCompare}
+              setPinned={friendsSetters.setPinned}
+              setPinSelf={friendsSetters.setPinSelf}
             />
           )}
         </div>

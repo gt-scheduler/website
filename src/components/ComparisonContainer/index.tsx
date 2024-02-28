@@ -56,17 +56,11 @@ export type EditInfo = {
 } | null;
 
 export type ComparisonContainerProps = {
-  handleCompareSchedules: (
-    compare?: boolean,
-    pinnedSchedules?: string[],
-    pinSelf?: boolean
-  ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
 };
 
 export default function ComparisonContainer({
-  handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
 }: ComparisonContainerProps): React.ReactElement {
@@ -226,17 +220,11 @@ export default function ComparisonContainer({
     (id: string) => {
       if (selected.includes(id)) {
         setSelected(selected.filter((selectedId: string) => selectedId !== id));
-        handleCompareSchedules(
-          undefined,
-          selected.filter((selectedId: string) => selectedId !== id),
-          undefined
-        );
       } else {
         setSelected(selected.concat([id]));
-        handleCompareSchedules(undefined, selected.concat([id]), undefined);
       }
     },
-    [selected, handleCompareSchedules]
+    [selected]
   );
 
   const setFriendScheduleColor = useCallback(
@@ -264,11 +252,6 @@ export default function ComparisonContainer({
                     type="Version"
                     onClick={(): void => {
                       setScheduleSelected(!scheduleSelected);
-                      handleCompareSchedules(
-                        undefined,
-                        undefined,
-                        !scheduleSelected
-                      );
                     }}
                     checkboxColor={scheduleSelected ? colorMap[version.id] : ''}
                     name={version.name}

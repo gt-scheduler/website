@@ -72,12 +72,6 @@ export default function Header({
         renameVersion,
         cloneVersion,
       }}
-      compareState={{
-        type: 'loaded',
-        compare: friendData.compare.compare,
-        pinned: friendData.compare.pinned,
-        pinSelf: friendData.compare.pinSelf,
-      }}
     />
   );
 }
