@@ -1,0 +1,84 @@
+.invitation-accept-modal-content {
+  .heading {
+    font-size: 24px;
+    color: white;
+    font-family: "Roboto";
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .modal-image {
+    width: 150px;
+    padding-top: 20px;
+  }
+
+  .sub-heading {
+    color: white;
+    font-size: 14px;
+    padding-top: 15px;
+    text-align: center;
+  }
+
+  .modal-bottom {
+    padding-top: 15px;
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+    column-gap: 20px;
+    
+    button {
+      width: 150px;
+      outline: inherit;
+      border: none;
+      padding-top: 2%;
+      padding-bottom: 2%;
+      cursor: pointer;
+    }
+
+    .no-button {
+      border-radius: 6px;
+      background: var(--action-button-secondary, #676767);
+      color: #FFF;
+      text-align: center;
+      font-family: Roboto;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+    }
+
+    .share-button {
+      border-radius: 6px;
+      background: #FE5B53;
+      color: #FFF;
+      text-align: center;
+      font-family: Roboto;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+  }
+
+  padding: 5%;
+  padding-left: 10%;
+  padding-right: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Roboto";
+}
+
+.remove-close-button {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  padding: 15px;
+  color: #808080;
+  border-radius: 50px;
+}
