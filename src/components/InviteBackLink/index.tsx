@@ -21,15 +21,13 @@ const handleInvite = async (
   inviteId: string | undefined,
   token: string | void
 ): Promise<void> => {
-  await axios({
-    method: 'POST',
-    url,
+  const data = JSON.stringify({
+    inviteId,
+    token,
+  });
+  await axios.post(url, `data=${data}`, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    data: {
-      inviteId,
-      token,
     },
   });
 };
