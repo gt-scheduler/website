@@ -16,21 +16,27 @@ enum LoadingState {
   ERROR,
 }
 
+type HandleInvitationResponse = {
+  email: string;
+};
+
 const url = `${CLOUD_FUNCTION_BASE_URL}/handleFriendInvitation`;
 
 const handleInvite = async (
   inviteId: string | undefined,
   token: string | void
-): Promise<void> => {
+): Promise<string> => {
   const data = JSON.stringify({
     inviteId,
     token,
   });
-  await axios.post(url, `data=${data}`, {
+  const res = await axios.post<HandleInvitationResponse>(url, `data=${data}`, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
+
+  return res.data.email;
 };
 
 export default function InviteBackLink(): React.ReactElement {
@@ -45,7 +51,7 @@ export default function InviteBackLink(): React.ReactElement {
       location.pathname.includes('/#')
         ? location.pathname.split('/#')[0] ?? '/'
         : '/',
-    [location]
+    [location, id]
   );
 
   const accountContext = useFirebaseAuth();
@@ -56,17 +62,18 @@ export default function InviteBackLink(): React.ReactElement {
         const token = await (accountContext.result as SignedIn).getToken();
         if (id && navigate) {
           handleInvite(id, token)
-            .then(() => {
+            .then((email) => {
               setState(LoadingState.SUCCESS);
-              setTimeout(() => {
-                navigate(redirectURL);
-              }, 5000);
+              navigate(
+                `${redirectURL}?email=${email}&status=success&inviteId=${id}`
+              );
             })
             .catch(() => {
               setState(LoadingState.ERROR);
-              setTimeout(() => {
-                navigate(redirectURL);
-              }, 10000);
+
+              navigate(
+                `${redirectURL}?email=none&status=failure&inviteId=${id}`
+              );
             });
         }
       }
@@ -107,7 +114,6 @@ export default function InviteBackLink(): React.ReactElement {
         type="button"
         className="continue-button"
         onClick={(): void => {
-          console.log(redirectURL);
           navigate(redirectURL);
         }}
       >
