@@ -1,20 +1,20 @@
-import Modal from '../Modal';
-import Button from '../Button';
-import { faL, faXmark } from '@fortawesome/free-solid-svg-icons';
-
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useSearchParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useLocalStorageState from 'use-local-storage-state';
-import './stylesheet.scss';
+
+import Button from '../Button';
+import Modal from '../Modal';
 import InvitationModal from '../InvitationModal';
+
+import './stylesheet.scss';
 
 export default function InvitationAcceptModal(): React.ReactElement {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [invitationModalOpen, setInvitationModalOpen] =
     useState<boolean>(false);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [hasSeen, setHasSeen] = useLocalStorageState(
     `redirect-invitation-modal-${searchParams.get('inviteId') ?? ''}`,
@@ -25,7 +25,6 @@ export default function InvitationAcceptModal(): React.ReactElement {
   );
 
   useEffect(() => {
-    console.log('ok');
     if (
       !searchParams.get('inviteId') ||
       !searchParams.get('status') ||

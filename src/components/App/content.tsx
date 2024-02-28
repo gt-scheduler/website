@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useRef } from 'react';
 
 import { Header, Scheduler, Attribution, Calendar } from '..';
 import { ReactErrorDetails } from '../ErrorDetails';

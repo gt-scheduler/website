@@ -51,7 +51,7 @@ export default function InviteBackLink(): React.ReactElement {
       location.pathname.includes('/#')
         ? location.pathname.split('/#')[0] ?? '/'
         : '/',
-    [location, id]
+    [location]
   );
 
   const accountContext = useFirebaseAuth();
