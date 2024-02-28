@@ -131,12 +131,13 @@ export function InvitationModalContent({
           string,
           FriendShareData
         >;
-        console.log(versionFriends)
+
         // if friend accepted, don't increment numNotAccepted
         return Object.keys(versionFriends).some((f) => {
           return (
             versionFriends[f]?.email === input.current?.value &&
-            (versionFriends[f]?.status === 'Accepted' || versionFriends[f]?.status === "Pending")
+            (versionFriends[f]?.status === 'Accepted' ||
+              versionFriends[f]?.status === 'Pending')
           );
         })
           ? acc
@@ -251,7 +252,7 @@ export function InvitationModalContent({
     term,
     getInvitationLink,
     checkedSchedules,
-    selectedExpiration
+    selectedExpiration,
   ]);
 
   const handleKeyDown = useCallback(
