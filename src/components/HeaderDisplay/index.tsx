@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -18,7 +18,7 @@ import HeaderActionBar from '../HeaderActionBar';
 import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
-import Toast from '../Toast';
+import Toast, { notifyToast } from '../Toast';
 
 import './stylesheet.scss';
 
@@ -35,6 +35,15 @@ type VersionState =
       cloneVersion: (id: string, newName: string) => void;
     };
 
+type TermsState =
+  | { type: 'loading' }
+  | {
+      type: 'loaded';
+      terms: Term[];
+      currentTerm: string;
+      onChangeTerm: (next: string) => void;
+    };
+
 export type HeaderDisplayProps = {
   totalCredits?: number | null;
   currentTab: number;
@@ -47,14 +56,7 @@ export type HeaderDisplayProps = {
   enableExportCalendar?: boolean;
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
-  termsState:
-    | { type: 'loading' }
-    | {
-        type: 'loaded';
-        terms: Term[];
-        currentTerm: string;
-        onChangeTerm: (next: string) => void;
-      };
+  termsState: TermsState;
   versionsState: VersionState;
   accountState: AccountContextValue | { type: 'loading' };
   skeleton: boolean;
@@ -92,17 +94,17 @@ export default function HeaderDisplay({
   // (small mobile is < 600 px wide)
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
 
-  // useEffect(() => {
-  //   if (termsState.type === 'loaded' && !skeleton) {
-  //     const termObject = termsState.terms.filter(
-  //       (term) => term.term === termsState.currentTerm
-  //     )[0];
+  useEffect(() => {
+    if (termsState.type === 'loaded' && !skeleton) {
+      const termObject = termsState.terms.filter(
+        (term) => term.term === termsState.currentTerm
+      )[0];
 
-  //     if (!termObject?.finalized) {
-  //       notifyToast('finalized-term-toast');
-  //     }
-  //   }
-  // });
+      if (!termObject?.finalized) {
+        notifyToast('finalized-term-toast');
+      }
+    }
+  }, [termsState, skeleton]);
 
   return (
     <div className="Header">

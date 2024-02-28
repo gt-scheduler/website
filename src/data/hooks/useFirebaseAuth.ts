@@ -48,6 +48,10 @@ export default function useFirebaseAuth(): LoadingState<AccountContextValue> {
               firebase
                 .auth()
                 .signOut()
+                .then(() => {
+                  // don't want to share localStorage between accounts
+                  localStorage.clear();
+                })
                 .catch((err) => {
                   softError(
                     new ErrorWithFields({
