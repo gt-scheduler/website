@@ -43,6 +43,8 @@ import {
 import { softError, ErrorWithFields } from '../../log';
 import { Term } from '../../types';
 
+import { CompareState } from '../../data/hooks/useUIStateFromStorage';
+
 export type DataLoaderProps = {
   children: React.ReactNode;
 };
@@ -72,6 +74,10 @@ export default function DataLoader({
         setTerm,
         currentVersion: currentVersionRaw,
         setVersion,
+        currentCompare: currentCompare,
+        setCompare,
+        setPinned,
+        setPinSelf,
       }): React.ReactElement => (
         <StageLoadTerms>
           {({ terms }): React.ReactElement => (
@@ -149,6 +155,10 @@ export default function DataLoader({
                                             setTerm={setTerm}
                                             currentVersion={currentVersion}
                                             setVersion={setVersion}
+                                            currentCompare={currentCompare}
+                                            setCompare={setCompare}
+                                            setPinned={setPinned}
+                                            setPinSelf={setPinSelf}
                                             oscar={oscar}
                                             scheduleVersion={scheduleVersion}
                                             updateScheduleVersion={
@@ -324,6 +334,10 @@ type ContextProviderProps = {
   setTerm: (next: string) => void;
   currentVersion: string;
   setVersion: (next: string) => void;
+  currentCompare: CompareState;
+  setCompare: (next: boolean) => void;
+  setPinned: (next: string[]) => void;
+  setPinSelf: (next: boolean) => void;
   oscar: Oscar;
   scheduleVersion: Immutable<ScheduleVersion>;
   updateScheduleVersion: (
@@ -362,6 +376,10 @@ function ContextProvider({
   setTerm,
   currentVersion,
   setVersion,
+  currentCompare,
+  setCompare,
+  setPinned,
+  setPinSelf,
   oscar,
   scheduleVersion,
   updateScheduleVersion,
@@ -503,11 +521,15 @@ function ContextProvider({
     () => [
       {
         friends: friendScheduleData,
+        compare: currentCompare,
       },
       {
         renameFriend,
         updateFriendTermData,
         updateFriendInfo,
+        setCompare,
+        setPinned,
+        setPinSelf,
       },
     ],
     [friendScheduleData, renameFriend, updateFriendTermData, updateFriendInfo]

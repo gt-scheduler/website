@@ -8,8 +8,14 @@ import {
   FriendTermData,
 } from '../data/types';
 import { ErrorWithFields } from '../log';
+import defaultUIState, {
+  CompareState,
+} from '../data/hooks/useUIStateFromStorage';
 
-export type FriendContextData = Immutable<{ friends: FriendScheduleData }>;
+export type FriendContextData = Immutable<{
+  friends: FriendScheduleData;
+  compare: CompareState;
+}>;
 export type FriendContextSetters = {
   updateFriendTermData: (
     applyDraft: (
@@ -20,6 +26,9 @@ export type FriendContextSetters = {
     applyDraft: (draft: Draft<FriendInfo>) => void | Immutable<FriendInfo>
   ) => void;
   renameFriend: (id: string, newName: string) => void;
+  setCompare: (next: boolean) => void;
+  setPinned: (next: string[]) => void;
+  setPinSelf: (next: boolean) => void;
 };
 
 export type FriendContextValue = [FriendContextData, FriendContextSetters];
@@ -27,6 +36,7 @@ export type FriendContextValue = [FriendContextData, FriendContextSetters];
 export const FriendContext = React.createContext<FriendContextValue>([
   {
     friends: defaultFriendScheduleData,
+    compare: defaultUIState().currentCompare,
   },
   {
     updateFriendTermData: (): void => {
@@ -45,6 +55,30 @@ export const FriendContext = React.createContext<FriendContextValue>([
         fields: {
           id,
           newName,
+        },
+      });
+    },
+    setCompare: (next: boolean): void => {
+      throw new ErrorWithFields({
+        message: 'empty FriendContext.compare value being used',
+        fields: {
+          next,
+        },
+      });
+    },
+    setPinned: (next: string[]): void => {
+      throw new ErrorWithFields({
+        message: 'empty FriendContext.compare value being used',
+        fields: {
+          next,
+        },
+      });
+    },
+    setPinSelf: (next: boolean): void => {
+      throw new ErrorWithFields({
+        message: 'empty FriendContext.compare value being used',
+        fields: {
+          next,
         },
       });
     },

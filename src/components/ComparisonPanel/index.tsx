@@ -5,14 +5,9 @@ import { CombinationContainer, ComparisonContainer } from '..';
 import { AccountContext } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import Modal from '../Modal';
+import { CompareState } from '../../data/hooks/useUIStateFromStorage';
 
 import './stylesheet.scss';
-
-type CompareState =
-    {
-      currentCompare: boolean;
-      setCompare: (next: boolean) => void;
-    };
 
 export type ComparisonPanelProps = {
   handleCompareSchedules: (
@@ -22,14 +17,12 @@ export type ComparisonPanelProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
-  compareState: CompareState;
 };
 
 export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
-  compareState,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
@@ -102,7 +95,9 @@ export default function ComparisonPanel({
               id="comparison-checkbox"
               onClick={(): void => handleTogglePanel()}
             />
-            <div className="slider round" /* onChange={compareState.setCompare} */ />
+            <div
+              className="slider round" /* onChange={compareState.setCompare} */
+            />
           </label>
         </div>
         {compare && (

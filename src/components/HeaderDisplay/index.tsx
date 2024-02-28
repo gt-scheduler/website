@@ -20,6 +20,7 @@ import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
 
 import './stylesheet.scss';
+import { CompareState } from '../../data/hooks/useUIStateFromStorage';
 
 type VersionState =
   | { type: 'loading' }
@@ -56,6 +57,7 @@ export type HeaderDisplayProps = {
       };
   versionsState: VersionState;
   accountState: AccountContextValue | { type: 'loading' };
+  compareState: CompareState;
 };
 
 /**

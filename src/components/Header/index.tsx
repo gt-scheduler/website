@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 
-import { ScheduleContext, TermsContext } from '../../contexts';
+import { FriendContext, ScheduleContext, TermsContext } from '../../contexts';
 import HeaderDisplay from '../HeaderDisplay';
 import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
 
@@ -71,6 +71,12 @@ export default function Header({
         deleteVersion,
         renameVersion,
         cloneVersion,
+      }}
+      compareState={{
+        type: 'loaded',
+        compare: friendData.compare.compare,
+        pinned: friendData.compare.pinned,
+        pinSelf: friendData.compare.pinSelf,
       }}
     />
   );

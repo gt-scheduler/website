@@ -7,13 +7,13 @@ export const UI_STATE_LOCAL_STORAGE_KEY = 'ui-state';
 export interface UIState {
   currentTerm: string;
   versionStates: Record<string, VersionUIState>;
-  currentCompare: boolean
+  currentCompare: CompareState;
 }
 
 export const defaultUIState: UIState = {
   currentTerm: '',
   versionStates: {},
-  currentCompare: false
+  currentCompare: { compare: false, pinned: [], pinSelf: false },
 };
 
 export interface VersionUIState {
@@ -21,7 +21,9 @@ export interface VersionUIState {
 }
 
 export interface CompareState {
-  currentCompare: boolean;
+  compare: boolean;
+  pinned: string[];
+  pinSelf: boolean;
 }
 
 type HookResult = {
@@ -29,8 +31,10 @@ type HookResult = {
   setTerm: (next: string) => void;
   currentVersion: string;
   setVersion: (next: string) => void;
-  currentCompare: boolean;
+  currentCompare: CompareState;
   setCompare: (next: boolean) => void;
+  setPinned: (next: string[]) => void;
+  setPinSelf: (next: boolean) => void;
 };
 
 /**
@@ -44,10 +48,8 @@ type HookResult = {
  * but still have the app resume to the last viewed schedule when opened again.
  */
 export default function useUIStateFromStorage(): HookResult {
-  const [{ currentTerm, versionStates, currentCompare }, setUIState] = useLocalStorageNoSync(
-    UI_STATE_LOCAL_STORAGE_KEY,
-    defaultUIState
-  );
+  const [{ currentTerm, versionStates, currentCompare }, setUIState] =
+    useLocalStorageNoSync(UI_STATE_LOCAL_STORAGE_KEY, defaultUIState);
 
   const setTerm = useCallback(
     (next: string) => {
@@ -84,7 +86,40 @@ export default function useUIStateFromStorage(): HookResult {
       setUIState((current) => {
         return {
           ...current,
-          currentCompare: next,
+          currentCompare: {
+            ...current.currentCompare,
+            compare: next,
+          },
+        };
+      });
+    },
+    [setUIState]
+  );
+
+  const setPinned = useCallback(
+    (next: string[]) => {
+      setUIState((current) => {
+        return {
+          ...current,
+          currentCompare: {
+            ...current.currentCompare,
+            pinned: next,
+          },
+        };
+      });
+    },
+    [setUIState]
+  );
+
+  const setPinSelf = useCallback(
+    (next: boolean) => {
+      setUIState((current) => {
+        return {
+          ...current,
+          currentCompare: {
+            ...current.currentCompare,
+            pinSelf: next,
+          },
         };
       });
     },
@@ -97,6 +132,8 @@ export default function useUIStateFromStorage(): HookResult {
     currentVersion,
     setVersion,
     currentCompare,
-    setCompare
+    setCompare,
+    setPinned,
+    setPinSelf,
   };
 }
