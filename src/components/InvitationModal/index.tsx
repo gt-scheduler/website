@@ -17,6 +17,7 @@ import {
   faLink,
   faSpinner,
   faXmark,
+  faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -77,7 +78,7 @@ export function InvitationModalContent({
   const [linkMessageClassName, setLinkMessageClassName] = useState('');
   const [linkLoading, setLinkLoading] = useState(false);
   const [checkedSchedules, setCheckedSchedules] = useState([currentVersion]);
-  const [invitationLink, setInvitationLink] = useState('');
+  // const [invitationLink, setInvitationLink] = useState('');
   const [emailInput, setEmailInput] = useState(inputEmail ?? '');
 
   const redirectURL = useMemo(
@@ -103,6 +104,7 @@ export function InvitationModalContent({
       redirectURL,
       friendEmail: input.current?.value,
     });
+
     return axios.post(
       `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`,
       `data=${data}`,
@@ -129,11 +131,12 @@ export function InvitationModalContent({
           string,
           FriendShareData
         >;
+        console.log(versionFriends)
         // if friend accepted, don't increment numNotAccepted
         return Object.keys(versionFriends).some((f) => {
           return (
             versionFriends[f]?.email === input.current?.value &&
-            versionFriends[f]?.status === 'Accepted'
+            (versionFriends[f]?.status === 'Accepted' || versionFriends[f]?.status === "Pending")
           );
         })
           ? acc
@@ -210,18 +213,13 @@ export function InvitationModalContent({
     selectedExpiration,
   ]);
 
-  const createLink = useCallback((): void => {
+  const createLink = useCallback(async (): Promise<void> => {
     setLinkLoading(true);
-    if (checkedSchedules.length === 0) {
-      setLinkMessage('Must check at least one schedule version');
-      setLinkMessageClassName('link-failure');
-      return;
-    }
     setLinkMessage('');
     setLinkMessageClassName('');
-    getInvitationLink()
+    await getInvitationLink()
       .then((response) => {
-        setInvitationLink(response.data.link);
+        copy(response.data.link);
         setLinkLoading(false);
         setLinkMessage('');
         setLinkMessageClassName('');
@@ -253,7 +251,7 @@ export function InvitationModalContent({
     term,
     getInvitationLink,
     checkedSchedules,
-    selectedExpiration,
+    selectedExpiration
   ]);
 
   const handleKeyDown = useCallback(
@@ -328,7 +326,13 @@ export function InvitationModalContent({
     [toRemoveInfo, handleDelete]
   );
 
-  useEffect(() => createLink(), [createLink]);
+  // show a fake loader when options change
+  useEffect(() => {
+    setLinkLoading(true);
+    setTimeout(() => {
+      setLinkLoading(false);
+    }, 200);
+  }, [checkedSchedules, selectedExpiration]);
 
   return (
     <div className={classes('invitation-modal-content', mobile && 'mobile')}>
@@ -354,19 +358,18 @@ export function InvitationModalContent({
               onChange={handleChangeSearch}
               value={emailInput}
             />
-            <text className={validClassName}>{validMessage}</text>
           </div>
           <button type="button" className="send-button" onClick={verifyEmail}>
-            Send Invite
+            <FontAwesomeIcon icon={faPaperPlane} />
           </button>
         </div>
+        <div className={validClassName}>{validMessage}</div>
         <div className="share-schedule-checkboxes">
           {allVersionNames.slice(0, 3).map((v) => (
             <ShareScheduleCheckbox
               checkedSchedules={checkedSchedules}
               version={v}
               setCheckedSchedules={setCheckedSchedules}
-              createLink={createLink}
               isOther={false}
             />
           ))}
@@ -398,7 +401,6 @@ export function InvitationModalContent({
                         checkedSchedules={checkedSchedules}
                         version={v}
                         setCheckedSchedules={setCheckedSchedules}
-                        createLink={createLink}
                         isOther
                       />
                     ))}
@@ -470,18 +472,17 @@ export function InvitationModalContent({
               linkLoading ? '' : 'link-generated',
               'copy-link-button'
             )}
+            disabled={linkLoading}
             onClick={(): void => {
-              if (linkLoading) {
-                return;
-              }
-              try {
-                copy(invitationLink);
-                setLinkMessage('Link copied!');
-                setLinkMessageClassName('link-success');
-              } catch (err) {
-                setLinkMessage('Error copying link');
-                setLinkMessageClassName('link-failure');
-              }
+              createLink()
+                .then(() => {
+                  setLinkMessage('Link copied!');
+                  setLinkMessageClassName('link-success');
+                })
+                .catch(() => {
+                  setLinkMessage('Error copying link');
+                  setLinkMessageClassName('link-failure');
+                });
             }}
           >
             <FontAwesomeIcon
@@ -650,7 +651,6 @@ export type ShareScheduleCheckboxProps = {
   checkedSchedules: string[];
   setCheckedSchedules: React.Dispatch<React.SetStateAction<string[]>>;
   version: { id: string; name: string };
-  createLink: () => void;
   isOther: boolean;
 };
 
@@ -658,7 +658,6 @@ function ShareScheduleCheckbox({
   checkedSchedules,
   setCheckedSchedules,
   version,
-  createLink,
   isOther,
 }: ShareScheduleCheckboxProps): React.ReactElement {
   return (
@@ -670,18 +669,12 @@ function ShareScheduleCheckbox({
       }
       onClick={(): void => {
         const newChecked = checkedSchedules;
-        const c = document.getElementsByClassName(
-          classes('share-schedule-checkbox', version.id)
-        )[0];
         if (!newChecked.includes(version.id)) {
           newChecked.push(version.id);
-          c?.classList.add('schedule-checked');
-        } else {
+        } else if (newChecked.length > 1) {
           newChecked.splice(newChecked.indexOf(version.id), 1);
-          c?.classList.remove('schedule-checked');
         }
-        setCheckedSchedules(newChecked);
-        createLink();
+        setCheckedSchedules([...newChecked]);
       }}
     >
       <FontAwesomeIcon

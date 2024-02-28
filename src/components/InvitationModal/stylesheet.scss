@@ -39,35 +39,39 @@
         font-size: 0.9em;
       }
 
+      
+      .valid-email {
+        text-align: start;
+        color: rgba(34, 181, 49, 0.75);
+        font-size: 12px;
+        font-weight: bold;
+        padding-top: 3px;
+        opacity: 1;
+      }
+
+      .invalid-email {
+        text-align: start;
+        color: rgba(255, 0, 0, 0.5);
+        font-size: 12px;
+        font-weight: bold;
+        padding-top: 3px;
+        opacity: 1;
+      }
+
       .email-input-block {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         padding-top: 5px;
         padding-bottom: 5px;
+        align-items: center;
+        column-gap: 5px;
 
         .email-input {
           display: flex;
           flex-direction: column;
           position: relative;
-
-          .valid-email {
-            text-align: start;
-            color: rgba(34, 181, 49, 0.75);
-            font-size: 12px;
-            font-weight: bold;
-            padding-top: 3px;
-            opacity: 1;
-          }
-
-          .invalid-email {
-            text-align: start;
-            color: rgba(255, 0, 0, 0.5);
-            font-size: 12px;
-            font-weight: bold;
-            padding-top: 3px;
-            opacity: 1;
-          }
+          flex-grow: 1;
 
           .email:has(+ .invalid-email) {
             border: 1px solid rgba(255, 0, 0, 0.5);
@@ -75,9 +79,9 @@
         }
 
         input[type='email'] {
-          width: 300px;
-          height: 24px;
-          padding: 15px;
+          padding: 5px;
+          padding-left: 8px;
+          height: 60px;
           border-radius: 6px;
           background-color: rgb(35, 35, 35);
           border: 1px solid rgb(35, 35, 35);
@@ -94,8 +98,8 @@
         }
 
         .send-button {
-          width: 86px;
-          height: 24px;
+          width: 60px;
+          align-self: stretch;
           font-size: 14px;
           color: white;
           border-radius: 6px;
@@ -307,6 +311,26 @@
         border-radius: 10px;
         padding: 10px 15px;
         border: none;
+
+        .copy-link-icon {
+          margin-right: 5px;
+        }
+
+        @include dark {
+          color: $theme-light-background;
+        }
+
+        @include light {
+          color: $theme-dark-background;
+        }
+      }
+
+      .copy-link-button {
+        background: var(--theme-card-bg);
+        border-radius: 10px;
+        padding: 10px 15px;
+        border: none;
+        font-size: 12px;
 
         .copy-link-icon {
           margin-right: 5px;
