@@ -58,7 +58,7 @@ export default function ComparisonPanel({
   return (
     <div className="comparison-panel">
       <div
-        className="drawer"
+        className={classes('drawer', expanded && 'opened')}
         onClick={(): void => {
           setExpanded(!expanded);
           setHover(false);
@@ -69,11 +69,11 @@ export default function ComparisonPanel({
         onMouseLeave={(): void => setHover(false)}
         id={tooltipId}
       >
-        <div className="drawer-line" />
+        <div className={classes('drawer-line', expanded && 'opened')} />
         <div className="icon">
           <div className={classes('arrow', expanded && 'right')} />
         </div>
-        <div className="drawer-line" />
+        <div className={classes('drawer-line', expanded && 'opened')} />
         <ReactTooltip
           key={tooltipY}
           anchorId={tooltipId}

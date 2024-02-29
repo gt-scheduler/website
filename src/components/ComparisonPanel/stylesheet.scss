@@ -6,12 +6,17 @@
 
   .drawer {
     width: 13px;
-    border-width: 0px 1px 0px 1px;
-    border-color: $color-border;
+    border-width: 0px 0px 0px 1px;
+    border-color: rgba(255, 255, 255, 0.50);
     border-style: solid;
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    &.opened {
+      border-color: $color-border;
+      border-width: 0px 1px 0px 1px;
+    }
 
     &:hover {
       background: $color-border;
@@ -21,8 +26,11 @@
       flex: 1;
       width: 5px;
       border-width: 0px 1px 0px 1px;
-      border-color: $color-border;
+      border-color: rgba(255, 255, 255, 0.50);
       border-style: solid;
+      &.opened {
+        border-color: $color-border;
+      }
     }
 
     .icon {
@@ -37,13 +45,14 @@
         width: 10px;
         right: -8px;
         border-width: 0px 2px 2px 0px;
-        border-color: $color-border;
+        border-color: rgba(255, 255, 255);
         border-style: solid;
         transform: rotate(135deg);
 
         &.right {
           left: -8px;
           transform: rotate(-45deg);
+          border-color: $color-border;
         }
       }
     }
