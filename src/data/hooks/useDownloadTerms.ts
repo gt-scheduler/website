@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { softError, ErrorWithFields } from '../../log';
-import { LoadingState, NonEmptyArray, Term } from '../../types';
+import { LoadingState, NonEmptyArray } from '../../types';
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 
@@ -14,8 +14,10 @@ const CRAWLER_INDEX_URL =
  * Repeatedly attempts to load in the case of errors,
  * and cancels itself once the parent context is unmounted.
  */
-export default function useDownloadTerms(): LoadingState<NonEmptyArray<Term>> {
-  const [state, setState] = useState<LoadingState<NonEmptyArray<Term>>>({
+export default function useDownloadTerms(): LoadingState<
+  NonEmptyArray<string>
+> {
+  const [state, setState] = useState<LoadingState<NonEmptyArray<string>>>({
     type: 'loading',
   });
 
@@ -26,20 +28,13 @@ export default function useDownloadTerms(): LoadingState<NonEmptyArray<Term>> {
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const promise = axios.get<{ terms: Term[] }>(CRAWLER_INDEX_URL);
+          const promise = axios.get<{ terms: string[] }>(CRAWLER_INDEX_URL);
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;
           }
 
-          const newTerms = result.value.data.terms
-            .sort((termA, termB) => {
-              if (termA.term < termB.term) {
-                return -1;
-              }
-              return 1;
-            })
-            .reverse();
+          const newTerms = result.value.data.terms.sort().reverse();
 
           // Ensure that there is at least 1 term before continuing
           if (newTerms.length === 0) {
@@ -50,7 +45,7 @@ export default function useDownloadTerms(): LoadingState<NonEmptyArray<Term>> {
 
           setState({
             type: 'loaded',
-            result: newTerms as NonEmptyArray<Term>,
+            result: newTerms as NonEmptyArray<string>,
           });
 
           return;

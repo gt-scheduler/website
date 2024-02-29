@@ -83,7 +83,7 @@ export default function Instructor({
             ? {
                 icon: faGraduationCap,
                 tooltip: 'View Instructor Ratings',
-                href: `http://www.ratemyprofessors.com/search/professors/361?q=${encodeURIComponent(
+                href: `http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=Georgia+Institute+of+Technology&query=${encodeURIComponent(
                   simplifyName(name)
                 )}`,
                 id: `${simplifyName(name, '-').toLowerCase()}-rmp`,

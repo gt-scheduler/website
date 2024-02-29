@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { NonEmptyArray, LoadingState, Term } from '../../types';
+import { NonEmptyArray, LoadingState } from '../../types';
 
 type HookResult = {
   currentTerm: string;
@@ -16,13 +16,13 @@ export default function useEnsureValidTerm({
   setTerm,
   currentTermRaw,
 }: {
-  terms: NonEmptyArray<Term>;
+  terms: NonEmptyArray<string>;
   setTerm: (next: string) => void;
   currentTermRaw: string;
 }): LoadingState<HookResult> {
   // Set the term to be the first one if it is unset or no longer valid.
   useEffect(() => {
-    const mostRecentTerm = terms[0].term;
+    const mostRecentTerm = terms[0];
     const correctedTerm = !isValidTerm(currentTermRaw, terms)
       ? mostRecentTerm
       : currentTermRaw;
@@ -48,10 +48,6 @@ export default function useEnsureValidTerm({
  * Determines if the given term is considered "valid";
  * helps to recover from invalid cookie values if possible.
  */
-export function isValidTerm(currTerm: string, terms: Term[]): boolean {
-  return (
-    currTerm !== '' &&
-    currTerm !== 'undefined' &&
-    terms.map((term) => term.term).includes(currTerm)
-  );
+export function isValidTerm(term: string, terms: string[]): boolean {
+  return term !== '' && term !== 'undefined' && terms.includes(term);
 }

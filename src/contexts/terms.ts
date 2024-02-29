@@ -1,6 +1,4 @@
 import React from 'react';
 
-import { Term } from '../types';
-
-export type TermsContextValue = Term[];
+export type TermsContextValue = readonly string[];
 export const TermsContext = React.createContext<TermsContextValue>([]);

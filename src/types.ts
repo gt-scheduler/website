@@ -84,11 +84,6 @@ export interface Event {
   days: string[];
 }
 
-export interface Term {
-  term: string;
-  finalized: boolean;
-}
-
 // Note: if this type ever changes,
 // the course gpa cache needs to be invalidated
 // (by changing the local storage key).
