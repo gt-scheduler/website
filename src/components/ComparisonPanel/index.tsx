@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CombinationContainer, ComparisonContainer } from '..';
 import { AccountContext } from '../../contexts/account';
 import { classes } from '../../utils/misc';
-import Modal from '../Modal';
 import InvitationModal from '../InvitationModal';
 import LoginModal from '../LoginModal';
 
