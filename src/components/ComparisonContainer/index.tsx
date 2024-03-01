@@ -31,6 +31,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import InvitationModal from '../InvitationModal';
 import ComparisonContainerShareBack from '../ComparisonContainerShareBack/ComparisonContainerShareBack';
+import { ScheduleDeletionRequest } from '../../types';
 
 import './stylesheet.scss';
 
@@ -137,13 +138,14 @@ export default function ComparisonContainer({
     async (senderId: string, versions: string[]) => {
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
-        senderId,
+        otherUserId: senderId,
         term,
         versions,
-      });
+        owner: false,
+      } as ScheduleDeletionRequest);
       axios
         .post(
-          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromFriend`,
+          `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
           `data=${data}`,
           {
             headers: {
