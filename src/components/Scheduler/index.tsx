@@ -12,6 +12,8 @@ import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
+import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
+
 /**
  * Wraps around the root top-level component of the Scheduler tab
  */
@@ -30,9 +32,10 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const [compare, setCompare] = useState(false);
-  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
-  const [pinSelf, setPinSelf] = useState(true);
+  const { currentTerm, currentCompare, setCompare, setPinned, setPinSelf } =
+    useUIStateFromStorage();
+
+  console.log(currentTerm);
 
   const handleCompareSchedules = useCallback(
     (
@@ -44,7 +47,7 @@ export default function Scheduler(): React.ReactElement {
         setCompare(newCompare);
       }
       if (newPinnedSchedules !== undefined) {
-        setPinnedSchedules(newPinnedSchedules);
+        setPinned(newPinnedSchedules);
       }
       if (newPinSelf !== undefined) {
         setPinSelf(newPinSelf);
@@ -77,17 +80,19 @@ export default function Scheduler(): React.ReactElement {
               <Calendar
                 className="calendar"
                 overlayCrns={overlayCrns}
-                compare={compare}
-                pinnedFriendSchedules={pinnedSchedules}
-                pinSelf={!compare || pinSelf}
+                compare={currentCompare.compare}
+                pinnedFriendSchedules={currentCompare.pinned}
+                pinSelf={!currentCompare.compare || currentCompare.pinSelf}
               />
             </div>
           )}
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}
-              pinnedSchedules={pinnedSchedules}
-              pinSelf={pinSelf}
+              pinnedSchedules={currentCompare.pinned}
+              pinSelf={currentCompare.pinSelf}
+              compare={currentCompare.compare}
+              setCompare={setCompare}
             />
           )}
         </div>

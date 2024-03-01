@@ -26,7 +26,9 @@ import useExtractTermScheduleData from '../../data/hooks/useExtractTermScheduleD
 import useEnsureValidTerm from '../../data/hooks/useEnsureValidTerm';
 import useScheduleDataProducer from '../../data/hooks/useScheduleDataProducer';
 import useMigrateScheduleData from '../../data/hooks/useMigrateScheduleData';
-import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
+import useUIStateFromStorage, {
+  CompareState,
+} from '../../data/hooks/useUIStateFromStorage';
 import { AccountContextValue, SignedIn } from '../../contexts/account';
 import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
 import useRawScheduleDataFromFirebase from '../../data/hooks/useRawScheduleDataFromFirebase';
@@ -68,6 +70,10 @@ export type StageLoadUIStateProps = {
     setTerm: (next: string) => void;
     currentVersion: string;
     setVersion: (next: string) => void;
+    currentCompare: CompareState;
+    setCompare: (next: boolean) => void;
+    setPinned: (next: string[]) => void;
+    setPinSelf: (next: boolean) => void;
   }) => React.ReactNode;
 };
 

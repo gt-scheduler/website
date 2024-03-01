@@ -19,18 +19,21 @@ export type ComparisonPanelProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  compare: boolean;
+  setCompare: (next: boolean) => void;
 };
 
 export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  compare,
+  setCompare,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
   const [tooltipY, setTooltipY] = useState(0);
   const [signedInModal, setSignedInModal] = useState(false);
-  const [compare, setCompare] = useState(false);
   const [invitationOpen, setInvitationOpen] = useState(false);
   // const [hoverCompare, setHoverCompare] = useState(false);
   // const [tooltipYCompare, setTooltipYCompare] = useState(0);
