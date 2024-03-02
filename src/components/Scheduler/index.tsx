@@ -10,6 +10,7 @@ import {
 } from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
+import useLocalStorageState from 'use-local-storage-state';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
 /**
@@ -30,9 +31,37 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const [compare, setCompare] = useState(false);
-  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
-  const [pinSelf, setPinSelf] = useState(true);
+  // const [{ currentTerm, versionStates }, setUIState] = useLocalStorageState(
+  //   UI_STATE_LOCAL_STORAGE_KEY,
+  //   {
+  //     defaultValue: defaultUIState,
+  //     storageSync: false,
+  //   }
+  // );
+
+  const [compare, setCompare] = useLocalStorageState<boolean>(
+    'compare-panel-state-compareValue',
+    {
+      defaultValue: false,
+      storageSync: false,
+    }
+  );
+  const [pinnedSchedules, setPinnedSchedules] = useLocalStorageState<string[]>(
+    'compare-panel-state-pinnedSchedules',
+    {
+      defaultValue: [],
+      storageSync: false,
+    }
+  );
+  const [pinSelf, setPinSelf] = useLocalStorageState<boolean>(
+    'compare-panel-state-pinSelfValue',
+    {
+      defaultValue: true,
+      storageSync: false,
+    }
+  );
+
+  console.log(compare);
 
   const handleCompareSchedules = useCallback(
     (
@@ -41,6 +70,7 @@ export default function Scheduler(): React.ReactElement {
       newPinSelf?: boolean
     ) => {
       if (newCompare !== undefined) {
+        console.log(newCompare);
         setCompare(newCompare);
       }
       if (newPinnedSchedules !== undefined) {
@@ -88,6 +118,7 @@ export default function Scheduler(): React.ReactElement {
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinnedSchedules}
               pinSelf={pinSelf}
+              compare={compare}
             />
           )}
         </div>
