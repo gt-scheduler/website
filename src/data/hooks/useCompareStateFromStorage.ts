@@ -63,7 +63,7 @@ export default function useCompareStateFromStorage(): HookResult {
         setPinSelf(newPinSelf);
       }
     },
-    []
+    [setCompare, setPinned, setPinSelf]
   );
 
   return {
