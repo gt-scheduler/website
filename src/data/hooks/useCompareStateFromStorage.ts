@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 
-export const UI_STATE_LOCAL_STORAGE_KEY = 'ui-state';
-
 type HookResult = {
   compare: boolean;
   pinned: string[];

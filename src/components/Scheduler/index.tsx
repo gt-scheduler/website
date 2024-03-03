@@ -31,14 +31,6 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  // const [{ currentTerm, versionStates }, setUIState] = useLocalStorageState(
-  //   UI_STATE_LOCAL_STORAGE_KEY,
-  //   {
-  //     defaultValue: defaultUIState,
-  //     storageSync: false,
-  //   }
-  // );
-
   const { compare, pinned, pinSelf, handleCompareSchedules } =
     useCompareStateFromStorage();
 
