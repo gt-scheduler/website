@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -10,6 +10,7 @@ import {
 } from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
+import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
 /**
@@ -30,28 +31,8 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const [compare, setCompare] = useState(false);
-  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
-  const [pinSelf, setPinSelf] = useState(true);
-
-  const handleCompareSchedules = useCallback(
-    (
-      newCompare?: boolean,
-      newPinnedSchedules?: string[],
-      newPinSelf?: boolean
-    ) => {
-      if (newCompare !== undefined) {
-        setCompare(newCompare);
-      }
-      if (newPinnedSchedules !== undefined) {
-        setPinnedSchedules(newPinnedSchedules);
-      }
-      if (newPinSelf !== undefined) {
-        setPinSelf(newPinSelf);
-      }
-    },
-    []
-  );
+  const { compare, pinned, pinSelf, handleCompareSchedules } =
+    useCompareStateFromStorage();
 
   return (
     <>
@@ -78,7 +59,7 @@ export default function Scheduler(): React.ReactElement {
                 className="calendar"
                 overlayCrns={overlayCrns}
                 compare={compare}
-                pinnedFriendSchedules={pinnedSchedules}
+                pinnedFriendSchedules={pinned}
                 pinSelf={!compare || pinSelf}
               />
             </div>
@@ -86,8 +67,9 @@ export default function Scheduler(): React.ReactElement {
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}
-              pinnedSchedules={pinnedSchedules}
+              pinnedSchedules={pinned}
               pinSelf={pinSelf}
+              compare={compare}
             />
           )}
         </div>

@@ -19,17 +19,18 @@ export type ComparisonPanelProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  compare: boolean;
 };
 
 export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  compare,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
   const [tooltipY, setTooltipY] = useState(0);
-  const [compare, setCompare] = useState(false);
   const [invitationOpen, setInvitationOpen] = useState(false);
   // const [hoverCompare, setHoverCompare] = useState(false);
   // const [tooltipYCompare, setTooltipYCompare] = useState(0);
@@ -56,7 +57,7 @@ export default function ComparisonPanel({
 
   const handleTogglePanel = useCallback(() => {
     if (type === 'signedIn') {
-      setCompare(!compare);
+      // setCompare(!compare);
       handleCompareSchedules(!compare, undefined, undefined);
     } else {
       setLoginOpen(true);
