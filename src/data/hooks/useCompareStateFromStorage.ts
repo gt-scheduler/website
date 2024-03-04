@@ -5,7 +5,7 @@ type HookResult = {
   compare: boolean;
   pinned: string[];
   pinSelf: boolean;
-  handleCompareSchedules: (
+  setCompareState: (
     newCompare: boolean | undefined,
     newPinned: string[] | undefined,
     newPinSelf: boolean | undefined
@@ -45,7 +45,7 @@ export default function useCompareStateFromStorage(): HookResult {
     }
   );
 
-  const handleCompareSchedules = useCallback(
+  const setCompareState = useCallback(
     (
       newCompare?: boolean,
       newPinnedSchedules?: string[],
@@ -68,6 +68,6 @@ export default function useCompareStateFromStorage(): HookResult {
     compare,
     pinned,
     pinSelf,
-    handleCompareSchedules,
+    setCompareState,
   };
 }

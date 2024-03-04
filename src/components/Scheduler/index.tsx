@@ -31,7 +31,7 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const { compare, pinned, pinSelf, handleCompareSchedules } =
+  const { compare, pinned, pinSelf, setCompareState } =
     useCompareStateFromStorage();
 
   return (
@@ -66,7 +66,7 @@ export default function Scheduler(): React.ReactElement {
           )}
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
-              handleCompareSchedules={handleCompareSchedules}
+              handleCompareSchedules={setCompareState}
               pinnedSchedules={pinned}
               pinSelf={pinSelf}
               compare={compare}
