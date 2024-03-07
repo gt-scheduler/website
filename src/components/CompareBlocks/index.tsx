@@ -22,6 +22,7 @@ export type CompareBlocksProps = {
   scheduleName: string;
   crn: string;
   overlay?: boolean;
+  friendOverlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
@@ -41,6 +42,7 @@ export default function CompareBlocks({
   scheduleName,
   crn,
   overlay = false,
+  friendOverlay = false,
   capture,
   sizeInfo,
   includeDetailsPopover,
@@ -128,6 +130,7 @@ export default function CompareBlocks({
               },
             ]}
             overlay={overlay}
+            friendOverlay={friendOverlay}
             capture={capture}
             sizeInfo={sizeInfo}
             includeDetailsPopover={includeDetailsPopover}

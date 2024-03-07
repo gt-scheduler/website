@@ -7,6 +7,12 @@
     }
   }
 
+  &.friend-overlay {
+    .meeting {
+      box-shadow: -6px 4px 4px 0px rgba(0, 0, 0, 0.4);
+    }
+  }
+
   .tooltip {
     opacity: 0.85;
     border-radius: 8px;
@@ -47,7 +53,7 @@
       // adds its own focus style:
       outline: none;
     }
-    
+
     // Add a box-shadow border to the meeting block when it is highlighted
     &::after {
       content: '';
@@ -62,7 +68,7 @@
       border-radius: 2px;
       transition: opacity 0.2s ease-in-out;
     }
-    
+
     &--selected {
       &::after {
         opacity: 0.5;
@@ -102,7 +108,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: .72em;
+        font-size: 0.72em;
       }
 
       .ids {
@@ -111,7 +117,7 @@
         overflow: hidden;
 
         span {
-          font-size: .8em;
+          font-size: 0.8em;
         }
       }
     }
