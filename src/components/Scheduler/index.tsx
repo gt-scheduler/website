@@ -47,7 +47,7 @@ export default function Scheduler(): React.ReactElement {
         setOverlaySchedules(newOverlaySchedules);
       }
     },
-    [setCompareState]
+    [setCompareState, setOverlaySchedules]
   );
 
   return (
@@ -87,7 +87,6 @@ export default function Scheduler(): React.ReactElement {
               pinnedSchedules={pinned}
               pinSelf={pinSelf}
               compare={compare}
-              overlaySchedules={overlaySchedules}
             />
           )}
         </div>

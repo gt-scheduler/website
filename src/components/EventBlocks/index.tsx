@@ -23,6 +23,7 @@ export type EventBlocksProps = {
   owner?: string;
   scheduleName?: string;
   scheduleId?: string;
+  overlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
@@ -43,6 +44,7 @@ export default function EventBlocks({
   owner,
   scheduleName,
   scheduleId,
+  overlay = false,
   capture,
   sizeInfo,
   includeDetailsPopover,
@@ -248,6 +250,7 @@ export default function EventBlocks({
           ].join(' '),
         },
       ])}
+      overlay={overlay}
       capture={capture}
       sizeInfo={sizeInfo}
       includeDetailsPopover={!dragging && includeDetailsPopover}

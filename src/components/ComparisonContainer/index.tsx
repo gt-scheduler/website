@@ -67,17 +67,14 @@ export type ComparisonContainerProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
-  overlaySchedules: string[];
 };
 
 export default function ComparisonContainer({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
-  overlaySchedules,
 }: ComparisonContainerProps): React.ReactElement {
   const [selected, setSelected] = useState<string[]>(pinnedSchedules);
-  const [overlay, setOverlay] = useState<string[]>(overlaySchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
@@ -406,10 +403,20 @@ export default function ComparisonContainer({
                             paletteInfo={paletteInfo}
                             setPaletteInfo={setPaletteInfo}
                             hoverFriendSchedule={(): void => {
-                              setOverlay([scheduleId]);
+                              handleCompareSchedules(
+                                undefined,
+                                undefined,
+                                undefined,
+                                [scheduleId]
+                              );
                             }}
                             unhoverFriendSchedule={(): void => {
-                              setOverlay([]);
+                              handleCompareSchedules(
+                                undefined,
+                                undefined,
+                                undefined,
+                                []
+                              );
                             }}
                           />
                         );
