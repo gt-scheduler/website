@@ -26,7 +26,13 @@ import './stylesheet.scss';
 /**
  * Inner content of the invitation modal.
  */
-export function InvitationModalContent(): React.ReactElement {
+export type InvitationModalContentProps = {
+  inputEmail?: string;
+};
+
+export function InvitationModalContent({
+  inputEmail,
+}: InvitationModalContentProps): React.ReactElement {
   const [removeInvitationOpen, setRemoveInvitationOpen] = useState(false);
   const [currentFriendId, setCurrentFriendId] = useState('');
 
@@ -38,16 +44,21 @@ export function InvitationModalContent(): React.ReactElement {
   const input = useRef<HTMLInputElement>(null);
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
+  const [emailInput, setEmailInput] = useState(inputEmail ?? '');
 
   const redirectURL = useMemo(
     () => window.location.href.split('/#')[0] ?? '/',
     []
   );
 
-  const handleChangeSearch = useCallback(() => {
-    setValidMessage('');
-    setValidClassName('');
-  }, []);
+  const handleChangeSearch = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEmailInput(e.target.value);
+      setValidMessage('');
+      setValidClassName('');
+    },
+    [setEmailInput]
+  );
 
   const sendInvitation = useCallback(async (): Promise<void> => {
     const IdToken = await (accountContext as SignedIn).getToken();
@@ -197,6 +208,7 @@ export function InvitationModalContent(): React.ReactElement {
               onFocus={handleChangeSearch}
               onKeyDown={handleKeyDown}
               onChange={handleChangeSearch}
+              value={emailInput}
             />
             <text className={validClassName}>{validMessage}</text>
           </div>
@@ -283,6 +295,7 @@ export function RemoveInvitationModalContent({
 export type InvitationModalProps = {
   show: boolean;
   onHide: () => void;
+  inputEmail?: string;
 };
 
 /**
@@ -291,6 +304,7 @@ export type InvitationModalProps = {
 export default function InvitationModal({
   show,
   onHide,
+  inputEmail,
 }: InvitationModalProps): React.ReactElement {
   return (
     <Modal
@@ -303,7 +317,7 @@ export default function InvitationModal({
       <Button className="remove-close-button" onClick={onHide}>
         <FontAwesomeIcon icon={faXmark} size="xl" />
       </Button>
-      <InvitationModalContent />
+      <InvitationModalContent inputEmail={inputEmail} />
     </Modal>
   );
 }

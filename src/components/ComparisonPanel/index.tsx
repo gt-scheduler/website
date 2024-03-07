@@ -1,10 +1,13 @@
 import React, { useState, useContext, useId, useCallback } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+import { faShare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { CombinationContainer, ComparisonContainer } from '..';
 import { AccountContext } from '../../contexts/account';
 import { classes } from '../../utils/misc';
-import Modal from '../Modal';
+import InvitationModal from '../InvitationModal';
+import LoginModal from '../LoginModal';
 
 import './stylesheet.scss';
 
@@ -17,6 +20,7 @@ export type ComparisonPanelProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  compare: boolean;
   overlaySchedules: string[];
 };
 
@@ -24,16 +28,20 @@ export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  compare,
   overlaySchedules,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
   const [tooltipY, setTooltipY] = useState(0);
-  const [signedInModal, setSignedInModal] = useState(false);
-  const [compare, setCompare] = useState(false);
+  const [invitationOpen, setInvitationOpen] = useState(false);
   // const [hoverCompare, setHoverCompare] = useState(false);
   // const [tooltipYCompare, setTooltipYCompare] = useState(0);
   const tooltipId = useId();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const hideLogin = useCallback(() => setLoginOpen(false), []);
+
+  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   const { type } = useContext(AccountContext);
 
@@ -42,19 +50,27 @@ export default function ComparisonPanel({
     setTooltipY(e.clientY);
   }, []);
 
+  const handleOpenInvitation = useCallback(() => {
+    if (type === 'signedIn') {
+      setInvitationOpen(true);
+    } else {
+      setLoginOpen(true);
+    }
+  }, [type]);
+
   const handleTogglePanel = useCallback(() => {
     if (type === 'signedIn') {
-      setCompare(!compare);
+      // setCompare(!compare);
       handleCompareSchedules(!compare, undefined, undefined);
     } else {
-      setSignedInModal(true);
+      setLoginOpen(true);
     }
   }, [type, compare, handleCompareSchedules]);
 
   return (
     <div className="comparison-panel">
       <div
-        className="drawer"
+        className={classes('drawer', expanded && 'opened')}
         onClick={(): void => {
           setExpanded(!expanded);
           setHover(false);
@@ -65,11 +81,11 @@ export default function ComparisonPanel({
         onMouseLeave={(): void => setHover(false)}
         id={tooltipId}
       >
-        <div className="drawer-line" />
+        <div className={classes('drawer-line', expanded && 'opened')} />
         <div className="icon">
           <div className={classes('arrow', expanded && 'right')} />
         </div>
-        <div className="drawer-line" />
+        <div className={classes('drawer-line', expanded && 'opened')} />
         <ReactTooltip
           key={tooltipY}
           anchorId={tooltipId}
@@ -87,6 +103,17 @@ export default function ComparisonPanel({
         </ReactTooltip>
       </div>
       <div className={classes('panel', !expanded && 'closed')}>
+        <InvitationModal show={invitationOpen} onHide={hideInvitation} />
+        <div className="invite-panel">
+          <button
+            type="button"
+            onClick={handleOpenInvitation}
+            className="invite-button"
+          >
+            <FontAwesomeIcon fixedWidth icon={faShare} />
+            <div>Share Schedule</div>
+          </button>
+        </div>
         <div className="comparison-header">
           <p className="header-title">Compare Schedules</p>
           <p className="header-text">{compare ? 'On' : 'Off'}</p>
@@ -101,12 +128,14 @@ export default function ComparisonPanel({
           </label>
         </div>
         {compare && (
-          <ComparisonContainer
-            handleCompareSchedules={handleCompareSchedules}
-            pinnedSchedules={pinnedSchedules}
-            pinSelf={pinSelf}
-            overlaySchedules={overlaySchedules}
-          />
+          <div>
+            <ComparisonContainer
+              handleCompareSchedules={handleCompareSchedules}
+              pinnedSchedules={pinnedSchedules}
+              pinSelf={pinSelf}
+              overlaySchedules={overlaySchedules}
+            />
+          </div>
         )}
         <div className="combination">
           <CombinationContainer compare={compare} />
@@ -138,24 +167,7 @@ export default function ComparisonPanel({
             to access courses and events
           </p>
         </ReactTooltip> */}
-        <Modal
-          className="not-signed-in-modal"
-          show={signedInModal}
-          onHide={(): void => setSignedInModal(false)}
-          buttons={[
-            {
-              label: 'Got it!',
-              onClick: (): void => {
-                setSignedInModal(false);
-              },
-            },
-          ]}
-          preserveChildrenWhileHiding
-        >
-          <p style={{ textAlign: 'center' }}>
-            Users should sign in to use the Compare Schedules panel.
-          </p>
-        </Modal>
+        <LoginModal show={loginOpen} onHide={hideLogin} comparison />
       </div>
     </div>
   );
