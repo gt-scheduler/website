@@ -10,7 +10,18 @@ import InvitationModal from '../InvitationModal';
 
 import './stylesheet.scss';
 
-export default function InvitationAcceptModal(): React.ReactElement {
+export type InvitationAcceptModalProps = {
+  handleCompareSchedules: (
+    compare?: boolean,
+    pinnedSchedules?: string[],
+    pinSelf?: boolean,
+    expanded?: boolean
+  ) => void;
+};
+
+export default function InvitationAcceptModal({
+  handleCompareSchedules,
+}: InvitationAcceptModalProps): React.ReactElement {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [invitationModalOpen, setInvitationModalOpen] =
     useState<boolean>(false);
@@ -40,6 +51,7 @@ export default function InvitationAcceptModal(): React.ReactElement {
   const onHide = (): void => {
     setHasSeen(true);
     setModalOpen(!modalOpen);
+    handleCompareSchedules(true, undefined, undefined, true);
   };
 
   return (

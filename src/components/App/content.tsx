@@ -8,7 +8,6 @@ import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
 import Finals from '../Finals';
-import InvitationAcceptModal from '../InvitationAcceptModal/InvitationAcceptModal';
 import {
   AppNavigationContext,
   AppMobileNav,
@@ -64,7 +63,6 @@ function AppContentBase(): React.ReactElement {
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
         {currentTabIndex === 2 && <Finals />}
-        <InvitationAcceptModal />
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
