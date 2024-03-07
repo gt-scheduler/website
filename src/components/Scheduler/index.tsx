@@ -32,13 +32,15 @@ export default function Scheduler(): React.ReactElement {
 
   const [compare, setCompare] = useState(false);
   const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
+  const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
   const [pinSelf, setPinSelf] = useState(true);
 
   const handleCompareSchedules = useCallback(
     (
       newCompare?: boolean,
       newPinnedSchedules?: string[],
-      newPinSelf?: boolean
+      newPinSelf?: boolean,
+      newOverlaySchedules?: string[]
     ) => {
       if (newCompare !== undefined) {
         setCompare(newCompare);
@@ -48,6 +50,9 @@ export default function Scheduler(): React.ReactElement {
       }
       if (newPinSelf !== undefined) {
         setPinSelf(newPinSelf);
+      }
+      if (newOverlaySchedules !== undefined) {
+        setOverlaySchedules(newOverlaySchedules);
       }
     },
     []
@@ -80,6 +85,7 @@ export default function Scheduler(): React.ReactElement {
                 compare={compare}
                 pinnedFriendSchedules={pinnedSchedules}
                 pinSelf={!compare || pinSelf}
+                overlayFriendSchedules={overlaySchedules}
               />
             </div>
           )}
@@ -88,6 +94,7 @@ export default function Scheduler(): React.ReactElement {
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinnedSchedules}
               pinSelf={pinSelf}
+              overlaySchedules={overlaySchedules}
             />
           )}
         </div>

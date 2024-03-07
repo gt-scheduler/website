@@ -21,6 +21,7 @@ export type CalendarProps = {
   compare?: boolean;
   pinnedFriendSchedules?: string[];
   pinSelf?: boolean;
+  overlayFriendSchedules?: string[];
   isAutosized?: boolean;
 };
 
@@ -55,6 +56,7 @@ export default function Calendar({
   compare = false,
   pinnedFriendSchedules = [],
   pinSelf = true,
+  overlayFriendSchedules = [],
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
   const [{ pinnedCrns, oscar, events, currentVersion }] =

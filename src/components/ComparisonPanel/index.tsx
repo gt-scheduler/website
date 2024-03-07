@@ -12,16 +12,19 @@ export type ComparisonPanelProps = {
   handleCompareSchedules: (
     compare?: boolean,
     pinnedSchedules?: string[],
-    pinSelf?: boolean
+    pinSelf?: boolean,
+    overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  overlaySchedules: string[];
 };
 
 export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  overlaySchedules,
 }: ComparisonPanelProps): React.ReactElement {
   const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
@@ -102,6 +105,7 @@ export default function ComparisonPanel({
             handleCompareSchedules={handleCompareSchedules}
             pinnedSchedules={pinnedSchedules}
             pinSelf={pinSelf}
+            overlaySchedules={overlaySchedules}
           />
         )}
         <div className="combination">

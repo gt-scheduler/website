@@ -59,18 +59,22 @@ export type ComparisonContainerProps = {
   handleCompareSchedules: (
     compare?: boolean,
     pinnedSchedules?: string[],
-    pinSelf?: boolean
+    pinSelf?: boolean,
+    overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  overlaySchedules: string[];
 };
 
 export default function ComparisonContainer({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  overlaySchedules,
 }: ComparisonContainerProps): React.ReactElement {
   const [selected, setSelected] = useState<string[]>(pinnedSchedules);
+  const [overlay, setOverlay] = useState<string[]>(overlaySchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
@@ -384,6 +388,12 @@ export default function ComparisonContainer({
                             color={colorMap[scheduleId]}
                             paletteInfo={paletteInfo}
                             setPaletteInfo={setPaletteInfo}
+                            hoverFriendSchedule={(): void => {
+                              setOverlay([scheduleId]);
+                            }}
+                            unhoverFriendSchedule={(): void => {
+                              setOverlay([]);
+                            }}
                           />
                         );
                       }
@@ -440,6 +450,8 @@ type ScheduleRowProps = {
   editInfo?: EditInfo;
   setEditInfo?: (info: EditInfo) => void;
   editValue?: string;
+  hoverFriendSchedule?: () => void;
+  unhoverFriendSchedule?: () => void;
 };
 
 function ScheduleRow({
@@ -466,6 +478,8 @@ function ScheduleRow({
   editInfo,
   setEditInfo,
   editValue,
+  hoverFriendSchedule,
+  unhoverFriendSchedule,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
@@ -481,7 +495,19 @@ function ScheduleRow({
   const palette = hasPalette && paletteInfo === id;
 
   return (
-    <div className="schedule-row">
+    <div
+      className="schedule-row"
+      onMouseEnter={(): void => {
+        if (type === 'Schedule') {
+          hoverFriendSchedule?.();
+        }
+      }}
+      onMouseLeave={(): void => {
+        if (type === 'Schedule') {
+          unhoverFriendSchedule?.();
+        }
+      }}
+    >
       <div
         className={classes('checkbox-container', edit && 'editing')}
         onMouseEnter={(): void => setDivHover(true)}
