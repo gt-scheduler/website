@@ -1,5 +1,6 @@
 import produce, { Immutable, Draft, original, castDraft } from 'immer';
 import React, { useCallback, useMemo } from 'react';
+import useLocalStorageState from 'use-local-storage-state';
 
 import {
   ScheduleContextValue,
@@ -294,6 +295,10 @@ function ContextProvider({
       currentVersion,
     });
 
+  const [adjustedCredits, setAdjustedCredits] = useLocalStorageState<
+    Record<string, number>
+  >('adjustedCredits', { defaultValue: {} });
+
   // Memoize the context values so that they are stable
   const scheduleContextValue = useMemo<ScheduleContextValue>(
     () => [
@@ -302,6 +307,7 @@ function ContextProvider({
         oscar,
         currentVersion,
         allVersionNames,
+        adjustedCredits,
         ...castDraft(scheduleVersion.schedule),
       },
       {
@@ -313,6 +319,7 @@ function ContextProvider({
         deleteVersion,
         renameVersion,
         cloneVersion,
+        setAdjustedCredits,
       },
     ],
     [
@@ -320,6 +327,7 @@ function ContextProvider({
       oscar,
       currentVersion,
       allVersionNames,
+      adjustedCredits,
       scheduleVersion.schedule,
       setTerm,
       patchSchedule,
@@ -329,6 +337,7 @@ function ContextProvider({
       deleteVersion,
       renameVersion,
       cloneVersion,
+      setAdjustedCredits,
     ]
   );
 

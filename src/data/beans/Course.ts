@@ -52,6 +52,8 @@ export default class Course {
 
   sections: Section[];
 
+  adjustedCredits: number | undefined;
+
   prereqs: CrawlerPrerequisites | undefined;
 
   hasLab: boolean;
@@ -107,6 +109,11 @@ export default class Course {
         }
       }
     );
+    this.adjustedCredits = this.sections.some(
+      (section) => section.adjustableCredits
+    )
+      ? 0
+      : undefined;
     this.prereqs = prereqs;
 
     const onlyLectures = this.sections.filter(

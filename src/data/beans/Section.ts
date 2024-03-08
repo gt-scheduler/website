@@ -46,6 +46,8 @@ export default class Section {
 
   scheduleType: string;
 
+  adjustableCredits: boolean;
+
   campus: string;
 
   deliveryMode: string | undefined;
@@ -87,6 +89,7 @@ export default class Section {
     this.seating = [[], 0];
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
+    this.adjustableCredits = this.scheduleType.includes('Directed Study');
     this.campus = oscar.campuses[campusIndex] ?? 'unknown';
     const attributes = attributeIndices
       .map((attributeIndex) => oscar.attributes[attributeIndex])

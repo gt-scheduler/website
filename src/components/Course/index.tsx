@@ -1,16 +1,19 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faAngleDown,
   faAngleUp,
   faShareAlt,
   faPalette,
+  faPencilAlt,
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 import { classes, getContentClassName } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
-import { ActionRow, Instructor, Palette, Prerequisite } from '..';
+import { ActionRow, CreditSlider, Instructor, Palette, Prerequisite } from '..';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
@@ -33,10 +36,18 @@ export default function Course({
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
+  const [creditSliderShown, setCreditSliderShown] = useState<boolean>(false);
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
-    { patchSchedule },
+    {
+      oscar,
+      desiredCourses,
+      pinnedCrns,
+      excludedCrns,
+      colorMap,
+      adjustedCredits,
+    },
+    { patchSchedule, setAdjustedCredits },
   ] = useContext(ScheduleContext);
 
   useEffect(() => {
@@ -132,19 +143,43 @@ export default function Course({
 
   const prereqControl = (
     nextPrereqOpen: boolean,
+    nextCreditSliderShown: boolean,
     nextExpanded: boolean
   ): void => {
     setPrereqOpen(nextPrereqOpen);
+    setCreditSliderShown(nextCreditSliderShown);
     setExpanded(nextExpanded);
   };
   const prereqAction = {
     icon: faShareAlt,
     styling: { transform: 'rotate(90deg)' },
     onClick: (): void => {
-      prereqControl(true, !prereqOpen ? true : !expanded);
+      prereqControl(
+        true,
+        false,
+        !prereqOpen || creditSliderShown ? true : !expanded
+      );
     },
     tooltip: 'View Prerequisites',
     id: `${course.id}-prerequisites`,
+  };
+
+  const sliderControl = (
+    nextPrereqOpen: boolean,
+    nextCreditSliderShown: boolean,
+    nextExpanded: boolean
+  ): void => {
+    setPrereqOpen(nextPrereqOpen);
+    setCreditSliderShown(nextCreditSliderShown);
+    setExpanded(nextExpanded);
+  };
+  const handleSliderChange = (newValue: number): void => {
+    const newAdjustedCredits = {
+      ...adjustedCredits,
+      [`${course.id}-${course.term}`]: newValue,
+    };
+    setAdjustedCredits(newAdjustedCredits);
+    course.adjustedCredits = newValue;
   };
 
   const pinnedSections = course.sections.filter((section) =>
@@ -153,6 +188,9 @@ export default function Course({
   const totalCredits = pinnedSections.reduce(
     (credits, section) => credits + section.credits,
     0
+  );
+  const adjustableCredits = pinnedSections.some(
+    (section) => section.adjustableCredits
   );
 
   return (
@@ -172,7 +210,7 @@ export default function Course({
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
-                  onClick: (): void => prereqControl(false, !expanded),
+                  onClick: (): void => prereqControl(false, false, !expanded),
                 },
                 prereqAction,
                 {
@@ -207,7 +245,44 @@ export default function Course({
                 : 'N/A'}
             </span>
             {totalCredits > 0 && (
-              <span className="credits">{totalCredits} Credits</span>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: color,
+                }}
+              >
+                <span className="credits">
+                  {adjustableCredits
+                    ? adjustedCredits[`${course.id}-${course.term}`] ?? 1
+                    : totalCredits}{' '}
+                  Credits
+                </span>
+                {adjustableCredits && (
+                  <div className="adjustable-credits">
+                    <FontAwesomeIcon
+                      className="pencil-icon"
+                      icon={faPencilAlt}
+                      id={`${course.id}-credits`}
+                      onClick={(): void => {
+                        sliderControl(
+                          false,
+                          true,
+                          prereqOpen || !creditSliderShown ? true : !expanded
+                        );
+                      }}
+                    />
+                    <ReactTooltip
+                      anchorId={`${course.id}-credits`}
+                      variant="dark"
+                      place="left"
+                      style={{ fontSize: '110%' }}
+                    >
+                      Adjust Credits
+                    </ReactTooltip>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -222,7 +297,7 @@ export default function Course({
           />
         )}
       </ActionRow>
-      {expanded && !prereqOpen && (
+      {expanded && !prereqOpen && !creditSliderShown && (
         <div className={classes('hover-container', 'nested')}>
           {includedInstructors.map((name) => {
             let instructorGpa: number | undefined = 0;
@@ -264,8 +339,21 @@ export default function Course({
           )}
         </div>
       )}
-      {expanded && prereqOpen && prereqs !== null && (
+      {expanded && !creditSliderShown && prereqOpen && prereqs !== null && (
         <Prerequisite course={course} prereqs={prereqs} />
+      )}
+      {expanded && creditSliderShown && !prereqOpen && (
+        <div
+          className={classes('hover-container', 'nested')}
+          style={{ padding: '2px 15px 2px 15px' }}
+        >
+          <CreditSlider
+            value={adjustedCredits[`${course.id}-${course.term}`] ?? 1}
+            onChange={(_: Event, newValue: number | number[]): void => {
+              handleSliderChange(newValue as number);
+            }}
+          />
+        </div>
       )}
     </div>
   );

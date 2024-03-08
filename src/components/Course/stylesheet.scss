@@ -22,6 +22,22 @@
     }
   }
 
+  .adjustable-credits {
+    z-index: 0;
+    opacity: 0.6;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+    
+    .pencil-icon {
+      padding: 0px 0px 0px 6px;
+      outline: none;
+      border: none;
+    }
+  }
+
   .palette {
     position: absolute;
     top: 0;
