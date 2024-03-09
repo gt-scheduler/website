@@ -60,7 +60,6 @@ export default function ComparisonPanel({
 
   const handleTogglePanel = useCallback(() => {
     if (type === 'signedIn') {
-      // setCompare(!compare);
       handleCompareSchedules(!compare, undefined, undefined);
     } else {
       setLoginOpen(true);
