@@ -264,6 +264,10 @@ export default function ComparisonContainer({
     [colorMap, patchSchedule]
   );
 
+  const sortedFriendsArray = Object.entries(friends).sort(
+    ([, friendA], [, friendB]) => friendA.name.localeCompare(friendB.name)
+  );
+
   return (
     <div className="comparison-container">
       <InvitationModal
@@ -333,7 +337,7 @@ export default function ComparisonContainer({
           <div className="shared-schedules">
             <p className="content-title shared-with">Shared with me</p>
             {Object.keys(friends).length !== 0 ? (
-              Object.entries(friends).map(([friendId, friend]) => {
+              sortedFriendsArray.map(([friendId, friend]) => {
                 return (
                   <div key={friendId} className="friend">
                     <ScheduleRow
