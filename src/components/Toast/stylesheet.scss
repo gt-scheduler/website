@@ -16,39 +16,66 @@
   color: #000000;
   font-weight: bold;
   font-size: 1em;
-}
 
-@keyframes fadein {
-  from {
-    right: 0;
-    opacity: 0;
+  @media (max-width: 450px) {
+    width: 80%;
+    right: 10%;
   }
-  to {
-    right: 30px;
-    opacity: 1;
+
+  &-icon {
+    font-size: 2em;
   }
-}
 
-@keyframes fadeout {
-  from {
-    right: 30px;
-    opacity: 1;
+  &-close-icon {
+    font-size: 1.5em;
+    cursor: pointer;
   }
-  to {
-    right: 0;
-    opacity: 0;
+
+  &-message {
+    flex: 1 0;
   }
-}
 
-.toast-icon {
-  font-size: 2em;
-}
+  @keyframes fadein {
+    from {
+      right: 0;
+      opacity: 0;
+    }
+    to {
+      right: 30px;
+      opacity: 1;
+    }
+  }
 
-.toast-close-icon {
-  font-size: 1.5em;
-  cursor: pointer;
-}
+  @keyframes fadeout {
+    from {
+      right: 30px;
+      opacity: 1;
+    }
+    to {
+      right: 0;
+      opacity: 0;
+    }
+  }
 
-.toast-message {
-  flex: 1 0;
+  @keyframes fadein-mobile {
+    from {
+      right: 0;
+      opacity: 0;
+    }
+    to {
+      right: 10%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeout-mobile {
+    from {
+      right: 10%;
+      opacity: 1;
+    }
+    to {
+      right: 0;
+      opacity: 0;
+    }
+  }
 }

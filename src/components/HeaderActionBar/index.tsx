@@ -3,23 +3,22 @@ import {
   faDownload,
   faCalendarAlt,
   faPaste,
-  faAdjust,
   faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext } from 'react';
+import React from 'react';
 
 import { Button } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
 } from '../../constants';
-import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
 import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
+import ShareIcon from '../ShareIcon';
 
 import './stylesheet.scss';
 
@@ -53,12 +52,6 @@ export default function HeaderActionBar({
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
 }: HeaderActionBarProps): React.ReactElement {
-  const [theme, setTheme] = useContext(ThemeContext);
-  const handleThemeChange = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  }, [theme, setTheme]);
-
   // Coalesce the export options into the props for a single <DropdownMenu>
   const enableExport =
     enableCopyCrns || enableDownloadCalendar || enableExportCalendar;
@@ -103,24 +96,12 @@ export default function HeaderActionBar({
         className="header-action-bar__button"
       >
         <div className="header-action-bar__export-dropdown-content">
-          <FontAwesomeIcon
-            className="header-action-bar__button-icon"
-            fixedWidth
-            icon={faDownload}
-          />
+          <ShareIcon className="header-action-bar__button-icon" />
           <div className="header-action-bar__button-text">Export</div>
           <FontAwesomeIcon fixedWidth icon={faCaretDown} />
         </div>
       </DropdownMenu>
 
-      <Button onClick={handleThemeChange} className="header-action-bar__button">
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faAdjust}
-        />
-        <div className="header-action-bar__button-text">Theme</div>
-      </Button>
       <Button
         href="https://github.com/gt-scheduler/website"
         className="header-action-bar__button"
