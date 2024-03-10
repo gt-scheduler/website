@@ -15,7 +15,6 @@ import {
   faCircle,
   faClose,
   faLink,
-  faSpinner,
   faXmark,
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
@@ -34,6 +33,7 @@ import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
+import Spinner from '../Spinner';
 
 /**
  * Inner content of the invitation modal.
@@ -74,6 +74,7 @@ export function InvitationModalContent({
   const input = useRef<HTMLInputElement>(null);
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
+  const [emailIcon, setEmailIcon] = useState('send');
   const [linkMessage, setLinkMessage] = useState('');
   const [linkMessageClassName, setLinkMessageClassName] = useState('');
   const [linkLoading, setLinkLoading] = useState(false);
@@ -91,6 +92,7 @@ export function InvitationModalContent({
       setEmailInput(e.target.value);
       setValidMessage('');
       setValidClassName('');
+      setEmailIcon('send');
     },
     [setEmailInput]
   );
@@ -118,8 +120,10 @@ export function InvitationModalContent({
 
   // verify email with a regex and send invitation if valid
   const verifyEmail = useCallback((): void => {
+    setEmailIcon('spinner');
     if (!input.current || !/^\S+@\S+\.\S+$/.test(input.current.value)) {
-      setValidMessage('Invalid Email');
+      setValidMessage('Invalid email, please try again!');
+      setEmailIcon('send');
       return setValidClassName('invalid-email');
     }
     const numNotAccepted = Object.entries(allFriends).reduce(
@@ -147,9 +151,8 @@ export function InvitationModalContent({
     );
 
     if (numNotAccepted === 0) {
-      setValidMessage(
-        'Email has already accepted an invite for these versions'
-      );
+      setValidMessage('User already invited, try another email!');
+      setEmailIcon('send');
       return setValidClassName('invalid-email');
     }
 
@@ -158,11 +161,14 @@ export function InvitationModalContent({
         if (input.current) {
           input.current.value = '';
         }
-        setValidMessage('Successfully sent!');
+        setValidMessage('Invite successfully sent!');
         setValidClassName('valid-email');
+        setEmailInput('');
+        setEmailIcon('checkmark');
       })
       .catch((err) => {
         setValidClassName('invalid-email');
+        setEmailIcon('send');
         const error = err as AxiosError;
         if (error.response) {
           const apiError = error.response.data as ApiErrorResponse;
@@ -364,11 +370,20 @@ export function InvitationModalContent({
             type="button"
             className={classes(
               'send-button',
-              !emailInput.trim() && 'disabled-send-button'
+              !emailInput.trim() && 'disabled-send-button',
+              emailIcon === 'spinner' && 'email-button-spinner',
+              emailIcon === 'checkmark' && 'email-button-checkmark'
             )}
             onClick={verifyEmail}
           >
-            <FontAwesomeIcon icon={faPaperPlane} />
+            {emailIcon === 'send' && <FontAwesomeIcon icon={faPaperPlane} />}
+            {emailIcon === 'spinner' && <Spinner size="small" />}
+            {emailIcon === 'checkmark' && (
+              <FontAwesomeIcon
+                className="email-button-check-icon"
+                icon={faCheck}
+              />
+            )}
           </button>
         </div>
         <div className={validClassName}>{validMessage}</div>
@@ -493,11 +508,13 @@ export function InvitationModalContent({
                 });
             }}
           >
-            <FontAwesomeIcon
-              className="copy-link-icon"
-              icon={linkLoading ? faSpinner : faLink}
-            />
-            <text>Copy Link</text>
+            <div className="link-icon-container">
+              {linkLoading && <Spinner className="link-spinner" size="small" />}
+              {!linkLoading && (
+                <FontAwesomeIcon className="copy-link-icon" icon={faLink} />
+              )}
+            </div>
+            <text>Share with link</text>
           </button>
           <div className="expiration">
             <div className="expiration-display">
@@ -527,6 +544,7 @@ export function InvitationModalContent({
                     className="expiration-option"
                     onClick={(): void => {
                       setSelectedExpiration(exp);
+                      setLinkMessage('');
                       setExpirationDropdownVisible(false);
                     }}
                   >

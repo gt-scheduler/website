@@ -1,7 +1,9 @@
 @import '../../variables';
 
 .invitation-modal {
-  padding: 10px 25px;
+  .modal__content {
+    padding: 0px;
+  }
 
   .remove-close-button {
     width: 16px;
@@ -16,7 +18,8 @@
 
   .invitation-modal-content {
     text-align: center;
-    overflow-y: hidden;
+    overflow: hidden;
+    padding: 20px 40px;
 
     @include light {
       background-color: $theme-light-background;
@@ -41,16 +44,16 @@
 
       .valid-email {
         text-align: start;
-        color: rgba(34, 181, 49, 0.75);
+        color: #22b531;
         font-size: 12px;
         font-weight: bold;
-        padding-top: 3px;
+        padding: 3px 0px;
         opacity: 1;
       }
 
       .invalid-email {
         text-align: start;
-        color: rgba(255, 0, 0, 0.5);
+        color: #ff2121;
         font-size: 12px;
         font-weight: bold;
         padding-top: 3px;
@@ -62,7 +65,6 @@
         flex-direction: row;
         justify-content: space-between;
         padding-top: 5px;
-        padding-bottom: 5px;
         align-items: center;
         column-gap: 5px;
 
@@ -73,12 +75,13 @@
           flex-grow: 1;
 
           .email:has(+ .invalid-email) {
-            border: 1px solid rgba(255, 0, 0, 0.5);
+            border: 1px solid #ff2121;
           }
         }
 
         input[type='email'] {
           padding: 5px;
+          line-height: 12px;
           padding: 12px;
           border-radius: 6px;
           background-color: rgb(35, 35, 35);
@@ -103,6 +106,9 @@
           border-radius: 6px;
           background-color: #c56e5b;
           border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
           &:hover {
             background-color: #e2944b;
@@ -118,6 +124,28 @@
             cursor: default;
           }
         }
+
+        .email-button-spinner {
+          background-color: #d89758;
+
+          &:hover {
+            cursor: default;
+          }
+        }
+
+        .email-button-checkmark {
+          background-color: #22b531;
+
+          &:hover {
+            background-color: #22b531;
+            cursor: default;
+          }
+
+          .email-button-check-icon {
+            width: 20px;
+            height: 20px;
+          }
+        }
       }
 
       .share-schedule-checkboxes {
@@ -125,7 +153,7 @@
         flex-direction: row;
         align-items: center;
         gap: 15px;
-        padding-top: 8px;
+        padding-top: 15px;
         padding-bottom: 15px;
 
         .other-schedules-button {
@@ -171,16 +199,16 @@
       align-items: stretch !important;
       border: none;
       background-color: rgb(80, 80, 80);
+      margin: 0px -40px;
     }
 
     //Style for Invited Users
 
     .invited-users {
       padding-top: 15px;
-      margin-bottom: 15px;
       justify-content: center;
       overflow-y: scroll;
-      height: 200px;
+      height: 215px;
     }
 
     .no-invited-users {
@@ -317,8 +345,13 @@
         border-radius: 10px;
         padding: 10px 15px;
         border: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-        .copy-link-icon {
+        .link-icon-container {
+          display: flex;
+          width: 20px;
           margin-right: 5px;
         }
 
@@ -334,9 +367,8 @@
       .copy-link-button {
         background: var(--theme-card-bg);
         border-radius: 10px;
-        padding: 10px 15px;
+        padding: 12px 15px;
         border: none;
-        font-size: 12px;
 
         .copy-link-icon {
           margin-right: 5px;
@@ -419,13 +451,13 @@
     }
 
     .link-message {
-      height: 20px;
+      height: 18px;
     }
 
     .link-success {
       align-self: flex-start;
       text-align: start;
-      color: rgba(34, 181, 49, 0.75);
+      color: #22b531;
       font-size: 12px;
       font-weight: bold;
       padding-top: 3px;
@@ -435,7 +467,7 @@
     .link-failure {
       align-self: flex-start;
       text-align: start;
-      color: rgba(255, 0, 0, 0.5);
+      color: #ff2121;
       font-size: 12px;
       font-weight: bold;
       padding-top: 3px;
