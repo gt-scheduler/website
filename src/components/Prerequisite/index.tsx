@@ -93,8 +93,6 @@ export default function Prerequisite({
     }
   }
 
-  const [{ term }] = useContext(ScheduleContext);
-
   return (
     <div className={classes('hover-container', 'nested')}>
       <ActionRow
@@ -104,8 +102,8 @@ export default function Prerequisite({
           {
             icon: faInfoCircle,
             href: isCourse
-              ? `https://oscar.gatech.edu/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${parent.subject}&crse_numb_in=${parent.number}`
-              : `https://oscar.gatech.edu/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${parent.crn}`,
+              ? `https://oscar.gatech.edu/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${parent.term}&subj_code_in=${parent.subject}&crse_numb_in=${parent.number}`
+              : `https://oscar.gatech.edu/bprod/bwckschd.p_disp_detail_sched?term_in=${parent.term}&crn_in=${parent.crn}`,
           },
         ]}
       />

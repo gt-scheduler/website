@@ -98,7 +98,7 @@ export default function Instructor({
         actions={[
           {
             icon: expanded ? faAngleUp : faAngleDown,
-            onClick: (): void => setExpanded(!expanded),
+            onClick: (): void => prereqControl(false, !expanded),
           },
           ...(areSectionPrereqsDiff ? [prereqAction] : []),
           !['TBA', 'Not Assigned'].includes(name)
