@@ -352,7 +352,7 @@ export function InvitationModalContent({
               key="email"
               ref={input}
               className="email"
-              placeholder="recipient@example.com"
+              placeholder="Enter user's email address"
               list="recent-invites"
               onFocus={handleChangeSearch}
               onKeyDown={handleKeyDown}
@@ -360,7 +360,14 @@ export function InvitationModalContent({
               value={emailInput}
             />
           </div>
-          <button type="button" className="send-button" onClick={verifyEmail}>
+          <button
+            type="button"
+            className={classes(
+              'send-button',
+              !emailInput.trim() && 'disabled-send-button'
+            )}
+            onClick={verifyEmail}
+          >
             <FontAwesomeIcon icon={faPaperPlane} />
           </button>
         </div>

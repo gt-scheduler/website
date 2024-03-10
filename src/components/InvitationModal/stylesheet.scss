@@ -39,7 +39,6 @@
         font-size: 0.9em;
       }
 
-      
       .valid-email {
         text-align: start;
         color: rgba(34, 181, 49, 0.75);
@@ -80,8 +79,7 @@
 
         input[type='email'] {
           padding: 5px;
-          padding-left: 8px;
-          height: 60px;
+          padding: 12px;
           border-radius: 6px;
           background-color: rgb(35, 35, 35);
           border: 1px solid rgb(35, 35, 35);
@@ -98,18 +96,26 @@
         }
 
         .send-button {
-          width: 60px;
+          width: 50px;
           align-self: stretch;
           font-size: 14px;
           color: white;
           border-radius: 6px;
           background-color: #c56e5b;
           border: none;
-          margin-top: 4px;
 
           &:hover {
             background-color: #e2944b;
             cursor: pointer;
+          }
+        }
+
+        .disabled-send-button {
+          background-color: #9d9d9d;
+
+          &:hover {
+            background-color: #9d9d9d;
+            cursor: default;
           }
         }
       }
