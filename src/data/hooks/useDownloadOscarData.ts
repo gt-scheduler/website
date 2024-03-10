@@ -81,7 +81,7 @@ export default function useDownloadOscarData(
       let attemptNumber = 1;
       while (!loadOperation.isCancelled) {
         try {
-          const promise = axios.get<CrawlerTermData>(url);
+          const promise = axios.get<CrawlerTermData>("202308.json");
           const result = await loadOperation.perform(promise);
           if (result.cancelled) {
             return;

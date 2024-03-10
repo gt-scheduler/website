@@ -340,8 +340,6 @@ export type CrawlerCourse = [
        ]
      * ```
      */
-  // ! Type had `undefined` explicitly added to ensure we check when accessing
-  prerequisites: CrawlerPrerequisites | undefined,
   /**
    * Description pulled from Oscar
    */

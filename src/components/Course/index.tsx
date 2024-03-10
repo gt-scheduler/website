@@ -109,7 +109,27 @@ export default function Course({
   const color = colorMap[course.id];
   const contentClassName = color != null && getContentClassName(color);
 
-  const prereqs: CrawlerPrerequisites | null = course.prereqs ?? [];
+  /**
+   * Returns whether all section prerequisites are equal
+   * @returns {boolean} whether section prerequisites are equal
+   */
+  const compareSectionPrereqs = (): boolean => {
+    const basis = course.sections?.[0];
+    if (!basis) {
+      return false;
+    }
+    const compareObj = (a: any, b: any): boolean =>
+      a && b && typeof a === 'object' && typeof b === 'object'
+        ? Object.keys(a).length === Object.keys(b).length &&
+          Object.keys(a).every((key) => compareObj(a[key], b[key]))
+        : a === b;
+    for (let i = 1; i < course.sections.length; i++) {
+      if (!compareObj(basis, course.sections[i])) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
@@ -264,8 +284,8 @@ export default function Course({
           )}
         </div>
       )}
-      {expanded && prereqOpen && prereqs !== null && (
-        <Prerequisite course={course} prereqs={prereqs} />
+      {expanded && prereqOpen && compareSectionPrereqs() && (
+        <Prerequisite course={course} prereqs={course.sections?.[0]?.prereqs ?? []} />
       )}
     </div>
   );
