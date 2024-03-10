@@ -2,12 +2,7 @@ import axios from 'axios';
 import { decode } from 'html-entities';
 
 import { Oscar, Section } from '.';
-import {
-  CourseGpa,
-  CrawlerCourse,
-  CrawlerPrerequisites,
-  Period,
-} from '../../types';
+import { CourseGpa, CrawlerCourse, Period } from '../../types';
 import {
   hasConflictBetween,
   isLab,

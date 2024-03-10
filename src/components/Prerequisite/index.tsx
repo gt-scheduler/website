@@ -24,16 +24,17 @@ export type PrerequisiteProps = {
 };
 
 /**
- * Renders the prereqs for a single course/section, given that the crawler version
- * supports prereqs. (Make sure to check this before). An empty prereq list is
- * an authoritative statement that the course/section has no prereqs, and as such a
- * message will be displayed telling the user. Otherwise, this component tries
- * to render the prereq tree in a way that is easily consumable without taking
- * up too much screen space, first trying to split the prereqs up into separate
- * "options" (sub-clauses of an OR set) if possible before rendering a list of
- * items with operators in between. Finally, in each item, there is the
- * flattened textual representation of the remainder of the subtree, which
- * restores parentheses groupings (much like the original Oscar prereq syntax)
+ * Renders the prereqs for a single course/section, given that the crawler
+ * version supports prereqs. (Make sure to check this before). An empty
+ * prereq list is an authoritative statement that the course/section has no
+ * prereqs, and as such a message will be displayed telling the user.
+ * Otherwise, this component tries to render the prereq tree in a way that
+ * is easily consumable without taking up too much screen space, first
+ * trying to split the prereqs up into separate "options"
+ * (sub-clauses of an OR set) if possible before rendering a list of items
+ * with operators in between. Finally, in each item, there is the flattened
+ * textual representation of the remainder of the subtree, which restores
+ * parentheses groupings (much like the original Oscar prereq syntax)
  */
 export default function Prerequisite({
   parent,
@@ -158,11 +159,11 @@ type PrerequisiteClauseDisplayProps = {
 };
 
 /**
- * Renders an arbitrary prereq clause. If the clause is a singular course/section,
- * then it renders a single Item. Otherwise, if the clause is a set,
- * this component renders an item for each member of the set, and includes
- * an operator at the end of each item's text to indicate that each item
- * is part of a larger prereq set.
+ * Renders an arbitrary prereq clause. If the clause is a singular
+ * course/section, then it renders a single Item. Otherwise, if the
+ * clause is a set, this component renders an item for each member
+ * of the set, and includes an operator at the end of each item's
+ * text to indicate that each item is part of a larger prereq set.
  */
 function PrerequisiteClauseDisplay({
   clause,
@@ -197,7 +198,8 @@ type PrerequisiteItemProps = {
 /**
  * Renders a single "item" -- a div with the completely flattened text
  * representation of the prereq subtree passed in as `clause` (whether
- * that's a single prereq course/section or a sprawling sub-tree with many branches).
+ * that's a single prereq course/section or a sprawling sub-tree with
+ * many branches).
  * Includes the ability to display a higher-level operator between different
  * `PrerequisiteItem`'s as long as `isLast` is false, which is used by
  * `PrerequisiteClauseDisplay` when it needs to render a prerequisite set.
