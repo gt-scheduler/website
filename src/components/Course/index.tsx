@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   faAngleDown,
   faAngleUp,
@@ -33,6 +39,8 @@ export default function Course({
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
+  const [areSectionPrereqsDiff, setAreSectionPrereqsDiff] =
+    useState<boolean>(false);
   const isSearching = Boolean(onAddCourse);
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
@@ -103,33 +111,52 @@ export default function Course({
     [excludedCrns, patchSchedule]
   );
 
+  /**
+   * Returns whether all section prerequisites are equal
+   * @returns {boolean} whether section prerequisites are equal
+   */
+  const compareSectionPrereqs = useCallback((course: CourseBean): boolean => {
+    const basisPrereqs = course.sections?.[0]?.prereqs;
+    if (!basisPrereqs) {
+      return false;
+    }
+
+    // This type is necessary to avoid eslint no-unsafe-member-access error
+    // in compareObj
+    type ValidObj = {
+      [index: string]: any; // eslint-disable-line
+    };
+
+    const compareObj = (a: unknown, b: unknown): boolean =>
+      a && b && typeof a === 'object' && typeof b === 'object'
+        ? Object.keys(a as ValidObj).length ===
+            Object.keys(b as ValidObj).length &&
+          Object.keys(a as ValidObj).every((key) =>
+            compareObj((a as ValidObj)[key], (b as ValidObj)[key])
+          )
+        : a === b;
+    for (let i = 1; i < course.sections.length; i++) {
+      if (!compareObj(basisPrereqs, course.sections[i]?.prereqs)) {
+        return false;
+      }
+    }
+    return true;
+  }, []);
+
+  useMemo(() => {
+    const course = oscar.findCourse(courseId);
+    if (!course) {
+      return;
+    }
+    setAreSectionPrereqsDiff(!compareSectionPrereqs(course));
+    console.log(!compareSectionPrereqs(course));
+  }, [courseId, compareSectionPrereqs, oscar]);
+
   const course = oscar.findCourse(courseId);
   if (course == null) return null;
 
   const color = colorMap[course.id];
   const contentClassName = color != null && getContentClassName(color);
-
-  /**
-   * Returns whether all section prerequisites are equal
-   * @returns {boolean} whether section prerequisites are equal
-   */
-  const compareSectionPrereqs = (): boolean => {
-    const basis = course.sections?.[0];
-    if (!basis) {
-      return false;
-    }
-    const compareObj = (a: any, b: any): boolean =>
-      a && b && typeof a === 'object' && typeof b === 'object'
-        ? Object.keys(a).length === Object.keys(b).length &&
-          Object.keys(a).every((key) => compareObj(a[key], b[key]))
-        : a === b;
-    for (let i = 1; i < course.sections.length; i++) {
-      if (!compareObj(basis, course.sections[i])) {
-        return false;
-      }
-    }
-    return true;
-  };
 
   const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
@@ -188,13 +215,16 @@ export default function Course({
         ].join(' ')}
         actions={
           isSearching
-            ? [{ icon: faPlus, onClick: onAddCourse }, prereqAction]
+            ? [
+                { icon: faPlus, onClick: onAddCourse },
+                ...(areSectionPrereqsDiff ? [] : [prereqAction]),
+              ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
                   onClick: (): void => prereqControl(false, !expanded),
                 },
-                prereqAction,
+                ...(areSectionPrereqsDiff ? [] : [prereqAction]),
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
@@ -284,8 +314,11 @@ export default function Course({
           )}
         </div>
       )}
-      {expanded && prereqOpen && compareSectionPrereqs() && (
-        <Prerequisite course={course} prereqs={course.sections?.[0]?.prereqs ?? []} />
+      {expanded && prereqOpen && !areSectionPrereqsDiff && (
+        <Prerequisite
+          course={course}
+          prereqs={course.sections?.[0]?.prereqs ?? []}
+        />
       )}
     </div>
   );
