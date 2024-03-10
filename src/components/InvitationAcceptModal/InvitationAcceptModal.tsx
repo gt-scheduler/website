@@ -92,7 +92,7 @@ export default function InvitationAcceptModal({
                     type="submit"
                     className="share-button"
                     onClick={(): void => {
-                      setHasSeen(true);
+                      onHide();
                       setInvitationModalOpen(true);
                     }}
                   >
