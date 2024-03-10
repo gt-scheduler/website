@@ -154,7 +154,6 @@ export default function Calendar({
       a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
   );
 
-  // type = either "pin" or "overlay"
   const friendSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
   const friendEvents: { data: FriendEventData; overlay: boolean }[] = [];
   if (compare) {
