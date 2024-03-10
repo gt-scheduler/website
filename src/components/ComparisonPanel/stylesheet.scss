@@ -194,6 +194,13 @@
     .combination {
       flex: 1;
 
+      .content-title{
+        font-weight: 700;
+        font-size: 14px;
+        margin: 16px 12px 4px 12px;
+        border-bottom: 2px solid $color-border;
+      }
+
       .CombinationContainer {
         height: 100%;
       }

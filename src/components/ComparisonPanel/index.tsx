@@ -134,6 +134,7 @@ export default function ComparisonPanel({
           </div>
         )}
         <div className="combination">
+          <p className="content-title">Schedule Combinations</p>
           <CombinationContainer compare={compare} />
         </div>
         {/* <div
