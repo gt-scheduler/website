@@ -38,36 +38,35 @@ export function InformationModalContent(): React.ReactElement {
           margin: '16px auto',
         }}
       >
-        New Feature: Recurring Events
+        New Feature: Compare Schedules
       </h1>
-      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 6, 2023</h4>
+      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>March 10, 2024</h4>
       <div className="information-content">
         <p>
           Hello <span style={{ color: '#EDA91F' }}>Yellow Jackets!</span> We are
           excited to announce a new feature for GT Scheduler.
           <br />
           <br />
-          Use Recurring Events to block out meetings, work shifts, and any other
-          weekly events you may need to schedule your classes around.
+          Use Compare Schedules to share and compare your schedules with your
+          friends!
           <br />
           <br />
-          Add, edit, and delete events in the Recurring Events tab, next to the
-          Courses tab.
+          Add and view your friends&apos; schedules to yours using the panel on
+          the right side of the page.
           <br />
           <br />
-          Drag and drop (web-only) events on the schedule view to adjust times.
         </p>
         <div className="information-images">
           <img
             className="information-image"
             alt="Event Blocks"
-            src="/event_blocks.png"
+            src="/compare_schedule.png"
           />
           <div className="information-spacer" />
           <img
             className="information-image"
             alt="Drag Drop"
-            src="/drag_event_blocks.png"
+            src="/compare_panel.png"
           />
         </div>
       </div>
