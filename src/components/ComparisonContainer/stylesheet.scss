@@ -29,7 +29,7 @@
         }
 
         &.shared-with{
-          margin-bottom: 10px;
+          margin-bottom: 8px;
         }
 
       }
@@ -48,14 +48,15 @@
       }
 
       .checked {
-        p{
+        p {
           font-weight: 700;
+          font-size: 14px;
         }
       }
 
       .friend-name {
-        p {
-          font-weight: 500;
+        div {
+          font-weight: 575;
           font-size: 16px;
         }
       }

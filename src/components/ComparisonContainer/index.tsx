@@ -566,11 +566,11 @@ function ScheduleRow({
             >
               <div
                 className={classes(
-                  type === 'User' && 'friend-name',
-                  checkboxColor !== '' && 'checked'
+                  'friend-name',
+                  type !== 'User' && checkboxColor !== '' && 'checked'
                 )}
               >
-                <p>{name}</p>
+                {type === 'User' ? <div>{name}</div> : <p>{name}</p>}
               </div>
               {hasTooltip && email !== name && (
                 <ReactTooltip
