@@ -17,6 +17,8 @@ import {
   faLink,
   faXmark,
   faPaperPlane,
+  faXmarkCircle,
+  faCircleCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -75,8 +77,7 @@ export function InvitationModalContent({
   const [validMessage, setValidMessage] = useState('');
   const [validClassName, setValidClassName] = useState('');
   const [emailIcon, setEmailIcon] = useState('send');
-  const [linkMessage, setLinkMessage] = useState('');
-  const [linkMessageClassName, setLinkMessageClassName] = useState('');
+  const [linkButtonClassName, setLinkButtonClassName] = useState('');
   const [linkLoading, setLinkLoading] = useState(false);
   const [checkedSchedules, setCheckedSchedules] = useState([currentVersion]);
   // const [invitationLink, setInvitationLink] = useState('');
@@ -222,24 +223,13 @@ export function InvitationModalContent({
 
   const createLink = useCallback(async (): Promise<void> => {
     setLinkLoading(true);
-    setLinkMessage('');
-    setLinkMessageClassName('');
+    setLinkButtonClassName('');
     await getInvitationLink()
       .then((response) => {
         copy(response.data.link);
-        setLinkLoading(false);
-        setLinkMessage('');
-        setLinkMessageClassName('');
       })
       .catch((err) => {
-        const error = err as AxiosError;
-        setLinkMessageClassName('link-failure');
-        if (error.response) {
-          const apiError = error.response.data as ApiErrorResponse;
-          setLinkMessage(apiError.message);
-          return;
-        }
-        setLinkMessage('Error creating link. Please try again later.');
+        setLinkButtonClassName('link-failure');
         softError(
           new ErrorWithFields({
             message: 'invite link creation failed',
@@ -252,6 +242,7 @@ export function InvitationModalContent({
             },
           })
         );
+        throw err;
       });
   }, [
     accountContext,
@@ -335,6 +326,7 @@ export function InvitationModalContent({
 
   // show a fake loader when options change
   useEffect(() => {
+    setLinkButtonClassName('');
     setLinkLoading(true);
     setTimeout(() => {
       setLinkLoading(false);
@@ -344,7 +336,7 @@ export function InvitationModalContent({
   return (
     <div className={classes('invitation-modal-content', mobile && 'mobile')}>
       <div className="top-block">
-        <h2>Share Schedule</h2>
+        <p className="modal-title">Share Schedule</p>
         <p>
           Enter an email associated with another user&apos;s GT-Scheduler
           account & we&apos;ll send them an invite via email to import this
@@ -492,29 +484,42 @@ export function InvitationModalContent({
           <button
             type="button"
             className={classes(
+              'copy-link-button',
               linkLoading ? '' : 'link-generated',
-              'copy-link-button'
+              linkButtonClassName
             )}
             disabled={linkLoading}
             onClick={(): void => {
               createLink()
                 .then(() => {
-                  setLinkMessage('Link copied!');
-                  setLinkMessageClassName('link-success');
+                  setLinkButtonClassName('link-success');
+                  setLinkLoading(false);
                 })
                 .catch(() => {
-                  setLinkMessage('Error copying link');
-                  setLinkMessageClassName('link-failure');
+                  setLinkButtonClassName('link-failure');
+                  setLinkLoading(false);
                 });
             }}
           >
-            <div className="link-icon-container">
+            <div
+              className={classes('link-icon-container', linkButtonClassName)}
+            >
               {linkLoading && <Spinner className="link-spinner" size="small" />}
-              {!linkLoading && (
-                <FontAwesomeIcon className="copy-link-icon" icon={faLink} />
+              {!linkLoading && linkButtonClassName === '' && (
+                <FontAwesomeIcon icon={faLink} />
+              )}
+              {!linkLoading && linkButtonClassName === 'link-success' && (
+                <FontAwesomeIcon icon={faCircleCheck} />
+              )}
+              {!linkLoading && linkButtonClassName === 'link-failure' && (
+                <FontAwesomeIcon icon={faXmarkCircle} />
               )}
             </div>
-            <text>Share with link</text>
+            <text className={linkButtonClassName}>
+              {linkButtonClassName === '' && 'Share with link'}
+              {linkButtonClassName === 'link-success' && 'Link copied!'}
+              {linkButtonClassName === 'link-failure' && 'Error occurred'}
+            </text>
           </button>
           <div className="expiration">
             <div className="expiration-display">
@@ -544,7 +549,6 @@ export function InvitationModalContent({
                     className="expiration-option"
                     onClick={(): void => {
                       setSelectedExpiration(exp);
-                      setLinkMessage('');
                       setExpirationDropdownVisible(false);
                     }}
                   >
@@ -554,9 +558,6 @@ export function InvitationModalContent({
             </div>
           </div>
         </div>
-        <text className={classes('link-message', linkMessageClassName)}>
-          {linkMessage}
-        </text>
       </div>
       <RemoveInvitationModal
         showRemove={removeInvitationOpen}

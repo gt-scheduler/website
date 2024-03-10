@@ -36,7 +36,13 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 10px 15px 5px 15px;
+      padding: 10px 0px 5px 0px;
+
+      .modal-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
 
       p {
         font-size: 0.9em;
@@ -153,8 +159,7 @@
         flex-direction: row;
         align-items: center;
         gap: 15px;
-        padding-top: 15px;
-        padding-bottom: 15px;
+        padding: 15px 0px 15px 2px;
 
         .other-schedules-button {
           display: flex;
@@ -233,6 +238,7 @@
         @include card;
         background-color: rgb(67, 67, 67);
         padding: 4px 8px;
+        margin: 4px 8px 4px 0px;
         height: 100%;
         display: flex;
         flex-direction: row;
@@ -328,7 +334,7 @@
   .modal-footer {
     display: flex;
     flex-direction: column;
-    padding-top: 18px;
+    padding-top: 24px;
 
     .link-options {
       display: flex;
@@ -355,21 +361,6 @@
           margin-right: 5px;
         }
 
-        @include dark {
-          color: $theme-light-background;
-        }
-
-        @include light {
-          color: $theme-dark-background;
-        }
-      }
-
-      .copy-link-button {
-        background: var(--theme-card-bg);
-        border-radius: 10px;
-        padding: 12px 15px;
-        border: none;
-
         .copy-link-icon {
           margin-right: 5px;
         }
@@ -381,6 +372,14 @@
         @include light {
           color: $theme-dark-background;
         }
+      }
+
+      .link-success {
+        color: #22b531;
+      }
+
+      .link-failure {
+        color: #ff2121;
       }
 
       .expiration {
@@ -448,30 +447,6 @@
           }
         }
       }
-    }
-
-    .link-message {
-      height: 18px;
-    }
-
-    .link-success {
-      align-self: flex-start;
-      text-align: start;
-      color: #22b531;
-      font-size: 12px;
-      font-weight: bold;
-      padding-top: 3px;
-      opacity: 1;
-    }
-
-    .link-failure {
-      align-self: flex-start;
-      text-align: start;
-      color: #ff2121;
-      font-size: 12px;
-      font-weight: bold;
-      padding-top: 3px;
-      opacity: 1;
     }
   }
 
