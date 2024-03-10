@@ -51,10 +51,8 @@ export function InformationModalContent(): React.ReactElement {
           friends!
           <br />
           <br />
-          Add and view your friends&apos; schedules to yours using the panel on
-          the right side of the page.
-          <br />
-          <br />
+          Add your friends&apos; schedules to yours and view them using the
+          panel on the right side of the page below your profile icon.
         </p>
         <div className="information-images">
           <img
