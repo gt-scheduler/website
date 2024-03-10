@@ -31,9 +31,9 @@ import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
+import Spinner from '../Spinner';
 
 import './stylesheet.scss';
-import Spinner from '../Spinner';
 
 /**
  * Inner content of the invitation modal.
