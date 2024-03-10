@@ -266,6 +266,7 @@ export default function EventAdd({
                   className="button"
                   disabled={submitDisabled}
                   onClick={onSubmit}
+                  id="event-add-button"
                 >
                   {event?.id ? 'Save' : 'Add'}
                 </Button>

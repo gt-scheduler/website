@@ -31,6 +31,7 @@ export type SelectProps<Id extends string | number> = {
 
   // Ignored if `onClickNew` is not provided.
   newLabel?: string;
+  id?: string
 };
 
 export interface SelectOption<Id extends string | number> {
@@ -93,6 +94,7 @@ export default function Select<Id extends string | number>({
   desiredItemWidth = null,
   onClickNew,
   newLabel = 'New',
+  id
 }: SelectProps<Id>): React.ReactElement {
   const [opened, setOpened] = useState(false);
 
@@ -169,6 +171,7 @@ export default function Select<Id extends string | number>({
       className={classes('Button', 'Select', className, `anchor-${menuAnchor}`)}
       onClick={(): void => trySetOpened(!opened)}
       style={style}
+      id={id}
     >
       <div className="text">{label}</div>
       <FontAwesomeIcon fixedWidth icon={faCaretDown} />
@@ -295,7 +298,7 @@ export default function Select<Id extends string | number>({
             </div>
           ))}
           {onClickNew !== undefined && (
-            <div className="option">
+            <div className="option" id={id ? `${id}-new-button` : undefined}>
               <Button className="option__button" onClick={onClickNew}>
                 <FontAwesomeIcon
                   fixedWidth
@@ -347,6 +350,7 @@ export type DropdownMenuProps = {
 export interface DropdownMenuAction {
   label: React.ReactNode;
   icon?: IconDefinition;
+  id?: string;
   onClick?: () => void;
 }
 
@@ -377,6 +381,7 @@ export function DropdownMenu({
         if (!disabled) setOpened(!opened);
       }}
       style={style}
+      id='export-button'
     >
       {children}
       {opened && (
@@ -384,10 +389,11 @@ export function DropdownMenu({
       )}
       {opened && (
         <div className="option-container">
-          {items.map(({ label, icon, onClick }, i) => (
+          {items.map(({ label, icon, onClick, id }, i) => (
             <div
               className={classes('option', onClick == null && 'option--text')}
               key={i}
+              id={id}
             >
               {onClick != null ? (
                 <Button className="option__button" onClick={onClick}>

@@ -68,6 +68,7 @@ export default function HeaderActionBar({
       label: 'Download image',
       icon: faDownload,
       onClick: onDownloadCalendar,
+      id: "export-download"
     });
   }
   if (enableExportCalendar) {
@@ -75,6 +76,7 @@ export default function HeaderActionBar({
       label: 'ICS (Calendar) file',
       icon: faCalendarAlt,
       onClick: onExportCalendar,
+      id: "export-calendar"
     });
   }
   if (enableCopyCrns) {
@@ -82,6 +84,7 @@ export default function HeaderActionBar({
       label: 'Copy CRNs to clipboard',
       icon: faPaste,
       onClick: onCopyCrns,
+      id: "export-copy-crn"
     });
   }
 

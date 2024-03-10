@@ -10,6 +10,7 @@ export type ButtonProps = {
   href?: string;
   onClick?: (e: React.SyntheticEvent<HTMLDivElement>) => void;
   children?: React.ReactNode;
+  id?: string;
 };
 
 export default function Button({
@@ -18,10 +19,11 @@ export default function Button({
   href,
   onClick,
   children,
+  id
 }: ButtonProps): React.ReactElement {
   if (disabled)
     return (
-      <div className={classes('Button', 'disabled', className)}>{children}</div>
+      <div className={classes('Button', 'disabled', className)}  id={id}>{children}</div>
     );
 
   if (href != null)
@@ -31,6 +33,7 @@ export default function Button({
         href={href}
         rel="noopener noreferrer"
         target="_blank"
+        id={id}
       >
         {children}
       </a>
@@ -46,6 +49,7 @@ export default function Button({
         if (event.key === 'Enter' && onClick != null) onClick(event);
       }}
       role="button"
+      id={id}
     >
       {children}
     </div>
