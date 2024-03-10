@@ -57,13 +57,13 @@ export function InformationModalContent(): React.ReactElement {
         <div className="information-images">
           <img
             className="information-image"
-            alt="Event Blocks"
+            alt="Compare Schedules View"
             src="/compare_schedule.png"
           />
           <div className="information-spacer" />
           <img
             className="information-image"
-            alt="Drag Drop"
+            alt="Compare Schedules Panel"
             src="/compare_panel.png"
           />
         </div>
