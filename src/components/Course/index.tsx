@@ -13,6 +13,7 @@ import {
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
+import _ from 'lodash';
 
 import { classes, getContentClassName } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
@@ -23,7 +24,6 @@ import { CourseGpa } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
-import _ from 'lodash';
 
 export type CourseProps = {
   className?: string;
