@@ -24,12 +24,12 @@
 
         &.content-title{
           font-weight: 700;
-          margin: 16px 12px 4px 12px;
+          margin: 16px 12px 0px 12px;
           border-bottom: 2px solid $color-border;
         }
 
         &.shared-with{
-          margin-bottom: 6px;
+          margin-bottom: 10px;
         }
 
       }
@@ -171,7 +171,7 @@
 
           &.schedule-checkbox {
             margin-top: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
           }
 
         }
