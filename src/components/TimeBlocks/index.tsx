@@ -38,7 +38,6 @@ export type TimeBlocksProps = {
   contentBody: TimeBlockContent[];
   popover: TimeBlockPopover[];
   overlay?: boolean;
-  friendOverlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
@@ -80,7 +79,6 @@ export default function TimeBlocks({
   contentBody,
   popover,
   overlay = false,
-  friendOverlay = false,
   capture,
   sizeInfo,
   includeDetailsPopover,
@@ -102,7 +100,6 @@ export default function TimeBlocks({
         'TimeBlocks',
         capture && 'capture',
         overlay && 'overlay',
-        friendOverlay && 'friend-overlay',
         className
       )}
     >

@@ -65,117 +65,14 @@ export default function Calendar({
   const [{ friends }] = useContext(FriendContext);
 
   // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
-  // e.g. crnSizeInfo[crn][day]["period.start-period.end"].rowIndex
-  const crnSizeInfo: Record<
+  // e.g. meetingSizeInfo[crn/id][day]["period.start-period.end"].rowIndex
+  const meetingSizeInfo: Record<
     string,
-    Record<string, Record<string, SectionBlockPosition>>
-  > = {};
-  const overlayCrnSizeInfo: Record<
-    string,
-    Record<string, Record<string, SectionBlockPosition>>
-  > = {};
-
-  // Contains the rowIndex's and rowSize's passed into each custom event's
-  // TimeBlocks, consistent with the rowIndex's and rowSize's of crns
-  const eventSizeInfo: Record<
-    string,
-    Record<string, Record<string, EventBlockPosition>>
-  > = {};
-  const overlayEventSizeInfo: Record<
-    string,
-    Record<string, Record<string, EventBlockPosition>>
+    Record<string, Record<string, SectionBlockPosition | EventBlockPosition>>
   > = {};
 
   const daysRef = React.useRef<HTMLDivElement>(null);
   const timesRef = React.useRef<HTMLDivElement>(null);
-
-  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
-  // next time block's rowSize and rowIndex (1 more than
-  // greatest of already processed connected blocks), updating
-  // the processed connected blocks to match its rowSize
-  const createSizeInfos = (
-    meetings: CommonMeetingObject[],
-    crnSizes: Record<
-      string,
-      Record<string, Record<string, SectionBlockPosition>>
-    >,
-    eventSizes: Record<
-      string,
-      Record<string, Record<string, EventBlockPosition>>
-    >
-  ): void => {
-    meetings.forEach((meeting) => {
-      const { period } = meeting;
-      if (period == null) return;
-
-      meeting.days.forEach((day) => {
-        const crnPeriodInfos = Object.values(crnSizes)
-          .flatMap<SectionBlockPosition | undefined>((days) =>
-            days != null ? Object.values(days[day] ?? {}) : []
-          )
-          .flatMap<SectionBlockPosition>((info) =>
-            info == null ? [] : [info]
-          );
-
-        const eventPeriodInfos = Object.values(eventSizes)
-          .flatMap<EventBlockPosition | undefined>((days) =>
-            days != null ? Object.values(days[day] ?? {}) : []
-          )
-          .flatMap<EventBlockPosition>((info) => (info == null ? [] : [info]));
-
-        const dayPeriodInfos: (SectionBlockPosition | EventBlockPosition)[] =
-          crnPeriodInfos;
-        dayPeriodInfos.push(...eventPeriodInfos);
-
-        const curRowSize = dayPeriodInfos
-          .filter(
-            (period2Info) =>
-              period2Info.period.start < period.end &&
-              period2Info.period.end > period.start
-          )
-          .reduce(
-            (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
-            1
-          );
-
-        updateJoinedRowSizes(
-          dayPeriodInfos,
-          new Set(),
-          meeting.id,
-          period,
-          curRowSize
-        );
-
-        if (!meeting.event) {
-          const courseSizeInfo = crnSizes[meeting.id] || {};
-          crnSizes[meeting.id] = courseSizeInfo;
-
-          const daySizeInfo = courseSizeInfo[day] || {};
-          courseSizeInfo[day] = daySizeInfo;
-
-          daySizeInfo[makeSizeInfoKey(period)] = {
-            period,
-            crn: meeting.id,
-            rowIndex: curRowSize - 1,
-            rowSize: curRowSize,
-          };
-        } else {
-          const evtSizeInfo = eventSizes[meeting.id] || {};
-          eventSizes[meeting.id] = evtSizeInfo;
-
-          const eventDaySizeInfo = evtSizeInfo[day] || {};
-          evtSizeInfo[day] = eventDaySizeInfo;
-
-          eventDaySizeInfo[makeSizeInfoKey(meeting.period)] = {
-            period: meeting.period,
-            id: meeting.id,
-            rowIndex: curRowSize - 1,
-            rowSize: curRowSize,
-          };
-        }
-      });
-    });
-  };
 
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
@@ -260,7 +157,6 @@ export default function Calendar({
   // type = either "pin" or "overlay"
   const friendSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
   const friendEvents: { data: FriendEventData; overlay: boolean }[] = [];
-  const friendOverlayMeetings: CommonMeetingObject[] = [];
   if (compare) {
     Object.values(friends).forEach((friend) =>
       Object.entries(friend.versions)
@@ -284,30 +180,16 @@ export default function Calendar({
 
             const section = oscar.findSection(crn);
             if (section == null) return;
-
-            if (!pinnedFriendSchedules.includes(schedule[0])) {
-              section.meetings
-                .filter((m) => m.period)
-                .forEach((meeting) => {
-                  friendOverlayMeetings.push({
-                    id: `${schedule[0]}-${crn}`,
-                    days: meeting.days,
-                    period: meeting.period,
-                    event: false,
-                  } as CommonMeetingObject);
-                });
-            } else {
-              section.meetings
-                .filter((m) => m.period)
-                .forEach((meeting) => {
-                  friendMeetings.push({
-                    id: `${schedule[0]}-${crn}`,
-                    days: meeting.days,
-                    period: meeting.period,
-                    event: false,
-                  } as CommonMeetingObject);
-                });
-            }
+            section.meetings
+              .filter((m) => m.period)
+              .forEach((meeting) => {
+                friendMeetings.push({
+                  id: `${schedule[0]}-${crn}`,
+                  days: meeting.days,
+                  period: meeting.period,
+                  event: false,
+                } as CommonMeetingObject);
+              });
           });
           schedule[1].schedule.events.forEach((event) => {
             friendEvents.push({
@@ -320,22 +202,12 @@ export default function Calendar({
               } as FriendEventData,
               overlay: !pinnedFriendSchedules.includes(schedule[0]),
             });
-
-            if (!pinnedFriendSchedules.includes(schedule[0])) {
-              friendOverlayMeetings.push({
-                id: `${schedule[0]}-${event.id}`,
-                days: event.days,
-                period: event.period,
-                event: true,
-              } as CommonMeetingObject);
-            } else {
-              friendMeetings.push({
-                id: `${schedule[0]}-${event.id}`,
-                days: event.days,
-                period: event.period,
-                event: true,
-              } as CommonMeetingObject);
-            }
+            friendMeetings.push({
+              id: `${schedule[0]}-${event.id}`,
+              days: event.days,
+              period: event.period,
+              event: true,
+            } as CommonMeetingObject);
           });
           friendMeetings.sort(
             (a, b) =>
@@ -343,23 +215,69 @@ export default function Calendar({
               0
           );
           meetings.push(...friendMeetings);
-
-          friendOverlayMeetings.sort(
-            (a, b) =>
-              a.period.end - a.period.start - (b.period.end - b.period.start) ??
-              0
-          );
         })
     );
   }
 
-  createSizeInfos(meetings, crnSizeInfo, eventSizeInfo);
+  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
+  // next time block's rowSize and rowIndex (1 more than
+  // greatest of already processed connected blocks), updating
+  // the processed connected blocks to match its rowSize
+  meetings.forEach((meeting) => {
+    const { period } = meeting;
+    if (period == null) return;
 
-  createSizeInfos(
-    friendOverlayMeetings,
-    overlayCrnSizeInfo,
-    overlayEventSizeInfo
-  );
+    meeting.days.forEach((day) => {
+      const dayPeriodInfos = Object.values(meetingSizeInfo)
+        .flatMap<SectionBlockPosition | EventBlockPosition | undefined>(
+          (days) => (days != null ? Object.values(days[day] ?? {}) : [])
+        )
+        .flatMap<SectionBlockPosition | EventBlockPosition>((info) =>
+          info == null ? [] : [info]
+        );
+
+      const curRowSize = dayPeriodInfos
+        .filter(
+          (period2Info) =>
+            period2Info.period.start < period.end &&
+            period2Info.period.end > period.start
+        )
+        .reduce(
+          (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
+          1
+        );
+
+      updateJoinedRowSizes(
+        dayPeriodInfos,
+        new Set(),
+        meeting.id,
+        period,
+        curRowSize
+      );
+
+      const mSizeInfo = meetingSizeInfo[meeting.id] || {};
+      meetingSizeInfo[meeting.id] = mSizeInfo;
+
+      const daySizeInfo = mSizeInfo[day] || {};
+      mSizeInfo[day] = daySizeInfo;
+
+      if (!meeting.event) {
+        daySizeInfo[makeSizeInfoKey(period)] = {
+          period,
+          crn: meeting.id,
+          rowIndex: curRowSize - 1,
+          rowSize: curRowSize,
+        };
+      } else {
+        daySizeInfo[makeSizeInfoKey(period)] = {
+          period: meeting.period,
+          id: meeting.id,
+          rowIndex: curRowSize - 1,
+          rowSize: curRowSize,
+        };
+      }
+    });
+  });
 
   // Allow the user to select a meeting, which will cause it to be highlighted
   // and for the meeting "details" popover/tooltip to remain open.
@@ -445,7 +363,7 @@ export default function Calendar({
             capture={capture}
             includeDetailsPopover={!isAutosized && !capture}
             includeContent={!preview}
-            sizeInfo={crnSizeInfo[crn] ?? {}}
+            sizeInfo={meetingSizeInfo[crn] ?? {}}
             selectedMeeting={
               selectedMeeting !== null && selectedMeeting[0] === crn
                 ? [selectedMeeting[1], selectedMeeting[2]]
@@ -474,7 +392,7 @@ export default function Calendar({
                 includeContent={!preview}
                 capture={capture}
                 includeDetailsPopover={false}
-                sizeInfo={crnSizeInfo[crn] ?? {}}
+                sizeInfo={meetingSizeInfo[crn] ?? {}}
               />
             ))}
         {events &&
@@ -484,7 +402,7 @@ export default function Calendar({
               scheduleId={compare ? currentVersion : undefined}
               event={event}
               capture={capture}
-              sizeInfo={eventSizeInfo[event.id] ?? {}}
+              sizeInfo={meetingSizeInfo[event.id] ?? {}}
               includeDetailsPopover={!isAutosized && !capture}
               includeContent={!preview}
               canBeTabFocused={!isAutosized && !capture}
@@ -516,13 +434,8 @@ export default function Calendar({
               capture={capture}
               includeDetailsPopover={!isAutosized && !capture}
               includeContent={!preview}
-              sizeInfo={
-                (overlay
-                  ? overlayCrnSizeInfo[`${data.scheduleId}-${data.crn}`]
-                  : crnSizeInfo[`${data.scheduleId}-${data.crn}`]) ?? {}
-              }
+              sizeInfo={meetingSizeInfo[`${data.scheduleId}-${data.crn}`] ?? {}}
               overlay={overlay}
-              friendOverlay={overlay}
               selectedMeeting={
                 selectedMeeting !== null &&
                 selectedMeeting[0] === `${data.scheduleId}-${data.crn}`
@@ -553,13 +466,8 @@ export default function Calendar({
               scheduleId={data.scheduleId}
               scheduleName={data.scheduleName}
               capture={capture}
-              sizeInfo={
-                (overlay
-                  ? overlayEventSizeInfo[`${data.scheduleId}-${data.id}`]
-                  : eventSizeInfo[`${data.scheduleId}-${data.id}`]) ?? {}
-              }
+              sizeInfo={meetingSizeInfo[`${data.scheduleId}-${data.id}`] ?? {}}
               overlay={overlay}
-              friendOverlay={overlay}
               includeDetailsPopover={!isAutosized && !capture}
               includeContent={!preview}
               canBeTabFocused={!isAutosized && !capture}
