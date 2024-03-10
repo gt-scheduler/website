@@ -8,7 +8,7 @@ import {
 import { ScheduleContext } from '../../contexts';
 import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
-import { Course } from '../../data/beans';
+import { Course, Section } from '../../data/beans';
 import {
   CrawlerPrerequisites,
   PrerequisiteClause,
@@ -19,14 +19,14 @@ import { ErrorWithFields, softError } from '../../log';
 const BASE_ITEM_STYLE = { fontSize: '0.9em', padding: '8px' };
 
 export type PrerequisiteProps = {
-  course: Course;
+  parent: Course | Section;
   prereqs: CrawlerPrerequisites;
 };
 
 /**
- * Renders the prereqs for a single course, given that the crawler version
+ * Renders the prereqs for a single course/section, given that the crawler version
  * supports prereqs. (Make sure to check this before). An empty prereq list is
- * an authoritative statement that the course has no prereqs, and as such a
+ * an authoritative statement that the course/section has no prereqs, and as such a
  * message will be displayed telling the user. Otherwise, this component tries
  * to render the prereq tree in a way that is easily consumable without taking
  * up too much screen space, first trying to split the prereqs up into separate
@@ -36,9 +36,11 @@ export type PrerequisiteProps = {
  * restores parentheses groupings (much like the original Oscar prereq syntax)
  */
 export default function Prerequisite({
-  course,
+  parent,
   prereqs,
 }: PrerequisiteProps): React.ReactElement {
+  const isCourse = parent instanceof Course;
+
   let content: React.ReactNode;
   if (prereqs.length === 0) {
     content = <PrerequisiteEmpty />;
@@ -78,9 +80,11 @@ export default function Prerequisite({
           new ErrorWithFields({
             message: 'invalid operator found in top-level prereqs',
             fields: {
-              courseId: course.id,
+              parentId: isCourse
+                ? parent.id
+                : `${parent.course.id} ${parent.id}`,
               operator: op,
-              term: course.term,
+              term: parent.term,
             },
           })
         );
@@ -98,10 +102,9 @@ export default function Prerequisite({
         actions={[
           {
             icon: faInfoCircle,
-            href:
-              `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
-              `course_detail?cat_term_in=${term}&subj_code_in=` +
-              `${course.subject}&crse_numb_in=${course.number}`,
+            href: isCourse
+              ? `https://oscar.gatech.edu/bprod/bwckctlg.p_disp_course_detail?cat_term_in=${term}&subj_code_in=${parent.subject}&crse_numb_in=${parent.number}`
+              : `https://oscar.gatech.edu/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${parent.crn}`,
           },
         ]}
       />
@@ -155,7 +158,7 @@ type PrerequisiteClauseDisplayProps = {
 };
 
 /**
- * Renders an arbitrary prereq clause. If the clause is a singular course,
+ * Renders an arbitrary prereq clause. If the clause is a singular course/section,
  * then it renders a single Item. Otherwise, if the clause is a set,
  * this component renders an item for each member of the set, and includes
  * an operator at the end of each item's text to indicate that each item
@@ -165,7 +168,7 @@ function PrerequisiteClauseDisplay({
   clause,
 }: PrerequisiteClauseDisplayProps): React.ReactElement {
   if (!Array.isArray(clause)) {
-    // Render the single prereq course
+    // Render the single prereq course/section
     return <PrerequisiteItem clause={clause} operator="and" isLast />;
   }
 
@@ -194,7 +197,7 @@ type PrerequisiteItemProps = {
 /**
  * Renders a single "item" -- a div with the completely flattened text
  * representation of the prereq subtree passed in as `clause` (whether
- * that's a single prereq course or a sprawling sub-tree with many branches).
+ * that's a single prereq course/section or a sprawling sub-tree with many branches).
  * Includes the ability to display a higher-level operator between different
  * `PrerequisiteItem`'s as long as `isLast` is false, which is used by
  * `PrerequisiteClauseDisplay` when it needs to render a prerequisite set.
@@ -213,7 +216,7 @@ function PrerequisiteItem({
 
 /**
  * Replacement prerequisite "item"-like component that simply contains
- * a notification to the user that the course has no prereqs.
+ * a notification to the user that the course/section has no prereqs.
  */
 function PrerequisiteEmpty(): React.ReactElement {
   return (

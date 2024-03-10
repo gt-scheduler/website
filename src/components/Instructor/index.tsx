@@ -4,11 +4,12 @@ import {
   faAngleUp,
   faBan,
   faGraduationCap,
+  faShareAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, simplifyName, unique } from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
-import { ActionRow, Section } from '..';
+import { ActionRow, Prerequisite, Section } from '..';
 import { ScheduleContext } from '../../contexts';
 
 import './stylesheet.scss';
@@ -19,6 +20,7 @@ export type InstructorProps = {
   name: string;
   sections: SectionBean[];
   gpa: string;
+  areSectionPrereqsDiff: boolean;
 };
 
 export default function Instructor({
@@ -27,10 +29,29 @@ export default function Instructor({
   name,
   sections,
   gpa,
+  areSectionPrereqsDiff,
 }: InstructorProps): React.ReactElement {
   const [{ pinnedCrns, excludedCrns }, { patchSchedule }] =
     useContext(ScheduleContext);
   const [expanded, setExpanded] = useState(true);
+  const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
+
+  const prereqControl = (
+    nextPrereqOpen: boolean,
+    nextExpanded: boolean
+  ): void => {
+    setPrereqOpen(nextPrereqOpen);
+    setExpanded(nextExpanded);
+  };
+  const prereqAction = {
+    icon: faShareAlt,
+    styling: { transform: 'rotate(90deg)' },
+    onClick: (): void => {
+      prereqControl(true, !prereqOpen ? true : !expanded);
+    },
+    tooltip: 'View Prerequisites',
+    id: `${name}-prerequisites`,
+  };
 
   const includeSection = useCallback(
     (section: SectionBean) => {
@@ -79,6 +100,7 @@ export default function Instructor({
             icon: expanded ? faAngleUp : faAngleDown,
             onClick: (): void => setExpanded(!expanded),
           },
+          ...(areSectionPrereqsDiff ? [prereqAction] : []),
           !['TBA', 'Not Assigned'].includes(name)
             ? {
                 icon: faGraduationCap,
@@ -102,7 +124,7 @@ export default function Instructor({
           <span className="gpa">Instructor GPA: {gpa || 'N/A'}</span>
         </div>
       </ActionRow>
-      {expanded && (
+      {expanded && !prereqOpen && (
         <div className={classes('section-container', 'nested')}>
           {includedSections.map((section) => {
             const pinned = pinnedCrns.includes(section.crn);
@@ -130,6 +152,12 @@ export default function Instructor({
             </div>
           )}
         </div>
+      )}
+      {expanded && prereqOpen && areSectionPrereqsDiff && sections?.[0] && (
+        <Prerequisite
+          parent={sections[0]}
+          prereqs={sections?.[0]?.prereqs ?? []}
+        />
       )}
     </div>
   );

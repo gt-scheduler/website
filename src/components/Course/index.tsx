@@ -149,7 +149,6 @@ export default function Course({
       return;
     }
     setAreSectionPrereqsDiff(!compareSectionPrereqs(course));
-    console.log(!compareSectionPrereqs(course));
   }, [courseId, compareSectionPrereqs, oscar]);
 
   const course = oscar.findCourse(courseId);
@@ -292,6 +291,7 @@ export default function Course({
                     ? instructorGpa.toFixed(2)
                     : 'N/A'
                 }
+                areSectionPrereqsDiff={areSectionPrereqsDiff}
               />
             );
           })}
@@ -316,7 +316,7 @@ export default function Course({
       )}
       {expanded && prereqOpen && !areSectionPrereqsDiff && (
         <Prerequisite
-          course={course}
+          parent={course}
           prereqs={course.sections?.[0]?.prereqs ?? []}
         />
       )}
