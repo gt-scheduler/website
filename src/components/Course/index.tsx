@@ -23,6 +23,7 @@ import { CourseGpa } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
+import _ from 'lodash';
 
 export type CourseProps = {
   className?: string;
@@ -121,22 +122,8 @@ export default function Course({
       return false;
     }
 
-    // This type is necessary to avoid eslint no-unsafe-member-access error
-    // in compareObj
-    type ValidObj = {
-      [index: string]: any; // eslint-disable-line
-    };
-
-    const compareObj = (a: unknown, b: unknown): boolean =>
-      a && b && typeof a === 'object' && typeof b === 'object'
-        ? Object.keys(a as ValidObj).length ===
-            Object.keys(b as ValidObj).length &&
-          Object.keys(a as ValidObj).every((key) =>
-            compareObj((a as ValidObj)[key], (b as ValidObj)[key])
-          )
-        : a === b;
     for (let i = 1; i < course.sections.length; i++) {
-      if (!compareObj(basisPrereqs, course.sections[i]?.prereqs)) {
+      if (!_.isEqual(basisPrereqs, course.sections[i]?.prereqs)) {
         return false;
       }
     }

@@ -1,11 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   faAngleUp,
   faAngleDown,
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { ScheduleContext } from '../../contexts';
 import { classes, serializePrereqs } from '../../utils/misc';
 import { ActionRow } from '..';
 import { Course, Section } from '../../data/beans';
