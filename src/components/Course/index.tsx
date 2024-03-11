@@ -40,8 +40,6 @@ export default function Course({
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
-  const [areSectionPrereqsDiff, setAreSectionPrereqsDiff] =
-    useState<boolean>(false);
   const isSearching = Boolean(onAddCourse);
   const [
     { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
@@ -116,7 +114,7 @@ export default function Course({
    * Returns whether all section prerequisites are equal
    * @returns {boolean} whether section prerequisites are equal
    */
-  const compareSectionPrereqs = useCallback((course: CourseBean): boolean => {
+  const allSectionPrereqsSame = useCallback((course: CourseBean): boolean => {
     const basisPrereqs = course.sections?.[0]?.prereqs;
     if (!basisPrereqs) {
       return false;
@@ -130,13 +128,10 @@ export default function Course({
     return true;
   }, []);
 
-  useMemo(() => {
+  const areSectionPrereqsDiff = useMemo(() => {
     const course = oscar.findCourse(courseId);
-    if (!course) {
-      return;
-    }
-    setAreSectionPrereqsDiff(!compareSectionPrereqs(course));
-  }, [courseId, compareSectionPrereqs, oscar]);
+    return course ? !allSectionPrereqsSame(course) : false;
+  }, [courseId, allSectionPrereqsSame, oscar]);
 
   const course = oscar.findCourse(courseId);
   if (course == null) return null;
