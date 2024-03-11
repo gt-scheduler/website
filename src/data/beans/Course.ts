@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { decode } from 'html-entities';
+import date from 'date-and-time';
+import util from 'util';
 
 import { Oscar, Section } from '.';
 import {
@@ -16,6 +18,8 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { cacheCollection, isAuthEnabled } from '../firebase';
+import { CacheItem } from '../types';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -268,6 +272,24 @@ export default class Course {
     return courseGpa;
   }
 
+  private async getCacheItemFromFirestore(
+    courseID: string
+  ): Promise<CacheItem | null> {
+    if (!isAuthEnabled) {
+      return null;
+    }
+    const document = await cacheCollection.doc(courseID).get();
+    if (document.exists) {
+      const data = document.data();
+
+      if (data != null) {
+        return data;
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Fetches the course GPA without caching it
    * @see `fetchGpa` for the persistent-caching version
@@ -283,6 +305,16 @@ export default class Course {
     const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
     const encodedCourse = encodeURIComponent(id);
     const url = `${COURSE_CRITIQUE_API_URL}?courseID=${encodedCourse}`;
+
+    // Try to see if firestore cache has the data
+    const firestoreCacheItem = await this.getCacheItemFromFirestore(id);
+    if (firestoreCacheItem != null) {
+      const age = getCacheItemAge(firestoreCacheItem);
+      if (age < 60 * 60 * 24) {
+        console.log('Using firestore cache');
+        console.log('d', firestoreCacheItem.d);
+      }
+    }
 
     let responseData: CourseDetailsAPIResponse;
     try {
@@ -448,4 +480,11 @@ interface CourseDetailsAPIResponse {
     F: number | unknown;
     W: number | unknown;
   }>;
+}
+
+function getCacheItemAge(cacheItem: CacheItem): number {
+  const now = new Date();
+  const timestamp = new Date(cacheItem.t);
+  const age = Math.max(0, date.subtract(now, timestamp).toSeconds());
+  return Math.floor(age);
 }
