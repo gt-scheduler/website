@@ -19,11 +19,13 @@ export default function Button({
   href,
   onClick,
   children,
-  id
+  id,
 }: ButtonProps): React.ReactElement {
   if (disabled)
     return (
-      <div className={classes('Button', 'disabled', className)}  id={id}>{children}</div>
+      <div className={classes('Button', 'disabled', className)} id={id}>
+        {children}
+      </div>
     );
 
   if (href != null)

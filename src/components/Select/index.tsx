@@ -31,7 +31,7 @@ export type SelectProps<Id extends string | number> = {
 
   // Ignored if `onClickNew` is not provided.
   newLabel?: string;
-  id?: string
+  id?: string;
 };
 
 export interface SelectOption<Id extends string | number> {
@@ -94,7 +94,7 @@ export default function Select<Id extends string | number>({
   desiredItemWidth = null,
   onClickNew,
   newLabel = 'New',
-  id
+  id,
 }: SelectProps<Id>): React.ReactElement {
   const [opened, setOpened] = useState(false);
 
@@ -381,7 +381,7 @@ export function DropdownMenu({
         if (!disabled) setOpened(!opened);
       }}
       style={style}
-      id='export-button'
+      id="export-button"
     >
       {children}
       {opened && (
