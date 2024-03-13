@@ -10,8 +10,9 @@ import './stylesheet.scss';
 
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
-const MODAL_LOCAL_STORAGE_KEY = '2023-04-05-spr2023-new-features-announcement';
+const MODAL_LOCAL_STORAGE_KEY = '2023-04-05-spr2024-new-features-announcement';
 const OUTDATED_LOCAL_STORAGE_KEY = [
+  '2023-04-05-spr2023-new-features-announcement',
   '2021-10-27-spr2022-schedule-versions-account-sync',
   '2023-03-05-spr2023-oscar-migration',
 ];
