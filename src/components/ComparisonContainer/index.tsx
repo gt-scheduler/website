@@ -218,15 +218,7 @@ export default function ComparisonContainer({
           );
         });
     },
-    [
-      selected,
-      colorMap,
-      updateFriendTermData,
-      patchSchedule,
-      deleteInvitation,
-      accountContext,
-      term,
-    ]
+    [selected, deleteInvitation, accountContext, term]
   );
 
   const handleToggleSchedule = useCallback(
