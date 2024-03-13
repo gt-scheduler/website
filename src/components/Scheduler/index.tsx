@@ -31,7 +31,7 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const { compare, pinned, pinSelf, setCompareState } =
+  const { compare, pinned, pinSelf, expanded, setCompareState } =
     useCompareStateFromStorage();
 
   return (
@@ -70,6 +70,7 @@ export default function Scheduler(): React.ReactElement {
               pinnedSchedules={pinned}
               pinSelf={pinSelf}
               compare={compare}
+              expanded={expanded}
             />
           )}
         </div>

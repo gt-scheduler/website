@@ -5,10 +5,12 @@ type HookResult = {
   compare: boolean;
   pinned: string[];
   pinSelf: boolean;
+  expanded: boolean;
   setCompareState: (
     newCompare: boolean | undefined,
     newPinned: string[] | undefined,
-    newPinSelf: boolean | undefined
+    newPinSelf: boolean | undefined,
+    newExpanded: boolean | undefined
   ) => void;
 };
 
@@ -44,12 +46,20 @@ export default function useCompareStateFromStorage(): HookResult {
       storageSync: false,
     }
   );
+  const [expanded, setExpanded] = useLocalStorageState<boolean>(
+    'compare-panel-state-expandedValue',
+    {
+      defaultValue: true,
+      storageSync: false,
+    }
+  );
 
   const setCompareState = useCallback(
     (
       newCompare?: boolean,
       newPinnedSchedules?: string[],
-      newPinSelf?: boolean
+      newPinSelf?: boolean,
+      newExpanded?: boolean
     ) => {
       if (newCompare !== undefined) {
         setCompare(newCompare);
@@ -60,14 +70,18 @@ export default function useCompareStateFromStorage(): HookResult {
       if (newPinSelf !== undefined) {
         setPinSelf(newPinSelf);
       }
+      if (newExpanded !== undefined) {
+        setExpanded(newExpanded);
+      }
     },
-    [setCompare, setPinned, setPinSelf]
+    [setCompare, setPinned, setPinSelf, setExpanded]
   );
 
   return {
     compare,
     pinned,
     pinSelf,
+    expanded,
     setCompareState,
   };
 }
