@@ -364,7 +364,7 @@ export type ScheduleDeletionRequest = {
    * ID of the INVITEE if the deletion requester is the INVITER
    * ID of the INVITER if the deletion requester is the INVITEE
    */
-  otherUserId: string;
+  peerUserId: string;
   /**
    * term that schedule version(s) belong to
    */

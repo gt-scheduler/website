@@ -138,7 +138,7 @@ export function InvitationModalContent({
       deleteFriendRecord(currentVersion, friendId);
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
-        otherUserId: friendId,
+        peerUserId: friendId,
         term,
         versions: currentVersion,
         owner: true,
