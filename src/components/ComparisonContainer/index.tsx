@@ -134,6 +134,18 @@ export default function ComparisonContainer({
     [editInfo, editValue, renameVersion, renameFriend]
   );
 
+  const handleNameEditOnBlur = useCallback(() => {
+    if (editValue.trim() === '') return;
+    if (editInfo?.type === 'User') {
+      renameFriend(editInfo?.id, editValue.trim());
+    }
+    if (editInfo?.type === 'Version') {
+      renameVersion(editInfo?.id, editValue.trim());
+    }
+    setEditInfo(null);
+    setEditValue('');
+  }, [editInfo, editValue, renameFriend, renameVersion]);
+
   const deleteInvitation = useCallback(
     async (senderId: string, versions: string[]) => {
       const data = JSON.stringify({
@@ -254,6 +266,10 @@ export default function ComparisonContainer({
     [colorMap, patchSchedule]
   );
 
+  const sortedFriendsArray = Object.entries(friends).sort(
+    ([, friendA], [, friendB]) => friendA.name.localeCompare(friendB.name)
+  );
+
   return (
     <div className="comparison-container">
       <InvitationModal
@@ -315,6 +331,7 @@ export default function ComparisonContainer({
                     color={colorMap[version.id]}
                     paletteInfo={paletteInfo}
                     setPaletteInfo={setPaletteInfo}
+                    handleNameEditOnBlur={handleNameEditOnBlur}
                   />
                 );
               })}
@@ -322,7 +339,7 @@ export default function ComparisonContainer({
           <div className="shared-schedules">
             <p className="content-title shared-with">Shared with me</p>
             {Object.keys(friends).length !== 0 ? (
-              Object.entries(friends).map(([friendId, friend]) => {
+              sortedFriendsArray.map(([friendId, friend]) => {
                 return (
                   <div key={friendId} className="friend">
                     <ScheduleRow
@@ -356,6 +373,7 @@ export default function ComparisonContainer({
                       editValue={editValue}
                       setInvitationModalEmail={setInvitationModalEmail}
                       setInvitationModalOpen={setInvitationModalOpen}
+                      handleNameEditOnBlur={handleNameEditOnBlur}
                     />
                     <div className="friend-email">
                       <p>{friend.email}</p>
@@ -418,6 +436,7 @@ export default function ComparisonContainer({
                                 []
                               );
                             }}
+                            handleNameEditOnBlur={handleNameEditOnBlur}
                           />
                         );
                       }
@@ -485,6 +504,7 @@ type ScheduleRowProps = {
   editValue?: string;
   hoverFriendSchedule?: () => void;
   unhoverFriendSchedule?: () => void;
+  handleNameEditOnBlur?: () => void;
 };
 
 function ScheduleRow({
@@ -515,6 +535,7 @@ function ScheduleRow({
   setInvitationModalEmail,
   hoverFriendSchedule,
   unhoverFriendSchedule,
+  handleNameEditOnBlur,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
@@ -566,7 +587,7 @@ function ScheduleRow({
             onChange={editOnChange}
             placeholder={name}
             onKeyDown={editOnKeyDown}
-            onBlur={(): void => setEditInfo(null)}
+            onBlur={handleNameEditOnBlur}
           />
         )}
         {!edit && (
@@ -580,7 +601,7 @@ function ScheduleRow({
               <div
                 className={classes(
                   type === 'User' && 'friend-name',
-                  checkboxColor !== '' && 'checked'
+                  type !== 'User' && checkboxColor !== '' && 'checked'
                 )}
               >
                 <p>{name}</p>

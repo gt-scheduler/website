@@ -74,7 +74,7 @@
     display: flex;
     flex: 0 0 1;
     flex-direction: column;
-    overflow: hidden;
+    overflow: scroll;
     align-items: stretch;
     width: 256px;
     transition: width 0.15s;
@@ -194,6 +194,13 @@
     .combination {
       flex: 1;
 
+      .content-title{
+        font-weight: 700;
+        font-size: 14px;
+        margin: 12px 12px 4px 12px;
+        border-bottom: 2px solid $color-border;
+      }
+
       .CombinationContainer {
         height: 100%;
       }
@@ -201,16 +208,16 @@
   }
   .invite-panel {
     display: flex;
-    margin: 10px 10px 10px 16px;
+    margin: 21px 10px 10px 16px;
     .invite-button {
       align-items: center;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 700;
       color: white;
       border-radius: 10px;
       background-color: #676767;
       display: flex;
-      padding: 10px 50px 10px 50px;
+      padding: 10px 47px 10px 47px;
       border: none;
       gap: 5px;
 
