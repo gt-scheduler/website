@@ -134,6 +134,7 @@ export default function ComparisonContainer({
   );
 
   const handleNameEditOnBlur = useCallback(() => {
+    if (editValue.trim() === '') return;
     if (editInfo?.type === 'User') {
       renameFriend(editInfo?.id, editValue.trim());
     }
@@ -566,11 +567,11 @@ function ScheduleRow({
             >
               <div
                 className={classes(
-                  'friend-name',
+                  type === 'User' && 'friend-name',
                   type !== 'User' && checkboxColor !== '' && 'checked'
                 )}
               >
-                {type === 'User' ? <div>{name}</div> : <p>{name}</p>}
+                <p>{name}</p>
               </div>
               {hasTooltip && email !== name && (
                 <ReactTooltip
