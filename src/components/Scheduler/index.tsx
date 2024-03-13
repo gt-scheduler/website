@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -33,6 +33,23 @@ export default function Scheduler(): React.ReactElement {
 
   const { compare, pinned, pinSelf, expanded, setCompareState } =
     useCompareStateFromStorage();
+  const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
+
+  const handleCompareSchedules = useCallback(
+    (
+      newCompare?: boolean,
+      newPinnedSchedules?: string[],
+      newPinSelf?: boolean,
+      newExpanded?: boolean,
+      newOverlaySchedules?: string[]
+    ) => {
+      setCompareState(newCompare, newPinnedSchedules, newPinSelf, newExpanded);
+      if (newOverlaySchedules !== undefined) {
+        setOverlaySchedules(newOverlaySchedules);
+      }
+    },
+    [setCompareState, setOverlaySchedules]
+  );
 
   return (
     <>
@@ -61,12 +78,13 @@ export default function Scheduler(): React.ReactElement {
                 compare={compare}
                 pinnedFriendSchedules={pinned}
                 pinSelf={!compare || pinSelf}
+                overlayFriendSchedules={overlaySchedules}
               />
             </div>
           )}
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
-              handleCompareSchedules={setCompareState}
+              handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinned}
               pinSelf={pinSelf}
               compare={compare}

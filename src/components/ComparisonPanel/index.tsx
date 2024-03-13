@@ -17,7 +17,8 @@ export type ComparisonPanelProps = {
     compare?: boolean,
     pinnedSchedules?: string[],
     pinSelf?: boolean,
-    expanded?: boolean
+    expanded?: boolean,
+    overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
