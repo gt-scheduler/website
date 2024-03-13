@@ -40,9 +40,10 @@ export default function Scheduler(): React.ReactElement {
       newCompare?: boolean,
       newPinnedSchedules?: string[],
       newPinSelf?: boolean,
+      newExpanded?: boolean,
       newOverlaySchedules?: string[]
     ) => {
-      setCompareState(newCompare, newPinnedSchedules, newPinSelf);
+      setCompareState(newCompare, newPinnedSchedules, newPinSelf, newExpanded);
       if (newOverlaySchedules !== undefined) {
         setOverlaySchedules(newOverlaySchedules);
       }

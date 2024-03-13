@@ -63,6 +63,7 @@ export type ComparisonContainerProps = {
     compare?: boolean,
     pinnedSchedules?: string[],
     pinSelf?: boolean,
+    expanded?: boolean,
     overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
@@ -425,11 +426,13 @@ export default function ComparisonContainer({
                                 undefined,
                                 undefined,
                                 undefined,
+                                undefined,
                                 [scheduleId]
                               );
                             }}
                             unhoverFriendSchedule={(): void => {
                               handleCompareSchedules(
+                                undefined,
                                 undefined,
                                 undefined,
                                 undefined,
