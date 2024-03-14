@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
@@ -19,6 +19,16 @@ enum LoadingState {
 type HandleInvitationResponse = {
   email: string;
 };
+
+interface ServerError extends AxiosError {
+  response: ServerErrorResponse;
+}
+
+interface ServerErrorResponse extends AxiosResponse {
+  data: {
+    message: string;
+  };
+}
 
 const url = `${CLOUD_FUNCTION_BASE_URL}/handleFriendInvitation`;
 
@@ -57,34 +67,46 @@ export default function InviteBackLink(): React.ReactElement {
   const accountContext = useFirebaseAuth();
 
   useEffect(() => {
-    const handleInviteAsync = async (): Promise<void> => {
+    const handleInviteAsync = async (): Promise<string | undefined> => {
       if (accountContext.type === 'loaded') {
         const token = await (accountContext.result as SignedIn).getToken();
-        if (id && navigate) {
-          handleInvite(id, token)
-            .then((email) => {
-              setState(LoadingState.SUCCESS);
-              navigate(
-                `${redirectURL}?email=${email}&status=success&inviteId=${id}`
-              );
-            })
-            .catch(() => {
-              setState(LoadingState.ERROR);
-
-              navigate(
-                `${redirectURL}?email=none&status=failure&inviteId=${id}`
-              );
-            });
-        }
+        return handleInvite(id, token);
       }
+      return undefined;
     };
 
     const { type } = accountContext;
 
-    if (type === 'loaded' && accountContext.result.type === 'signedIn') {
-      handleInviteAsync().catch((err) => {
-        console.error('Error handling invite', err); // eslint-disable-line no-console
-      });
+    if (
+      type === 'loaded' &&
+      accountContext.result.type === 'signedIn' &&
+      redirectURL !== undefined
+    ) {
+      handleInviteAsync()
+        .then((email) => {
+          setState(LoadingState.SUCCESS);
+          navigate(
+            `${redirectURL}?email=${email ?? ''}&status=success&inviteId=${
+              id ?? ''
+            }`
+          );
+        })
+        .catch((err: ServerError) => {
+          setState(LoadingState.ERROR);
+          navigate(
+            `${redirectURL}?email=none&status=${
+              err.response?.data.message ?? ''
+            }&inviteId=${id ?? ''}`
+          );
+        });
+    } else if (
+      type === 'loaded' &&
+      accountContext.result.type !== 'signedIn' &&
+      redirectURL !== undefined
+    ) {
+      navigate(
+        `${redirectURL}?email=none&status=not-logged-in&inviteId=${id ?? ''}`
+      );
     }
   }, [id, navigate, redirectURL, accountContext.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
