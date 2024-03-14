@@ -1,8 +1,10 @@
+@import '../../variables.scss';
+
 .invitation-accept-modal-content {
   .heading {
     font-size: 24px;
     color: white;
-    font-family: "Roboto";
+    font-family: 'Roboto';
     text-align: center;
     font-weight: 700;
   }
@@ -39,7 +41,7 @@
     justify-content: center;
     padding-top: 10px;
     column-gap: 20px;
-    
+
     button {
       width: 150px;
       outline: inherit;
@@ -52,7 +54,7 @@
     .no-button {
       border-radius: 6px;
       background: var(--action-button-secondary, #676767);
-      color: #FFF;
+      color: #fff;
       text-align: center;
       font-family: Roboto;
       font-size: 14px;
@@ -63,8 +65,8 @@
 
     .share-button {
       border-radius: 6px;
-      background: #FE5B53;
-      color: #FFF;
+      background: #fe5b53;
+      color: #fff;
       text-align: center;
       font-family: Roboto;
       font-size: 14px;
@@ -79,16 +81,15 @@
     margin: 10px;
   }
 
+
+
   padding: 5%;
   padding-left: 10%;
   padding-right: 10%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: "Roboto";
-
-
-
+  font-family: 'Roboto';
 }
 
 .remove-close-button {

@@ -7,6 +7,7 @@ import useLocalStorageState from 'use-local-storage-state';
 import Button from '../Button';
 import Modal from '../Modal';
 import InvitationModal from '../InvitationModal';
+import LoginModal from '../LoginModal';
 
 import './stylesheet.scss';
 
@@ -25,6 +26,7 @@ export default function InvitationAcceptModal({
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [invitationModalOpen, setInvitationModalOpen] =
     useState<boolean>(false);
+  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
 
   const [hasSeen, setHasSeen] = useLocalStorageState(
@@ -63,7 +65,32 @@ export default function InvitationAcceptModal({
         }}
         inputEmail={searchParams.get('email') ?? undefined}
       />
-      <Modal show={modalOpen} onHide={onHide} width={700}>
+
+      <LoginModal
+        show={loginModalOpen}
+        onHide={(): void => {
+          setLoginModalOpen(false);
+        }}
+      />
+
+      <Modal
+        show={modalOpen}
+        onHide={onHide}
+        width={700}
+        buttons={
+          searchParams.get('status') === 'not-logged-in'
+            ? [
+                {
+                  label: 'Login',
+                  onClick: (): void => {
+                    onHide();
+                    setLoginModalOpen(true);
+                  },
+                },
+              ]
+            : undefined
+        }
+      >
         <Button className="remove-close-button" onClick={onHide}>
           <FontAwesomeIcon icon={faXmark} size="xl" />
         </Button>
@@ -139,6 +166,8 @@ function FailureContent({ error }: FailureContentProps): React.ReactElement {
           ? 'Invalid Invite'
           : error === 'invite-expired'
           ? 'Invite Expired'
+          : error === 'not-logged-in'
+          ? 'Not Logged In'
           : "Something's wrong here.."}
       </div>
       <div className="error-message">
@@ -151,6 +180,11 @@ function FailureContent({ error }: FailureContentProps): React.ReactElement {
           <span>
             The invite request has <u>expired</u>, please ask the user for a new
             invite.
+          </span>
+        ) : error === 'not-logged-in' ? (
+          <span>
+            Login and click on the invite link again to add your friend&apos;s
+            schedule to your view.
           </span>
         ) : (
           <span>
