@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -10,6 +10,7 @@ import {
 } from '..';
 import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
+import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
 /**
@@ -30,27 +31,24 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
-  const [compare, setCompare] = useState(false);
-  const [pinnedSchedules, setPinnedSchedules] = useState<string[]>([]);
-  const [pinSelf, setPinSelf] = useState(true);
+  const { compare, pinned, pinSelf, expanded, setCompareState } =
+    useCompareStateFromStorage();
+  const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
 
   const handleCompareSchedules = useCallback(
     (
       newCompare?: boolean,
       newPinnedSchedules?: string[],
-      newPinSelf?: boolean
+      newPinSelf?: boolean,
+      newExpanded?: boolean,
+      newOverlaySchedules?: string[]
     ) => {
-      if (newCompare !== undefined) {
-        setCompare(newCompare);
-      }
-      if (newPinnedSchedules !== undefined) {
-        setPinnedSchedules(newPinnedSchedules);
-      }
-      if (newPinSelf !== undefined) {
-        setPinSelf(newPinSelf);
+      setCompareState(newCompare, newPinnedSchedules, newPinSelf, newExpanded);
+      if (newOverlaySchedules !== undefined) {
+        setOverlaySchedules(newOverlaySchedules);
       }
     },
-    []
+    [setCompareState, setOverlaySchedules]
   );
 
   return (
@@ -78,16 +76,19 @@ export default function Scheduler(): React.ReactElement {
                 className="calendar"
                 overlayCrns={overlayCrns}
                 compare={compare}
-                pinnedFriendSchedules={pinnedSchedules}
+                pinnedFriendSchedules={pinned}
                 pinSelf={!compare || pinSelf}
+                overlayFriendSchedules={overlaySchedules}
               />
             </div>
           )}
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}
-              pinnedSchedules={pinnedSchedules}
+              pinnedSchedules={pinned}
               pinSelf={pinSelf}
+              compare={compare}
+              expanded={expanded}
             />
           )}
         </div>
