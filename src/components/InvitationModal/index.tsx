@@ -34,6 +34,7 @@ import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
 import Spinner from '../Spinner';
+import { ScheduleDeletionRequest } from '../../types';
 
 import './stylesheet.scss';
 
@@ -272,13 +273,14 @@ export function InvitationModalContent({
       deleteFriendRecord(versionId, friendId);
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
-        friendId,
+        peerUserId: friendId,
         term,
-        version: versionId,
-      });
+        versions: currentVersion,
+        owner: true,
+      } as ScheduleDeletionRequest);
       axios
         .post(
-          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromSender`,
+          `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
           `data=${data}`,
           {
             headers: {
