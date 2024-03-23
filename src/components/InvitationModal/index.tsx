@@ -67,10 +67,8 @@ export function InvitationModalContent({
     []
   );
 
-  const [
-    { currentVersion, term, allVersionNames, allFriends },
-    { deleteFriendRecord },
-  ] = useContext(ScheduleContext);
+  const [{ currentVersion, term, allVersionNames, allFriends }] =
+    useContext(ScheduleContext);
   const accountContext = useContext(AccountContext);
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
@@ -267,15 +265,14 @@ export function InvitationModalContent({
     [verifyEmail]
   );
 
-  // delete friend from record of friends
+  // delete invitation or remove schedules from already accepted invitation
   const handleDelete = useCallback(
     async (versionId: string, friendId: string): Promise<void> => {
-      deleteFriendRecord(versionId, friendId);
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
         peerUserId: friendId,
         term,
-        versions: currentVersion,
+        versions: [versionId],
         owner: true,
       } as ScheduleDeletionRequest);
       axios
@@ -289,21 +286,10 @@ export function InvitationModalContent({
           }
         )
         .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'delete friend record from sender failed',
-              source: err,
-              fields: {
-                user: (accountContext as SignedIn).id,
-                friend: friendId,
-                term,
-                version: versionId,
-              },
-            })
-          );
+          throw err;
         });
     },
-    [accountContext, deleteFriendRecord, term]
+    [accountContext, term]
   );
 
   function showRemoveInvitation(
@@ -319,11 +305,25 @@ export function InvitationModalContent({
     (confirm: boolean) => {
       setRemoveInvitationOpen(false);
       if (confirm) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        handleDelete(toRemoveInfo.version.id, toRemoveInfo.friendId);
+        handleDelete(toRemoveInfo.version.id, toRemoveInfo.friendId).catch(
+          (err) => {
+            softError(
+              new ErrorWithFields({
+                message: 'delete friend record from sender failed',
+                source: err,
+                fields: {
+                  user: (accountContext as SignedIn).id,
+                  friend: toRemoveInfo.friendId,
+                  term,
+                  version: toRemoveInfo.version.id,
+                },
+              })
+            );
+          }
+        );
       }
     },
-    [toRemoveInfo, handleDelete]
+    [toRemoveInfo, handleDelete, accountContext, term]
   );
 
   // show a fake loader when options change
