@@ -90,8 +90,7 @@ export default function ComparisonContainer({
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
-  const [{ friends }, { updateFriendTermData, renameFriend }] =
-    useContext(FriendContext);
+  const [{ friends }, { renameFriend }] = useContext(FriendContext);
 
   const accountContext = useContext(AccountContext);
 
@@ -148,7 +147,7 @@ export default function ComparisonContainer({
     setEditValue('');
   }, [editInfo, editValue, renameFriend, renameVersion]);
 
-  const deleteInvitation = useCallback(
+  const deleteSchedulesFromInvitee = useCallback(
     async (senderId: string, versions: string[]) => {
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
@@ -157,82 +156,88 @@ export default function ComparisonContainer({
         versions,
         owner: false,
       } as ScheduleDeletionRequest);
-      axios
-        .post(
-          `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
-          `data=${data}`,
-          {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          }
-        )
-        .catch((err) => {
-          throw err;
-        });
+
+      const friend = friends[senderId];
+      if (friend) {
+        axios
+          .post(
+            `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
+            `data=${data}`,
+            {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+            }
+          )
+          .then(() => {
+            const newColorMap = { ...colorMap };
+            versions.forEach((schedule) => {
+              delete newColorMap[schedule];
+            });
+            setSelected(
+              selected.filter(
+                (selectedId: string) =>
+                  !Object.keys(friend.versions).includes(selectedId)
+              )
+            );
+            patchSchedule({ colorMap: newColorMap });
+            // updateFriendTermData((draft) => {
+            //   delete draft.accessibleSchedules[senderId];
+            // });
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
     },
-    [accountContext, term]
+    [accountContext, term, colorMap, friends, patchSchedule, selected]
   );
 
+  // remove all versions of a particular friend from user (invitee) view
   const handleRemoveFriend = useCallback(
     (ownerId: string) => {
       const friend = friends[ownerId];
       if (friend) {
-        const newColorMap = { ...colorMap };
-
         const versions = Object.keys(friend.versions);
-        versions.forEach((schedule) => {
-          delete newColorMap[schedule];
-        });
-        setSelected(
-          selected.filter(
-            (selectedId: string) =>
-              !Object.keys(friend.versions).includes(selectedId)
-          )
-        );
-        patchSchedule({ colorMap: newColorMap });
-        updateFriendTermData((draft) => {
-          delete draft.accessibleSchedules[ownerId];
-        });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        deleteInvitation(ownerId, versions);
-      }
-    },
-    [
-      friends,
-      selected,
-      colorMap,
-      patchSchedule,
-      updateFriendTermData,
-      deleteInvitation,
-    ]
-  );
-
-  const handleRemoveSchedule = useCallback(
-    (id: string, ownerId: string) => {
-      deleteInvitation(ownerId, [id])
-        .then(() => {
-          setSelected(
-            selected.filter((selectedId: string) => selectedId !== id)
-          );
-        })
-        .catch((err) => {
+        deleteSchedulesFromInvitee(ownerId, versions).catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'delete sender record failed',
+              message: 'Failed to delete user schedule',
               source: err,
               fields: {
                 user: (accountContext as SignedIn).id,
                 sender: ownerId,
                 term,
-                versions: [id],
+                versions,
               },
             })
           );
         });
+      }
     },
-    [selected, deleteInvitation, accountContext, term]
+    [friends, deleteSchedulesFromInvitee, accountContext, term]
+  );
+
+  const handleRemoveSchedule = useCallback(
+    (id: string, ownerId: string) => {
+      deleteSchedulesFromInvitee(ownerId, [id]).catch((err) => {
+        softError(
+          new ErrorWithFields({
+            message: 'Failed to delete user schedule',
+            source: err,
+            fields: {
+              user: (accountContext as SignedIn).id,
+              sender: ownerId,
+              term,
+              versions: [id],
+            },
+          })
+        );
+      });
+    },
+    [deleteSchedulesFromInvitee, accountContext, term]
   );
 
   const handleToggleSchedule = useCallback(
