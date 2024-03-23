@@ -31,6 +31,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import InvitationModal from '../InvitationModal';
 import ComparisonContainerShareBack from '../ComparisonContainerShareBack/ComparisonContainerShareBack';
+import { ScheduleDeletionRequest } from '../../types';
 
 import './stylesheet.scss';
 
@@ -151,13 +152,14 @@ export default function ComparisonContainer({
     async (senderId: string, versions: string[]) => {
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
-        senderId,
+        peerUserId: senderId,
         term,
         versions,
-      });
+        owner: false,
+      } as ScheduleDeletionRequest);
       axios
         .post(
-          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromFriend`,
+          `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
           `data=${data}`,
           {
             headers: {
@@ -166,18 +168,7 @@ export default function ComparisonContainer({
           }
         )
         .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'delete sender record failed',
-              source: err,
-              fields: {
-                user: (accountContext as SignedIn).id,
-                sender: senderId,
-                term,
-                versions,
-              },
-            })
-          );
+          throw err;
         });
     },
     [accountContext, term]
@@ -220,25 +211,28 @@ export default function ComparisonContainer({
 
   const handleRemoveSchedule = useCallback(
     (id: string, ownerId: string) => {
-      updateFriendTermData((draft) => {
-        if (draft.accessibleSchedules[ownerId]?.length === 1) {
-          delete draft.accessibleSchedules[ownerId];
-        } else {
-          draft.accessibleSchedules[ownerId] =
-            draft.accessibleSchedules[ownerId]?.filter(
-              (schedule) => schedule !== id
-            ) ?? [];
-        }
-      });
-      const newColorMap = { ...colorMap };
-      delete newColorMap[id];
-      patchSchedule({ colorMap: newColorMap });
-      setSelected(selected.filter((selectedId: string) => selectedId !== id));
-
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      deleteInvitation(ownerId, [id]);
+      deleteInvitation(ownerId, [id])
+        .then(() => {
+          setSelected(
+            selected.filter((selectedId: string) => selectedId !== id)
+          );
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'delete sender record failed',
+              source: err,
+              fields: {
+                user: (accountContext as SignedIn).id,
+                sender: ownerId,
+                term,
+                versions: [id],
+              },
+            })
+          );
+        });
     },
-    [selected, colorMap, updateFriendTermData, patchSchedule, deleteInvitation]
+    [selected, deleteInvitation, accountContext, term]
   );
 
   const handleToggleSchedule = useCallback(

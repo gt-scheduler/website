@@ -20,6 +20,7 @@ import Modal from '../Modal';
 import Button from '../Button';
 import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
+import { ScheduleDeletionRequest } from '../../types';
 
 import './stylesheet.scss';
 
@@ -137,13 +138,14 @@ export function InvitationModalContent({
       deleteFriendRecord(currentVersion, friendId);
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
-        friendId,
+        peerUserId: friendId,
         term,
-        version: currentVersion,
-      });
+        versions: currentVersion,
+        owner: true,
+      } as ScheduleDeletionRequest);
       axios
         .post(
-          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromSender`,
+          `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
           `data=${data}`,
           {
             headers: {
