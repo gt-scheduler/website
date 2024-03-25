@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { decode } from 'html-entities';
 import date from 'date-and-time';
-import util from 'util';
+import brotliPromise from 'brotli-wasm';
 
 import { Oscar, Section } from '.';
 import {
@@ -312,8 +312,13 @@ export default class Course {
       const age = getCacheItemAge(firestoreCacheItem);
       if (age < 60 * 60 * 24) {
         console.log('Using firestore cache');
-        console.log('d', firestoreCacheItem.d);
+        const decompressedData = await decompressData(firestoreCacheItem.d);
+        return this.decodeCourseCritiqueResponse(
+          JSON.parse(decompressedData) as CourseDetailsAPIResponse
+        );
       }
+    } else {
+      console.log('Not in firestore cache');
     }
 
     let responseData: CourseDetailsAPIResponse;
@@ -487,4 +492,23 @@ function getCacheItemAge(cacheItem: CacheItem): number {
   const timestamp = new Date(cacheItem.t);
   const age = Math.max(0, date.subtract(now, timestamp).toSeconds());
   return Math.floor(age);
+}
+
+async function decompressData(compressedBase64: string): Promise<string> {
+  // Initialize brotli
+  const brotli = await brotliPromise;
+
+  // Convert base64 string to Uint8Array for decompression
+  const compressedData = Uint8Array.from(atob(compressedBase64), (c) =>
+    c.charCodeAt(0)
+  );
+
+  // Decompress and handle the binary data
+  const decompressedData = brotli.decompress(compressedData);
+
+  // Convert decompressed data back to a string
+  const decoder = new TextDecoder(); // Assuming the original data was a UTF-8 string
+  const decompressedStr = decoder.decode(decompressedData);
+
+  return decompressedStr;
 }
