@@ -1,0 +1,14 @@
+@import "../../variables";
+
+.share-icon {
+  transition-duration: $theme-switch-transition-duration;
+  transition-property: fill;
+
+  @include light {
+    fill: $theme-light-foreground;
+  }
+
+  @include dark {
+    fill: $theme-dark-foreground;
+  }
+}

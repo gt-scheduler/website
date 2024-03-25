@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import {
   faCaretDown,
   faSignOutAlt,
   faSignInAlt,
   faUserCircle,
+  faAdjust,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { AccountContextValue, SignedIn } from '../../contexts/account';
+import { ThemeContext } from '../../contexts';
 import LoginModal from '../LoginModal';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import Spinner from '../Spinner';
@@ -40,6 +42,12 @@ export default function AccountDropdown({
   const [loginOpen, setLoginOpen] = useState(false);
   const hideLogin = useCallback(() => setLoginOpen(false), []);
 
+  const [theme, setTheme] = useContext(ThemeContext);
+  const handleThemeChange = useCallback(() => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  }, [theme, setTheme]);
+
   if (!isAuthEnabled) return null;
 
   let items: DropdownMenuAction[];
@@ -61,6 +69,11 @@ export default function AccountDropdown({
           icon: faSignOutAlt,
           onClick: (): void => state.signOut(),
         },
+        {
+          label: 'Theme',
+          icon: faAdjust,
+          onClick: handleThemeChange,
+        },
       ];
       circleContent = <UserInitials state={state} />;
       disabled = false;
@@ -73,6 +86,11 @@ export default function AccountDropdown({
           onClick: (): void => {
             setLoginOpen(true);
           },
+        },
+        {
+          label: 'Theme',
+          icon: faAdjust,
+          onClick: handleThemeChange,
         },
       ];
       circleContent = (

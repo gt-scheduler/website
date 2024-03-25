@@ -62,6 +62,7 @@ export default function useExtractScheduleVersion({
             const id = generateScheduleVersionId();
             draft.versions[id] = {
               name: 'Primary',
+              friends: {},
               createdAt: new Date().toISOString(),
               schedule: castDraft(defaultSchedule),
             };

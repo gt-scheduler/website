@@ -12,8 +12,7 @@ export default function Maintenance(): React.ReactElement {
             </h1>
             <p>
               GT Scheduler is currently undergoing maintenance. <br />
-              We’ll resume service to assist 2023 Summer and Fall registration
-              starting <span>Friday, March 17, 2023</span>.
+              We’ll resume service to assist registration and scheduling soon.
             </p>
             <p>
               We appreciate your continued support and patience. For any

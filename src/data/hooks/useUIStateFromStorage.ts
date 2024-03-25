@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-
-import useLocalStorageNoSync from '../../hooks/useLocalStorageNoSync';
+import useLocalStorageState from 'use-local-storage-state';
 
 export const UI_STATE_LOCAL_STORAGE_KEY = 'ui-state';
 
@@ -36,9 +35,12 @@ type HookResult = {
  * but still have the app resume to the last viewed schedule when opened again.
  */
 export default function useUIStateFromStorage(): HookResult {
-  const [{ currentTerm, versionStates }, setUIState] = useLocalStorageNoSync(
+  const [{ currentTerm, versionStates }, setUIState] = useLocalStorageState(
     UI_STATE_LOCAL_STORAGE_KEY,
-    defaultUIState
+    {
+      defaultValue: defaultUIState,
+      storageSync: false,
+    }
   );
 
   const setTerm = useCallback(

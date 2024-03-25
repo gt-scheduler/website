@@ -28,6 +28,7 @@ export default function Tab({
       style={style}
       onClick={onClick}
       type="button"
+      id={label}
     >
       {label}
     </button>

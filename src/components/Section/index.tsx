@@ -100,6 +100,7 @@ export default function Section({
         {
           icon: faChair,
           id: sectionTooltipId,
+          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
           icon: faBan,

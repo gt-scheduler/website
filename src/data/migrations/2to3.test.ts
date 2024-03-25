@@ -127,6 +127,7 @@ describe('migrate2to3', () => {
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
+              friends: {},
             },
             sv_00000000000000000001: {
               name: 'Secondary',
@@ -140,6 +141,7 @@ describe('migrate2to3', () => {
                 colorMap: {},
                 sortingOptionIndex: 0,
               },
+              friends: {},
             },
             sv_00000000000000000002: {
               name: 'Tertiary',
@@ -153,6 +155,7 @@ describe('migrate2to3', () => {
                 colorMap: {},
                 sortingOptionIndex: 0,
               },
+              friends: {},
             },
           },
         },

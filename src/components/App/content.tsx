@@ -16,6 +16,7 @@ import {
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
+import { Term } from '../../types';
 
 /**
  * Renders the actual content at the root of the app
@@ -62,7 +63,6 @@ function AppContentBase(): React.ReactElement {
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
         {currentTabIndex === 2 && <Finals />}
-
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
@@ -85,7 +85,7 @@ export type AppSkeletonProps = {
   children: React.ReactNode;
   accountState?: AccountContextValue;
   termsState?: {
-    terms: string[];
+    terms: Term[];
     currentTerm: string;
     onChangeTerm: (next: string) => void;
   };
@@ -120,6 +120,7 @@ export function AppSkeleton({
             : { type: 'loaded', ...termsState }
         }
         versionsState={{ type: 'loading' }}
+        skeleton
       />
       {children}
       <Attribution />
