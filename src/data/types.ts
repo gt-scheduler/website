@@ -142,3 +142,18 @@ export interface Version3Schedule {
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
 }
+
+export interface CacheItem {
+  // ISO 8601 date-time that the item was added
+  t: string;
+  // Schema version
+  // (old versions are ignored)
+  v: 1;
+  // Opaque Course Critique API response string,
+  // brotli-compressed before being stored
+  d: string;
+  // Opaque Course Critique API status code
+  s: number;
+  // The content-type of the response string
+  c: string;
+}

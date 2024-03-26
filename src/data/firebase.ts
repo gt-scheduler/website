@@ -3,7 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { ErrorWithFields, softError } from '../log';
-import { AnyScheduleData } from './types';
+import { AnyScheduleData, CacheItem } from './types';
 
 // This data is not secret; it is included in the application bundle.
 // Supply these environment variables when developing locally.
@@ -18,6 +18,7 @@ export const firebaseConfig = {
 };
 
 const SCHEDULE_COLLECTION = 'schedules';
+const CACHE_COLLECTION = 'course_critique_course_data_cache';
 
 /**
  * Whether Firebase authentication is enabled in this environment.
@@ -32,8 +33,10 @@ let db: firebase.firestore.Firestore =
   null as unknown as firebase.firestore.Firestore;
 type SchedulesCollection =
   firebase.firestore.CollectionReference<AnyScheduleData>;
+type CacheCollection = firebase.firestore.CollectionReference<CacheItem>;
 let schedulesCollection: SchedulesCollection =
   null as unknown as SchedulesCollection;
+let cacheCollection: CacheCollection = null as unknown as CacheCollection;
 /* eslint-enable import/no-mutable-exports */
 if (isAuthEnabled) {
   const app = firebase.initializeApp(firebaseConfig);
@@ -43,6 +46,8 @@ if (isAuthEnabled) {
   schedulesCollection = db.collection(
     SCHEDULE_COLLECTION
   ) as SchedulesCollection;
+
+  cacheCollection = db.collection(CACHE_COLLECTION) as CacheCollection;
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
     softError(
@@ -54,7 +59,7 @@ if (isAuthEnabled) {
   });
 }
 
-export { auth, db, schedulesCollection };
+export { auth, db, schedulesCollection, cacheCollection };
 export { firebase };
 
 // Configure the enabled auth providers that firebase UI displays as options

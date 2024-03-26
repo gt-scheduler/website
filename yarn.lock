@@ -3650,6 +3650,11 @@ braces@^3.0.2, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
+brotli-wasm@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/brotli-wasm/-/brotli-wasm-2.0.1.tgz#2b3f4dc3db0c3e60d2635c055e6bac4ddf4bd3f5"
+  integrity sha512-+3USgYsC7bzb5yU0/p2HnnynZl0ak0E6uoIm4UW4Aby/8s8HFCq6NCfrrf1E9c3O8OCSzq3oYO1tUVqIi61Nww==
+
 browser-hrtime@^1.1.8:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/browser-hrtime/-/browser-hrtime-1.1.8.tgz#6a17cc212c19bdaf60faa499b7ae10a0dfb65d5e"
@@ -4473,6 +4478,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+date-and-time@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/date-and-time/-/date-and-time-3.1.1.tgz#70060a97463dd0b3ee5253504956d6d82d5dcda5"
+  integrity sha512-N9kstidT3P0VUk1iKOFilOZ6251r6iTUNx9M9kvgL2jqOk9mljWZUq5CjAtYwCnppWHbERk5YFQUrSbY7FQOpA==
 
 debug@2.6.9, debug@^2.6.0:
   version "2.6.9"
