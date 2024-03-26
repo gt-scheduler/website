@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   faAngleDown,
   faAngleUp,
@@ -7,13 +13,14 @@ import {
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
+import _ from 'lodash';
 
 import { classes, getContentClassName } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
-import { CourseGpa, CrawlerPrerequisites } from '../../types';
+import { CourseGpa } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
@@ -103,13 +110,34 @@ export default function Course({
     [excludedCrns, patchSchedule]
   );
 
+  /**
+   * Returns whether all section prerequisites are equal
+   * @returns {boolean} whether section prerequisites are equal
+   */
+  const allSectionPrereqsSame = useCallback((course: CourseBean): boolean => {
+    const basisPrereqs = course.sections?.[0]?.prereqs;
+    if (!basisPrereqs) {
+      return false;
+    }
+
+    for (let i = 1; i < course.sections.length; i++) {
+      if (!_.isEqual(basisPrereqs, course.sections[i]?.prereqs)) {
+        return false;
+      }
+    }
+    return true;
+  }, []);
+
+  const areSectionPrereqsDiff = useMemo(() => {
+    const course = oscar.findCourse(courseId);
+    return course ? !allSectionPrereqsSame(course) : false;
+  }, [courseId, allSectionPrereqsSame, oscar]);
+
   const course = oscar.findCourse(courseId);
   if (course == null) return null;
 
   const color = colorMap[course.id];
   const contentClassName = color != null && getContentClassName(color);
-
-  const prereqs: CrawlerPrerequisites | null = course.prereqs ?? [];
 
   const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
@@ -168,13 +196,16 @@ export default function Course({
         ].join(' ')}
         actions={
           isSearching
-            ? [{ icon: faPlus, onClick: onAddCourse }, prereqAction]
+            ? [
+                { icon: faPlus, onClick: onAddCourse },
+                ...(areSectionPrereqsDiff ? [] : [prereqAction]),
+              ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
                   onClick: (): void => prereqControl(false, !expanded),
                 },
-                prereqAction,
+                ...(areSectionPrereqsDiff ? [] : [prereqAction]),
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
@@ -242,6 +273,7 @@ export default function Course({
                     ? instructorGpa.toFixed(2)
                     : 'N/A'
                 }
+                areSectionPrereqsDiff={areSectionPrereqsDiff}
               />
             );
           })}
@@ -264,8 +296,11 @@ export default function Course({
           )}
         </div>
       )}
-      {expanded && prereqOpen && prereqs !== null && (
-        <Prerequisite course={course} prereqs={prereqs} />
+      {expanded && prereqOpen && !areSectionPrereqsDiff && (
+        <Prerequisite
+          parent={course}
+          prereqs={course.sections?.[0]?.prereqs ?? []}
+        />
       )}
     </div>
   );
