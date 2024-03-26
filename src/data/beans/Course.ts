@@ -311,14 +311,11 @@ export default class Course {
     if (firestoreCacheItem != null) {
       const age = getCacheItemAge(firestoreCacheItem);
       if (age < 60 * 60 * 24) {
-        console.log('Using firestore cache');
         const decompressedData = await decompressData(firestoreCacheItem.d);
         return this.decodeCourseCritiqueResponse(
           JSON.parse(decompressedData) as CourseDetailsAPIResponse
         );
       }
-    } else {
-      console.log('Not in firestore cache');
     }
 
     let responseData: CourseDetailsAPIResponse;
