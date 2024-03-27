@@ -45,19 +45,21 @@ export function InformationModalContent(): React.ReactElement {
       >
         New Feature: Compare Schedules
       </h1>
-      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>March 10, 2024</h4>
+      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 2, 2024</h4>
       <div className="information-content">
         <p>
           Hello <span style={{ color: '#EDA91F' }}>Yellow Jackets!</span> We are
           excited to announce a new feature for GT Scheduler.
           <br />
           <br />
-          Use Compare Schedules to share and compare your schedules with your
-          friends!
+          Share your schedule with other students and they can share theirs
+          back. Then toggle &quot;Compare Schedules&quot; and click on the other
+          students&apos; schedules to compare.
           <br />
           <br />
-          Add your friends&apos; schedules to yours and view them using the
-          panel on the right side of the page below your profile icon.
+          However, to keep GT Scheduler and its amazing features, we need to
+          maintain our costs. Please consider donating to help keep GT Scheduler
+          running!
         </p>
         <div className="information-images">
           <img
@@ -106,8 +108,8 @@ export default function InformationModal(): React.ReactElement {
       className={classes('InformationModal', mobile && 'mobile')}
       show={show}
       onHide={(): void => setShow(false)}
-      buttons={[{ label: 'Got it!', onClick: (): void => setShow(false) }]}
-      width={800}
+      buttons={[{ label: 'Donate Today', onClick: (): void => setShow(false) }]}
+      width={850}
     >
       <InformationModalContent />
     </Modal>
