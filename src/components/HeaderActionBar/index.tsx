@@ -1,4 +1,4 @@
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
+import {} from '@fortawesome/free-brands-svg-icons';
 import {
   faDownload,
   faCalendarAlt,
@@ -6,6 +6,7 @@ import {
   faCaretDown,
   faShare,
   faCircle,
+  faHandHoldingDollar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useContext, useState } from 'react';
@@ -114,6 +115,19 @@ export default function HeaderActionBar({
 
   return (
     <div className={classes('header-action-bar', className)} style={style}>
+      <Button href="./" className="header-action-bar__button">
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faHandHoldingDollar}
+        />
+
+        <div className="header-action-bar__button-text">Donate</div>
+      </Button>
+      {/* Github Icon:
+          <div className="header-action-bar__button-text">GitHub</div>
+      */}
+
       <DropdownMenu
         disabled={!enableExport}
         items={exportActions}
@@ -142,18 +156,6 @@ export default function HeaderActionBar({
         {seenInviteModal || type === 'signedOut' ? null : (
           <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
         )}
-      </Button>
-
-      <Button
-        href="https://github.com/gt-scheduler/website"
-        className="header-action-bar__button"
-      >
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faGithub}
-        />
-        <div className="header-action-bar__button-text">GitHub</div>
       </Button>
 
       <AccountDropdown state={accountState} />
