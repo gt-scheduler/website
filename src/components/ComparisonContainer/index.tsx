@@ -96,6 +96,12 @@ export default function ComparisonContainer({
 
   useEffect(() => {
     const newColorMap = { ...colorMap };
+    allVersionNames.forEach((versionName) => {
+      const version = versionName.id;
+      if (!(version in newColorMap)) {
+        newColorMap[version] = getRandomColor();
+      }
+    });
     if (!(currentVersion in newColorMap)) {
       newColorMap[currentVersion] = getRandomColor();
     }
@@ -242,6 +248,8 @@ export default function ComparisonContainer({
 
   const handleToggleSchedule = useCallback(
     (id: string) => {
+      console.log(selected);
+      console.log(id);
       if (selected.includes(id)) {
         setSelected(selected.filter((selectedId: string) => selectedId !== id));
         handleCompareSchedules(
@@ -284,7 +292,7 @@ export default function ComparisonContainer({
           <div className="my-schedule">
             <p className="content-title">My Schedule</p>
             {allVersionNames
-              .filter((version) => version.id === currentVersion)
+              // .filter((version) => version.id === currentVersion)
               .map((version) => {
                 return (
                   <ScheduleRow
@@ -292,14 +300,11 @@ export default function ComparisonContainer({
                     id={version.id}
                     type="Version"
                     onClick={(): void => {
-                      setScheduleSelected(!scheduleSelected);
-                      handleCompareSchedules(
-                        undefined,
-                        undefined,
-                        !scheduleSelected
-                      );
+                      handleToggleSchedule(version.id);
                     }}
-                    checkboxColor={scheduleSelected ? colorMap[version.id] : ''}
+                    checkboxColor={
+                      selected.includes(version.id) ? colorMap[version.id] : ''
+                    }
                     name={version.name}
                     // placeholder functions
                     handleEditSchedule={(): void => {
@@ -332,6 +337,24 @@ export default function ComparisonContainer({
                     paletteInfo={paletteInfo}
                     setPaletteInfo={setPaletteInfo}
                     handleNameEditOnBlur={handleNameEditOnBlur}
+                    // hoverFriendSchedule={(): void => {
+                    //   handleCompareSchedules(
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     [version.id]
+                    //   );
+                    // }}
+                    // unhoverFriendSchedule={(): void => {
+                    //   handleCompareSchedules(
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     []
+                    //   );
+                    // }}
                   />
                 );
               })}
