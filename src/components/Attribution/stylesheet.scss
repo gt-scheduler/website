@@ -7,7 +7,7 @@
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     text-align: center;
     color: inherit;
     border-top: 1px solid $color-border;
@@ -19,5 +19,9 @@
         max-width: fit-content;
         flex-wrap: wrap;
         justify-content: center;
+    }
+
+    .githubText {
+        margin-left: 5px;
     }
 }

@@ -1,4 +1,3 @@
-import {} from '@fortawesome/free-brands-svg-icons';
 import {
   faDownload,
   faCalendarAlt,
@@ -124,9 +123,6 @@ export default function HeaderActionBar({
 
         <div className="header-action-bar__button-text">Donate</div>
       </Button>
-      {/* Github Icon:
-          <div className="header-action-bar__button-text">GitHub</div>
-      */}
 
       <DropdownMenu
         disabled={!enableExport}
