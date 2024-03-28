@@ -282,7 +282,7 @@ export default function ComparisonContainer({
       <div className="comparison-body">
         <div className="comparison-content">
           <div className="my-schedule">
-            <p className="content-title">My Schedule</p>
+            <p className="my-schedule-title">My Schedule</p>
             {allVersionNames
               .filter((version) => version.id === currentVersion)
               .map((version) => {

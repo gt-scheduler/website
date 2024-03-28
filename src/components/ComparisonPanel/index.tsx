@@ -129,13 +129,11 @@ export default function ComparisonPanel({
           </label>
         </div>
         {compare && (
-          <div>
-            <ComparisonContainer
-              handleCompareSchedules={handleCompareSchedules}
-              pinnedSchedules={pinnedSchedules}
-              pinSelf={pinSelf}
-            />
-          </div>
+          <ComparisonContainer
+            handleCompareSchedules={handleCompareSchedules}
+            pinnedSchedules={pinnedSchedules}
+            pinSelf={pinSelf}
+          />
         )}
         <div className="combination">
           <p className="content-title">Schedule Combinations</p>

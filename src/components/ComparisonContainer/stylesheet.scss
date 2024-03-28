@@ -2,14 +2,15 @@
 @import '../../variables';
 
 .comparison-container {
+  overflow-y: auto;
+  max-height: 40%;
+  height: auto;
   .comparison-body {
     display: flex;
     flex-direction: column;
-    height: 100%;
 
     .comparison-content {
       position: relative;
-      margin-bottom: 12px;
       overflow-x: hidden;
       overflow-y: auto;
       flex: 1 1 auto;
@@ -25,6 +26,12 @@
         &.content-title{
           font-weight: 700;
           margin: 16px 12px 0px 12px;
+          border-bottom: 2px solid $color-border;
+        }
+
+        &.my-schedule-title{
+          font-weight: 700;
+          margin: 0px 12px 0px 12px;
           border-bottom: 2px solid $color-border;
         }
 

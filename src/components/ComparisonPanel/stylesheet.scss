@@ -74,7 +74,6 @@
     display: flex;
     flex: 0 0 1;
     flex-direction: column;
-    overflow: scroll;
     align-items: stretch;
     width: 256px;
     transition: width 0.15s;
@@ -82,7 +81,7 @@
     .comparison-header {
       display: flex;
       align-items: center;
-      margin: 11px 12px 7px 12px;
+      margin: 11px 12px 20px 12px;
 
       p {
         margin: 0px;
@@ -186,18 +185,13 @@
       width: 0px;
     }
 
-    .comparison-container {
-      max-height: calc(100% - 37px);
-      // border-bottom: 1px solid $color-border;
-    }
-
     .combination {
       flex: 1;
 
       .content-title{
         font-weight: 700;
         font-size: 14px;
-        margin: 12px 12px 4px 12px;
+        margin: 18px 12px 4px 12px;
         border-bottom: 2px solid $color-border;
       }
 
