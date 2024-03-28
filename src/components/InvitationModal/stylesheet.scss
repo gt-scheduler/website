@@ -12,7 +12,7 @@
     right: 12px;
     top: 12px;
     padding: 15px;
-    color: #808080;
+    color: $color-neutral;
     border-radius: 50px;
   }
 
@@ -20,16 +20,8 @@
     text-align: center;
     overflow: hidden;
     padding: 20px 40px;
-
-    @include light {
-      background-color: $theme-light-background;
-      color: $modal-foreground-color-light;
-    }
-
-    @include dark {
-      background-color: $theme-dark-background;
-      color: white;
-    }
+    background-color: var(--theme-bg);
+    color: var(--theme-fg);
 
     //Style for email input
     .top-block {
@@ -99,8 +91,12 @@
           }
 
           @include light {
-            background-color: rgba($color-neutral, 0.5);
-            border: 1px solid rgba($color-neutral, 0.5);
+            background-color: rgba($color-neutral, 0.3);
+            border: 1px solid rgba($color-neutral, 0.3);
+
+            &:focus {
+              border-color: rgba(0, 0, 0, 0.5);
+            }
           }
         }
 
@@ -123,10 +119,10 @@
         }
 
         .disabled-send-button {
-          background-color: #9d9d9d;
+          background-color: $color-neutral;
 
           &:hover {
-            background-color: #9d9d9d;
+            background-color: $color-neutral;
             cursor: default;
           }
         }
@@ -203,7 +199,7 @@
       display: flex;
       align-items: stretch !important;
       border: none;
-      background-color: rgb(80, 80, 80);
+      background-color: var(--theme-card-bg);
       margin: 0px -40px;
     }
 
@@ -229,14 +225,11 @@
       align-content: flex-start;
       row-gap: 8px;
       padding-bottom: 25px;
-
-      @include light {
-        color: #333333;
-      }
+      color: var(--theme-fg);
 
       .individual-shared-email {
         @include card;
-        background-color: rgb(67, 67, 67);
+        background-color: var(--theme-card-bg);
         padding: 4px 8px;
         margin: 4px 8px 4px 0px;
         height: 100%;
@@ -300,7 +293,7 @@
         color: white;
 
         @include light {
-          color: rgba(128, 128, 128, 0.5);
+          color: $color-neutral;
         }
       }
 
@@ -308,21 +301,17 @@
         width: 10px;
         height: 10px;
         padding: 15px;
-        color: rgb(67, 67, 67);
+        color: var(--theme-card-bg);
         position: relative;
         display: inline-flex;
-
-        @include light {
-          color: #e5e5e5;
-        }
       }
 
       &:hover {
         .circle {
-          color: rgba(255, 255, 255, 0.25);
+          color: $color-neutral;
 
           @include light {
-            color: #333333;
+            color: var(--theme-fg);
           }
         }
 
@@ -354,6 +343,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
+        color: var(--theme-fg);
 
         .link-icon-container {
           display: flex;
@@ -365,12 +355,14 @@
           margin-right: 5px;
         }
 
-        @include dark {
-          color: $theme-light-background;
-        }
+        &:hover {
+          @include dark {
+            background: $modal-foreground-color-light;
+          }
 
-        @include light {
-          color: $theme-dark-background;
+          @include light {
+            background: $modal-foreground-color-dark;
+          }
         }
       }
 
@@ -405,6 +397,14 @@
 
             &:hover {
               cursor: pointer;
+
+              @include dark {
+                background: $modal-foreground-color-light;
+              }
+
+              @include light {
+                background: $modal-foreground-color-dark;
+              }
             }
           }
         }
@@ -422,27 +422,14 @@
           position: absolute;
           max-width: 150px;
           overflow-x: auto;
-
-          @include dark {
-            background-color: $theme-dark-background;
-          }
-
-          @include light {
-            background-color: $theme-light-background;
-          }
+          background-color: var(--theme-bg);
 
           .expiration-option {
             padding: 8px 15px;
 
             &:hover {
               cursor: pointer;
-              @include dark {
-                background-color: $theme-dark-card-background;
-              }
-
-              @include light {
-                background-color: $theme-light-card-background;
-              }
+              background-color: var(--theme-card-bg);
             }
           }
         }
@@ -492,14 +479,7 @@
     border-color: var(--theme-fg);
     margin-right: 8px;
     padding: 1px;
-
-    @include dark {
-      color: $theme-dark-background;
-    }
-
-    @include light {
-      color: $theme-light-background;
-    }
+    color: var(--theme-bg);
   }
 
   .schedule-checked {
@@ -545,7 +525,7 @@
         right: 12px;
         top: 12px;
         padding: 15px;
-        color: #808080;
+        color: $color-neutral;
         border-radius: 50px;
       }
     }

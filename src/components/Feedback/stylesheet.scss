@@ -24,7 +24,7 @@
     --feedback-outer-color: #{$theme-light-background};
     --feedback-inner-color: #{$theme-light-card-background};
   }
-  
+
   background-color: var(--feedback-outer-color);
 
   // Include theme switch transition
@@ -57,25 +57,25 @@
     display: flex;
     flex-direction: column;
   }
-  
+
   .text {
     margin-top: 10px;
     font-size: 16px;
     margin-bottom: 20px;
   }
-  
-  .FeedbackTitle  {
+
+  .FeedbackTitle {
     font-size: 24px;
     margin-bottom: 16px;
     margin-top: 0;
   }
-  
+
   .FormButtons {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    
+
     & div {
       display: inline-block;
       justify-content: space-around;
@@ -87,10 +87,10 @@
       transition-property: background-color;
     }
   }
-  
+
   .FormButton {
     vertical-align: middle;
-    height:40px;
+    height: 40px;
     width: 40px;
     border-radius: 5px;
     &.active {
@@ -106,12 +106,12 @@
     align-items: flex-start;
     justify-content: space-between;
   }
-  
+
   .score {
     font-size: 14px;
-    color: #808080;
+    color: $color-neutral;
   }
-  
+
   .FeedbackTextArea {
     margin-top: 20px;
     border: none;
@@ -131,10 +131,10 @@
     transition-property: background-color;
 
     &::placeholder {
-      color: #808080;
+      color: $color-neutral;
     }
   }
-  
+
   .SubmitButton {
     position: relative;
     width: 100px;
@@ -148,7 +148,7 @@
     margin-right: auto;
     color: white;
   }
-  
+
   .CloseIcon {
     position: absolute;
     top: 0;
