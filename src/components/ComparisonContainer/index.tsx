@@ -599,6 +599,7 @@ function ScheduleRow({
               className={classes('name', hasCheck && 'check')}
               onMouseEnter={(): void => setTooltipHover(true)}
               onMouseLeave={(): void => setTooltipHover(false)}
+              onClick={onClick}
             >
               <div
                 className={classes(
