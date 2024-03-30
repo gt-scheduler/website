@@ -5,6 +5,9 @@ import { classes } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import Modal from '../Modal';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import { faX } from '@fortawesome/free-solid-svg-icons';
+import Button from '../Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './stylesheet.scss';
 
@@ -23,9 +26,19 @@ const OUTDATED_LOCAL_STORAGE_KEY = [
  * Additionally, make sure to change `MODAL_LOCAL_STORAGE_KEY`
  * with another unique value that has never been used before.
  */
-export function InformationModalContent(): React.ReactElement {
+
+export type InformationModalContentProps = {
+  setShow: (show: boolean) => void;
+};
+
+export function InformationModalContent({
+  setShow,
+}: InformationModalContentProps): React.ReactElement {
   return (
     <>
+      <Button className="close-button" onClick={(): void => setShow(false)}>
+        <FontAwesomeIcon fixedWidth icon={faX} size="xl" />
+      </Button>
       <img
         style={{
           width: '150px',
@@ -119,7 +132,7 @@ export default function InformationModal(): React.ReactElement {
       ]}
       width={850}
     >
-      <InformationModalContent />
+      <InformationModalContent setShow={setShow} />
     </Modal>
   );
 }
