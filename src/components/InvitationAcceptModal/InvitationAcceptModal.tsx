@@ -47,15 +47,15 @@ export default function InvitationAcceptModal({
   );
 
   useEffect(() => {
-    // if (
-    //   !searchParams.get('inviteId') ||
-    //   !searchParams.get('status') ||
-    //   !searchParams.get('email') ||
-    //   hasSeen
-    // ) {
-    //   setModalOpen(false);
-    //   return;
-    // }
+    if (
+      !searchParams.get('inviteId') ||
+      !searchParams.get('status') ||
+      !searchParams.get('email') ||
+      hasSeen
+    ) {
+      setModalOpen(false);
+      return;
+    }
 
     const email: string | null = searchParams.get('email');
 
