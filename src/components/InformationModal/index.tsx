@@ -108,7 +108,15 @@ export default function InformationModal(): React.ReactElement {
       className={classes('InformationModal', mobile && 'mobile')}
       show={show}
       onHide={(): void => setShow(false)}
-      buttons={[{ label: 'Donate Today', onClick: (): void => setShow(false) }]}
+      buttons={[
+        {
+          label: 'Donate Today',
+          onClick: (): void => {
+            setShow(false);
+            window.open('https://donorbox.org/gt-scheduler');
+          },
+        },
+      ]}
       width={850}
     >
       <InformationModalContent />

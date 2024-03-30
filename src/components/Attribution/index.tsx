@@ -14,10 +14,15 @@ export default function Attribution(): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   return (
     <div className={classes('Attribution')}>
-      <Button href="https://github.com/gt-scheduler/website">
-        <FontAwesomeIcon fixedWidth icon={faGithub} size="2xl" />
-        <span className="githubText">GitHub</span>
-      </Button>
+      {!mobile ? (
+        <Button href="https://github.com/gt-scheduler/website">
+          <FontAwesomeIcon fixedWidth icon={faGithub} size="2xl" />
+          <span className="githubText">GitHub</span>
+        </Button>
+      ) : (
+        <div />
+      )}
+
       <p>
         Copyright (c) 2023 with{' '}
         <span role="img" aria-label="love">

@@ -114,7 +114,10 @@ export default function HeaderActionBar({
 
   return (
     <div className={classes('header-action-bar', className)} style={style}>
-      <Button href="./" className="header-action-bar__button">
+      <Button
+        href="https://donorbox.org/gt-scheduler"
+        className="header-action-bar__button"
+      >
         <FontAwesomeIcon
           className="header-action-bar__button-icon"
           fixedWidth
@@ -137,22 +140,6 @@ export default function HeaderActionBar({
         </div>
       </DropdownMenu>
       <InvitationModal show={invitationOpen} onHide={hideInvitation} />
-
-      <Button
-        onClick={openInvitation}
-        disabled={type === 'signedOut'}
-        className={classes('header-action-bar__button', 'invite-button')}
-      >
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faShare}
-        />
-        <div className="header-action-bar__button-text">Invite</div>
-        {seenInviteModal || type === 'signedOut' ? null : (
-          <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
-        )}
-      </Button>
 
       <AccountDropdown state={accountState} />
     </div>
