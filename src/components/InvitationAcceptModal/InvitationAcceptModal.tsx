@@ -1,6 +1,6 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useSearchParams } from 'react-router-dom';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useLocalStorageState from 'use-local-storage-state';
 
@@ -28,10 +28,7 @@ export default function InvitationAcceptModal({
   const [invitationModalOpen, setInvitationModalOpen] =
     useState<boolean>(false);
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-
-  const [schedulesShared, setSchedulesShared] = useState<string[]>();
-  const [schedulesReceived, setSchedulesReceived] = useState<string[]>();
-  const [friendName, setFriendName] = useState<string>();
+  const [friendID, setFriendID] = useState<string>();
 
   const [searchParams] = useSearchParams();
 
@@ -46,6 +43,46 @@ export default function InvitationAcceptModal({
     }
   );
 
+  const schedulesShared = useMemo(() => {
+    return Object.keys(allFriends)
+      .map((version_id) => {
+        if (
+          friendID &&
+          allFriends[version_id] &&
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          friendID in allFriends[version_id]!
+        ) {
+          const versionName = allVersionNames.filter(
+            (v) => v.id === version_id
+          );
+          if (versionName.length > 0) {
+            return versionName[0]?.name;
+          }
+        }
+        return undefined;
+      })
+      .filter((v) => v) as string[];
+  }, [friendID, allFriends, allVersionNames]);
+
+  const schedulesReceived = useMemo((): string[] | undefined => {
+    if (friendID) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return Object.keys(friends[friendID]!.versions)
+        .map((version_id): string | undefined => {
+          return friends[friendID]?.versions[version_id]?.name;
+        })
+        .filter((name) => name) as string[];
+    }
+    return undefined;
+  }, [friendID, friends]);
+
+  const friendName = useMemo((): string | undefined => {
+    if (friendID) {
+      return friends[friendID]?.name;
+    }
+    return undefined;
+  }, [friendID, friends]);
+
   useEffect(() => {
     if (
       !searchParams.get('inviteId') ||
@@ -59,42 +96,12 @@ export default function InvitationAcceptModal({
 
     const email: string | null = searchParams.get('email');
 
-    let friendID = '';
-
     if (friends) {
       Object.keys(friends).forEach((f_i) => {
         if (friends[f_i] && friends[f_i]?.email === email) {
-          friendID = f_i;
-          setFriendName(friends[f_i]?.name);
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const received = Object.keys(friends[f_i]!.versions)
-            .map((version_id): string | undefined => {
-              return friends[f_i]?.versions[version_id]?.name;
-            })
-            .filter((name) => name) as string[];
-
-          setSchedulesReceived(received);
+          setFriendID(f_i);
         }
       });
-
-      if (friendID !== '') {
-        const sent = Object.keys(allFriends)
-          .map((version_id) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            if (allFriends[version_id] && friendID in allFriends[version_id]!) {
-              const versionName = allVersionNames.filter(
-                (v) => v.id === version_id
-              );
-              if (versionName.length > 0) {
-                return versionName[0]?.name;
-              }
-            }
-            return undefined;
-          })
-          .filter((v) => v) as string[];
-
-        setSchedulesShared(sent);
-      }
 
       setModalOpen(true);
     }
@@ -151,6 +158,10 @@ export default function InvitationAcceptModal({
                   label: 'Share Back',
                   onClick: (): void => {
                     onHide();
+                    localStorage.setItem(
+                      `share-back-invitation-${friendID ?? ''}`,
+                      'true'
+                    );
                     setInvitationModalOpen(true);
                   },
                 },
@@ -165,8 +176,8 @@ export default function InvitationAcceptModal({
           <SuccessContent
             name={friendName ?? ''}
             email={searchParams.get('email') ?? ''}
-            schedulesReceived={schedulesReceived}
-            schedulesSent={schedulesShared}
+            schedulesReceived={schedulesReceived ?? []}
+            schedulesSent={schedulesShared ?? []}
           />
         ) : (
           <FailureContent error={searchParams.get('status') ?? ''} />
@@ -179,8 +190,8 @@ export default function InvitationAcceptModal({
 type SuccessContentProps = {
   email: string;
   name: string;
-  schedulesReceived: string[] | undefined;
-  schedulesSent: string[] | undefined;
+  schedulesReceived: string[];
+  schedulesSent: string[];
 };
 
 function SuccessContent({
@@ -218,6 +229,11 @@ function SuccessContent({
               </span>
             );
           })}
+        {schedulesReceived?.length === 0 ? (
+          <span>
+            <b> None</b>
+          </span>
+        ) : null}
       </div>
       <div className="sub-heading">
         Schedules you have shared with {`${name}`}:
@@ -238,6 +254,11 @@ function SuccessContent({
               </span>
             );
           })}
+        {schedulesSent?.length === 0 ? (
+          <span>
+            <b> None</b>
+          </span>
+        ) : null}
       </div>
     </div>
   );
