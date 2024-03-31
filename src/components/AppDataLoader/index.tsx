@@ -512,6 +512,7 @@ function ContextProvider({
       deleteVersion,
       renameVersion,
       cloneVersion,
+      termScheduleData.versions,
     ]
   );
 
