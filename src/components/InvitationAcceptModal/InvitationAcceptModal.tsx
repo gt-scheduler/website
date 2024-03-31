@@ -125,6 +125,7 @@ export default function InvitationAcceptModal({
         show={modalOpen}
         onHide={onHide}
         width={700}
+        buttonPrompt="Would you like to share your schedule back?"
         buttons={
           searchParams.get('status') === 'not-logged-in'
             ? [
@@ -136,7 +137,23 @@ export default function InvitationAcceptModal({
                   },
                 },
               ]
-            : undefined
+            : schedulesShared &&
+              schedulesShared.length !== allVersionNames.length
+            ? [
+                {
+                  label: 'No',
+                  onClick: onHide,
+                  cancel: true,
+                },
+                {
+                  label: 'Share Back',
+                  onClick: (): void => {
+                    onHide();
+                    setInvitationModalOpen(true);
+                  },
+                },
+              ]
+            : []
         }
       >
         <Button className="remove-close-button" onClick={onHide}>
@@ -146,8 +163,6 @@ export default function InvitationAcceptModal({
           <SuccessContent
             name={friendName ?? ''}
             email={searchParams.get('email') ?? ''}
-            onHide={onHide}
-            setInvitationModalOpen={setInvitationModalOpen}
             schedulesReceived={schedulesReceived}
             schedulesSent={schedulesShared}
           />
@@ -162,8 +177,6 @@ export default function InvitationAcceptModal({
 type SuccessContentProps = {
   email: string;
   name: string;
-  onHide: () => void;
-  setInvitationModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   schedulesReceived: string[] | undefined;
   schedulesSent: string[] | undefined;
 };
@@ -171,8 +184,6 @@ type SuccessContentProps = {
 function SuccessContent({
   name,
   email,
-  onHide,
-  setInvitationModalOpen,
   schedulesReceived,
   schedulesSent,
 }: SuccessContentProps): React.ReactElement {
@@ -182,7 +193,7 @@ function SuccessContent({
         You have successfully added a new schedule to your view!
       </div>
 
-      <img src="/scheduled.png" alt="ok" className="modal-image" />
+      <img src="/invitation-succesful.png" alt="ok" className="modal-image" />
       <div className="sub-heading">
         You will now be able to see {email}&apos;s schedule!
       </div>
@@ -225,25 +236,6 @@ function SuccessContent({
               </span>
             );
           })}
-      </div>
-      <div className="modal-bottom">
-        <div>Would you like to share your schedule back?</div>
-
-        <div className="button-row">
-          <button type="submit" className="no-button" onClick={onHide}>
-            No
-          </button>
-          <button
-            type="submit"
-            className="share-button"
-            onClick={(): void => {
-              onHide();
-              setInvitationModalOpen(true);
-            }}
-          >
-            Share Back
-          </button>
-        </div>
       </div>
     </div>
   );
