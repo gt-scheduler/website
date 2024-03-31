@@ -481,6 +481,7 @@ function ContextProvider({
         allFriends,
         currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
+        versions: termScheduleData.versions,
       },
       {
         setTerm,

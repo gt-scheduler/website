@@ -81,7 +81,6 @@ export default function ComparisonContainer({
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
-  const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
   const [invitationModalOpen, setInvitationModalOpen] = useState(false);
   const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
@@ -337,24 +336,24 @@ export default function ComparisonContainer({
                     paletteInfo={paletteInfo}
                     setPaletteInfo={setPaletteInfo}
                     handleNameEditOnBlur={handleNameEditOnBlur}
-                    // hoverFriendSchedule={(): void => {
-                    //   handleCompareSchedules(
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     [version.id]
-                    //   );
-                    // }}
-                    // unhoverFriendSchedule={(): void => {
-                    //   handleCompareSchedules(
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     []
-                    //   );
-                    // }}
+                    hoverFriendSchedule={(): void => {
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        [version.id]
+                      );
+                    }}
+                    unhoverFriendSchedule={(): void => {
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        []
+                      );
+                    }}
                   />
                 );
               })}
