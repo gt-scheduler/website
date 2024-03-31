@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 
-import { classes } from '../../utils/misc';
 import { faX } from '@fortawesome/free-solid-svg-icons';
-import Button from '../Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import Button from '../Button';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
-import usePrevious from '../../hooks/usePrevious';
 
 import './stylesheet.scss';
 
@@ -38,16 +37,18 @@ export default function DonateBanner(): React.ReactElement {
     <div>
       {show ? (
         <div className="banner">
-          <div>&nbsp;</div>
+          <div className="spacer" />
           <span>
             {!mobile
               ? 'Help keep GT Scheduler and its amazing features running!'
-              : 'Help keep GT Scheduler running by'}
+              : 'Help us and'}
             <Button
               className="donateButton"
               href="https://donorbox.org/gt-scheduler"
             >
-              <b>{!mobile ? 'Donate today.' : 'donating today.'}</b>
+              <b className="buttonText">
+                {!mobile ? 'Donate today.' : 'donate today.'}
+              </b>
             </Button>
           </span>
           <Button
