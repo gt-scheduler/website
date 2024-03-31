@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
+import { faX } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import Modal from '../Modal';
 import useScreenWidth from '../../hooks/useScreenWidth';
-import { faX } from '@fortawesome/free-solid-svg-icons';
 import Button from '../Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './stylesheet.scss';
 

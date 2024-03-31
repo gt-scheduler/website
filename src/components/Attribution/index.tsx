@@ -1,9 +1,8 @@
 import React from 'react';
-
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button } from '..';
 
+import { Button } from '..';
 import { classes } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';

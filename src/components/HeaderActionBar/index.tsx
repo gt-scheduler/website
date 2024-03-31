@@ -3,27 +3,22 @@ import {
   faCalendarAlt,
   faPaste,
   faCaretDown,
-  faShare,
-  faCircle,
   faHandHoldingDollar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext, useState } from 'react';
-import useLocalStorageState from 'use-local-storage-state';
+import React, { useCallback, useState } from 'react';
 
 import { Button, InvitationModal } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
-  DESKTOP_BREAKPOINT,
 } from '../../constants';
 import useMedia from '../../hooks/useMedia';
-import { AccountContext, AccountContextValue } from '../../contexts/account';
+import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
 import ShareIcon from '../ShareIcon';
-import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
@@ -38,9 +33,6 @@ export type HeaderActionBarProps = {
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
 };
-
-// Key to mark when a user has already seen the invite modal.
-const MODAL_LOCAL_STORAGE_KEY = '2023-05-10-spr2023-invite-modal';
 
 /**
  * Displays the icon buttons (with optional text)
@@ -60,25 +52,8 @@ export default function HeaderActionBar({
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
 }: HeaderActionBarProps): React.ReactElement {
-  const { type } = useContext(AccountContext);
-
   const [invitationOpen, setInvitationOpen] = useState(false);
-  const [seenInviteModal, setSeenInviteModal] = useLocalStorageState<boolean>(
-    MODAL_LOCAL_STORAGE_KEY,
-    {
-      defaultValue: false,
-      storageSync: true,
-    }
-  );
 
-  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
-
-  const openInvitation = useCallback(() => {
-    setInvitationOpen(true);
-    if (!seenInviteModal) {
-      setSeenInviteModal(true);
-    }
-  }, [seenInviteModal, setSeenInviteModal]);
   const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   // Coalesce the export options into the props for a single <DropdownMenu>
