@@ -277,6 +277,7 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
             true
           );
         }}
+        id="version-selector-dropdown"
       />
 
       <Modal
