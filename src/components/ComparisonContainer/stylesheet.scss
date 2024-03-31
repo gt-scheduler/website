@@ -158,11 +158,13 @@
             opacity: 0;
           }
 
+
           &:hover {
             background-color: $color-border;
 
             .icon {
               opacity: 1;
+              height: 30px;
             }
 
             .name {
