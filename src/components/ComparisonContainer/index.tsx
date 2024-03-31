@@ -68,20 +68,19 @@ export type ComparisonContainerProps = {
     overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
-  pinSelf: boolean;
+  shareBackRemount: number;
 };
 
 export default function ComparisonContainer({
   handleCompareSchedules,
   pinnedSchedules,
-  pinSelf,
+  shareBackRemount,
 }: ComparisonContainerProps): React.ReactElement {
   const [selected, setSelected] = useState<string[]>(pinnedSchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
-  const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
   const [invitationModalOpen, setInvitationModalOpen] = useState(false);
   const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
@@ -96,6 +95,12 @@ export default function ComparisonContainer({
 
   useEffect(() => {
     const newColorMap = { ...colorMap };
+    allVersionNames.forEach((versionName) => {
+      const version = versionName.id;
+      if (!(version in newColorMap)) {
+        newColorMap[version] = getRandomColor();
+      }
+    });
     if (!(currentVersion in newColorMap)) {
       newColorMap[currentVersion] = getRandomColor();
     }
@@ -112,7 +117,7 @@ export default function ComparisonContainer({
     if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
       patchSchedule({ colorMap: newColorMap });
     }
-  }, [friends, currentVersion, colorMap, patchSchedule]);
+  }, [friends, currentVersion, colorMap, patchSchedule, allVersionNames]);
 
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -284,7 +289,7 @@ export default function ComparisonContainer({
           <div className="my-schedule">
             <p className="content-title">My Schedule</p>
             {allVersionNames
-              .filter((version) => version.id === currentVersion)
+              // .filter((version) => version.id === currentVersion)
               .map((version) => {
                 return (
                   <ScheduleRow
@@ -292,14 +297,11 @@ export default function ComparisonContainer({
                     id={version.id}
                     type="Version"
                     onClick={(): void => {
-                      setScheduleSelected(!scheduleSelected);
-                      handleCompareSchedules(
-                        undefined,
-                        undefined,
-                        !scheduleSelected
-                      );
+                      handleToggleSchedule(version.id);
                     }}
-                    checkboxColor={scheduleSelected ? colorMap[version.id] : ''}
+                    checkboxColor={
+                      selected.includes(version.id) ? colorMap[version.id] : ''
+                    }
                     name={version.name}
                     // placeholder functions
                     handleEditSchedule={(): void => {
@@ -332,6 +334,24 @@ export default function ComparisonContainer({
                     paletteInfo={paletteInfo}
                     setPaletteInfo={setPaletteInfo}
                     handleNameEditOnBlur={handleNameEditOnBlur}
+                    hoverFriendSchedule={(): void => {
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        [version.id]
+                      );
+                    }}
+                    unhoverFriendSchedule={(): void => {
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        []
+                      );
+                    }}
                   />
                 );
               })}
@@ -449,6 +469,7 @@ export default function ComparisonContainer({
                       friendEmail={friend.email}
                       setModalEmail={setInvitationModalEmail}
                       setModalOpen={setInvitationModalOpen}
+                      key={shareBackRemount}
                     />
                   </div>
                 );
@@ -556,12 +577,12 @@ function ScheduleRow({
     <div
       className="schedule-row"
       onMouseEnter={(): void => {
-        if (type === 'Schedule') {
+        if (type === 'Schedule' || type === 'Version') {
           hoverFriendSchedule?.();
         }
       }}
       onMouseLeave={(): void => {
-        if (type === 'Schedule') {
+        if (type === 'Schedule' || type === 'Version') {
           unhoverFriendSchedule?.();
         }
       }}

@@ -3,7 +3,12 @@ import { Draft, Immutable } from 'immer';
 
 import { Oscar } from '../data/beans';
 import { EMPTY_OSCAR } from '../data/beans/Oscar';
-import { defaultSchedule, FriendShareData, Schedule } from '../data/types';
+import {
+  defaultSchedule,
+  FriendShareData,
+  Schedule,
+  TermScheduleData,
+} from '../data/types';
 import { ErrorWithFields } from '../log';
 
 type ExtraData = {
@@ -17,7 +22,9 @@ type ExtraData = {
 
 export type ScheduleContextData = Immutable<Schedule> &
   // `Oscar` can't go into `Immutable`, so we place it separately
-  Immutable<ExtraData> & { readonly oscar: Oscar };
+  Immutable<ExtraData> & {
+    readonly oscar: Oscar;
+  } & Immutable<TermScheduleData>;
 
 export type ScheduleContextSetters = {
   setTerm: (next: string) => void;
@@ -45,6 +52,7 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
     allFriends: {},
     oscar: EMPTY_OSCAR,
     ...defaultSchedule,
+    versions: {},
   },
   {
     setTerm: (next: string): void => {

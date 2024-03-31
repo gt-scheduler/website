@@ -1,9 +1,10 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useSearchParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useLocalStorageState from 'use-local-storage-state';
 
+import { FriendContext, ScheduleContext } from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import InvitationModal from '../InvitationModal';
@@ -18,16 +19,23 @@ export type InvitationAcceptModalProps = {
     pinSelf?: boolean,
     expanded?: boolean
   ) => void;
+  setShareBackRemount: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export default function InvitationAcceptModal({
   handleCompareSchedules,
+  setShareBackRemount,
 }: InvitationAcceptModalProps): React.ReactElement {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [invitationModalOpen, setInvitationModalOpen] =
     useState<boolean>(false);
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
+  const [friendID, setFriendID] = useState<string>();
+
   const [searchParams] = useSearchParams();
+
+  const [{ friends }] = useContext(FriendContext);
+  const [{ allFriends, allVersionNames }] = useContext(ScheduleContext);
 
   const [hasSeen, setHasSeen] = useLocalStorageState(
     `redirect-invitation-modal-${searchParams.get('inviteId') ?? ''}`,
@@ -37,6 +45,46 @@ export default function InvitationAcceptModal({
     }
   );
 
+  const schedulesShared = useMemo(() => {
+    return Object.keys(allFriends)
+      .map((version_id) => {
+        if (
+          friendID &&
+          allFriends[version_id] &&
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          friendID in allFriends[version_id]!
+        ) {
+          const versionName = allVersionNames.filter(
+            (v) => v.id === version_id
+          );
+          if (versionName.length > 0) {
+            return versionName[0]?.name;
+          }
+        }
+        return undefined;
+      })
+      .filter((v) => v) as string[];
+  }, [friendID, allFriends, allVersionNames]);
+
+  const schedulesReceived = useMemo((): string[] | undefined => {
+    if (friendID) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return Object.keys(friends[friendID]!.versions)
+        .map((version_id): string | undefined => {
+          return friends[friendID]?.versions[version_id]?.name;
+        })
+        .filter((name) => name) as string[];
+    }
+    return undefined;
+  }, [friendID, friends]);
+
+  const friendName = useMemo((): string | undefined => {
+    if (friendID) {
+      return friends[friendID]?.name;
+    }
+    return undefined;
+  }, [friendID, friends]);
+
   useEffect(() => {
     if (
       !searchParams.get('inviteId') ||
@@ -45,10 +93,21 @@ export default function InvitationAcceptModal({
       hasSeen
     ) {
       setModalOpen(false);
-    } else {
+      return;
+    }
+
+    const email: string | null = searchParams.get('email');
+
+    if (friends) {
+      Object.keys(friends).forEach((f_i) => {
+        if (friends[f_i] && friends[f_i]?.email === email) {
+          setFriendID(f_i);
+        }
+      });
+
       setModalOpen(true);
     }
-  }, [searchParams, hasSeen]);
+  }, [searchParams, hasSeen, friends]);
 
   const onHide = (): void => {
     setHasSeen(true);
@@ -77,6 +136,7 @@ export default function InvitationAcceptModal({
         show={modalOpen}
         onHide={onHide}
         width={700}
+        buttonPrompt="Would you like to share your schedule back?"
         buttons={
           searchParams.get('status') === 'not-logged-in'
             ? [
@@ -88,7 +148,29 @@ export default function InvitationAcceptModal({
                   },
                 },
               ]
-            : undefined
+            : schedulesShared &&
+              schedulesShared.length !== allVersionNames.length &&
+              searchParams.get('status') === 'success'
+            ? [
+                {
+                  label: 'No',
+                  onClick: onHide,
+                  cancel: true,
+                },
+                {
+                  label: 'Share Back',
+                  onClick: (): void => {
+                    onHide();
+                    localStorage.setItem(
+                      `share-back-invitation-${friendID ?? ''}`,
+                      'true'
+                    );
+                    setShareBackRemount(1);
+                    setInvitationModalOpen(true);
+                  },
+                },
+              ]
+            : []
         }
       >
         <Button className="remove-close-button" onClick={onHide}>
@@ -96,9 +178,10 @@ export default function InvitationAcceptModal({
         </Button>
         {searchParams.get('status') === 'success' ? (
           <SuccessContent
+            name={friendName ?? ''}
             email={searchParams.get('email') ?? ''}
-            onHide={onHide}
-            setInvitationModalOpen={setInvitationModalOpen}
+            schedulesReceived={schedulesReceived ?? []}
+            schedulesSent={schedulesShared ?? []}
           />
         ) : (
           <FailureContent error={searchParams.get('status') ?? ''} />
@@ -110,43 +193,76 @@ export default function InvitationAcceptModal({
 
 type SuccessContentProps = {
   email: string;
-  onHide: () => void;
-  setInvitationModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  name: string;
+  schedulesReceived: string[];
+  schedulesSent: string[];
 };
 
 function SuccessContent({
+  name,
   email,
-  onHide,
-  setInvitationModalOpen,
+  schedulesReceived,
+  schedulesSent,
 }: SuccessContentProps): React.ReactElement {
   return (
     <div className="invitation-accept-modal-content">
       <div className="heading">
         You have successfully added a new schedule to your view!
       </div>
+
+      <img src="/invitation-succesful.png" alt="ok" className="modal-image" />
       <div className="sub-heading">
         You will now be able to see {email}&apos;s schedule!
       </div>
-
-      <img src="/scheduled.png" alt="ok" className="modal-image" />
-      <div className="modal-bottom">
-        <div>Would you like to share your schedule back?</div>
-
-        <div className="button-row">
-          <button type="submit" className="no-button" onClick={onHide}>
-            No
-          </button>
-          <button
-            type="submit"
-            className="share-button"
-            onClick={(): void => {
-              onHide();
-              setInvitationModalOpen(true);
-            }}
-          >
-            Share Back
-          </button>
-        </div>
+      <div className="sub-heading">
+        Schedules {`${name}`} has shared with you:
+        {schedulesReceived &&
+          schedulesReceived.map((version, i) => {
+            if (i !== schedulesReceived.length - 1) {
+              return (
+                <span>
+                  {' '}
+                  <b>{version}</b>,
+                </span>
+              );
+            }
+            return (
+              <span>
+                {' '}
+                <b>{version}</b>
+              </span>
+            );
+          })}
+        {schedulesReceived?.length === 0 ? (
+          <span>
+            <b> None</b>
+          </span>
+        ) : null}
+      </div>
+      <div className="sub-heading">
+        Schedules you have shared with {`${name}`}:
+        {schedulesSent &&
+          schedulesSent.map((version, i) => {
+            if (i !== schedulesSent.length - 1) {
+              return (
+                <span>
+                  {' '}
+                  <b>{version}</b>,
+                </span>
+              );
+            }
+            return (
+              <span>
+                {' '}
+                <b>{version}</b>
+              </span>
+            );
+          })}
+        {schedulesSent?.length === 0 ? (
+          <span>
+            <b> None</b>
+          </span>
+        ) : null}
       </div>
     </div>
   );

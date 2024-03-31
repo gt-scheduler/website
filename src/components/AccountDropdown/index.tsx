@@ -63,11 +63,13 @@ export default function AccountDropdown({
       items = [
         {
           label: <SignedInLabel state={state} />,
+          id: 'signed-in-label',
         },
         {
           label: 'Sign out',
           icon: faSignOutAlt,
           onClick: (): void => state.signOut(),
+          id: 'sign-out-dropdown',
         },
         {
           label: 'Theme',
@@ -86,6 +88,7 @@ export default function AccountDropdown({
           onClick: (): void => {
             setLoginOpen(true);
           },
+          id: 'sign-in-button-dropdown',
         },
         {
           label: 'Theme',

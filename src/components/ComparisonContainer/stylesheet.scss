@@ -20,18 +20,16 @@
         font-size: 14px;
         font-weight: 400;
         line-height: normal;
-        font-family: Roboto;
 
-        &.content-title{
+        &.content-title {
           font-weight: 700;
           margin: 16px 12px 0px 12px;
           border-bottom: 2px solid $color-border;
         }
 
-        &.shared-with{
+        &.shared-with {
           margin-bottom: 8px;
         }
-
       }
 
       .friend {
@@ -58,7 +56,7 @@
         p {
           font-weight: 575;
           font-size: 16px;
-        }        
+        }
       }
 
       .no-shared-schedules {
@@ -82,9 +80,8 @@
           align-items: center;
           position: relative;
           height: 22px;
-          
+
           .checkbox {
-            
             margin-left: 12px;
             border: 1px solid;
             border-radius: 3px;
@@ -113,7 +110,7 @@
             &.check {
               margin-left: 8px;
             }
-            
+
             p {
               text-overflow: ellipsis;
             }
@@ -174,7 +171,6 @@
             margin-top: 4px;
             margin-bottom: 2px;
           }
-
         }
 
         .palette {
@@ -195,45 +191,57 @@
         margin-top: 12px;
         margin-left: 10px;
         margin-right: 10px;
-        border: 1px solid #7C7C7C;
+        border: 1px solid $color-neutral;
         border-radius: 8px;
         padding: 8px 10px;
         gap: 6px;
-        
+
         p {
           font-size: 12px;
           line-height: normal;
         }
-      
+
         .shareback-button {
           width: 100px;
           height: 24px;
           padding: 6px 10px;
           font-size: 12px;
-          color: #000000;
+          color: var(--theme-bg);
+          background-color: var(--theme-fg);
           border-radius: 8px;
-          background-color: #FFF;
-          border: 1px solid #7C7C7C;
+          border: 1px solid $color-neutral;
           margin-left: 5px;
-      
+
           &:hover {
-            background-color: #d1d1d1;
+            @include dark {
+              background: $modal-foreground-color-dark;
+            }
+
+            @include light {
+              background: $modal-foreground-color-light;
+            }
           }
         }
-      
+
         .dont-shareback-button {
           width: 100px;
           height: 24px;
           padding: 6px 10px;
           font-size: 12px;
-          color: white;
+          color: var(--theme-fg);
+          background-color: var(--theme-bg);
           border-radius: 8px;
-          background-color: #333;
-          border: 1px solid #7C7C7C;
+          border: 1px solid $color-neutral;
           margin-right: 5px;
-      
+
           &:hover {
-            background-color: #7C7C7C;
+            @include dark {
+              background: $modal-foreground-color-light;
+            }
+
+            @include light {
+              background: $modal-foreground-color-dark;
+            }
           }
         }
       }
@@ -251,7 +259,6 @@
 }
 
 .shared-schedule-modal {
-
   h2 {
     font-weight: 700;
     font-size: 24px;
@@ -271,5 +278,6 @@
     top: 11px;
     right: 11px;
     border-radius: 50%;
+    color: $color-neutral;
   }
 }

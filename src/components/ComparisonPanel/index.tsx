@@ -21,7 +21,6 @@ export type ComparisonPanelProps = {
     overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
-  pinSelf: boolean;
   compare: boolean;
   expanded: boolean;
 };
@@ -29,7 +28,6 @@ export type ComparisonPanelProps = {
 export default function ComparisonPanel({
   handleCompareSchedules,
   pinnedSchedules,
-  pinSelf,
   compare,
   expanded,
 }: ComparisonPanelProps): React.ReactElement {
@@ -67,9 +65,14 @@ export default function ComparisonPanel({
     }
   }, [type, compare, handleCompareSchedules]);
 
+  const [shareBackRemount, setShareBackRemount] = useState(0);
+
   return (
     <div className="comparison-panel">
-      <InvitationAcceptModal handleCompareSchedules={handleCompareSchedules} />
+      <InvitationAcceptModal
+        handleCompareSchedules={handleCompareSchedules}
+        setShareBackRemount={setShareBackRemount}
+      />
       <div
         className={classes('drawer', expanded && 'opened')}
         onClick={(): void => {
@@ -133,7 +136,7 @@ export default function ComparisonPanel({
             <ComparisonContainer
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinnedSchedules}
-              pinSelf={pinSelf}
+              shareBackRemount={shareBackRemount}
             />
           </div>
         )}
