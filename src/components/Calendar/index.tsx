@@ -157,18 +157,22 @@ export default function Calendar({
       a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
   );
 
-  const selfFriend: Immutable<FriendScheduleData> = {
-    self: {
-      name: 'Me',
-      email: '',
-      versions,
-    },
-  };
-  const allUsers = { ...friends, ...selfFriend };
-
   const userSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
   const userEvents: { data: FriendEventData; overlay: boolean }[] = [];
   if (compare) {
+    /*
+    Create a dummy friend schedule data object for self schedules for
+    conforming types to iterate over all schedules in one go
+    */
+    const selfFriend: Immutable<FriendScheduleData> = {
+      self: {
+        name: 'Me',
+        email: '',
+        versions,
+      },
+    };
+    const allUsers = { ...friends, ...selfFriend };
+
     Object.values(allUsers).forEach((friend) =>
       Object.entries(friend.versions)
         .filter(
