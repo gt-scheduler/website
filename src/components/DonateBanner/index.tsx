@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
-
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
