@@ -86,7 +86,6 @@ export default function Scheduler(): React.ReactElement {
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinned}
-              pinSelf={pinSelf}
               compare={compare}
               expanded={expanded}
             />

@@ -68,13 +68,11 @@ export type ComparisonContainerProps = {
     overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
-  pinSelf: boolean;
 };
 
 export default function ComparisonContainer({
   handleCompareSchedules,
   pinnedSchedules,
-  pinSelf,
 }: ComparisonContainerProps): React.ReactElement {
   const [selected, setSelected] = useState<string[]>(pinnedSchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
