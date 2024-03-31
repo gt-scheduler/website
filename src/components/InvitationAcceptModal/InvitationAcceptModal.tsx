@@ -3,12 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useLocalStorageState from 'use-local-storage-state';
+
 import { FriendContext, ScheduleContext } from '../../contexts';
 import Button from '../Button';
 import Modal from '../Modal';
 import InvitationModal from '../InvitationModal';
 import LoginModal from '../LoginModal';
-import { FriendShareData } from '../../data/types';
 
 import './stylesheet.scss';
 
@@ -66,6 +66,7 @@ export default function InvitationAcceptModal({
         if (friends[f_i] && friends[f_i]?.email === email) {
           friendID = f_i;
           setFriendName(friends[f_i]?.name);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const received = Object.keys(friends[f_i]!.versions)
             .map((version_id): string | undefined => {
               return friends[f_i]?.versions[version_id]?.name;
@@ -79,6 +80,7 @@ export default function InvitationAcceptModal({
       if (friendID !== '') {
         const sent = Object.keys(allFriends)
           .map((version_id) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             if (allFriends[version_id] && friendID in allFriends[version_id]!) {
               const versionName = allVersionNames.filter(
                 (v) => v.id === version_id
@@ -96,7 +98,7 @@ export default function InvitationAcceptModal({
 
       setModalOpen(true);
     }
-  }, [searchParams, hasSeen, friends]);
+  }, [searchParams, hasSeen, friends, allFriends, allVersionNames]);
 
   const onHide = (): void => {
     setHasSeen(true);
