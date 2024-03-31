@@ -67,9 +67,14 @@ export default function ComparisonPanel({
     }
   }, [type, compare, handleCompareSchedules]);
 
+  const [shareBackRemount, setShareBackRemount] = useState(0);
+
   return (
     <div className="comparison-panel">
-      <InvitationAcceptModal handleCompareSchedules={handleCompareSchedules} />
+      <InvitationAcceptModal
+        handleCompareSchedules={handleCompareSchedules}
+        setShareBackRemount={setShareBackRemount}
+      />
       <div
         className={classes('drawer', expanded && 'opened')}
         onClick={(): void => {
@@ -134,6 +139,7 @@ export default function ComparisonPanel({
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinnedSchedules}
               pinSelf={pinSelf}
+              shareBackRemount={shareBackRemount}
             />
           </div>
         )}
