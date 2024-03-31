@@ -15,6 +15,7 @@ import { Button, InvitationModal } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
+  DESKTOP_BREAKPOINT,
 } from '../../constants';
 import useMedia from '../../hooks/useMedia';
 import { AccountContext, AccountContextValue } from '../../contexts/account';
@@ -22,6 +23,7 @@ import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
 import ShareIcon from '../ShareIcon';
+import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
@@ -68,6 +70,8 @@ export default function HeaderActionBar({
       storageSync: true,
     }
   );
+
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   const openInvitation = useCallback(() => {
     setInvitationOpen(true);
@@ -128,21 +132,23 @@ export default function HeaderActionBar({
       </DropdownMenu>
       <InvitationModal show={invitationOpen} onHide={hideInvitation} />
 
-      <Button
-        onClick={openInvitation}
-        disabled={type === 'signedOut'}
-        className={classes('header-action-bar__button', 'invite-button')}
-      >
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faShare}
-        />
-        <div className="header-action-bar__button-text">Invite</div>
-        {seenInviteModal || type === 'signedOut' ? null : (
-          <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
-        )}
-      </Button>
+      {!mobile && (
+        <Button
+          onClick={openInvitation}
+          disabled={type === 'signedOut'}
+          className={classes('header-action-bar__button', 'invite-button')}
+        >
+          <FontAwesomeIcon
+            className="header-action-bar__button-icon"
+            fixedWidth
+            icon={faShare}
+          />
+          <div className="header-action-bar__button-text">Invite</div>
+          {seenInviteModal || type === 'signedOut' ? null : (
+            <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
+          )}
+        </Button>
+      )}
 
       <Button
         href="https://github.com/gt-scheduler/website"

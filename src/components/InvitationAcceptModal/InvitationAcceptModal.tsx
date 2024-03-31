@@ -161,7 +161,7 @@ export default function InvitationAcceptModal({
                   onClick: (): void => {
                     onHide();
                     localStorage.setItem(
-                      `shareack-inviationn-${friendID ?? ''}`,
+                      `share-back-invitation-${friendID ?? ''}`,
                       'true'
                     );
                     setShareBackRemount(1);

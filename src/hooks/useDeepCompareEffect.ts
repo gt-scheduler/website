@@ -20,12 +20,11 @@ export default function useDeepCompareEffect(
   callback: EffectCallback,
   dependencies: DependencyList
 ): void {
-  const ref = useRef(dependencies);
-  dependencies.forEach((dep, i) => {
-    if (!lodash.isEqual(dep, ref.current[i])) {
-      ref.current = dependencies;
-    }
-  });
+  const ref = useRef<DependencyList>([]);
+
+  if (!lodash.isEqual(dependencies, ref.current)) {
+    ref.current = lodash.cloneDeep(dependencies);
+  }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useEffect(callback, ref.current);

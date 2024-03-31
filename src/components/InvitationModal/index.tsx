@@ -5,7 +5,6 @@ import React, {
   useState,
   useRef,
   useMemo,
-  useEffect,
 } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
@@ -35,6 +34,7 @@ import { AccountContext, SignedIn } from '../../contexts/account';
 import { ErrorWithFields, softError } from '../../log';
 import Spinner from '../Spinner';
 import { ScheduleDeletionRequest } from '../../types';
+import useDeepCompareEffect from '../../hooks/useDeepCompareEffect';
 
 import './stylesheet.scss';
 
@@ -120,8 +120,12 @@ export function InvitationModalContent({
 
   // verify email with a regex and send invitation if valid
   const verifyEmail = useCallback((): void => {
+    if (!input.current?.value) {
+      return;
+    }
+
     setEmailIcon('spinner');
-    if (!input.current || !/^\S+@\S+\.\S+$/.test(input.current.value)) {
+    if (!/^\S+@\S+\.\S+$/.test(input.current.value)) {
       setValidMessage('Invalid email, please try again!');
       setEmailIcon('send');
       return setValidClassName('invalid-email');
@@ -151,7 +155,7 @@ export function InvitationModalContent({
     );
 
     if (numNotAccepted === 0) {
-      setValidMessage('User already invited, try another email!');
+      setValidMessage('User has already been invited to selected schedules.');
       setEmailIcon('send');
       return setValidClassName('invalid-email');
     }
@@ -327,7 +331,7 @@ export function InvitationModalContent({
   );
 
   // show a fake loader when options change
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     setLinkButtonClassName('');
     setLinkLoading(true);
     setTimeout(() => {
