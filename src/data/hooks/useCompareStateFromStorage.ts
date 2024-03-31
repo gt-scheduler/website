@@ -37,7 +37,6 @@ export default function useCompareStateFromStorage({
   pinSelfDefault,
   expandedDefault,
 }: Props): HookResult {
-  console.log(pinDefault);
   const [compare, setCompare] = useLocalStorageState<boolean>(
     'compare-panel-state-compareValue',
     {
