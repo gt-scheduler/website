@@ -19,10 +19,12 @@ export type InvitationAcceptModalProps = {
     pinSelf?: boolean,
     expanded?: boolean
   ) => void;
+  setShareBackRemount: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export default function InvitationAcceptModal({
   handleCompareSchedules,
+  setShareBackRemount,
 }: InvitationAcceptModalProps): React.ReactElement {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [invitationModalOpen, setInvitationModalOpen] =
@@ -105,7 +107,7 @@ export default function InvitationAcceptModal({
 
       setModalOpen(true);
     }
-  }, [searchParams, hasSeen, friends, allFriends, allVersionNames]);
+  }, [searchParams, hasSeen, friends]);
 
   const onHide = (): void => {
     setHasSeen(true);
@@ -159,9 +161,10 @@ export default function InvitationAcceptModal({
                   onClick: (): void => {
                     onHide();
                     localStorage.setItem(
-                      `share-back-invitation-${friendID ?? ''}`,
+                      `shareack-inviationn-${friendID ?? ''}`,
                       'true'
                     );
+                    setShareBackRemount(1);
                     setInvitationModalOpen(true);
                   },
                 },

@@ -69,12 +69,14 @@ export type ComparisonContainerProps = {
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
+  shareBackRemount: number;
 };
 
 export default function ComparisonContainer({
   handleCompareSchedules,
   pinnedSchedules,
   pinSelf,
+  shareBackRemount,
 }: ComparisonContainerProps): React.ReactElement {
   const [selected, setSelected] = useState<string[]>(pinnedSchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
@@ -449,6 +451,7 @@ export default function ComparisonContainer({
                       friendEmail={friend.email}
                       setModalEmail={setInvitationModalEmail}
                       setModalOpen={setInvitationModalOpen}
+                      key={shareBackRemount}
                     />
                   </div>
                 );
