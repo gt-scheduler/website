@@ -578,12 +578,12 @@ function ScheduleRow({
     <div
       className="schedule-row"
       onMouseEnter={(): void => {
-        if (type === 'Schedule') {
+        if (type === 'Schedule' || type === 'Version') {
           hoverFriendSchedule?.();
         }
       }}
       onMouseLeave={(): void => {
-        if (type === 'Schedule') {
+        if (type === 'Schedule' || type === 'Version') {
           unhoverFriendSchedule?.();
         }
       }}
