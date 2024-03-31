@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
+import { Immutable } from 'immer';
 
+import { FriendScheduleData } from '../../data/types';
 import { Section } from '../../data/beans';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
@@ -155,12 +157,19 @@ export default function Calendar({
       a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
   );
 
-  const friendSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
-  const friendEvents: { data: FriendEventData; overlay: boolean }[] = [];
+  const selfFriend: Immutable<FriendScheduleData> = {
+    self: {
+      name: 'Me',
+      email: '',
+      versions,
+    },
+  };
+  const allUsers = { ...friends, ...selfFriend };
+
   const userSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
   const userEvents: { data: FriendEventData; overlay: boolean }[] = [];
   if (compare) {
-    Object.values(friends).forEach((friend) =>
+    Object.values(allUsers).forEach((friend) =>
       Object.entries(friend.versions)
         .filter(
           (schedule) =>
@@ -170,7 +179,7 @@ export default function Calendar({
         .forEach((schedule) => {
           const friendMeetings: CommonMeetingObject[] = [];
           schedule[1].schedule.pinnedCrns.forEach((crn) => {
-            friendSchedules.push({
+            userSchedules.push({
               data: {
                 friend: friend.name,
                 scheduleName: schedule[1].name,
@@ -194,7 +203,7 @@ export default function Calendar({
               });
           });
           schedule[1].schedule.events.forEach((event) => {
-            friendEvents.push({
+            userEvents.push({
               data: {
                 friend: friend.name,
                 scheduleName: schedule[1].name,
@@ -219,62 +228,6 @@ export default function Calendar({
           meetings.push(...friendMeetings);
         })
     );
-    Object.entries(versions)
-      .filter(
-        (schedule) =>
-          pinnedFriendSchedules.includes(schedule[0]) ||
-          overlayFriendSchedules.includes(schedule[0])
-      )
-      .forEach((schedule) => {
-        const userMeetings: CommonMeetingObject[] = [];
-        schedule[1].schedule.pinnedCrns.forEach((crn) => {
-          userSchedules.push({
-            data: {
-              friend: 'Me',
-              scheduleName: schedule[1].name,
-              scheduleId: schedule[0],
-              crn,
-            } as FriendCrnData,
-            overlay: !pinnedFriendSchedules.includes(schedule[0]),
-          });
-
-          const section = oscar.findSection(crn);
-          if (section == null) return;
-          section.meetings
-            .filter((m) => m.period)
-            .forEach((meeting) => {
-              userMeetings.push({
-                id: `${schedule[0]}-${crn}`,
-                days: meeting.days,
-                period: meeting.period,
-                event: false,
-              } as CommonMeetingObject);
-            });
-        });
-        schedule[1].schedule.events.forEach((event) => {
-          userEvents.push({
-            data: {
-              friend: 'Me',
-              scheduleName: schedule[1].name,
-              scheduleId: schedule[0],
-              id: event.id,
-              event,
-            } as FriendEventData,
-            overlay: !pinnedFriendSchedules.includes(schedule[0]),
-          });
-          userMeetings.push({
-            id: `${schedule[0]}-${event.id}`,
-            days: event.days,
-            period: event.period,
-            event: true,
-          } as CommonMeetingObject);
-        });
-        userMeetings.sort(
-          (a, b) =>
-            a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
-        );
-        meetings.push(...userMeetings);
-      });
   }
 
   // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
@@ -482,7 +435,7 @@ export default function Calendar({
             />
           ))}
         {compare &&
-          friendSchedules.concat(userSchedules).map(({ data, overlay }) => (
+          userSchedules.map(({ data, overlay }) => (
             <CompareBlocks
               key={`${data.scheduleId}-${data.crn}`}
               crn={data.crn}
@@ -516,7 +469,7 @@ export default function Calendar({
             />
           ))}
         {compare &&
-          friendEvents.concat(userEvents).map(({ data, overlay }) => (
+          userEvents.map(({ data, overlay }) => (
             <EventBlocks
               key={`${data.scheduleId}-${data.id}`}
               event={data.event}
