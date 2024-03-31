@@ -128,10 +128,10 @@ export default function HeaderDisplay({
       )}
 
       {/* Left-aligned logo */}
-      <Button className="logo">
+      <div className="logo">
         <span className="gt">GT </span>
         <span className="scheduler">Scheduler</span>
-      </Button>
+      </div>
 
       {/* Term selector */}
       {termsState.type === 'loaded' ? (

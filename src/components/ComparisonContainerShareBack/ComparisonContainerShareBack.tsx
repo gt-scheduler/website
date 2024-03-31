@@ -17,7 +17,7 @@ export default function ComparisonContainerShareBack({
   setModalOpen,
 }: ComparisonContainerShareBack): React.ReactElement | null {
   const [hasSeen, setHasSeen] = useLocalStorageState(
-    `share-back-invitation-${friendId}`,
+    `shareack-inviationn-${friendId}`,
     {
       defaultValue: false,
       storageSync: true,
