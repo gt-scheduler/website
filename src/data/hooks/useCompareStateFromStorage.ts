@@ -14,6 +14,13 @@ type HookResult = {
   ) => void;
 };
 
+type Props = {
+  compareDefault?: boolean;
+  pinDefault?: string[];
+  pinSelfDefault?: boolean;
+  expandedDefault?: boolean;
+};
+
 /**
  * Gets the current UI state from local storage.
  * Do not call this function in a non-root component;
@@ -24,32 +31,38 @@ type HookResult = {
  * with different schedules if desired,
  * but still have the app resume to the last viewed schedule when opened again.
  */
-export default function useCompareStateFromStorage(): HookResult {
+export default function useCompareStateFromStorage({
+  compareDefault,
+  pinDefault,
+  pinSelfDefault,
+  expandedDefault,
+}: Props): HookResult {
+  console.log(pinDefault);
   const [compare, setCompare] = useLocalStorageState<boolean>(
     'compare-panel-state-compareValue',
     {
-      defaultValue: false,
+      defaultValue: compareDefault ?? false,
       storageSync: false,
     }
   );
   const [pinned, setPinned] = useLocalStorageState<string[]>(
     'compare-panel-state-pinnedSchedules',
     {
-      defaultValue: [],
+      defaultValue: pinDefault ?? [],
       storageSync: false,
     }
   );
   const [pinSelf, setPinSelf] = useLocalStorageState<boolean>(
     'compare-panel-state-pinSelfValue',
     {
-      defaultValue: true,
+      defaultValue: pinSelfDefault ?? true,
       storageSync: false,
     }
   );
   const [expanded, setExpanded] = useLocalStorageState<boolean>(
     'compare-panel-state-expandedValue',
     {
-      defaultValue: true,
+      defaultValue: expandedDefault ?? true,
       storageSync: false,
     }
   );
