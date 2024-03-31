@@ -149,7 +149,8 @@ export default function InvitationAcceptModal({
                 },
               ]
             : schedulesShared &&
-              schedulesShared.length !== allVersionNames.length
+              schedulesShared.length !== allVersionNames.length &&
+              searchParams.get('status') === 'success'
             ? [
                 {
                   label: 'No',
