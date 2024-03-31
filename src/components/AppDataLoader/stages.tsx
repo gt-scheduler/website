@@ -4,7 +4,7 @@ import { Immutable, Draft, castDraft } from 'immer';
 import { Oscar } from '../../data/beans';
 import useDownloadOscarData from '../../data/hooks/useDownloadOscarData';
 import useDownloadTerms from '../../data/hooks/useDownloadTerms';
-import { NonEmptyArray } from '../../types';
+import { NonEmptyArray, Term } from '../../types';
 import LoadingDisplay from '../LoadingDisplay';
 import { SkeletonContent, AppSkeleton, AppSkeletonProps } from '../App/content';
 import {
@@ -78,7 +78,7 @@ export function StageLoadUIState({
 
 export type StageEnsureValidTermProps = {
   skeletonProps?: StageSkeletonProps;
-  terms: NonEmptyArray<string>;
+  terms: NonEmptyArray<Term>;
   currentTermRaw: string;
   setTerm: (next: string) => void;
   children: (props: { currentTerm: string }) => React.ReactNode;
@@ -343,7 +343,7 @@ export function StageCreateScheduleDataProducer({
 
 export type StageLoadTermsProps = {
   skeletonProps?: StageSkeletonProps;
-  children: (props: { terms: NonEmptyArray<string> }) => React.ReactNode;
+  children: (props: { terms: NonEmptyArray<Term> }) => React.ReactNode;
 };
 
 /**

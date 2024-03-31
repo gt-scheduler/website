@@ -23,7 +23,6 @@ jobs:
         # Always run the linter, even if prettier failed
         if: ${{ steps.install.outcome == 'success' }}
 
-
   build:
     name: Build & Stage
     runs-on: ubuntu-latest
@@ -47,7 +46,7 @@ jobs:
           REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID_DEV }}
           REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID_DEV }}
           REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID_DEV }}
-      
+
       - name: Stage
         uses: rossjrw/pr-preview-action@v1
         with:
