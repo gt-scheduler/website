@@ -1,6 +1,6 @@
 import React from 'react';
 import useLocalStorageState from 'use-local-storage-state';
-import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Button from '../Button';
@@ -42,7 +42,7 @@ export default function DonateBanner(): React.ReactElement {
               setHasSeen(true);
             }}
           >
-            <FontAwesomeIcon fixedWidth icon={faX} size="lg" />
+            <FontAwesomeIcon fixedWidth icon={faXmark} size="lg" />
           </Button>
         </div>
       ) : (

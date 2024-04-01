@@ -1,7 +1,15 @@
+@import '../../variables.scss';
+
 .InformationModal {
   .close-button {
-    width: fit-content;
-    margin-left: auto;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    padding: 15px;
+    color: $color-neutral;
+    border-radius: 50px;
   }
   .information-content {
     display: flex;

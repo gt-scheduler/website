@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
-import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes } from '../../utils/misc';
@@ -13,7 +13,7 @@ import './stylesheet.scss';
 
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
-const MODAL_LOCAL_STORAGE_KEY = '2023-04-05-spr2024-new-features-announcement';
+const MODAL_LOCAL_STORAGE_KEY = '2024-04-01-spr2024-new-features-announcement';
 const OUTDATED_LOCAL_STORAGE_KEY = [
   '2023-04-05-spr2023-new-features-announcement',
   '2021-10-27-spr2022-schedule-versions-account-sync',
@@ -37,7 +37,7 @@ export function InformationModalContent({
   return (
     <>
       <Button className="close-button" onClick={(): void => setShow(false)}>
-        <FontAwesomeIcon fixedWidth icon={faX} size="xl" />
+        <FontAwesomeIcon icon={faXmark} size="xl" />
       </Button>
       <img
         style={{
