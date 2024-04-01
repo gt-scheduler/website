@@ -395,6 +395,9 @@ export default function ComparisonContainer({
                       setInvitationModalOpen={setInvitationModalOpen}
                       handleNameEditOnBlur={handleNameEditOnBlur}
                     />
+                    <div className="friend-email">
+                      <p>{friend.email}</p>
+                    </div>
                     {Object.entries(friend.versions).map(
                       ([scheduleId, schedule]) => {
                         return (
