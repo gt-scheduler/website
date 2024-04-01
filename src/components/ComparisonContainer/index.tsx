@@ -560,6 +560,7 @@ function ScheduleRow({
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
   const [divHover, setDivHover] = useState(false);
+  const [showPaletteTooltip, setShowPaletteTooltip] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [showEditTooltip, setShowEditTooltip] = useState(false);
   const [showRemoveTooltip, setShowRemoveTooltip] = useState(false);
@@ -651,13 +652,30 @@ function ScheduleRow({
           </>
         )}
         {(divHover || edit) && hasPalette && setPaletteInfo && (
-          <Button
-            className="icon"
-            onClick={(): void => setPaletteInfo(palette ? '' : id)}
-            key={`${id}-palette`}
+          <div
+            onMouseEnter={(): void => setShowPaletteTooltip(true)}
+            onMouseLeave={(): void => setShowPaletteTooltip(false)}
+            id={`${tooltipId}-palette`}
           >
-            <FontAwesomeIcon icon={faPalette} size="xs" />
-          </Button>
+            <Button
+              className="icon"
+              onClick={(): void => setPaletteInfo(palette ? '' : id)}
+              key={`${id}-palette`}
+            >
+              <FontAwesomeIcon icon={faPalette} size="xs" />
+            </Button>
+            <ReactTooltip
+              key={`palette-tooltip-${id}`}
+              anchorId={`${tooltipId}-palette`}
+              place="top"
+              isOpen={showPaletteTooltip}
+              setIsOpen={setShowPaletteTooltip}
+              className="tooltip"
+              variant="dark"
+            >
+              Edit Color
+            </ReactTooltip>
+          </div>
         )}
         {(divHover || edit) &&
           hasEdit &&
