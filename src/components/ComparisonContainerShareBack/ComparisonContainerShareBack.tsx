@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
+
+import { ScheduleContext } from '../../contexts';
 
 type ComparisonContainerShareBack = {
   friendId: string;
@@ -16,6 +18,8 @@ export default function ComparisonContainerShareBack({
   setModalEmail,
   setModalOpen,
 }: ComparisonContainerShareBack): React.ReactElement | null {
+  const [{ allFriends, allVersionNames }] = useContext(ScheduleContext);
+
   const [hasSeen, setHasSeen] = useLocalStorageState(
     `share-back-invitation-${friendId}`,
     {
@@ -24,7 +28,28 @@ export default function ComparisonContainerShareBack({
     }
   );
 
-  if (hasSeen) {
+  const schedulesShared = useMemo(() => {
+    return Object.keys(allFriends)
+      .map((version_id) => {
+        if (
+          friendId &&
+          allFriends[version_id] &&
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          friendId in allFriends[version_id]!
+        ) {
+          const versionName = allVersionNames.filter(
+            (v) => v.id === version_id
+          );
+          if (versionName.length > 0) {
+            return versionName[0]?.name;
+          }
+        }
+        return undefined;
+      })
+      .filter((v) => v) as string[];
+  }, [friendId, allFriends, allVersionNames]);
+
+  if (hasSeen || schedulesShared.length === allVersionNames.length) {
     return null;
   }
 
