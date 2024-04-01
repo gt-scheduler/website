@@ -18,6 +18,7 @@ enum LoadingState {
 
 type HandleInvitationResponse = {
   email: string;
+  term: string;
 };
 
 interface ServerError extends AxiosError {
@@ -35,7 +36,7 @@ const url = `${CLOUD_FUNCTION_BASE_URL}/handleFriendInvitation`;
 const handleInvite = async (
   inviteId: string | undefined,
   token: string | void
-): Promise<string> => {
+): Promise<HandleInvitationResponse> => {
   const data = JSON.stringify({
     inviteId,
     token,
@@ -46,7 +47,7 @@ const handleInvite = async (
     },
   });
 
-  return res.data.email;
+  return res.data;
 };
 
 export default function InviteBackLink(): React.ReactElement {
@@ -67,7 +68,9 @@ export default function InviteBackLink(): React.ReactElement {
   const accountContext = useFirebaseAuth();
 
   useEffect(() => {
-    const handleInviteAsync = async (): Promise<string | undefined> => {
+    const handleInviteAsync = async (): Promise<
+      HandleInvitationResponse | undefined
+    > => {
       if (accountContext.type === 'loaded') {
         const token = await (accountContext.result as SignedIn).getToken();
         return handleInvite(id, token);
@@ -83,12 +86,12 @@ export default function InviteBackLink(): React.ReactElement {
       redirectURL !== undefined
     ) {
       handleInviteAsync()
-        .then((email) => {
+        .then((resp) => {
           setState(LoadingState.SUCCESS);
           navigate(
-            `${redirectURL}?email=${email ?? ''}&status=success&inviteId=${
-              id ?? ''
-            }`
+            `${redirectURL}?email=${resp?.email ?? ''}&term=${
+              resp?.term ?? ''
+            }&status=success&inviteId=${id ?? ''}`
           );
         })
         .catch((err: ServerError) => {
