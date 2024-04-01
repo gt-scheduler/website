@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,32 +9,18 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
-const BANNER_LOCAL_STORAGE_KEY = '2023-04-05-spr2024-donate-banner';
-// const OUTDATED_LOCAL_STORAGE_KEY = [
-//   '2023-04-05-spr2024-donate-banner',
-//   '2023-04-05-spr2023-new-features-announcement',
-//   '2021-10-27-spr2022-schedule-versions-account-sync',
-//   '2023-03-05-spr2023-oscar-migration',
-// ];
+const BANNER_LOCAL_STORAGE_KEY = '2024-04-01-spr2024-donate-banner';
 
 export default function DonateBanner(): React.ReactElement {
-  const [show, setShow] = useState(false);
   const [hasSeen, setHasSeen] = useLocalStorageState(BANNER_LOCAL_STORAGE_KEY, {
     defaultValue: false,
     storageSync: true,
   });
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
-  useEffect(() => {
-    if (!hasSeen) {
-      setShow(true);
-      setHasSeen(true);
-    }
-  }, [hasSeen, setHasSeen]);
-
   return (
     <div>
-      {show ? (
+      {!hasSeen ? (
         <div className="banner">
           <div className="spacer" />
           <span>
@@ -53,7 +39,7 @@ export default function DonateBanner(): React.ReactElement {
           <Button
             className="close-button"
             onClick={(): void => {
-              setShow(false);
+              setHasSeen(true);
             }}
           >
             <FontAwesomeIcon fixedWidth icon={faX} size="lg" />
