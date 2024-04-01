@@ -27,14 +27,14 @@ export default function DonateBanner(): React.ReactElement {
             {!mobile
               ? 'Help keep GT Scheduler and its amazing features running!'
               : 'Help us and'}
-            <Button
+            <a
               className="donateButton"
               href="https://donorbox.org/gt-scheduler"
             >
               <b className="buttonText">
                 {!mobile ? 'Donate today.' : 'donate today.'}
               </b>
-            </Button>
+            </a>
           </span>
           <Button
             className="close-button"
