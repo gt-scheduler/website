@@ -1,4 +1,8 @@
 .InformationModal {
+  .close-button {
+    width: fit-content;
+    margin-left: auto;
+  }
   .information-content {
     display: flex;
     position: relative;
@@ -8,7 +12,7 @@
     margin-bottom: 20px;
     p {
       margin: 0px;
-      width: 12vw;
+      width: 15vw;
     }
     .information-images {
       display: flex;

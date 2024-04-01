@@ -1,29 +1,24 @@
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import {
   faDownload,
   faCalendarAlt,
   faPaste,
   faCaretDown,
-  faShare,
-  faCircle,
+  faHandHoldingDollar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext, useState } from 'react';
-import useLocalStorageState from 'use-local-storage-state';
+import React, { useCallback, useState } from 'react';
 
 import { Button, InvitationModal } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
-  DESKTOP_BREAKPOINT,
 } from '../../constants';
 import useMedia from '../../hooks/useMedia';
-import { AccountContext, AccountContextValue } from '../../contexts/account';
+import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
 import ShareIcon from '../ShareIcon';
-import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
@@ -38,9 +33,6 @@ export type HeaderActionBarProps = {
   onDownloadCalendar?: () => void;
   enableDownloadCalendar?: boolean;
 };
-
-// Key to mark when a user has already seen the invite modal.
-const MODAL_LOCAL_STORAGE_KEY = '2023-05-10-spr2023-invite-modal';
 
 /**
  * Displays the icon buttons (with optional text)
@@ -60,25 +52,8 @@ export default function HeaderActionBar({
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
 }: HeaderActionBarProps): React.ReactElement {
-  const { type } = useContext(AccountContext);
-
   const [invitationOpen, setInvitationOpen] = useState(false);
-  const [seenInviteModal, setSeenInviteModal] = useLocalStorageState<boolean>(
-    MODAL_LOCAL_STORAGE_KEY,
-    {
-      defaultValue: false,
-      storageSync: true,
-    }
-  );
 
-  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
-
-  const openInvitation = useCallback(() => {
-    setInvitationOpen(true);
-    if (!seenInviteModal) {
-      setSeenInviteModal(true);
-    }
-  }, [seenInviteModal, setSeenInviteModal]);
   const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   // Coalesce the export options into the props for a single <DropdownMenu>
@@ -121,6 +96,19 @@ export default function HeaderActionBar({
 
   return (
     <div className={classes('header-action-bar', className)} style={style}>
+      <Button
+        href="https://donorbox.org/gt-scheduler"
+        className="header-action-bar__button"
+      >
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faHandHoldingDollar}
+        />
+
+        <div className="header-action-bar__button-text">Donate</div>
+      </Button>
+
       <DropdownMenu
         disabled={!enableExport}
         items={exportActions}
@@ -134,36 +122,6 @@ export default function HeaderActionBar({
         </div>
       </DropdownMenu>
       <InvitationModal show={invitationOpen} onHide={hideInvitation} />
-
-      {!mobile && (
-        <Button
-          onClick={openInvitation}
-          disabled={type === 'signedOut'}
-          className={classes('header-action-bar__button', 'invite-button')}
-        >
-          <FontAwesomeIcon
-            className="header-action-bar__button-icon"
-            fixedWidth
-            icon={faShare}
-          />
-          <div className="header-action-bar__button-text">Invite</div>
-          {seenInviteModal || type === 'signedOut' ? null : (
-            <FontAwesomeIcon className="circle" fixedWidth icon={faCircle} />
-          )}
-        </Button>
-      )}
-
-      <Button
-        href="https://github.com/gt-scheduler/website"
-        className="header-action-bar__button"
-      >
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faGithub}
-        />
-        <div className="header-action-bar__button-text">GitHub</div>
-      </Button>
 
       <AccountDropdown state={accountState} />
     </div>
