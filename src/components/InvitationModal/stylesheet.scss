@@ -182,7 +182,8 @@
           position: absolute;
           max-width: 150px;
           overflow-x: auto;
-
+          overflow-y: auto;
+          max-height: 300px;
           @include dark {
             background-color: $theme-dark-background;
           }
