@@ -1,8 +1,7 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import useLocalStorageState from 'use-local-storage-state';
 
 import { FriendContext, ScheduleContext } from '../../contexts';
 import Button from '../Button';
@@ -34,17 +33,11 @@ export default function InvitationAcceptModal({
 
   const [searchParams] = useSearchParams();
 
+  const navigate = useNavigate();
+
   const [{ friends }] = useContext(FriendContext);
   const [{ allFriends, allVersionNames }, { setTerm }] =
     useContext(ScheduleContext);
-
-  const [hasSeen, setHasSeen] = useLocalStorageState(
-    `redirect-invitation-modal-${searchParams.get('inviteId') ?? ''}`,
-    {
-      defaultValue: false,
-      storageSync: true,
-    }
-  );
 
   const schedulesShared = useMemo(() => {
     return Object.keys(allFriends)
@@ -90,8 +83,7 @@ export default function InvitationAcceptModal({
     if (
       !searchParams.get('inviteId') ||
       !searchParams.get('status') ||
-      !searchParams.get('email') ||
-      hasSeen
+      !searchParams.get('email')
     ) {
       setModalOpen(false);
       return;
@@ -116,12 +108,10 @@ export default function InvitationAcceptModal({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       setTerm(searchParams.get('term')!);
     }
-  }, [searchParams, hasSeen, friends, setTerm]);
+  }, [searchParams, friends, setTerm]);
 
   const onHide = (): void => {
-    if (searchParams.get('status') === 'success') {
-      setHasSeen(true);
-    }
+    navigate('/');
     setModalOpen(!modalOpen);
     handleCompareSchedules(true, undefined, undefined, true);
   };
