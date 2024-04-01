@@ -560,6 +560,9 @@ function ScheduleRow({
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
   const [divHover, setDivHover] = useState(false);
+  const [showShareTooltip, setShowShareTooltip] = useState(false);
+  const [showEditTooltip, setShowEditTooltip] = useState(false);
+  const [showRemoveTooltip, setShowRemoveTooltip] = useState(false);
 
   const edit =
     hasEdit &&
@@ -661,34 +664,87 @@ function ScheduleRow({
           setInvitationModalOpen !== undefined &&
           setInvitationModalEmail !== undefined &&
           email && (
-            <Button
-              className="icon"
-              onClick={(): void => {
-                setInvitationModalEmail(email);
-                setInvitationModalOpen(true);
-              }}
-              key={`${id}-share`}
+            <div
+              onMouseEnter={(): void => setShowShareTooltip(true)}
+              onMouseLeave={(): void => setShowShareTooltip(false)}
+              id={`${tooltipId}-share`}
             >
-              <FontAwesomeIcon icon={faShareFromSquare} size="xs" />
-            </Button>
+              <Button
+                className="icon"
+                onClick={(): void => {
+                  setInvitationModalEmail(email);
+                  setInvitationModalOpen(true);
+                }}
+                key={`${id}-share`}
+                data-for={`share-tooltip-${id}`}
+                data-tip="Share"
+              >
+                <FontAwesomeIcon icon={faShareFromSquare} size="xs" />
+              </Button>
+              <ReactTooltip
+                key={`share-tooltip-${id}`}
+                anchorId={`${tooltipId}-share`}
+                place="top"
+                isOpen={showShareTooltip}
+                setIsOpen={setShowShareTooltip}
+                className="tooltip"
+                variant="dark"
+              >
+                Share Back
+              </ReactTooltip>
+            </div>
           )}
         {(divHover || edit) && hasEdit && (
-          <Button
-            className="icon"
-            onClick={handleEditSchedule}
-            key={`${id}-edit`}
+          <div
+            onMouseEnter={(): void => setShowEditTooltip(true)}
+            onMouseLeave={(): void => setShowEditTooltip(false)}
+            id={`${tooltipId}-edit`}
           >
-            <FontAwesomeIcon icon={faPencil} size="xs" />
-          </Button>
+            <Button
+              className="icon"
+              onClick={handleEditSchedule}
+              key={`${id}-edit`}
+            >
+              <FontAwesomeIcon icon={faPencil} size="xs" />
+            </Button>
+            <ReactTooltip
+              key={`edit-tooltip-${id}`}
+              anchorId={`${tooltipId}-edit`}
+              place="top"
+              isOpen={showEditTooltip}
+              setIsOpen={setShowEditTooltip}
+              className="tooltip"
+              variant="dark"
+            >
+              Edit
+            </ReactTooltip>
+          </div>
         )}
         {(divHover || edit) && hasDelete && (
-          <Button
-            className="icon"
-            onClick={handleRemoveSchedule}
-            key={`${id}-delete`}
+          <div
+            onMouseEnter={(): void => setShowRemoveTooltip(true)}
+            onMouseLeave={(): void => setShowRemoveTooltip(false)}
+            id={`${tooltipId}-delete`}
           >
-            <FontAwesomeIcon icon={faCircleXmark} size="xs" />
-          </Button>
+            <Button
+              className="icon"
+              onClick={handleRemoveSchedule}
+              key={`${id}-delete`}
+            >
+              <FontAwesomeIcon icon={faCircleXmark} size="xs" />
+            </Button>
+            <ReactTooltip
+              key={`delete-tooltip-${id}`}
+              anchorId={`${tooltipId}-delete`}
+              place="top"
+              isOpen={showRemoveTooltip}
+              setIsOpen={setShowRemoveTooltip}
+              className="tooltip"
+              variant="dark"
+            >
+              Remove
+            </ReactTooltip>
+          </div>
         )}
       </div>
       {hasPalette && palette && setFriendScheduleColor && setPaletteInfo && (
