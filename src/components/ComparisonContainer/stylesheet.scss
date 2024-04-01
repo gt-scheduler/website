@@ -2,14 +2,15 @@
 @import '../../variables';
 
 .comparison-container {
+  overflow-y: auto;
+  max-height: 70%;
+  height: auto;
   .comparison-body {
     display: flex;
     flex-direction: column;
-    height: 100%;
 
     .comparison-content {
       position: relative;
-      margin-bottom: 12px;
       overflow-x: hidden;
       overflow-y: auto;
       flex: 1 1 auto;
@@ -27,8 +28,14 @@
           border-bottom: 2px solid $color-border;
         }
 
-        &.shared-with {
-          margin-bottom: 8px;
+        &.my-schedule-title{
+          font-weight: 700;
+          margin: 0px 12px 0px 12px;
+          border-bottom: 2px solid $color-border;
+        }
+
+        &.shared-with{
+          margin-bottom: 4px;
         }
       }
 
@@ -50,6 +57,10 @@
           font-weight: 700;
           font-size: 14px;
         }
+      }
+
+      .schedule-name {
+        cursor : pointer;
       }
 
       .friend-name {
@@ -144,10 +155,11 @@
 
           .icon {
             width: 27px;
-            height: 100%;
+            height: 22px;
             padding: 0px;
             opacity: 0;
           }
+
 
           &:hover {
             background-color: $color-border;
@@ -199,18 +211,23 @@
         p {
           font-size: 12px;
           line-height: normal;
+          font-style: oblique;
+          overflow: visible;
         }
 
         .shareback-button {
           width: 100px;
           height: 24px;
           padding: 6px 10px;
-          font-size: 12px;
+          font-size: 9px;
           color: var(--theme-bg);
           background-color: var(--theme-fg);
           border-radius: 8px;
-          border: 1px solid $color-neutral;
+          background-color: #FFF;
+          border: 1px solid rgba(128, 128, 128, 0.2);
           margin-left: 5px;
+          font-weight: 650;
+          cursor : pointer;
 
           &:hover {
             @include dark {
@@ -227,13 +244,15 @@
           width: 100px;
           height: 24px;
           padding: 6px 10px;
-          font-size: 12px;
+          font-size: 9px;
           color: var(--theme-fg);
           background-color: var(--theme-bg);
           border-radius: 8px;
           border: 1px solid $color-neutral;
           margin-right: 5px;
-
+          font-weight: 650;
+          cursor : pointer;
+      
           &:hover {
             @include dark {
               background: $modal-foreground-color-light;
