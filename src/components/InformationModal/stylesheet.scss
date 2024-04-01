@@ -18,9 +18,11 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
+    padding-left: 15%;
+    padding-right: 15%;
     p {
       margin: 0px;
-      width: 15vw;
+      width: 50%;
     }
     .information-images {
       display: flex;
@@ -44,6 +46,7 @@
     width: 100%;
     align-items: center;
     justify-content: center;
+    padding: 0;
     p {
       margin: auto;
       width: 80vw;
