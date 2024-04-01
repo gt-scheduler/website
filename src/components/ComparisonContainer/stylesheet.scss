@@ -241,7 +241,8 @@
           height: 24px;
           padding: 6px 10px;
           font-size: 9px;
-          color: white;
+          color: var(--theme-fg);
+          background-color: var(--theme-bg);
           border-radius: 8px;
           border: 1px solid $color-neutral;
           margin-right: 5px;
