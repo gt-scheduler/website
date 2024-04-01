@@ -209,7 +209,9 @@
   }
   .invite-panel {
     display: flex;
-    margin: 21px 10px 10px 16px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 
     .invite-button {
       align-items: center;
