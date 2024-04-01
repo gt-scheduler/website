@@ -26,13 +26,13 @@
           border-bottom: 2px solid $color-border;
         }
 
-        &.my-schedule-title{
+        &.my-schedule-title {
           font-weight: 700;
           margin: 0px 12px 0px 12px;
           border-bottom: 2px solid $color-border;
         }
 
-        &.shared-with{
+        &.shared-with {
           margin-bottom: 4px;
         }
       }
@@ -58,7 +58,7 @@
       }
 
       .schedule-name {
-        cursor : pointer;
+        cursor: pointer;
       }
 
       .friend-name {
@@ -158,7 +158,6 @@
             opacity: 0;
           }
 
-
           &:hover {
             background-color: $color-border;
 
@@ -221,11 +220,10 @@
           color: var(--theme-bg);
           background-color: var(--theme-fg);
           border-radius: 8px;
-          background-color: #FFF;
           border: 1px solid rgba(128, 128, 128, 0.2);
           margin-left: 5px;
           font-weight: 650;
-          cursor : pointer;
+          cursor: pointer;
 
           &:hover {
             @include dark {
@@ -249,8 +247,8 @@
           border: 1px solid $color-neutral;
           margin-right: 5px;
           font-weight: 650;
-          cursor : pointer;
-      
+          cursor: pointer;
+
           &:hover {
             @include dark {
               background: $modal-foreground-color-light;
