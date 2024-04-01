@@ -22,7 +22,9 @@ export default function useEnsureValidTerm({
 }): LoadingState<HookResult> {
   // Set the term to be the first one if it is unset or no longer valid.
   useEffect(() => {
-    const mostRecentTerm = terms[0].term;
+    const mostRecentTerm =
+      terms.find((term) => term.finalized === true)?.term ?? terms[0].term;
+
     const correctedTerm = !isValidTerm(currentTermRaw, terms)
       ? mostRecentTerm
       : currentTermRaw;
