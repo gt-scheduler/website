@@ -57,12 +57,14 @@ export function InvitationModalContent({
   const [expirationDropdownVisible, setExpirationDropdownVisible] =
     useState(false);
   const [selectedExpiration, setSelectedExpiration] = useState('Never');
+
+  // All choices sent in seconds
   const expirationChoices = useMemo(
     (): Record<string, number> => ({
-      Never: 1000,
-      '1 week': 7,
-      '1 day': 1,
-      '1 hour': 0.0417,
+      Never: 356 * 24 * 3600,
+      '1 week': 7 * 24 * 3600,
+      '1 day': 24 * 3600,
+      '1 hour': 3600,
     }),
     []
   );
