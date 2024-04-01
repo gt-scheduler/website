@@ -287,7 +287,7 @@ function FailureContent({ error }: FailureContentProps): React.ReactElement {
   return (
     <div className="invitation-accept-modal-content">
       <img src="/mascot.png" alt="buzz" className="buzz-image" />
-      <div className="heading">Failed to add new schedule</div>
+      <div className="heading">Failed to add new schedules</div>
       <div className="error-sub-heading">
         {error === 'invalid-invite'
           ? 'Invalid Invite'
@@ -295,6 +295,8 @@ function FailureContent({ error }: FailureContentProps): React.ReactElement {
           ? 'Invite Expired'
           : error === 'not-logged-in'
           ? 'Not Logged In'
+          : error === 'already-accepted-all'
+          ? 'Schedules Already Accepted'
           : "Something's wrong here.."}
       </div>
       <div className="error-message">
@@ -313,6 +315,8 @@ function FailureContent({ error }: FailureContentProps): React.ReactElement {
             Login and click on the invite link again to add your friend&apos;s
             schedule to your view.
           </span>
+        ) : error === 'already-accepted-all' ? (
+          <span>You have already accepted these schedules from the user!</span>
         ) : (
           <span>
             An unknown error occurred on our end, please ask the user for a new
