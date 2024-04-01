@@ -221,7 +221,11 @@ function SuccessContent({
         You have successfully added a new schedule to your view!
       </div>
 
-      <img src="/invitation-succesful.png" alt="ok" className="modal-image" />
+      <img
+        src="https://firebasestorage.googleapis.com/v0/b/gt-scheduler-web-dev.appspot.com/o/invitation-succesful.png?alt=media&token=b73c792c-0a1f-4407-85a3-ff6b3d0fd270"
+        alt="ok"
+        className="modal-image"
+      />
       <div className="sub-heading">
         You will now be able to see {email}&apos;s schedule!
       </div>

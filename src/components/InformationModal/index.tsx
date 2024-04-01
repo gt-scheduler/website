@@ -78,13 +78,13 @@ export function InformationModalContent({
           <img
             className="information-image"
             alt="Compare Schedules View"
-            src="/compare_schedule.png"
+            src="https://firebasestorage.googleapis.com/v0/b/gt-scheduler-web-dev.appspot.com/o/compare_schedule.png?alt=media&token=ca79c044-7a4d-4dad-be1d-2d0026e521a1"
           />
           <div className="information-spacer" />
           <img
             className="information-image"
             alt="Compare Schedules Panel"
-            src="/compare_panel.png"
+            src="https://firebasestorage.googleapis.com/v0/b/gt-scheduler-web-dev.appspot.com/o/compare_panel.png?alt=media&token=ba1c27dc-fa78-41db-bb0d-afcc4b3d8508"
           />
         </div>
       </div>
