@@ -90,7 +90,11 @@ export default function CombinationContainer({
                     style={{ outline: 'none' }}
                     rowCount={sortedCombinations.length}
                     rowHeight={108}
-                    // List.rowRenderer is a normal render prop, not a component.
+                    /*
+                    List.rowRenderer is a normal render prop,
+                    not a component.
+                    */
+                    // eslint-disable-next-line max-len
                     // eslint-disable-next-line react/no-unstable-nested-components
                     rowRenderer={({
                       index,
