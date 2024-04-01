@@ -57,8 +57,8 @@ export default function ComparisonContainerShareBack({
     <div className="shareback-panel">
       <div>
         <p>
-          You have {friendName}&apos;s schedule. Would you like to share yours
-          back?
+          You have <strong>{friendName}&apos;s schedule</strong>. Would you like
+          to share yours back?
         </p>
       </div>
       <div>
