@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import {
@@ -8,7 +8,11 @@ import {
   ComparisonPanel,
   CourseContainer,
 } from '..';
-import { OverlayCrnsContext, OverlayCrnsContextValue } from '../../contexts';
+import {
+  OverlayCrnsContext,
+  OverlayCrnsContextValue,
+  ScheduleContext,
+} from '../../contexts';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
@@ -31,8 +35,10 @@ export default function Scheduler(): React.ReactElement {
     [overlayCrns, setOverlayCrns]
   );
 
+  const [{ currentVersion }] = useContext(ScheduleContext);
+
   const { compare, pinned, pinSelf, expanded, setCompareState } =
-    useCompareStateFromStorage();
+    useCompareStateFromStorage({ pinDefault: [currentVersion] });
   const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
 
   const handleCompareSchedules = useCallback(
@@ -86,7 +92,6 @@ export default function Scheduler(): React.ReactElement {
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}
               pinnedSchedules={pinned}
-              pinSelf={pinSelf}
               compare={compare}
               expanded={expanded}
             />

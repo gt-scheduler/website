@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
+import { Immutable } from 'immer';
 
+import { FriendScheduleData } from '../../data/types';
 import { Section } from '../../data/beans';
 import { CLOSE, DAYS, OPEN } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
@@ -59,7 +61,7 @@ export default function Calendar({
   overlayFriendSchedules = [],
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, currentVersion }] =
+  const [{ pinnedCrns, oscar, events, currentVersion, versions }] =
     useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
@@ -107,9 +109,10 @@ export default function Calendar({
       });
   };
 
-  const crns = pinSelf
-    ? Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]))
-    : [];
+  const crns =
+    pinSelf && !compare
+      ? Array.from(new Set([...pinnedCrns, ...(overlayCrns || [])]))
+      : [];
 
   // Find section using crn and convert the meetings into
   // an array of CommonMeetingObject
@@ -154,10 +157,23 @@ export default function Calendar({
       a.period.end - a.period.start - (b.period.end - b.period.start) ?? 0
   );
 
-  const friendSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
-  const friendEvents: { data: FriendEventData; overlay: boolean }[] = [];
+  const userSchedules: { data: FriendCrnData; overlay: boolean }[] = [];
+  const userEvents: { data: FriendEventData; overlay: boolean }[] = [];
   if (compare) {
-    Object.values(friends).forEach((friend) =>
+    /*
+    Create a dummy friend schedule data object for self schedules for
+    conforming types to iterate over all schedules in one go
+    */
+    const selfFriend: Immutable<FriendScheduleData> = {
+      self: {
+        name: 'Me',
+        email: '',
+        versions,
+      },
+    };
+    const allUsers = { ...friends, ...selfFriend };
+
+    Object.values(allUsers).forEach((friend) =>
       Object.entries(friend.versions)
         .filter(
           (schedule) =>
@@ -167,7 +183,7 @@ export default function Calendar({
         .forEach((schedule) => {
           const friendMeetings: CommonMeetingObject[] = [];
           schedule[1].schedule.pinnedCrns.forEach((crn) => {
-            friendSchedules.push({
+            userSchedules.push({
               data: {
                 friend: friend.name,
                 scheduleName: schedule[1].name,
@@ -191,7 +207,7 @@ export default function Calendar({
               });
           });
           schedule[1].schedule.events.forEach((event) => {
-            friendEvents.push({
+            userEvents.push({
               data: {
                 friend: friend.name,
                 scheduleName: schedule[1].name,
@@ -423,7 +439,7 @@ export default function Calendar({
             />
           ))}
         {compare &&
-          friendSchedules.map(({ data, overlay }) => (
+          userSchedules.map(({ data, overlay }) => (
             <CompareBlocks
               key={`${data.scheduleId}-${data.crn}`}
               crn={data.crn}
@@ -457,7 +473,7 @@ export default function Calendar({
             />
           ))}
         {compare &&
-          friendEvents.map(({ data, overlay }) => (
+          userEvents.map(({ data, overlay }) => (
             <EventBlocks
               key={`${data.scheduleId}-${data.id}`}
               event={data.event}
