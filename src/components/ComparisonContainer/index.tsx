@@ -626,7 +626,8 @@ function ScheduleRow({
               <div
                 className={classes(
                   type === 'User' && 'friend-name',
-                  type !== 'User' && checkboxColor !== '' && 'checked'
+                  type !== 'User' && checkboxColor !== '' && 'checked',
+                  type !== 'User' && 'schedule-name'
                 )}
               >
                 <p>{name}</p>

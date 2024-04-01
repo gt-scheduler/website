@@ -59,6 +59,10 @@
         }
       }
 
+      .schedule-name {
+        cursor : pointer;
+      }
+
       .friend-name {
         p {
           font-size: 14px;
@@ -222,7 +226,8 @@
           border: 1px solid rgba(128, 128, 128, 0.2);
           margin-left: 5px;
           font-weight: 650;
-      
+          cursor : pointer;
+
           &:hover {
             @include dark {
               background: $modal-foreground-color-dark;
@@ -245,6 +250,7 @@
           border: 1px solid $color-neutral;
           margin-right: 5px;
           font-weight: 650;
+          cursor : pointer;
       
           &:hover {
             @include dark {
