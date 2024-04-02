@@ -137,7 +137,7 @@ export default function Calendar({
 
   const meetings: CommonMeetingObject[] = crnMeetings as CommonMeetingObject[];
 
-  if (!compare || pinSelf) {
+  if (!compare && pinSelf) {
     // Add events to meetings array
     meetings.push(
       ...events.map((event) => {
