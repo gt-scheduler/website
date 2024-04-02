@@ -143,7 +143,7 @@ export function InvitationModalContent({
         >;
 
         // if friend accepted, don't increment numNotAccepted
-        return Object.keys(versionFriends).some((f) => {
+        return Object.keys(versionFriends ?? {}).some((f) => {
           return (
             versionFriends[f]?.email === input.current?.value &&
             (versionFriends[f]?.status === 'Accepted' ||
