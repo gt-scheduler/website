@@ -1,0 +1,542 @@
+@import '../../variables';
+
+.invitation-modal {
+  .modal__content {
+    padding: 0px;
+  }
+
+  .remove-close-button {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    padding: 15px;
+    color: $color-neutral;
+    border-radius: 50px;
+  }
+
+  .invitation-modal-content {
+    text-align: center;
+    overflow: hidden;
+    padding: 20px 40px;
+    background-color: var(--theme-bg);
+    color: var(--theme-fg);
+
+    //Style for email input
+    .top-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 0px 5px 0px;
+
+      .modal-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 0.9em;
+      }
+
+      .valid-email {
+        text-align: start;
+        color: #22b531;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 3px 0px;
+        opacity: 1;
+      }
+
+      .invalid-email {
+        text-align: start;
+        color: #ff2121;
+        font-size: 12px;
+        font-weight: bold;
+        padding-top: 3px;
+        opacity: 1;
+      }
+
+      .email-input-block {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-top: 5px;
+        align-items: center;
+        column-gap: 5px;
+
+        .email-input {
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          flex-grow: 1;
+
+          .email:has(+ .invalid-email) {
+            border: 1px solid #ff2121;
+          }
+        }
+
+        input[type='email'] {
+          padding: 5px;
+          line-height: 12px;
+          padding: 12px;
+          border-radius: 6px;
+          background-color: rgb(35, 35, 35);
+          border: 1px solid rgb(35, 35, 35);
+          outline: none;
+
+          &:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+          }
+
+          @include light {
+            background-color: rgba($color-neutral, 0.3);
+            border: 1px solid rgba($color-neutral, 0.3);
+
+            &:focus {
+              border-color: rgba(0, 0, 0, 0.5);
+            }
+          }
+        }
+
+        .send-button {
+          width: 50px;
+          align-self: stretch;
+          font-size: 14px;
+          color: white;
+          border-radius: 6px;
+          background-color: #c56e5b;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background-color: #e2944b;
+            cursor: pointer;
+          }
+        }
+
+        .disabled-send-button {
+          background-color: $color-neutral;
+
+          &:hover {
+            background-color: $color-neutral;
+            cursor: default;
+          }
+        }
+
+        .email-button-spinner {
+          background-color: #d89758;
+
+          &:hover {
+            cursor: default;
+          }
+        }
+
+        .email-button-checkmark {
+          background-color: #22b531;
+
+          &:hover {
+            background-color: #22b531;
+            cursor: default;
+          }
+
+          .email-button-check-icon {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+
+      .share-schedule-checkboxes {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 0px 15px 2px;
+
+        .other-schedules-button {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+
+        .other-schedules-text {
+          text-decoration: underline;
+          margin-right: 5px;
+          margin-bottom: 0px;
+        }
+
+        .other-schedules-list {
+          @include popup;
+
+          margin: 0;
+          padding: 2px 0px;
+          z-index: 2;
+          position: absolute;
+          max-width: 150px;
+          overflow-x: auto;
+          overflow-y: auto;
+          max-height: 300px;
+          @include dark {
+            background-color: $theme-dark-background;
+          }
+
+          @include light {
+            background-color: $theme-light-background;
+          }
+        }
+      }
+    }
+
+    .divider {
+      height: 1.5px;
+      display: flex;
+      align-items: stretch !important;
+      border: none;
+      background-color: var(--theme-card-bg);
+      margin: 0px -40px;
+    }
+
+    //Style for Invited Users
+
+    .invited-users {
+      padding-top: 15px;
+      justify-content: center;
+      overflow-y: scroll;
+      height: 215px;
+    }
+
+    .no-invited-users {
+      font-size: 14px;
+      padding: 10px 0px 25px 0px;
+    }
+
+    .shared-emails {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-content: flex-start;
+      row-gap: 8px;
+      padding-bottom: 25px;
+      color: var(--theme-fg);
+
+      .individual-shared-email {
+        @include card;
+        background-color: var(--theme-card-bg);
+        padding: 4px 8px;
+        margin: 4px 8px 4px 0px;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        border-radius: 16px;
+        width: max-content;
+        max-width: 100%;
+        min-width: min-content;
+        font-size: 0.9em;
+        cursor: pointer;
+
+        @include light {
+          background-color: rgba($color-neutral, 0.5);
+          opacity: 0.75;
+        }
+
+        .email-text {
+          line-height: 100%;
+        }
+      }
+    }
+
+    .email-and-status {
+      display: flex;
+      flex-direction: column;
+      height: 26px;
+    }
+
+    .Pending {
+      border-color: rgba(205, 165, 24, 0.5);
+      border-style: solid;
+      border-width: 1.5px;
+    }
+
+    .Accepted {
+      border-color: rgba(34, 181, 49, 0.5);
+      border-style: solid;
+      border-width: 1.5px;
+    }
+
+    .status-tooltip {
+      background-color: rgba(0, 0, 0, 1);
+      border-radius: 4px;
+    }
+
+    .button-remove {
+      width: 10px;
+      height: 10px;
+      background-color: transparent;
+      position: relative;
+      align-self: center;
+
+      .circle {
+        width: 12px;
+        height: 12px;
+        padding: 10px;
+        position: absolute;
+        position: absolute;
+        color: white;
+
+        @include light {
+          color: $color-neutral;
+        }
+      }
+
+      .remove {
+        width: 10px;
+        height: 10px;
+        padding: 15px;
+        color: var(--theme-card-bg);
+        position: relative;
+        display: inline-flex;
+      }
+
+      &:hover {
+        .circle {
+          color: $color-neutral;
+
+          @include light {
+            color: var(--theme-fg);
+          }
+        }
+
+        background-color: transparent;
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    flex-direction: column;
+    padding-top: 24px;
+
+    .link-options {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .link-generated:hover {
+        cursor: pointer;
+      }
+
+      .copy-link-button {
+        background: var(--theme-card-bg);
+        border-radius: 10px;
+        padding: 10px 15px;
+        border: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: var(--theme-fg);
+
+        .link-icon-container {
+          display: flex;
+          width: 20px;
+          margin-right: 5px;
+        }
+
+        .copy-link-icon {
+          margin-right: 5px;
+        }
+
+        &:hover {
+          @include dark {
+            background: $modal-foreground-color-light;
+          }
+
+          @include light {
+            background: $modal-foreground-color-dark;
+          }
+        }
+      }
+
+      .link-success {
+        color: #22b531;
+      }
+
+      .link-failure {
+        color: #ff2121;
+      }
+
+      .expiration {
+        position: relative;
+
+        .expiration-display {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 5px;
+
+          .current-expiration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: var(--theme-card-bg);
+            margin-left: 5px;
+            border-radius: 30px;
+            padding: 4px 15px;
+            gap: 5px;
+            width: 100px;
+
+            &:hover {
+              cursor: pointer;
+
+              @include dark {
+                background: $modal-foreground-color-light;
+              }
+
+              @include light {
+                background: $modal-foreground-color-dark;
+              }
+            }
+          }
+        }
+
+        .expiration-select {
+          @include popup;
+          display: flex;
+          flex-direction: column;
+          width: 100px;
+
+          margin: 0;
+          z-index: 2;
+          right: 0;
+          bottom: 100%;
+          position: absolute;
+          max-width: 150px;
+          overflow-x: auto;
+          background-color: var(--theme-bg);
+
+          .expiration-option {
+            padding: 8px 15px;
+
+            &:hover {
+              cursor: pointer;
+              background-color: var(--theme-card-bg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .mobile.invitation-modal-content {
+    .email-input-block {
+      flex-direction: column;
+      align-items: center;
+      .email-input {
+        max-width: 100%;
+        margin-bottom: 6px;
+        .email {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.intercept {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  cursor: default;
+}
+
+.checkbox-and-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .share-schedule-checkbox {
+    width: 12px;
+    height: 12px;
+    border: 2px solid;
+    border-radius: 2px;
+    border-color: var(--theme-fg);
+    margin-right: 8px;
+    padding: 1px;
+    color: var(--theme-bg);
+  }
+
+  .schedule-checked {
+    background-color: var(--theme-fg);
+  }
+
+  .checkbox-label {
+    font-size: 14px;
+    margin: 0px;
+  }
+}
+
+.other-checkbox-and-label {
+  padding: 10px 15px;
+}
+
+.modal-positioner {
+  .remove-invitation-modal {
+    overflow-y: hidden;
+
+    .modal__content {
+      padding: 0px;
+      padding-top: 20px !important;
+      padding-bottom: 20px !important;
+      text-align: center;
+
+      .remove-invitation-modal-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+        text-align: center;
+        padding-top: 15px;
+        padding-left: 50px;
+        padding-right: 50px;
+        height: 200px;
+      }
+
+      .remove-close-button {
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        padding: 15px;
+        color: $color-neutral;
+        border-radius: 50px;
+      }
+    }
+
+    .modal__button--cancel {
+      background-color: #c56e5b !important;
+
+      &:hover {
+        background-color: #e2944b !important;
+      }
+    }
+  }
+}

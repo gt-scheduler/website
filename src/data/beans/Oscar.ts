@@ -175,12 +175,35 @@ export default class Oscar {
     });
 
     this.sortingOptions = [
-      new SortingOption('Most Compact', (combination) => {
+      new SortingOption('Most Compact', (combination, events) => {
         const { startMap, endMap } = combination;
+
+        const eventStartMap = new Map<string, number>();
+        const eventEndMap = new Map<string, number>();
+        events.forEach((event) => {
+          const { start, end } = event.period;
+          for (const day of event.days) {
+            if (!eventStartMap.has(day)) {
+              eventStartMap.set(day, start);
+            }
+            eventStartMap.set(
+              day,
+              Math.min(start, eventStartMap.get(day) ?? Infinity)
+            );
+
+            if (!eventEndMap.has(day)) {
+              eventEndMap.set(day, end);
+            }
+            eventEndMap.set(day, Math.max(end, eventEndMap.get(day) ?? -1));
+          }
+        });
         const diffs = Object.keys(startMap).map((day) => {
-          const end = endMap[day];
-          const start = startMap[day];
+          let end = endMap[day];
+          let start = startMap[day];
           if (end == null || start == null) return 0;
+          end = Math.max(end, eventEndMap.get(day) ?? -1);
+          start = Math.min(start, eventStartMap.get(day) ?? Infinity);
+
           return end - start;
         });
         const sum = diffs.reduce((tot, min) => tot + min, 0);
@@ -314,7 +337,8 @@ export default class Oscar {
 
   sortCombinations(
     combinations: Combination[],
-    sortingOptionIndex: number
+    sortingOptionIndex: number,
+    events: Immutable<Event[]>
   ): Combination[] {
     const sortingOption = this.sortingOptions[sortingOptionIndex];
     if (sortingOption === undefined) {
@@ -331,7 +355,7 @@ export default class Oscar {
     return combinations
       .map((combination) => ({
         ...combination,
-        factor: sortingOption.calculateFactor(combination),
+        factor: sortingOption.calculateFactor(combination, events),
       }))
       .sort((a, b) => a.factor - b.factor);
   }
