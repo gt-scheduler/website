@@ -83,7 +83,6 @@ describe('useMigrateScheduleData', () => {
               name: 'Primary',
               // January 1, 1970 at 0 seconds
               createdAt: '1970-01-01T00:00:00.000Z',
-              friends: {},
               schedule: {
                 desiredCourses: ['CS 1100', 'CS 1331'],
                 pinnedCrns: [
@@ -141,7 +140,6 @@ describe('useMigrateScheduleData', () => {
                 sv_48RC7kqO7YDiBK66qXOd: {
                   name: 'Primary',
                   createdAt: '2021-09-16T00:00:46.191Z',
-                  friends: {},
                   schedule: {
                     desiredCourses: ['CS 1100', 'CS 1331'],
                     pinnedCrns: [
@@ -188,7 +186,6 @@ describe('useMigrateScheduleData', () => {
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
               },
-              friends: {},
             },
           },
         },

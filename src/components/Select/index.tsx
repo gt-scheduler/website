@@ -442,21 +442,19 @@ type AutoFocusInputProps = {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 };
 
 /**
  * Simple wrapper around `<input>`
  * that automatically focuses its contents when it is first mounted
  */
-export function AutoFocusInput({
+function AutoFocusInput({
   className,
   style,
   value,
   onChange,
   placeholder,
   onKeyDown,
-  onBlur,
 }: AutoFocusInputProps): React.ReactElement {
   const inputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
@@ -475,7 +473,6 @@ export function AutoFocusInput({
       onKeyDown={onKeyDown}
       ref={inputRef}
       type="text"
-      onBlur={onBlur}
     />
   );
 }

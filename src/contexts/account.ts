@@ -7,7 +7,6 @@ export type SignedOut = {
 export type SignedIn = {
   type: 'signedIn';
   signOut: () => void;
-  getToken: () => Promise<string | void>;
   name: string | null;
   provider: string | null;
   email: string | null;

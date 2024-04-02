@@ -13,7 +13,6 @@ export type HookResult = {
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
-  deleteFriendRecord: (versionId: string, friendId: string) => void;
 };
 
 /**
@@ -41,7 +40,6 @@ export default function useVersionActions({
       updateTermScheduleData((draft) => {
         draft.versions[id] = {
           name,
-          friends: {},
           schedule: castDraft(defaultSchedule),
           createdAt: new Date().toISOString(),
         };
@@ -92,7 +90,6 @@ export default function useVersionActions({
             const newId = generateScheduleVersionId();
             draft.versions[newId] = {
               name: 'Primary',
-              friends: {},
               createdAt: new Date().toISOString(),
               schedule: castDraft(defaultSchedule),
             };
@@ -177,7 +174,6 @@ export default function useVersionActions({
         }
         draft.versions[newId] = {
           name: newName,
-          friends: {},
           schedule: castDraft(existingDraft.schedule),
           createdAt: new Date().toISOString(),
         };
@@ -187,50 +183,5 @@ export default function useVersionActions({
     [updateTermScheduleData, setVersion]
   );
 
-  const deleteFriendRecord = useCallback(
-    (versionId: string, friendId: string): void => {
-      updateTermScheduleData((draft) => {
-        const existingDraft = draft.versions[versionId];
-        if (existingDraft === undefined) {
-          softError(
-            new ErrorWithFields({
-              message:
-                "deleteFriendRecord called with version name that doesn't exist; ignoring",
-              fields: {
-                allVersionNames: Object.entries(draft.versions).map(
-                  ([versionId_, { name }]) => ({ id: versionId_, name })
-                ),
-                versionId,
-                versionCount: Object.keys(draft.versions).length,
-              },
-            })
-          );
-          return;
-        }
-        if (friendId in existingDraft.friends) {
-          delete existingDraft.friends[friendId];
-        } else {
-          softError(
-            new ErrorWithFields({
-              message:
-                "deleteFriendRecord called with friend ID that doesn't exist; ignoring",
-              fields: {
-                allFriendIds: Object.keys(existingDraft.friends),
-                friendId,
-              },
-            })
-          );
-        }
-      });
-    },
-    [updateTermScheduleData]
-  );
-
-  return {
-    addNewVersion,
-    deleteVersion,
-    renameVersion,
-    cloneVersion,
-    deleteFriendRecord,
-  };
+  return { addNewVersion, deleteVersion, renameVersion, cloneVersion };
 }

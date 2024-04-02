@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import firebaseui from 'firebaseui';
 import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
 
-import { classes } from '../../utils/misc';
 import Modal from '../Modal';
 import { firebase, authProviders } from '../../data/firebase';
 
@@ -18,15 +17,11 @@ const uiConfig: firebaseui.auth.Config = {
   },
 };
 
-export type LoginModalContentProps = { comparison: boolean };
-
 /**
  * Inner content of the login modal.
  * This utilizes Firebase UI to handle the authentication UI components.
  */
-export function LoginModalContent({
-  comparison,
-}: LoginModalContentProps): React.ReactElement {
+export function LoginModalContent(): React.ReactElement {
   // Calculate the min height of the FirebaseUI element
   // so that it does not cause a large layout shift when initially loading.
   // The height is determined based on the number of auth providers,
@@ -39,20 +34,11 @@ export function LoginModalContent({
 
   return (
     <div className="login-modal-content">
-      {comparison ? (
-        <p className="compare-text">
-          You must <span className="underline">sign in</span> to use the Compare
-          Schedule Feature!
-        </p>
-      ) : (
-        <h1>Sign in</h1>
-      )}
-      <div className={classes(comparison && 'compare-subtext')}>
-        <p className="login-modal-content__body">
-          Sign in using one of the below identity providers to start syncing
-          your schedules across devices.
-        </p>
-      </div>
+      <h1>Sign in</h1>
+      <p className="login-modal-content__body">
+        Sign in using one of the below identity providers to start syncing your
+        schedules across devices.
+      </p>
       <div style={{ minHeight }}>
         <FirebaseAuth
           className="login-modal-content__firebase-ui"
@@ -67,7 +53,6 @@ export function LoginModalContent({
 export type LoginModalProps = {
   show: boolean;
   onHide: () => void;
-  comparison?: boolean;
 };
 
 /**
@@ -77,7 +62,6 @@ export type LoginModalProps = {
 export default function LoginModal({
   show,
   onHide,
-  comparison = false,
 }: LoginModalProps): React.ReactElement {
   // If the modal is open,
   // attach a listener for the authentication state
@@ -103,7 +87,7 @@ export default function LoginModal({
         { label: 'Cancel', onClick: (): void => onHide(), cancel: true },
       ]}
     >
-      <LoginModalContent comparison={comparison} />
+      <LoginModalContent />
     </Modal>
   );
 }
