@@ -37,6 +37,7 @@ export default function migrate2To3(
       const version3ScheduleVersion: Version3ScheduleVersion = {
         name: version2ScheduleVersion.name,
         createdAt: version2ScheduleVersion.createdAt,
+        friends: {},
         schedule: {
           ...version2ScheduleVersion.schedule,
           ...newFields,

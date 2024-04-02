@@ -6,6 +6,10 @@
   align-items: stretch;
   border-right: 1px solid $color-border;
 
+  .turn-off-compare-text {
+    margin: 0px 12px 0px 12px;
+    font-size: 14px;
+  }
   .scroller {
     flex: 1;
     overflow-y: auto;

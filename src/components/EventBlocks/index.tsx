@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Immutable, castDraft } from 'immer';
 
 import { daysToString, periodToString } from '../../utils/misc';
@@ -20,14 +20,18 @@ export interface EventBlockPosition extends TimeBlockPosition {
 export type EventBlocksProps = {
   className?: string;
   event: Immutable<Event>;
+  owner?: string;
+  scheduleName?: string;
+  scheduleId?: string;
+  overlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
   includeContent: boolean;
   sizeInfo: SizeInfo;
   canBeTabFocused?: boolean;
   deviceHasHover?: boolean;
-  daysRef: React.RefObject<HTMLDivElement>;
-  timesRef: React.RefObject<HTMLDivElement>;
+  daysRef?: React.RefObject<HTMLDivElement>;
+  timesRef?: React.RefObject<HTMLDivElement>;
   selectedMeeting?: [meetingIndex: number, day: string] | null;
   onSelectMeeting?: (
     meeting: [meetingIndex: number, day: string] | null
@@ -37,6 +41,10 @@ export type EventBlocksProps = {
 export default function EventBlocks({
   className,
   event,
+  owner,
+  scheduleName,
+  scheduleId,
+  overlay = false,
   capture,
   sizeInfo,
   includeDetailsPopover,
@@ -48,12 +56,28 @@ export default function EventBlocks({
   selectedMeeting,
   onSelectMeeting,
 }: EventBlocksProps): React.ReactElement | null {
+  const popover = scheduleName
+    ? [
+        {
+          name: 'Owner',
+          content: owner,
+        },
+        {
+          name: 'Schedule',
+          content: scheduleName,
+        },
+      ]
+    : [];
   const [tempStart, setTempStart] = useState<number>(event.period.start);
 
   // Store these in refs since the event handlers won't be re generated
   // once the event handlers are set inside handleMouseDown
   const tempStartRef = useRef<number>(event.period.start);
   const tempDaysRef = useRef<string[]>([...event.days]);
+
+  useEffect(() => {
+    setTempStart(event.period.start);
+  }, [event.period.start]);
 
   // Save original style of the block
   const savedStyleRef = useRef<string>();
@@ -144,7 +168,7 @@ export default function EventBlocks({
     e: MouseEvent,
     ref: React.RefObject<HTMLDivElement>
   ): void => {
-    if (!ref.current || !timesRef.current || !daysRef.current) return;
+    if (!ref.current || !timesRef?.current || !daysRef?.current) return;
 
     // math which calculates the new start time by calculating mouse
     // position proportional to calendar size, then we find new time
@@ -213,7 +237,7 @@ export default function EventBlocks({
             ]
           : []
       }
-      popover={[
+      popover={popover.concat([
         {
           name: 'Name',
           content: event.name,
@@ -225,13 +249,15 @@ export default function EventBlocks({
             periodToString(event.period),
           ].join(' '),
         },
-      ]}
+      ])}
+      overlay={overlay}
       capture={capture}
       sizeInfo={sizeInfo}
       includeDetailsPopover={!dragging && includeDetailsPopover}
       includeContent={includeContent}
       canBeTabFocused={canBeTabFocused}
       onSelectMeeting={onSelectMeeting}
+      schedule={scheduleId}
       selectedMeeting={selectedMeeting}
       deviceHasHover={deviceHasHover}
       handleMouseDown={handleMouseDown}
