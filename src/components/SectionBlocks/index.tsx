@@ -18,7 +18,6 @@ export interface SectionBlockPosition extends TimeBlockPosition {
 export type SectionBlocksProps = {
   className?: string;
   crn: string;
-  schedule?: string;
   overlay?: boolean;
   capture: boolean;
   includeDetailsPopover: boolean;
@@ -35,7 +34,6 @@ export type SectionBlocksProps = {
 export default function SectionBlocks({
   className,
   crn,
-  schedule,
   overlay = false,
   capture,
   sizeInfo,
@@ -59,9 +57,9 @@ export default function SectionBlocks({
 
         return (
           <TimeBlocks
-            key={`${section.course.id}-${section.id}-${i}`}
             className={className}
             id={section.course.id}
+            key={`${section.course.id}-${period.start}`}
             meetingIndex={i}
             period={period}
             days={meeting.days.filter((day) => day !== 'S' && day !== 'U')}
@@ -124,7 +122,6 @@ export default function SectionBlocks({
             deviceHasHover={deviceHasHover}
             selectedMeeting={selectedMeeting}
             onSelectMeeting={onSelectMeeting}
-            schedule={schedule}
           />
         );
       })}

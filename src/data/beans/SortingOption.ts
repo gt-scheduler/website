@@ -1,16 +1,11 @@
-import { Immutable } from 'immer';
-
-import { Combination, Event } from '../../types';
+import { Combination } from '../../types';
 
 export default class SortingOption {
   label: string;
 
-  calculateFactor: (combo: Combination, events: Immutable<Event[]>) => number;
+  calculateFactor: (combo: Combination) => number;
 
-  constructor(
-    label: string,
-    calculateFactor: (combo: Combination, events: Immutable<Event[]>) => number
-  ) {
+  constructor(label: string, calculateFactor: (combo: Combination) => number) {
     this.label = label;
     this.calculateFactor = calculateFactor;
   }

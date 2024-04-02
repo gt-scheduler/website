@@ -43,7 +43,6 @@ export type TimeBlocksProps = {
   includeContent: boolean;
   sizeInfo: SizeInfo;
   canBeTabFocused?: boolean;
-  schedule?: string;
   /**
    * Passing through this prop to skip subscribing to a media query per
    * TimeBlocks component instance:
@@ -87,11 +86,10 @@ export default function TimeBlocks({
   deviceHasHover = true,
   selectedMeeting,
   onSelectMeeting,
-  schedule,
   handleMouseDown,
 }: TimeBlocksProps): React.ReactElement | null {
   const [{ colorMap }] = useContext(ScheduleContext);
-  const color = colorMap[schedule ?? id];
+  const color = colorMap[id];
   const sizeInfoKey = makeSizeInfoKey(period);
 
   return (
@@ -254,22 +252,17 @@ function MeetingDayBlock({
         {includeContent && (
           <div className="meeting-wrapper">
             <div className="ids">
-              {contentHeader.map((content, i) => {
+              {contentHeader.map((content) => {
                 return (
-                  <span
-                    className={content.className}
-                    key={`content-header-${i}`}
-                  >
+                  <span className={content.className}>
                     {content.content}&nbsp;
                   </span>
                 );
               })}
             </div>
-            {contentBody.map((content, i) => {
+            {contentBody.map((content) => {
               return (
-                <span className={content.className} key={`content-body-${i}`}>
-                  {content.content}
-                </span>
+                <span className={content.className}>{content.content}</span>
               );
             })}
           </div>
@@ -323,9 +316,9 @@ function DetailsPopoverContent({
   return (
     <table className="popover">
       <tbody>
-        {popover.map((popoverInfo, i) => {
+        {popover.map((popoverInfo) => {
           return popoverInfo.content ? (
-            <tr key={`popover-content-${i}`}>
+            <tr>
               <td>
                 <b>{popoverInfo.name}</b>
               </td>

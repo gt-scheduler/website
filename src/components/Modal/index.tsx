@@ -21,7 +21,6 @@ export interface ModalButtonProps {
 
 export type ModalProps = {
   children?: React.ReactNode;
-  buttonPrompt?: string;
   buttons?: ModalButtonProps[];
   show: boolean;
   onHide: () => void;
@@ -59,7 +58,6 @@ type TransitionProps = {
  */
 export default function Modal({
   children,
-  buttonPrompt,
   buttons = [],
   show,
   onHide,
@@ -112,7 +110,6 @@ export default function Modal({
               checkboxContent && 'has-checkbox'
             )}
           >
-            {buttonPrompt && <div>{buttonPrompt}</div>}
             {checkboxContent && (
               <div className="checkbox">
                 <div
@@ -126,11 +123,9 @@ export default function Modal({
                 <p>{checkboxContent}</p>
               </div>
             )}
-            <div className="button_container">
-              {buttons.map((props, i) => (
-                <ModalButton {...props} key={i} />
-              ))}
-            </div>
+            {buttons.map((props, i) => (
+              <ModalButton {...props} key={i} />
+            ))}
           </div>
         )}
       </div>

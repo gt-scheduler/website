@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import Modal from '../Modal';
 import useScreenWidth from '../../hooks/useScreenWidth';
-import Button from '../Button';
 
 import './stylesheet.scss';
 
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
-const MODAL_LOCAL_STORAGE_KEY = '2024-04-01-spr2024-new-features-announcement';
+const MODAL_LOCAL_STORAGE_KEY = '2023-04-05-spr2023-new-features-announcement';
 const OUTDATED_LOCAL_STORAGE_KEY = [
-  '2023-04-05-spr2023-new-features-announcement',
   '2021-10-27-spr2022-schedule-versions-account-sync',
   '2023-03-05-spr2023-oscar-migration',
 ];
@@ -26,25 +22,11 @@ const OUTDATED_LOCAL_STORAGE_KEY = [
  * Additionally, make sure to change `MODAL_LOCAL_STORAGE_KEY`
  * with another unique value that has never been used before.
  */
-
-export type InformationModalContentProps = {
-  setShow: (show: boolean) => void;
-};
-
-export function InformationModalContent({
-  setShow,
-}: InformationModalContentProps): React.ReactElement {
+export function InformationModalContent(): React.ReactElement {
   return (
     <>
-      <Button className="close-button" onClick={(): void => setShow(false)}>
-        <FontAwesomeIcon icon={faXmark} size="xl" />
-      </Button>
       <img
-        style={{
-          width: '150px',
-          margin: '12px auto 16px auto',
-          display: 'block',
-        }}
+        style={{ width: '150px', margin: '0 auto', display: 'block' }}
         alt="GT Scheduler Logo"
         src="/mascot.png"
       />
@@ -56,35 +38,36 @@ export function InformationModalContent({
           margin: '16px auto',
         }}
       >
-        New Feature: Compare Schedules
+        New Feature: Recurring Events
       </h1>
-      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 2, 2024</h4>
+      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 6, 2023</h4>
       <div className="information-content">
         <p>
           Hello <span style={{ color: '#EDA91F' }}>Yellow Jackets!</span> We are
           excited to announce a new feature for GT Scheduler.
           <br />
           <br />
-          Share your schedule with other students and they can share theirs
-          back. Then toggle &quot;Compare Schedules&quot; and click on the other
-          students&apos; schedules to compare.
+          Use Recurring Events to block out meetings, work shifts, and any other
+          weekly events you may need to schedule your classes around.
           <br />
           <br />
-          However, to keep GT Scheduler and its amazing features, we need to
-          maintain our costs. Please consider donating to help keep GT Scheduler
-          running!
+          Add, edit, and delete events in the Recurring Events tab, next to the
+          Courses tab.
+          <br />
+          <br />
+          Drag and drop (web-only) events on the schedule view to adjust times.
         </p>
         <div className="information-images">
           <img
             className="information-image"
-            alt="Compare Schedules View"
-            src="/compare_schedule.png"
+            alt="Event Blocks"
+            src="/event_blocks.png"
           />
           <div className="information-spacer" />
           <img
             className="information-image"
-            alt="Compare Schedules Panel"
-            src="/compare_panel.png"
+            alt="Drag Drop"
+            src="/drag_event_blocks.png"
           />
         </div>
       </div>
@@ -121,18 +104,10 @@ export default function InformationModal(): React.ReactElement {
       className={classes('InformationModal', mobile && 'mobile')}
       show={show}
       onHide={(): void => setShow(false)}
-      buttons={[
-        {
-          label: 'Donate Today',
-          onClick: (): void => {
-            setShow(false);
-            window.open('https://donorbox.org/gt-scheduler');
-          },
-        },
-      ]}
-      width={850}
+      buttons={[{ label: 'Got it!', onClick: (): void => setShow(false) }]}
+      width={800}
     >
-      <InformationModalContent setShow={setShow} />
+      <InformationModalContent />
     </Modal>
   );
 }

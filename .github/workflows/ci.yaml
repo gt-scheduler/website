@@ -9,12 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'yarn'
+        uses: actions/checkout@v2
 
       - name: Install
         run: yarn install --frozen-lockfile
@@ -33,12 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'yarn'
+        uses: actions/checkout@v2
 
       - name: Install
         run: yarn install --frozen-lockfile
@@ -68,12 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'yarn'
+        uses: actions/checkout@v2
 
       - name: Install
         run: yarn install --frozen-lockfile

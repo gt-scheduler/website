@@ -3,28 +3,19 @@ import { Draft, Immutable } from 'immer';
 
 import { Oscar } from '../data/beans';
 import { EMPTY_OSCAR } from '../data/beans/Oscar';
-import {
-  defaultSchedule,
-  FriendShareData,
-  Schedule,
-  TermScheduleData,
-} from '../data/types';
+import { defaultSchedule, Schedule } from '../data/types';
 import { ErrorWithFields } from '../log';
 
 type ExtraData = {
   term: string;
   currentVersion: string;
-  currentFriends: Record<string, FriendShareData>;
-  allFriends: Record<string, Record<string, FriendShareData>>;
   allVersionNames: { id: string; name: string }[];
   // `oscar` is included below as a separate type
 };
 
 export type ScheduleContextData = Immutable<Schedule> &
   // `Oscar` can't go into `Immutable`, so we place it separately
-  Immutable<ExtraData> & {
-    readonly oscar: Oscar;
-  } & Immutable<TermScheduleData>;
+  Immutable<ExtraData> & { readonly oscar: Oscar };
 
 export type ScheduleContextSetters = {
   setTerm: (next: string) => void;
@@ -37,7 +28,6 @@ export type ScheduleContextSetters = {
   deleteVersion: (id: string) => void;
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
-  deleteFriendRecord: (versionId: string, friendId: string) => void;
 };
 export type ScheduleContextValue = [
   ScheduleContextData,
@@ -47,12 +37,9 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
   {
     term: '',
     currentVersion: '',
-    currentFriends: {},
     allVersionNames: [],
-    allFriends: {},
     oscar: EMPTY_OSCAR,
     ...defaultSchedule,
-    versions: {},
   },
   {
     setTerm: (next: string): void => {
@@ -81,15 +68,6 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
         message: 'empty ScheduleContext.setCurrentVersion value being used',
         fields: {
           next,
-        },
-      });
-    },
-    deleteFriendRecord: (versionId: string, friendId: string): void => {
-      throw new ErrorWithFields({
-        message: 'empty ScheduleContext.deleteFriendRecord value being used',
-        fields: {
-          versionId,
-          friendId,
         },
       });
     },
