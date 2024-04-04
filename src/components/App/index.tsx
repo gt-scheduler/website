@@ -1,5 +1,6 @@
 import React from 'react';
 import { TooltipProvider } from 'react-tooltip';
+import { TourProvider } from '@reactour/tour';
 
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
@@ -16,6 +17,7 @@ import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import InformationModal from '../InformationModal';
+import Tour, { nextButton, steps, Close } from '../Tour';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -32,48 +34,70 @@ export default function App(): React.ReactElement {
     <ThemeContext.Provider value={themeContextValue}>
       <AppCSSRoot>
         <TooltipProvider>
-          {/* To bring the website down for maintenance purposes, 
+          <TourProvider
+            steps={steps}
+            startAt={1}
+            showBadge={false}
+            showDots={false}
+            components={{ Close }}
+            disableInteraction
+            nextButton={nextButton}
+            prevButton={(): React.ReactElement => <p />}
+            styles={{
+              popover: (base) => ({
+                ...base,
+                borderRadius: '10px',
+                backgroundColor: '#333333',
+                padding: '30px',
+              }),
+            }}
+          >
+            {/* To bring the website down for maintenance purposes, 
             insert <Maintenance /> here and disable everything below.
             See https://github.com/gt-scheduler/website/pull/194 for reference. */}
-          <ErrorBoundary
-            fallback={(error, errorInfo): React.ReactElement => (
-              <AppSkeleton>
-                <SkeletonContent>
-                  <ErrorHeader />
-                  <ErrorDisplay
-                    errorDetails={
-                      <ReactErrorDetails error={error} errorInfo={errorInfo} />
-                    }
-                  >
-                    <div>
-                      There was en error somewhere in the core application logic
-                      and it can&apos;t continue.
-                    </div>
-                    <div>
-                      Try refreshing the page to see if it fixes the issue.
-                    </div>
-                  </ErrorDisplay>
-                </SkeletonContent>
-              </AppSkeleton>
-            )}
-          >
-            <AppNavigation>
-              {/* AppDataLoader is in charge of ensuring that there are valid values
+            <ErrorBoundary
+              fallback={(error, errorInfo): React.ReactElement => (
+                <AppSkeleton>
+                  <SkeletonContent>
+                    <ErrorHeader />
+                    <ErrorDisplay
+                      errorDetails={
+                        <ReactErrorDetails
+                          error={error}
+                          errorInfo={errorInfo}
+                        />
+                      }
+                    >
+                      <div>
+                        There was en error somewhere in the core application
+                        logic and it can&apos;t continue.
+                      </div>
+                      <div>
+                        Try refreshing the page to see if it fixes the issue.
+                      </div>
+                    </ErrorDisplay>
+                  </SkeletonContent>
+                </AppSkeleton>
+              )}
+            >
+              <AppNavigation>
+                {/* AppDataLoader is in charge of ensuring that there are valid values
                 for the Terms and Term contexts before rendering its children.
                 If any data is still loading,
                 then it displays an "app skeleton" with a spinner.
                 If there was an error while loading
                 then it displays an error screen. */}
-              <AppDataLoader>
-                <AppContent />
-              </AppDataLoader>
-            </AppNavigation>
-            <Feedback />
-
-            {/* Display a popup when first visiting the site */}
-            {/* Include <InformationModal /> or <MaintenanceModal /> here */}
-            <InformationModal />
-          </ErrorBoundary>
+                <AppDataLoader>
+                  <AppContent />
+                </AppDataLoader>
+              </AppNavigation>
+              <Feedback />
+              <Tour />
+              {/* Display a popup when first visiting the site */}
+              {/* Include <InformationModal /> or <MaintenanceModal /> here */}
+              <InformationModal />
+            </ErrorBoundary>
+          </TourProvider>
         </TooltipProvider>
       </AppCSSRoot>
     </ThemeContext.Provider>
