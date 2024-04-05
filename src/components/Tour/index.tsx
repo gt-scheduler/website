@@ -7,7 +7,6 @@ import {
 import React from 'react';
 
 import './stylesheet.scss';
-import '@reactour/popover/dist/index.css';
 
 export const steps: StepType[] = [
   {
