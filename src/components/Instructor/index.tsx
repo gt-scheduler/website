@@ -1,16 +1,16 @@
-import React, { useCallback, useContext, useId, useState } from 'react';
+import React, { useCallback, useContext, useId } from 'react';
 import {
   faAngleDown,
   faAngleUp,
   faBan,
   faGraduationCap,
-  faShareAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, simplifyName, unique } from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
 import { ActionRow, Prerequisite, Section } from '..';
 import { ScheduleContext } from '../../contexts';
+import usePrereqControl from '../../hooks/usePrereqControl';
 
 import './stylesheet.scss';
 
@@ -20,7 +20,7 @@ export type InstructorProps = {
   name: string;
   sections: SectionBean[];
   gpa: string;
-  areSectionPrereqsDiff: boolean;
+  prereqDepth: number;
 };
 
 export default function Instructor({
@@ -29,29 +29,13 @@ export default function Instructor({
   name,
   sections,
   gpa,
-  areSectionPrereqsDiff,
+  prereqDepth,
 }: InstructorProps): React.ReactElement {
   const [{ pinnedCrns, excludedCrns }, { patchSchedule }] =
     useContext(ScheduleContext);
-  const [expanded, setExpanded] = useState(true);
-  const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
 
-  const prereqControl = (
-    nextPrereqOpen: boolean,
-    nextExpanded: boolean
-  ): void => {
-    setPrereqOpen(nextPrereqOpen);
-    setExpanded(nextExpanded);
-  };
-  const prereqAction = {
-    icon: faShareAlt,
-    styling: { transform: 'rotate(90deg)' },
-    onClick: (): void => {
-      prereqControl(true, !prereqOpen ? true : !expanded);
-    },
-    tooltip: 'View Prerequisites',
-    id: `${name}-prerequisites`,
-  };
+  const { prereqAction, prereqControl, expanded, prereqOpen } =
+    usePrereqControl(name);
 
   const includeSection = useCallback(
     (section: SectionBean) => {
@@ -85,6 +69,9 @@ export default function Instructor({
   );
 
   const excludeTooltipId = useId();
+
+  const areProfPrereqsSame = prereqDepth === 1;
+
   return (
     <div
       className={classes(
@@ -100,7 +87,7 @@ export default function Instructor({
             icon: expanded ? faAngleUp : faAngleDown,
             onClick: (): void => prereqControl(false, !expanded),
           },
-          ...(areSectionPrereqsDiff ? [prereqAction] : []),
+          ...(areProfPrereqsSame ? [prereqAction] : []),
           !['TBA', 'Not Assigned'].includes(name)
             ? {
                 icon: faGraduationCap,
@@ -135,6 +122,7 @@ export default function Instructor({
                 section={section}
                 color={color}
                 pinned={pinned}
+                prereqDepth={prereqDepth}
               />
             );
           })}
@@ -153,7 +141,7 @@ export default function Instructor({
           )}
         </div>
       )}
-      {expanded && prereqOpen && areSectionPrereqsDiff && sections?.[0] && (
+      {expanded && prereqOpen && areProfPrereqsSame && sections?.[0] && (
         <Prerequisite
           parent={sections[0]}
           prereqs={sections?.[0]?.prereqs ?? []}

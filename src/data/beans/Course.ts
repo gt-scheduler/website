@@ -59,9 +59,12 @@ export default class Course {
 
   term: string;
 
+  prereqDepth: number;
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
-    const [title, sections] = data;
+    const [title, sections, , prereqDepth] = data;
+    this.prereqDepth = prereqDepth;
 
     this.id = courseId;
     const [subject, number] = this.id.split(' ');

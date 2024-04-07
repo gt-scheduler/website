@@ -81,7 +81,6 @@ export default function ComparisonContainer({
   const [editInfo, setEditInfo] = useState<EditInfo>(null);
   const [editValue, setEditValue] = useState('');
   const [paletteInfo, setPaletteInfo] = useState<string>();
-  const [scheduleSelected, setScheduleSelected] = useState(pinSelf);
   const [invitationModalOpen, setInvitationModalOpen] = useState(false);
   const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
@@ -118,7 +117,7 @@ export default function ComparisonContainer({
     if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
       patchSchedule({ colorMap: newColorMap });
     }
-  }, [friends, currentVersion, colorMap, patchSchedule]);
+  }, [friends, currentVersion, colorMap, patchSchedule, allVersionNames]);
 
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -248,8 +247,6 @@ export default function ComparisonContainer({
 
   const handleToggleSchedule = useCallback(
     (id: string) => {
-      console.log(selected);
-      console.log(id);
       if (selected.includes(id)) {
         setSelected(selected.filter((selectedId: string) => selectedId !== id));
         handleCompareSchedules(
