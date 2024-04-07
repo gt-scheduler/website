@@ -7,13 +7,26 @@ import useLocalStorageState from 'use-local-storage-state';
 import Button from '../Button';
 import Modal from '../Modal';
 import InvitationModal from '../InvitationModal';
+import LoginModal from '../LoginModal';
 
 import './stylesheet.scss';
 
-export default function InvitationAcceptModal(): React.ReactElement {
+export type InvitationAcceptModalProps = {
+  handleCompareSchedules: (
+    compare?: boolean,
+    pinnedSchedules?: string[],
+    pinSelf?: boolean,
+    expanded?: boolean
+  ) => void;
+};
+
+export default function InvitationAcceptModal({
+  handleCompareSchedules,
+}: InvitationAcceptModalProps): React.ReactElement {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [invitationModalOpen, setInvitationModalOpen] =
     useState<boolean>(false);
+  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
 
   const [hasSeen, setHasSeen] = useLocalStorageState(
@@ -40,6 +53,7 @@ export default function InvitationAcceptModal(): React.ReactElement {
   const onHide = (): void => {
     setHasSeen(true);
     setModalOpen(!modalOpen);
+    handleCompareSchedules(true, undefined, undefined, true);
   };
 
   return (
@@ -51,47 +65,134 @@ export default function InvitationAcceptModal(): React.ReactElement {
         }}
         inputEmail={searchParams.get('email') ?? undefined}
       />
-      <Modal show={modalOpen} onHide={onHide} width={700}>
+
+      <LoginModal
+        show={loginModalOpen}
+        onHide={(): void => {
+          setLoginModalOpen(false);
+        }}
+      />
+
+      <Modal
+        show={modalOpen}
+        onHide={onHide}
+        width={700}
+        buttons={
+          searchParams.get('status') === 'not-logged-in'
+            ? [
+                {
+                  label: 'Login',
+                  onClick: (): void => {
+                    onHide();
+                    setLoginModalOpen(true);
+                  },
+                },
+              ]
+            : undefined
+        }
+      >
         <Button className="remove-close-button" onClick={onHide}>
           <FontAwesomeIcon icon={faXmark} size="xl" />
         </Button>
-        <div className="invitation-accept-modal-content">
-          <div className="heading">
-            {searchParams.get('status') === 'success'
-              ? 'You have successfully added a new schedule to your view!'
-              : 'Failed to add the schedule, please ask the user for a new invite.'}
-          </div>
-          {searchParams.get('status') === 'success' ? (
-            <>
-              <div className="sub-heading">
-                You will now be able to see {searchParams.get('email')}&apos;s
-                schedule!
-              </div>
-
-              <img src="/scheduled.png" alt="ok" className="modal-image" />
-              <div className="modal-bottom">
-                <div>Would you like to share your schedule back?</div>
-
-                <div className="button-row">
-                  <button type="submit" className="no-button" onClick={onHide}>
-                    No
-                  </button>
-                  <button
-                    type="submit"
-                    className="share-button"
-                    onClick={(): void => {
-                      setHasSeen(true);
-                      setInvitationModalOpen(true);
-                    }}
-                  >
-                    Share Back
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : null}
-        </div>
+        {searchParams.get('status') === 'success' ? (
+          <SuccessContent
+            email={searchParams.get('email') ?? ''}
+            onHide={onHide}
+            setInvitationModalOpen={setInvitationModalOpen}
+          />
+        ) : (
+          <FailureContent error={searchParams.get('status') ?? ''} />
+        )}
       </Modal>
     </>
+  );
+}
+
+type SuccessContentProps = {
+  email: string;
+  onHide: () => void;
+  setInvitationModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function SuccessContent({
+  email,
+  onHide,
+  setInvitationModalOpen,
+}: SuccessContentProps): React.ReactElement {
+  return (
+    <div className="invitation-accept-modal-content">
+      <div className="heading">
+        You have successfully added a new schedule to your view!
+      </div>
+      <div className="sub-heading">
+        You will now be able to see {email}&apos;s schedule!
+      </div>
+
+      <img src="/scheduled.png" alt="ok" className="modal-image" />
+      <div className="modal-bottom">
+        <div>Would you like to share your schedule back?</div>
+
+        <div className="button-row">
+          <button type="submit" className="no-button" onClick={onHide}>
+            No
+          </button>
+          <button
+            type="submit"
+            className="share-button"
+            onClick={(): void => {
+              onHide();
+              setInvitationModalOpen(true);
+            }}
+          >
+            Share Back
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type FailureContentProps = {
+  error: string;
+};
+
+function FailureContent({ error }: FailureContentProps): React.ReactElement {
+  return (
+    <div className="invitation-accept-modal-content">
+      <img src="/mascot.png" alt="buzz" className="buzz-image" />
+      <div className="heading">Failed to add new schedule</div>
+      <div className="error-sub-heading">
+        {error === 'invalid-invite'
+          ? 'Invalid Invite'
+          : error === 'invite-expired'
+          ? 'Invite Expired'
+          : error === 'not-logged-in'
+          ? 'Not Logged In'
+          : "Something's wrong here.."}
+      </div>
+      <div className="error-message">
+        {error === 'invalid-invite' ? (
+          <span>
+            The invite request is <u>invalid</u>, please ask the user for a new
+            invite.
+          </span>
+        ) : error === 'invite-expired' ? (
+          <span>
+            The invite request has <u>expired</u>, please ask the user for a new
+            invite.
+          </span>
+        ) : error === 'not-logged-in' ? (
+          <span>
+            Login and click on the invite link again to add your friend&apos;s
+            schedule to your view.
+          </span>
+        ) : (
+          <span>
+            An unknown error occurred on our end, please ask the user for a new
+            invite!
+          </span>
+        )}
+      </div>
+    </div>
   );
 }

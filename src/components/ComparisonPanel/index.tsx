@@ -8,6 +8,7 @@ import { AccountContext } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import InvitationModal from '../InvitationModal';
 import LoginModal from '../LoginModal';
+import InvitationAcceptModal from '../InvitationAcceptModal/InvitationAcceptModal';
 
 import './stylesheet.scss';
 
@@ -15,11 +16,14 @@ export type ComparisonPanelProps = {
   handleCompareSchedules: (
     compare?: boolean,
     pinnedSchedules?: string[],
-    pinSelf?: boolean
+    pinSelf?: boolean,
+    expanded?: boolean,
+    overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
   compare: boolean;
+  expanded: boolean;
 };
 
 export default function ComparisonPanel({
@@ -27,8 +31,8 @@ export default function ComparisonPanel({
   pinnedSchedules,
   pinSelf,
   compare,
+  expanded,
 }: ComparisonPanelProps): React.ReactElement {
-  const [expanded, setExpanded] = useState(true);
   const [hover, setHover] = useState(false);
   const [tooltipY, setTooltipY] = useState(0);
   const [invitationOpen, setInvitationOpen] = useState(false);
@@ -57,7 +61,6 @@ export default function ComparisonPanel({
 
   const handleTogglePanel = useCallback(() => {
     if (type === 'signedIn') {
-      // setCompare(!compare);
       handleCompareSchedules(!compare, undefined, undefined);
     } else {
       setLoginOpen(true);
@@ -66,10 +69,11 @@ export default function ComparisonPanel({
 
   return (
     <div className="comparison-panel">
+      <InvitationAcceptModal handleCompareSchedules={handleCompareSchedules} />
       <div
         className={classes('drawer', expanded && 'opened')}
         onClick={(): void => {
-          setExpanded(!expanded);
+          handleCompareSchedules(undefined, undefined, undefined, !expanded);
           setHover(false);
         }}
         onMouseEnter={(e: React.MouseEvent): void => {
@@ -134,6 +138,7 @@ export default function ComparisonPanel({
           </div>
         )}
         <div className="combination">
+          <p className="content-title">Schedule Combinations</p>
           <CombinationContainer compare={compare} />
         </div>
         {/* <div

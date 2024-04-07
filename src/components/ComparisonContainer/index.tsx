@@ -31,6 +31,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import InvitationModal from '../InvitationModal';
 import ComparisonContainerShareBack from '../ComparisonContainerShareBack/ComparisonContainerShareBack';
+import { ScheduleDeletionRequest } from '../../types';
 
 import './stylesheet.scss';
 
@@ -62,7 +63,9 @@ export type ComparisonContainerProps = {
   handleCompareSchedules: (
     compare?: boolean,
     pinnedSchedules?: string[],
-    pinSelf?: boolean
+    pinSelf?: boolean,
+    expanded?: boolean,
+    overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
   pinSelf: boolean;
@@ -87,13 +90,18 @@ export default function ComparisonContainer({
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
-  const [{ friends }, { updateFriendTermData, renameFriend }] =
-    useContext(FriendContext);
+  const [{ friends }, { renameFriend }] = useContext(FriendContext);
 
   const accountContext = useContext(AccountContext);
 
   useEffect(() => {
     const newColorMap = { ...colorMap };
+    allVersionNames.forEach((versionName) => {
+      const version = versionName.id;
+      if (!(version in newColorMap)) {
+        newColorMap[version] = getRandomColor();
+      }
+    });
     if (!(currentVersion in newColorMap)) {
       newColorMap[currentVersion] = getRandomColor();
     }
@@ -133,102 +141,115 @@ export default function ComparisonContainer({
     [editInfo, editValue, renameVersion, renameFriend]
   );
 
-  const deleteInvitation = useCallback(
+  const handleNameEditOnBlur = useCallback(() => {
+    if (editValue.trim() === '') return;
+    if (editInfo?.type === 'User') {
+      renameFriend(editInfo?.id, editValue.trim());
+    }
+    if (editInfo?.type === 'Version') {
+      renameVersion(editInfo?.id, editValue.trim());
+    }
+    setEditInfo(null);
+    setEditValue('');
+  }, [editInfo, editValue, renameFriend, renameVersion]);
+
+  const deleteSchedulesFromInvitee = useCallback(
     async (senderId: string, versions: string[]) => {
       const data = JSON.stringify({
         IDToken: await (accountContext as SignedIn).getToken(),
-        senderId,
+        peerUserId: senderId,
         term,
         versions,
-      });
-      axios
-        .post(
-          `${CLOUD_FUNCTION_BASE_URL}/deleteInvitationFromFriend`,
-          `data=${data}`,
-          {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          }
-        )
-        .catch((err) => {
+        owner: false,
+      } as ScheduleDeletionRequest);
+
+      const friend = friends[senderId];
+      if (friend) {
+        axios
+          .post(
+            `${CLOUD_FUNCTION_BASE_URL}/deleteSharedSchedule`,
+            `data=${data}`,
+            {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+            }
+          )
+          .then(() => {
+            const newColorMap = { ...colorMap };
+            versions.forEach((schedule) => {
+              delete newColorMap[schedule];
+            });
+            setSelected(
+              selected.filter(
+                (selectedId: string) =>
+                  !Object.keys(friend.versions).includes(selectedId)
+              )
+            );
+            patchSchedule({ colorMap: newColorMap });
+            // updateFriendTermData((draft) => {
+            //   delete draft.accessibleSchedules[senderId];
+            // });
+          })
+          .catch((err) => {
+            throw err;
+          });
+      }
+    },
+    [accountContext, term, colorMap, friends, patchSchedule, selected]
+  );
+
+  // remove all versions of a particular friend from user (invitee) view
+  const handleRemoveFriend = useCallback(
+    (ownerId: string) => {
+      const friend = friends[ownerId];
+      if (friend) {
+        const versions = Object.keys(friend.versions);
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        deleteSchedulesFromInvitee(ownerId, versions).catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'delete sender record failed',
+              message: 'Failed to delete user schedule',
               source: err,
               fields: {
                 user: (accountContext as SignedIn).id,
-                sender: senderId,
+                sender: ownerId,
                 term,
                 versions,
               },
             })
           );
         });
-    },
-    [accountContext, term]
-  );
-
-  const handleRemoveFriend = useCallback(
-    (ownerId: string) => {
-      const friend = friends[ownerId];
-      if (friend) {
-        const newColorMap = { ...colorMap };
-
-        const versions = Object.keys(friend.versions);
-        versions.forEach((schedule) => {
-          delete newColorMap[schedule];
-        });
-        setSelected(
-          selected.filter(
-            (selectedId: string) =>
-              !Object.keys(friend.versions).includes(selectedId)
-          )
-        );
-        patchSchedule({ colorMap: newColorMap });
-        updateFriendTermData((draft) => {
-          delete draft.accessibleSchedules[ownerId];
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        deleteInvitation(ownerId, versions);
       }
     },
-    [
-      friends,
-      selected,
-      colorMap,
-      patchSchedule,
-      updateFriendTermData,
-      deleteInvitation,
-    ]
+    [friends, deleteSchedulesFromInvitee, accountContext, term]
   );
 
   const handleRemoveSchedule = useCallback(
     (id: string, ownerId: string) => {
-      updateFriendTermData((draft) => {
-        if (draft.accessibleSchedules[ownerId]?.length === 1) {
-          delete draft.accessibleSchedules[ownerId];
-        } else {
-          draft.accessibleSchedules[ownerId] =
-            draft.accessibleSchedules[ownerId]?.filter(
-              (schedule) => schedule !== id
-            ) ?? [];
-        }
+      deleteSchedulesFromInvitee(ownerId, [id]).catch((err) => {
+        softError(
+          new ErrorWithFields({
+            message: 'Failed to delete user schedule',
+            source: err,
+            fields: {
+              user: (accountContext as SignedIn).id,
+              sender: ownerId,
+              term,
+              versions: [id],
+            },
+          })
+        );
       });
-      const newColorMap = { ...colorMap };
-      delete newColorMap[id];
-      patchSchedule({ colorMap: newColorMap });
-      setSelected(selected.filter((selectedId: string) => selectedId !== id));
-
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      deleteInvitation(ownerId, [id]);
     },
-    [selected, colorMap, updateFriendTermData, patchSchedule, deleteInvitation]
+    [deleteSchedulesFromInvitee, accountContext, term]
   );
 
   const handleToggleSchedule = useCallback(
     (id: string) => {
+      console.log(selected);
+      console.log(id);
       if (selected.includes(id)) {
         setSelected(selected.filter((selectedId: string) => selectedId !== id));
         handleCompareSchedules(
@@ -253,6 +274,10 @@ export default function ComparisonContainer({
     [colorMap, patchSchedule]
   );
 
+  const sortedFriendsArray = Object.entries(friends).sort(
+    ([, friendA], [, friendB]) => friendA.name.localeCompare(friendB.name)
+  );
+
   return (
     <div className="comparison-container">
       <InvitationModal
@@ -267,7 +292,7 @@ export default function ComparisonContainer({
           <div className="my-schedule">
             <p className="content-title">My Schedule</p>
             {allVersionNames
-              .filter((version) => version.id === currentVersion)
+              // .filter((version) => version.id === currentVersion)
               .map((version) => {
                 return (
                   <ScheduleRow
@@ -275,14 +300,11 @@ export default function ComparisonContainer({
                     id={version.id}
                     type="Version"
                     onClick={(): void => {
-                      setScheduleSelected(!scheduleSelected);
-                      handleCompareSchedules(
-                        undefined,
-                        undefined,
-                        !scheduleSelected
-                      );
+                      handleToggleSchedule(version.id);
                     }}
-                    checkboxColor={scheduleSelected ? colorMap[version.id] : ''}
+                    checkboxColor={
+                      selected.includes(version.id) ? colorMap[version.id] : ''
+                    }
                     name={version.name}
                     // placeholder functions
                     handleEditSchedule={(): void => {
@@ -314,6 +336,25 @@ export default function ComparisonContainer({
                     color={colorMap[version.id]}
                     paletteInfo={paletteInfo}
                     setPaletteInfo={setPaletteInfo}
+                    handleNameEditOnBlur={handleNameEditOnBlur}
+                    // hoverFriendSchedule={(): void => {
+                    //   handleCompareSchedules(
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     [version.id]
+                    //   );
+                    // }}
+                    // unhoverFriendSchedule={(): void => {
+                    //   handleCompareSchedules(
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     undefined,
+                    //     []
+                    //   );
+                    // }}
                   />
                 );
               })}
@@ -321,7 +362,7 @@ export default function ComparisonContainer({
           <div className="shared-schedules">
             <p className="content-title shared-with">Shared with me</p>
             {Object.keys(friends).length !== 0 ? (
-              Object.entries(friends).map(([friendId, friend]) => {
+              sortedFriendsArray.map(([friendId, friend]) => {
                 return (
                   <div key={friendId} className="friend">
                     <ScheduleRow
@@ -355,6 +396,7 @@ export default function ComparisonContainer({
                       editValue={editValue}
                       setInvitationModalEmail={setInvitationModalEmail}
                       setInvitationModalOpen={setInvitationModalOpen}
+                      handleNameEditOnBlur={handleNameEditOnBlur}
                     />
                     <div className="friend-email">
                       <p>{friend.email}</p>
@@ -401,6 +443,25 @@ export default function ComparisonContainer({
                             color={colorMap[scheduleId]}
                             paletteInfo={paletteInfo}
                             setPaletteInfo={setPaletteInfo}
+                            hoverFriendSchedule={(): void => {
+                              handleCompareSchedules(
+                                undefined,
+                                undefined,
+                                undefined,
+                                undefined,
+                                [scheduleId]
+                              );
+                            }}
+                            unhoverFriendSchedule={(): void => {
+                              handleCompareSchedules(
+                                undefined,
+                                undefined,
+                                undefined,
+                                undefined,
+                                []
+                              );
+                            }}
+                            handleNameEditOnBlur={handleNameEditOnBlur}
                           />
                         );
                       }
@@ -466,6 +527,9 @@ type ScheduleRowProps = {
   editInfo?: EditInfo;
   setEditInfo?: (info: EditInfo) => void;
   editValue?: string;
+  hoverFriendSchedule?: () => void;
+  unhoverFriendSchedule?: () => void;
+  handleNameEditOnBlur?: () => void;
 };
 
 function ScheduleRow({
@@ -494,6 +558,9 @@ function ScheduleRow({
   editValue,
   setInvitationModalOpen,
   setInvitationModalEmail,
+  hoverFriendSchedule,
+  unhoverFriendSchedule,
+  handleNameEditOnBlur,
 }: ScheduleRowProps): React.ReactElement {
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
@@ -509,7 +576,19 @@ function ScheduleRow({
   const palette = hasPalette && paletteInfo === id;
 
   return (
-    <div className="schedule-row">
+    <div
+      className="schedule-row"
+      onMouseEnter={(): void => {
+        if (type === 'Schedule') {
+          hoverFriendSchedule?.();
+        }
+      }}
+      onMouseLeave={(): void => {
+        if (type === 'Schedule') {
+          unhoverFriendSchedule?.();
+        }
+      }}
+    >
       <div
         className={classes(
           'checkbox-container',
@@ -533,7 +612,7 @@ function ScheduleRow({
             onChange={editOnChange}
             placeholder={name}
             onKeyDown={editOnKeyDown}
-            onBlur={(): void => setEditInfo(null)}
+            onBlur={handleNameEditOnBlur}
           />
         )}
         {!edit && (
@@ -547,7 +626,7 @@ function ScheduleRow({
               <div
                 className={classes(
                   type === 'User' && 'friend-name',
-                  checkboxColor !== '' && 'checked'
+                  type !== 'User' && checkboxColor !== '' && 'checked'
                 )}
               >
                 <p>{name}</p>
