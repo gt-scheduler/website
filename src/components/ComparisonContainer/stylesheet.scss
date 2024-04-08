@@ -2,14 +2,13 @@
 @import '../../variables';
 
 .comparison-container {
+  height: auto;
   .comparison-body {
     display: flex;
     flex-direction: column;
-    height: 100%;
 
     .comparison-content {
       position: relative;
-      margin-bottom: 12px;
       overflow-x: hidden;
       overflow-y: auto;
       flex: 1 1 auto;
@@ -20,18 +19,22 @@
         font-size: 14px;
         font-weight: 400;
         line-height: normal;
-        font-family: Roboto;
 
-        &.content-title{
+        &.content-title {
           font-weight: 700;
           margin: 16px 12px 0px 12px;
           border-bottom: 2px solid $color-border;
         }
 
-        &.shared-with{
-          margin-bottom: 8px;
+        &.my-schedule-title {
+          font-weight: 700;
+          margin: 0px 12px 0px 12px;
+          border-bottom: 2px solid $color-border;
         }
 
+        &.shared-with {
+          margin-bottom: 4px;
+        }
       }
 
       .friend {
@@ -54,11 +57,15 @@
         }
       }
 
+      .schedule-name {
+        cursor: pointer;
+      }
+
       .friend-name {
         p {
           font-weight: 575;
           font-size: 16px;
-        }        
+        }
       }
 
       .no-shared-schedules {
@@ -82,9 +89,8 @@
           align-items: center;
           position: relative;
           height: 22px;
-          
+
           .checkbox {
-            
             margin-left: 12px;
             border: 1px solid;
             border-radius: 3px;
@@ -113,7 +119,7 @@
             &.check {
               margin-left: 8px;
             }
-            
+
             p {
               text-overflow: ellipsis;
             }
@@ -147,7 +153,7 @@
 
           .icon {
             width: 27px;
-            height: 100%;
+            height: 22px;
             padding: 0px;
             opacity: 0;
           }
@@ -174,7 +180,6 @@
             margin-top: 4px;
             margin-bottom: 2px;
           }
-
         }
 
         .palette {
@@ -195,45 +200,63 @@
         margin-top: 12px;
         margin-left: 10px;
         margin-right: 10px;
-        border: 1px solid #7C7C7C;
+        border: 1px solid $color-neutral;
         border-radius: 8px;
         padding: 8px 10px;
         gap: 6px;
-        
+
         p {
           font-size: 12px;
           line-height: normal;
+          font-style: oblique;
+          overflow: visible;
         }
-      
+
         .shareback-button {
           width: 100px;
           height: 24px;
           padding: 6px 10px;
-          font-size: 12px;
-          color: #000000;
+          font-size: 9px;
+          color: var(--theme-bg);
+          background-color: var(--theme-fg);
           border-radius: 8px;
-          background-color: #FFF;
-          border: 1px solid #7C7C7C;
+          border: 1px solid rgba(128, 128, 128, 0.2);
           margin-left: 5px;
-      
+          font-weight: 650;
+          cursor: pointer;
+
           &:hover {
-            background-color: #d1d1d1;
+            @include dark {
+              background: $modal-foreground-color-dark;
+            }
+
+            @include light {
+              background: $modal-foreground-color-light;
+            }
           }
         }
-      
+
         .dont-shareback-button {
           width: 100px;
           height: 24px;
           padding: 6px 10px;
-          font-size: 12px;
-          color: white;
+          font-size: 9px;
+          color: var(--theme-fg);
+          background-color: var(--theme-bg);
           border-radius: 8px;
-          background-color: #333;
-          border: 1px solid #7C7C7C;
+          border: 1px solid $color-neutral;
           margin-right: 5px;
-      
+          font-weight: 650;
+          cursor: pointer;
+
           &:hover {
-            background-color: #7C7C7C;
+            @include dark {
+              background: $modal-foreground-color-light;
+            }
+
+            @include light {
+              background: $modal-foreground-color-dark;
+            }
           }
         }
       }
@@ -251,7 +274,6 @@
 }
 
 .shared-schedule-modal {
-
   h2 {
     font-weight: 700;
     font-size: 24px;
@@ -271,5 +293,6 @@
     top: 11px;
     right: 11px;
     border-radius: 50%;
+    color: $color-neutral;
   }
 }

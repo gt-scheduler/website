@@ -68,13 +68,13 @@ export type ComparisonContainerProps = {
     overlaySchedules?: string[]
   ) => void;
   pinnedSchedules: string[];
-  pinSelf: boolean;
+  shareBackRemount: number;
 };
 
 export default function ComparisonContainer({
   handleCompareSchedules,
   pinnedSchedules,
-  pinSelf,
+  shareBackRemount,
 }: ComparisonContainerProps): React.ReactElement {
   const [selected, setSelected] = useState<string[]>(pinnedSchedules);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteInfo>(null);
@@ -287,7 +287,7 @@ export default function ComparisonContainer({
       <div className="comparison-body">
         <div className="comparison-content">
           <div className="my-schedule">
-            <p className="content-title">My Schedule</p>
+            <p className="my-schedule-title">My Schedule</p>
             {allVersionNames
               // .filter((version) => version.id === currentVersion)
               .map((version) => {
@@ -334,24 +334,24 @@ export default function ComparisonContainer({
                     paletteInfo={paletteInfo}
                     setPaletteInfo={setPaletteInfo}
                     handleNameEditOnBlur={handleNameEditOnBlur}
-                    // hoverFriendSchedule={(): void => {
-                    //   handleCompareSchedules(
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     [version.id]
-                    //   );
-                    // }}
-                    // unhoverFriendSchedule={(): void => {
-                    //   handleCompareSchedules(
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     undefined,
-                    //     []
-                    //   );
-                    // }}
+                    hoverFriendSchedule={(): void => {
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        [version.id]
+                      );
+                    }}
+                    unhoverFriendSchedule={(): void => {
+                      handleCompareSchedules(
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        []
+                      );
+                    }}
                   />
                 );
               })}
@@ -469,6 +469,7 @@ export default function ComparisonContainer({
                       friendEmail={friend.email}
                       setModalEmail={setInvitationModalEmail}
                       setModalOpen={setInvitationModalOpen}
+                      key={shareBackRemount}
                     />
                   </div>
                 );
@@ -562,6 +563,10 @@ function ScheduleRow({
   const tooltipId = useId();
   const [tooltipHover, setTooltipHover] = useState(false);
   const [divHover, setDivHover] = useState(false);
+  const [showPaletteTooltip, setShowPaletteTooltip] = useState(false);
+  const [showShareTooltip, setShowShareTooltip] = useState(false);
+  const [showEditTooltip, setShowEditTooltip] = useState(false);
+  const [showRemoveTooltip, setShowRemoveTooltip] = useState(false);
 
   const edit =
     hasEdit &&
@@ -576,12 +581,12 @@ function ScheduleRow({
     <div
       className="schedule-row"
       onMouseEnter={(): void => {
-        if (type === 'Schedule') {
+        if (type === 'Schedule' || type === 'Version') {
           hoverFriendSchedule?.();
         }
       }}
       onMouseLeave={(): void => {
-        if (type === 'Schedule') {
+        if (type === 'Schedule' || type === 'Version') {
           unhoverFriendSchedule?.();
         }
       }}
@@ -619,11 +624,13 @@ function ScheduleRow({
               className={classes('name', hasCheck && 'check')}
               onMouseEnter={(): void => setTooltipHover(true)}
               onMouseLeave={(): void => setTooltipHover(false)}
+              onClick={onClick}
             >
               <div
                 className={classes(
                   type === 'User' && 'friend-name',
-                  type !== 'User' && checkboxColor !== '' && 'checked'
+                  type !== 'User' && checkboxColor !== '' && 'checked',
+                  type !== 'User' && 'schedule-name'
                 )}
               >
                 <p>{name}</p>
@@ -649,47 +656,117 @@ function ScheduleRow({
           </>
         )}
         {(divHover || edit) && hasPalette && setPaletteInfo && (
-          <Button
-            className="icon"
-            onClick={(): void => setPaletteInfo(palette ? '' : id)}
-            key={`${id}-palette`}
+          <div
+            onMouseEnter={(): void => setShowPaletteTooltip(true)}
+            onMouseLeave={(): void => setShowPaletteTooltip(false)}
+            id={`${tooltipId}-palette`}
           >
-            <FontAwesomeIcon icon={faPalette} size="xs" />
-          </Button>
+            <Button
+              className="icon"
+              onClick={(): void => setPaletteInfo(palette ? '' : id)}
+              key={`${id}-palette`}
+            >
+              <FontAwesomeIcon icon={faPalette} size="xs" />
+            </Button>
+            <ReactTooltip
+              key={`palette-tooltip-${id}`}
+              anchorId={`${tooltipId}-palette`}
+              place="top"
+              isOpen={showPaletteTooltip}
+              setIsOpen={setShowPaletteTooltip}
+              className="tooltip"
+              variant="dark"
+            >
+              Edit Color
+            </ReactTooltip>
+          </div>
         )}
         {(divHover || edit) &&
           hasEdit &&
           setInvitationModalOpen !== undefined &&
           setInvitationModalEmail !== undefined &&
           email && (
-            <Button
-              className="icon"
-              onClick={(): void => {
-                setInvitationModalEmail(email);
-                setInvitationModalOpen(true);
-              }}
-              key={`${id}-share`}
+            <div
+              onMouseEnter={(): void => setShowShareTooltip(true)}
+              onMouseLeave={(): void => setShowShareTooltip(false)}
+              id={`${tooltipId}-share`}
             >
-              <FontAwesomeIcon icon={faShareFromSquare} size="xs" />
-            </Button>
+              <Button
+                className="icon"
+                onClick={(): void => {
+                  setInvitationModalEmail(email);
+                  setInvitationModalOpen(true);
+                }}
+                key={`${id}-share`}
+                data-for={`share-tooltip-${id}`}
+                data-tip="Share"
+              >
+                <FontAwesomeIcon icon={faShareFromSquare} size="xs" />
+              </Button>
+              <ReactTooltip
+                key={`share-tooltip-${id}`}
+                anchorId={`${tooltipId}-share`}
+                place="top"
+                isOpen={showShareTooltip}
+                setIsOpen={setShowShareTooltip}
+                className="tooltip"
+                variant="dark"
+              >
+                Share Back
+              </ReactTooltip>
+            </div>
           )}
         {(divHover || edit) && hasEdit && (
-          <Button
-            className="icon"
-            onClick={handleEditSchedule}
-            key={`${id}-edit`}
+          <div
+            onMouseEnter={(): void => setShowEditTooltip(true)}
+            onMouseLeave={(): void => setShowEditTooltip(false)}
+            id={`${tooltipId}-edit`}
           >
-            <FontAwesomeIcon icon={faPencil} size="xs" />
-          </Button>
+            <Button
+              className="icon"
+              onClick={handleEditSchedule}
+              key={`${id}-edit`}
+            >
+              <FontAwesomeIcon icon={faPencil} size="xs" />
+            </Button>
+            <ReactTooltip
+              key={`edit-tooltip-${id}`}
+              anchorId={`${tooltipId}-edit`}
+              place="top"
+              isOpen={showEditTooltip}
+              setIsOpen={setShowEditTooltip}
+              className="tooltip"
+              variant="dark"
+            >
+              Edit
+            </ReactTooltip>
+          </div>
         )}
         {(divHover || edit) && hasDelete && (
-          <Button
-            className="icon"
-            onClick={handleRemoveSchedule}
-            key={`${id}-delete`}
+          <div
+            onMouseEnter={(): void => setShowRemoveTooltip(true)}
+            onMouseLeave={(): void => setShowRemoveTooltip(false)}
+            id={`${tooltipId}-delete`}
           >
-            <FontAwesomeIcon icon={faCircleXmark} size="xs" />
-          </Button>
+            <Button
+              className="icon"
+              onClick={handleRemoveSchedule}
+              key={`${id}-delete`}
+            >
+              <FontAwesomeIcon icon={faCircleXmark} size="xs" />
+            </Button>
+            <ReactTooltip
+              key={`delete-tooltip-${id}`}
+              anchorId={`${tooltipId}-delete`}
+              place="top"
+              isOpen={showRemoveTooltip}
+              setIsOpen={setShowRemoveTooltip}
+              className="tooltip"
+              variant="dark"
+            >
+              Remove
+            </ReactTooltip>
+          </div>
         )}
       </div>
       {hasPalette && palette && setFriendScheduleColor && setPaletteInfo && (

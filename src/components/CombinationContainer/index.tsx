@@ -58,64 +58,80 @@ export default function CombinationContainer({
   return (
     <>
       <div className="CombinationContainer">
-        <Select
-          onChange={(newSortingOptionIndex): void =>
-            patchSchedule({ sortingOptionIndex: newSortingOptionIndex })
-          }
-          current={sortingOptionIndex}
-          options={oscar.sortingOptions.map((sortingOption, i) => ({
-            id: i,
-            label: sortingOption.label,
-          }))}
-        />
-        <Button
-          className="reset"
-          onClick={handleResetPinnedCrns}
-          disabled={pinnedCrns.length === 0}
-        >
-          Reset Sections
-        </Button>
-        <div className="scroller">
-          <AutoSizer>
-            {({ width, height }): React.ReactElement => (
-              <List
-                width={width}
-                height={height}
-                style={{ outline: 'none' }}
-                rowCount={sortedCombinations.length}
-                rowHeight={108}
-                // List.rowRenderer is a normal render prop, not a component.
-                // eslint-disable-next-line react/no-unstable-nested-components
-                rowRenderer={({ index, key, style }): React.ReactElement => {
-                  const { crns } = sortedCombinations[index] as Combination;
-                  return (
-                    <div className="list-item" style={style} key={key}>
-                      <div
-                        className="combination"
-                        onMouseEnter={(): void => setOverlayCrns(crns)}
-                        onMouseLeave={(): void => setOverlayCrns([])}
-                        onClick={(): void =>
-                          patchSchedule({
-                            pinnedCrns: [...pinnedCrns, ...crns],
-                          })
-                        }
-                      >
-                        <div className="number">{index + 1}</div>
-                        <Calendar
-                          className="calendar-preview"
-                          overlayCrns={crns}
-                          isAutosized
-                          compare={compare}
-                          preview
-                        />
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-            )}
-          </AutoSizer>
-        </div>
+        {compare ? (
+          <div className="turn-off-compare-text">
+            Turn compare schedules off to view section combinations!
+          </div>
+        ) : (
+          <>
+            <Select
+              onChange={(newSortingOptionIndex): void =>
+                patchSchedule({ sortingOptionIndex: newSortingOptionIndex })
+              }
+              current={sortingOptionIndex}
+              options={oscar.sortingOptions.map((sortingOption, i) => ({
+                id: i,
+                label: sortingOption.label,
+              }))}
+            />
+            <Button
+              className="reset"
+              onClick={handleResetPinnedCrns}
+              disabled={pinnedCrns.length === 0}
+            >
+              Reset Sections
+            </Button>
+            <div className="scroller">
+              <AutoSizer>
+                {({ width, height }): React.ReactElement => (
+                  <List
+                    width={width}
+                    height={height}
+                    style={{ outline: 'none' }}
+                    rowCount={sortedCombinations.length}
+                    rowHeight={108}
+                    /*
+                    List.rowRenderer is a normal render prop,
+                    not a component.
+                    */
+                    // eslint-disable-next-line max-len
+                    // eslint-disable-next-line react/no-unstable-nested-components
+                    rowRenderer={({
+                      index,
+                      key,
+                      style,
+                    }): React.ReactElement => {
+                      const { crns } = sortedCombinations[index] as Combination;
+                      return (
+                        <div className="list-item" style={style} key={key}>
+                          <div
+                            className="combination"
+                            onMouseEnter={(): void => setOverlayCrns(crns)}
+                            onMouseLeave={(): void => setOverlayCrns([])}
+                            onClick={(): void =>
+                              patchSchedule({
+                                pinnedCrns: [...pinnedCrns, ...crns],
+                              })
+                            }
+                          >
+                            <div className="number">{index + 1}</div>
+                            <Calendar
+                              className="calendar-preview"
+                              overlayCrns={crns}
+                              isAutosized
+                              compare={compare}
+                              preview
+                            />
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
+                )}
+              </AutoSizer>
+            </div>
+          </>
+        )}
       </div>
 
       <Modal

@@ -7,7 +7,7 @@
   .drawer {
     width: 13px;
     border-width: 0px 0px 0px 1px;
-    border-color: rgba(255, 255, 255, 0.50);
+    border-color: rgba(255, 255, 255, 0.5);
     border-style: solid;
     display: flex;
     flex-direction: column;
@@ -21,12 +21,12 @@
     &:hover {
       background: $color-border;
     }
-    
+
     .drawer-line {
       flex: 1;
       width: 5px;
       border-width: 0px 1px 0px 1px;
-      border-color: rgba(255, 255, 255, 0.50);
+      border-color: rgba(255, 255, 255, 0.5);
       border-style: solid;
       &.opened {
         border-color: $color-border;
@@ -74,26 +74,26 @@
     display: flex;
     flex: 0 0 1;
     flex-direction: column;
-    overflow: scroll;
     align-items: stretch;
     width: 256px;
     transition: width 0.15s;
+    overflow-y: auto;
 
     .comparison-header {
       display: flex;
       align-items: center;
-      margin: 11px 12px 7px 12px;
+      margin: 11px 12px 20px 12px;
 
       p {
         margin: 0px;
         overflow: hidden;
 
-        &.header-title{
+        &.header-title {
           flex: 1;
           font-size: 16px;
         }
 
-        &.header-text{
+        &.header-text {
           font-size: 12px;
           margin-right: 4px;
         }
@@ -105,39 +105,39 @@
         position: relative;
         width: 43px;
       }
-      
+
       .switch input {
         display: none;
       }
-      
+
       .slider {
-        background-color: #505050;
+        background-color: $color-neutral;
         bottom: 0;
         cursor: pointer;
         left: 0;
         position: absolute;
         right: 0;
         top: 0;
-        transition: .4s;
+        transition: 0.4s;
         border-radius: 19px;
       }
-      
+
       .slider:before {
         background-color: #ffffff;
         bottom: 2px;
-        content: "";
+        content: '';
         height: 15px;
         left: 2px;
         position: absolute;
-        transition: .4s;
+        transition: 0.4s;
         width: 15px;
         border-radius: 50%;
       }
-      
+
       input.checked + .slider {
-        background-color: #589BD5;
+        background-color: #589bd5;
       }
-      
+
       input.checked + .slider:before {
         transform: translateX(24px);
       }
@@ -145,10 +145,11 @@
 
     .comparison-overlay {
       background-color: var(--theme-bg);
-  
+
       pointer-events: none;
       opacity: 0;
-      transition-duration: 0.15s, $theme-switch-transition-duration, $theme-switch-transition-duration;
+      transition-duration: 0.15s, $theme-switch-transition-duration,
+        $theme-switch-transition-duration;
       transition-property: opacity, color, background-color;
 
       &.left {
@@ -165,7 +166,7 @@
         width: 256px;
         height: 360px;
       }
-  
+
       &.open {
         pointer-events: all;
         opacity: 0.4;
@@ -186,18 +187,13 @@
       width: 0px;
     }
 
-    .comparison-container {
-      max-height: calc(100% - 37px);
-      // border-bottom: 1px solid $color-border;
-    }
-
     .combination {
       flex: 1;
 
-      .content-title{
+      .content-title {
         font-weight: 700;
         font-size: 14px;
-        margin: 12px 12px 4px 12px;
+        margin: 18px 12px 4px 12px;
         border-bottom: 2px solid $color-border;
       }
 
@@ -208,23 +204,31 @@
   }
   .invite-panel {
     display: flex;
-    margin: 21px 10px 10px 16px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
     .invite-button {
       align-items: center;
       font-size: 14px;
       font-weight: 700;
-      color: white;
+      color: var(--theme-fg);
       border-radius: 10px;
-      background-color: #676767;
+      background-color: $color-border;
       display: flex;
       padding: 10px 47px 10px 47px;
       border: none;
       gap: 5px;
 
       &:hover {
-        background-color: #929292;
+        @include dark {
+          background: $modal-foreground-color-light;
+        }
+
+        @include light {
+          background: $modal-foreground-color-dark;
+        }
       }
     }
   }
-
 }
