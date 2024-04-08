@@ -3,12 +3,13 @@ import {
   ProviderProps,
   PopoverContentProps,
   useTour,
+  TourProvider as TourProv,
 } from '@reactour/tour';
 import React from 'react';
 
 import './stylesheet.scss';
 
-export const steps: StepType[] = [
+const steps: StepType[] = [
   {
     selector: '#Recurring\\ Events',
     content: () => (
@@ -91,7 +92,7 @@ export const steps: StepType[] = [
 
 type CloseProps = { onClick?: (() => void) | undefined };
 
-export function Close({ onClick }: CloseProps): React.ReactElement {
+function Close({ onClick }: CloseProps): React.ReactElement {
   return (
     <button
       type="button"
@@ -108,7 +109,7 @@ export function Close({ onClick }: CloseProps): React.ReactElement {
   );
 }
 
-export function nextButton(props: {
+function nextButton(props: {
   setCurrentStep: ProviderProps['setCurrentStep'];
   currentStep: ProviderProps['currentStep'];
   steps?: ProviderProps['steps'];
@@ -137,7 +138,7 @@ export function nextButton(props: {
   );
 }
 
-export default function Tour(): React.ReactElement {
+function Tour(): React.ReactElement {
   const { setIsOpen, setCurrentStep } = useTour();
   return (
     <div className="tour-button-wrapper">
@@ -152,5 +153,37 @@ export default function Tour(): React.ReactElement {
         ?
       </button>
     </div>
+  );
+}
+
+type TourProviderProps = {
+  children: React.ReactNode;
+};
+
+export default function TourProvider({
+  children,
+}: TourProviderProps): React.ReactElement {
+  return (
+    <TourProv
+      steps={steps}
+      startAt={1}
+      showBadge={false}
+      showDots={false}
+      components={{ Close }}
+      disableInteraction
+      nextButton={nextButton}
+      prevButton={(): React.ReactElement => <p />}
+      styles={{
+        popover: (base) => ({
+          ...base,
+          borderRadius: '10px',
+          backgroundColor: '#333333',
+          padding: '30px',
+        }),
+      }}
+    >
+      {children}
+      <Tour />
+    </TourProv>
   );
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import { TooltipProvider } from 'react-tooltip';
-import { TourProvider } from '@reactour/tour';
 
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
@@ -17,7 +16,7 @@ import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import InformationModal from '../InformationModal';
-import Tour, { nextButton, steps, Close } from '../Tour';
+import TourProvider from '../Tour';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
@@ -33,25 +32,8 @@ export default function App(): React.ReactElement {
   return (
     <ThemeContext.Provider value={themeContextValue}>
       <AppCSSRoot>
-        <TooltipProvider>
-          <TourProvider
-            steps={steps}
-            startAt={1}
-            showBadge={false}
-            showDots={false}
-            components={{ Close }}
-            disableInteraction
-            nextButton={nextButton}
-            prevButton={(): React.ReactElement => <p />}
-            styles={{
-              popover: (base) => ({
-                ...base,
-                borderRadius: '10px',
-                backgroundColor: '#333333',
-                padding: '30px',
-              }),
-            }}
-          >
+        <TourProvider>
+          <TooltipProvider>
             {/* To bring the website down for maintenance purposes, 
             insert <Maintenance /> here and disable everything below.
             See https://github.com/gt-scheduler/website/pull/194 for reference. */}
@@ -92,13 +74,12 @@ export default function App(): React.ReactElement {
                 </AppDataLoader>
               </AppNavigation>
               <Feedback />
-              <Tour />
               {/* Display a popup when first visiting the site */}
               {/* Include <InformationModal /> or <MaintenanceModal /> here */}
               <InformationModal />
             </ErrorBoundary>
-          </TourProvider>
-        </TooltipProvider>
+          </TooltipProvider>
+        </TourProvider>
       </AppCSSRoot>
     </ThemeContext.Provider>
   );
