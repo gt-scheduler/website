@@ -76,6 +76,7 @@ const CAMPUSES: Record<string, string> = {
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 const FIREBASE_PROJECT_ID = firebaseConfig.projectId || `gt-scheduler-web-dev`;
+
 const CLOUD_FUNCTION_BASE_URL = `https://us-east1-${FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
 const LARGE_DESKTOP_BREAKPOINT = 1200;

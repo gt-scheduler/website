@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   faAngleDown,
   faAngleUp,
-  faShareAlt,
   faPalette,
   faPlus,
   faTrash,
@@ -13,8 +12,9 @@ import Cancellable from '../../utils/cancellable';
 import { ActionRow, Instructor, Palette, Prerequisite } from '..';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
-import { CourseGpa, CrawlerPrerequisites } from '../../types';
+import { CourseGpa } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import usePrereqControl from '../../hooks/usePrereqControl';
 
 import './stylesheet.scss';
 
@@ -29,8 +29,6 @@ export default function Course({
   courseId,
   onAddCourse,
 }: CourseProps): React.ReactElement | null {
-  const [expanded, setExpanded] = useState<boolean>(false);
-  const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
@@ -39,8 +37,12 @@ export default function Course({
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
+  const course = oscar.findCourse(courseId);
+
+  const { prereqAction, prereqControl, expanded, prereqOpen } =
+    usePrereqControl(course?.id ?? '', false);
+
   useEffect(() => {
-    const course = oscar.findCourse(courseId);
     if (course == null) return;
     if (isSearching) return;
 
@@ -72,9 +74,10 @@ export default function Course({
     return (): void => {
       loadOperation.cancel();
     };
-  }, [isSearching, oscar, courseId]);
+  }, [isSearching, oscar, courseId, course]);
 
   const handleRemoveCourse = useCallback(
+    // eslint-disable-next-line no-shadow
     (course: CourseBean) => {
       const newColorMap = { ...colorMap };
       delete newColorMap[course.id];
@@ -103,13 +106,10 @@ export default function Course({
     [excludedCrns, patchSchedule]
   );
 
-  const course = oscar.findCourse(courseId);
-  if (course == null) return null;
+  if (!course) return null;
 
   const color = colorMap[course.id];
   const contentClassName = color != null && getContentClassName(color);
-
-  const prereqs: CrawlerPrerequisites | null = course.prereqs ?? [];
 
   const instructorMap: Record<string, Section[] | undefined> = {};
   course.sections.forEach((section) => {
@@ -130,23 +130,6 @@ export default function Course({
     (instructor) => !excludedInstructors.includes(instructor)
   );
 
-  const prereqControl = (
-    nextPrereqOpen: boolean,
-    nextExpanded: boolean
-  ): void => {
-    setPrereqOpen(nextPrereqOpen);
-    setExpanded(nextExpanded);
-  };
-  const prereqAction = {
-    icon: faShareAlt,
-    styling: { transform: 'rotate(90deg)' },
-    onClick: (): void => {
-      prereqControl(true, !prereqOpen ? true : !expanded);
-    },
-    tooltip: 'View Prerequisites',
-    id: `${course.id}-prerequisites`,
-  };
-
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
   );
@@ -154,6 +137,8 @@ export default function Course({
     (credits, section) => credits + section.credits,
     0
   );
+
+  const areSectionPrereqsSame = course.prereqDepth === 0;
 
   return (
     <div
@@ -168,13 +153,16 @@ export default function Course({
         ].join(' ')}
         actions={
           isSearching
-            ? [{ icon: faPlus, onClick: onAddCourse }, prereqAction]
+            ? [
+                { icon: faPlus, onClick: onAddCourse },
+                ...(areSectionPrereqsSame ? [prereqAction] : []),
+              ]
             : [
                 {
                   icon: expanded ? faAngleUp : faAngleDown,
                   onClick: (): void => prereqControl(false, !expanded),
                 },
-                prereqAction,
+                ...(areSectionPrereqsSame ? [prereqAction] : []),
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
@@ -242,6 +230,7 @@ export default function Course({
                     ? instructorGpa.toFixed(2)
                     : 'N/A'
                 }
+                prereqDepth={course.prereqDepth}
               />
             );
           })}
@@ -264,8 +253,11 @@ export default function Course({
           )}
         </div>
       )}
-      {expanded && prereqOpen && prereqs !== null && (
-        <Prerequisite course={course} prereqs={prereqs} />
+      {expanded && prereqOpen && areSectionPrereqsSame && (
+        <Prerequisite
+          parent={course}
+          prereqs={course.sections?.[0]?.prereqs ?? []}
+        />
       )}
     </div>
   );

@@ -2,12 +2,7 @@ import axios from 'axios';
 import { decode } from 'html-entities';
 
 import { Oscar, Section } from '.';
-import {
-  CourseGpa,
-  CrawlerCourse,
-  CrawlerPrerequisites,
-  Period,
-} from '../../types';
+import { CourseGpa, CrawlerCourse, Period } from '../../types';
 import {
   hasConflictBetween,
   isLab,
@@ -52,8 +47,6 @@ export default class Course {
 
   sections: Section[];
 
-  prereqs: CrawlerPrerequisites | undefined;
-
   hasLab: boolean;
 
   onlyLectures: Section[] | undefined;
@@ -66,9 +59,12 @@ export default class Course {
 
   term: string;
 
+  prereqDepth: number;
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
-    const [title, sections, prereqs] = data;
+    const [title, sections, , prereqDepth] = data;
+    this.prereqDepth = prereqDepth;
 
     this.id = courseId;
     const [subject, number] = this.id.split(' ');
@@ -107,7 +103,6 @@ export default class Course {
         }
       }
     );
-    this.prereqs = prereqs;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)

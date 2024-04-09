@@ -189,7 +189,30 @@ export type CrawlerSection = [
    * integer index into caches.gradeBases,
    * specifying the grading scheme of the class
    */
-  gradeBaseIndex: number
+  gradeBaseIndex: number,
+  /**
+   * the full, human-readable name of the course (e.g. "Accounting I")
+   */
+  fullName: string,
+  /**
+     * a tree of prerequisite classes and the necessary grades in them
+     * (using boolean expressions in prefix order)
+     *
+     * @example
+     *
+     * ```json
+       [
+         "and",
+         [
+            "or",
+            {"id":"CS 3510", "grade":"C"},
+            {"id":"CS 3511", "grade":"C"}
+         ]
+       ]
+     * ```
+     */
+  // ! Type had `undefined` explicitly added to ensure we check when accessing
+  prerequisites: CrawlerPrerequisites | undefined
 ];
 
 // Prerequisite types:
@@ -317,12 +340,17 @@ export type CrawlerCourse = [
        ]
      * ```
      */
-  // ! Type had `undefined` explicitly added to ensure we check when accessing
-  prerequisites: CrawlerPrerequisites | undefined,
   /**
    * Description pulled from Oscar
    */
-  description: string | null
+  description: string | null,
+  /**
+   * level of prerequisite uniqueness
+   * 0: all course sections have the same prerequisites
+   * 1: all course sections grouped by professor have the same prerequisites
+   * 2: some sections of the same professor have different prerequisites
+   */
+  prereqDepth: number
 ];
 
 // TermData type (imported as `CrawlerTermData`):
