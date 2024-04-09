@@ -40,7 +40,7 @@ export default function Course({
   const course = oscar.findCourse(courseId);
 
   const { prereqAction, prereqControl, expanded, prereqOpen } =
-    usePrereqControl(course?.id ?? '');
+    usePrereqControl(course?.id ?? '', false);
 
   useEffect(() => {
     if (course == null) return;

@@ -16,9 +16,12 @@ type ReturnProps = {
   prereqOpen: boolean;
 };
 
-export default function usePrereqControl(name: string): ReturnProps {
+export default function usePrereqControl(
+  name: string,
+  initExpanded: boolean
+): ReturnProps {
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState<boolean>(initExpanded);
 
   const prereqControl = (
     nextPrereqOpen: boolean,

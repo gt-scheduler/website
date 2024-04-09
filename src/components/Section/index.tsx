@@ -38,7 +38,10 @@ export default function Section({
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
   const [seating, setSeating] = useState<Seating>([[], 0]);
 
-  const { prereqAction, expanded, prereqOpen } = usePrereqControl(section.id);
+  const { prereqAction, expanded, prereqOpen } = usePrereqControl(
+    section.id,
+    false
+  );
 
   let hovering = false;
   const handleHover = (): void => {

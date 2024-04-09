@@ -35,7 +35,7 @@ export default function Instructor({
     useContext(ScheduleContext);
 
   const { prereqAction, prereqControl, expanded, prereqOpen } =
-    usePrereqControl(name);
+    usePrereqControl(name, true);
 
   const includeSection = useCallback(
     (section: SectionBean) => {
