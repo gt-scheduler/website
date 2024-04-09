@@ -105,11 +105,11 @@ export default function Section({
         onMouseEnter={(): void => setOverlayCrns([section.crn])}
         onMouseLeave={(): void => setOverlayCrns([])}
         actions={[
-          ...(areProfPrereqsDiff ? [prereqAction] : []),
           {
             icon: pinned ? faTimes : faThumbtack,
             onClick: (): void => pinSection(section),
           },
+          ...(areProfPrereqsDiff ? [prereqAction] : []),
           {
             icon: faChair,
             id: sectionTooltipId,
