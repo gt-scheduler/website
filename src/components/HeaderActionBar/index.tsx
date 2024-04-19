@@ -1,25 +1,24 @@
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import {
   faDownload,
   faCalendarAlt,
   faPaste,
-  faAdjust,
   faCaretDown,
+  faHandHoldingDollar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { Button } from '..';
+import { Button, InvitationModal } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
 } from '../../constants';
-import { ThemeContext } from '../../contexts';
 import useMedia from '../../hooks/useMedia';
 import { AccountContextValue } from '../../contexts/account';
 import { classes } from '../../utils/misc';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import AccountDropdown from '../AccountDropdown';
+import ShareIcon from '../ShareIcon';
 
 import './stylesheet.scss';
 
@@ -53,11 +52,9 @@ export default function HeaderActionBar({
   onDownloadCalendar = (): void => undefined,
   enableDownloadCalendar = false,
 }: HeaderActionBarProps): React.ReactElement {
-  const [theme, setTheme] = useContext(ThemeContext);
-  const handleThemeChange = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  }, [theme, setTheme]);
+  const [invitationOpen, setInvitationOpen] = useState(false);
+
+  const hideInvitation = useCallback(() => setInvitationOpen(false), []);
 
   // Coalesce the export options into the props for a single <DropdownMenu>
   const enableExport =
@@ -68,6 +65,7 @@ export default function HeaderActionBar({
       label: 'Download image',
       icon: faDownload,
       onClick: onDownloadCalendar,
+      id: 'export-download',
     });
   }
   if (enableExportCalendar) {
@@ -75,6 +73,7 @@ export default function HeaderActionBar({
       label: 'ICS (Calendar) file',
       icon: faCalendarAlt,
       onClick: onExportCalendar,
+      id: 'export-calendar',
     });
   }
   if (enableCopyCrns) {
@@ -82,6 +81,7 @@ export default function HeaderActionBar({
       label: 'Copy CRNs to clipboard',
       icon: faPaste,
       onClick: onCopyCrns,
+      id: 'export-copy-crn',
     });
   }
 
@@ -96,6 +96,19 @@ export default function HeaderActionBar({
 
   return (
     <div className={classes('header-action-bar', className)} style={style}>
+      <Button
+        href="https://donorbox.org/gt-scheduler"
+        className="header-action-bar__button"
+      >
+        <FontAwesomeIcon
+          className="header-action-bar__button-icon"
+          fixedWidth
+          icon={faHandHoldingDollar}
+        />
+
+        <div className="header-action-bar__button-text">Donate</div>
+      </Button>
+
       <DropdownMenu
         disabled={!enableExport}
         items={exportActions}
@@ -103,35 +116,12 @@ export default function HeaderActionBar({
         className="header-action-bar__button"
       >
         <div className="header-action-bar__export-dropdown-content">
-          <FontAwesomeIcon
-            className="header-action-bar__button-icon"
-            fixedWidth
-            icon={faDownload}
-          />
+          <ShareIcon className="header-action-bar__button-icon" />
           <div className="header-action-bar__button-text">Export</div>
           <FontAwesomeIcon fixedWidth icon={faCaretDown} />
         </div>
       </DropdownMenu>
-
-      <Button onClick={handleThemeChange} className="header-action-bar__button">
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faAdjust}
-        />
-        <div className="header-action-bar__button-text">Theme</div>
-      </Button>
-      <Button
-        href="https://github.com/gt-scheduler/website"
-        className="header-action-bar__button"
-      >
-        <FontAwesomeIcon
-          className="header-action-bar__button-icon"
-          fixedWidth
-          icon={faGithub}
-        />
-        <div className="header-action-bar__button-text">GitHub</div>
-      </Button>
+      <InvitationModal show={invitationOpen} onHide={hideInvitation} />
 
       <AccountDropdown state={accountState} />
     </div>

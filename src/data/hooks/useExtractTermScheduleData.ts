@@ -73,7 +73,7 @@ export default function useExtractTermScheduleData({
                 'updateTermScheduleData called on term that does not exist',
               fields: {
                 currentTerm,
-                currentTermScheduleData,
+                currentTermScheduleData: currentTermScheduleDataDraft,
                 allTermsInData: Object.keys(draft.terms),
               },
             })
@@ -87,7 +87,7 @@ export default function useExtractTermScheduleData({
         );
       });
     },
-    [currentTerm, currentTermScheduleData, updateScheduleData]
+    [currentTerm, updateScheduleData]
   );
 
   if (currentTermScheduleData === undefined) {

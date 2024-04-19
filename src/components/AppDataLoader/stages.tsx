@@ -1,17 +1,24 @@
-import React from 'react';
-import { Immutable, Draft, castDraft } from 'immer';
+import React, { useMemo } from 'react';
+import { Immutable, Draft, castDraft, castImmutable } from 'immer';
 
 import { Oscar } from '../../data/beans';
 import useDownloadOscarData from '../../data/hooks/useDownloadOscarData';
 import useDownloadTerms from '../../data/hooks/useDownloadTerms';
-import { NonEmptyArray } from '../../types';
+import { NonEmptyArray, Term } from '../../types';
 import LoadingDisplay from '../LoadingDisplay';
 import { SkeletonContent, AppSkeleton, AppSkeletonProps } from '../App/content';
 import {
   AnyScheduleData,
+  defaultFriendData,
+  FriendData,
+  FriendTermData,
+  FriendIds,
+  FriendInfo,
   ScheduleData,
   ScheduleVersion,
   TermScheduleData,
+  RawFriendScheduleData,
+  FriendScheduleData,
 } from '../../data/types';
 import useRawScheduleDataFromStorage from '../../data/hooks/useRawScheduleDataFromStorage';
 import useExtractSchedule from '../../data/hooks/useExtractScheduleVersion';
@@ -23,6 +30,11 @@ import useUIStateFromStorage from '../../data/hooks/useUIStateFromStorage';
 import { AccountContextValue, SignedIn } from '../../contexts/account';
 import useFirebaseAuth from '../../data/hooks/useFirebaseAuth';
 import useRawScheduleDataFromFirebase from '../../data/hooks/useRawScheduleDataFromFirebase';
+import useRawFriendDataFromFirebase from '../../data/hooks/useRawFriendDataFromFirebase';
+import useFriendDataProducer from '../../data/hooks/useFriendDataProducer';
+import useExtractFriendTermData from '../../data/hooks/useExtractFriendTermData';
+import useRawFriendScheduleDataFromFirebaseFunction from '../../data/hooks/useRawFriendScheduleDataFromFirebaseFunction';
+import useExtractFriendInfo from '../../data/hooks/useExtractFriendInfo';
 
 // Each of the components in this file is a "stage" --
 // a component that takes in a render function for its `children` prop
@@ -78,7 +90,7 @@ export function StageLoadUIState({
 
 export type StageEnsureValidTermProps = {
   skeletonProps?: StageSkeletonProps;
-  terms: NonEmptyArray<string>;
+  terms: NonEmptyArray<Term>;
   currentTermRaw: string;
   setTerm: (next: string) => void;
   children: (props: { currentTerm: string }) => React.ReactNode;
@@ -256,7 +268,6 @@ export function StageLoadRawScheduleDataFromFirebase({
   children,
 }: StageLoadRawScheduleDataFromFirebaseProps): React.ReactElement {
   const loadingState = useRawScheduleDataFromFirebase(accountState);
-
   if (loadingState.type !== 'loaded') {
     return (
       <AppSkeleton {...skeletonProps}>
@@ -343,7 +354,7 @@ export function StageCreateScheduleDataProducer({
 
 export type StageLoadTermsProps = {
   skeletonProps?: StageSkeletonProps;
-  children: (props: { terms: NonEmptyArray<string> }) => React.ReactNode;
+  children: (props: { terms: NonEmptyArray<Term> }) => React.ReactNode;
 };
 
 /**
@@ -520,4 +531,246 @@ export function StageExtractScheduleVersion({
   }
 
   return <>{children({ ...loadingState.result })}</>;
+}
+
+export type StageLoadRawFriendDataProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
+  currentTerm: string;
+  children: (props: {
+    rawFriendData: Immutable<FriendData>;
+    setFriendData: (
+      next: ((current: FriendData | null) => FriendData | null) | FriendData
+    ) => void;
+  }) => React.ReactNode;
+};
+
+export function StageLoadRawFriendData({
+  skeletonProps,
+  accountState,
+  currentTerm,
+  children,
+}: StageLoadRawFriendDataProps): React.ReactElement {
+  const friendDataSignedOut = useMemo(() => {
+    const friendData = castDraft({ ...defaultFriendData });
+    friendData.terms[currentTerm] = { accessibleSchedules: {} };
+    return castImmutable(friendData);
+  }, [currentTerm]);
+
+  if (accountState.type === 'signedOut') {
+    return (
+      <>
+        {children({
+          rawFriendData: friendDataSignedOut,
+          setFriendData: () => {
+            /* empty */
+          },
+        })}
+      </>
+    );
+  }
+
+  return StageLoadRawFriendDataFromFirebase({
+    skeletonProps,
+    accountState,
+    children,
+  });
+}
+
+export type StageLoadRawFriendDataFromFirebaseProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: SignedIn;
+  children: (props: {
+    rawFriendData: Immutable<FriendData>;
+    setFriendData: (
+      next: ((current: FriendData | null) => FriendData | null) | FriendData
+    ) => void;
+  }) => React.ReactNode;
+};
+
+export function StageLoadRawFriendDataFromFirebase({
+  skeletonProps,
+  accountState,
+  children,
+}: StageLoadRawFriendDataFromFirebaseProps): React.ReactElement {
+  const loadingState = useRawFriendDataFromFirebase(accountState);
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps}>
+        <SkeletonContent>
+          <LoadingDisplay
+            state={loadingState}
+            name="friend data from the cloud"
+          />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ ...loadingState.result })}</>;
+}
+
+export type StageCreateFriendDataProducerProps = {
+  setFriendData: (
+    next: ((current: FriendData | null) => FriendData | null) | FriendData
+  ) => void;
+  children: (props: {
+    updateFriendData: (
+      applyDraft: (draft: Draft<FriendData>) => void | Immutable<FriendData>
+    ) => void;
+  }) => React.ReactNode;
+};
+
+export function StageCreateFriendDataProducer({
+  setFriendData,
+  children,
+}: StageCreateFriendDataProducerProps): React.ReactElement {
+  const { updateFriendData } = useFriendDataProducer({ setFriendData });
+  return <>{children({ updateFriendData })}</>;
+}
+
+export type StageExtractFriendTermDataProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
+  currentTerm: string;
+  rawFriendData: Immutable<FriendData>;
+  updateFriendData: (
+    applyDraft: (draft: Draft<FriendData>) => void | Immutable<FriendData>
+  ) => void;
+  children: (props: {
+    termFriendData: Immutable<FriendIds>;
+    updateFriendTermData: (
+      applyDraft: (
+        draft: Draft<FriendTermData>
+      ) => void | Immutable<FriendTermData>
+    ) => void;
+  }) => React.ReactNode;
+};
+
+export function StageExtractFriendTermData({
+  skeletonProps,
+  accountState,
+  currentTerm,
+  rawFriendData,
+  updateFriendData,
+  children,
+}: StageExtractFriendTermDataProps): React.ReactElement {
+  const loadingState = useExtractFriendTermData({
+    currentTerm,
+    rawFriendData,
+    updateFriendData,
+  });
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps} accountState={accountState}>
+        <SkeletonContent>
+          <LoadingDisplay
+            state={loadingState}
+            name="extract friend data for current term"
+          />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return <>{children({ ...loadingState.result })}</>;
+}
+
+export type StageLoadRawFriendScheduleDataFromFirebaseFunctionProps = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
+  currentTerm: string;
+  termFriendData: Immutable<FriendIds>;
+  children: (props: {
+    rawFriendScheduleData: RawFriendScheduleData;
+  }) => React.ReactNode;
+};
+
+export function StageLoadRawFriendScheduleDataFromFirebaseFunction({
+  skeletonProps,
+  accountState,
+  currentTerm,
+  termFriendData,
+  children,
+}: // eslint-disable-next-line max-len
+StageLoadRawFriendScheduleDataFromFirebaseFunctionProps): React.ReactElement {
+  const loadingState = useRawFriendScheduleDataFromFirebaseFunction({
+    currentTerm,
+    termFriendData,
+  });
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps} accountState={accountState}>
+        <SkeletonContent>
+          <LoadingDisplay
+            state={loadingState}
+            name="fetch friend schedules for current term"
+          />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return (
+    <>
+      {children({
+        rawFriendScheduleData: { ...loadingState.result.friendScheduleData },
+      })}
+    </>
+  );
+}
+
+export type StageExtractFriendInfo = {
+  skeletonProps?: StageSkeletonProps;
+  accountState: AccountContextValue;
+  rawFriendScheduleData: RawFriendScheduleData;
+  friendInfo: Immutable<FriendInfo>;
+  updateFriendData: (
+    applyDraft: (draft: Draft<FriendData>) => void | Immutable<FriendData>
+  ) => void;
+  children: (props: {
+    friendScheduleData: Immutable<FriendScheduleData>;
+    updateFriendInfo: (
+      applyDraft: (draft: Draft<FriendInfo>) => void | Immutable<FriendInfo>
+    ) => void;
+  }) => React.ReactNode;
+};
+
+export function StageExtractFriendInfo({
+  skeletonProps,
+  accountState,
+  rawFriendScheduleData,
+  friendInfo,
+  updateFriendData,
+  children,
+}: StageExtractFriendInfo): React.ReactElement {
+  const loadingState = useExtractFriendInfo({
+    rawFriendScheduleData,
+    friendInfo,
+    updateFriendData,
+  });
+
+  if (loadingState.type !== 'loaded') {
+    return (
+      <AppSkeleton {...skeletonProps} accountState={accountState}>
+        <SkeletonContent>
+          <LoadingDisplay
+            state={loadingState}
+            name="extract friend info for current term"
+          />
+        </SkeletonContent>
+      </AppSkeleton>
+    );
+  }
+
+  return (
+    <>
+      {children({
+        ...loadingState.result,
+      })}
+    </>
+  );
 }

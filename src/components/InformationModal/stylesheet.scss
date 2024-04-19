@@ -1,23 +1,38 @@
+@import '../../variables.scss';
+
 .InformationModal {
-  align-items: center;
+  .close-button {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    padding: 15px;
+    color: $color-neutral;
+    border-radius: 50px;
+  }
   .information-content {
     display: flex;
+    position: relative;
     width: 100%;
     align-items: center;
     justify-content: center;
+    margin-bottom: 20px;
+    padding-left: 15%;
+    padding-right: 15%;
     p {
       margin: 0px;
-      width: 270px;
+      width: 50%;
     }
     .information-images {
       display: flex;
+      overflow: hidden;
+      align-items: center;
       .information-image {
         width: auto;
-        height: 275px;
+        height: 25vh;
         margin-left: 16px;
         display: block;
-        border: #505050 3px solid;
-        border-radius: 12px;
         overflow: hidden;
       }
     }
@@ -31,6 +46,7 @@
     width: 100%;
     align-items: center;
     justify-content: center;
+    padding: 0;
     p {
       margin: auto;
       width: 80vw;
@@ -38,16 +54,15 @@
     }
     .information-images {
       display: flex;
+      justify-content: space-evenly;
       .information-spacer {
-        flex: 1;
+        flex: .5;
       }
       .information-image {
         width: auto;
-        height: 65vw;
+        height: 45vw;
         margin: 16px 0px 0px 0px;
         display: block;
-        border: #505050 3px solid;
-        border-radius: 12px;
         overflow: hidden;
       }
     }

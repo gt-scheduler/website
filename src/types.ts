@@ -84,6 +84,11 @@ export interface Event {
   days: string[];
 }
 
+export interface Term {
+  term: string;
+  finalized: boolean;
+}
+
 // Note: if this type ever changes,
 // the course gpa cache needs to be invalidated
 // (by changing the local storage key).
@@ -349,3 +354,27 @@ export interface CrawlerTermData {
    */
   version: number;
 }
+
+export type ScheduleDeletionRequest = {
+  /**
+   * token of account that requested the schedule deletion
+   */
+  IDToken: string | void;
+  /**
+   * ID of the INVITEE if the deletion requester is the INVITER
+   * ID of the INVITER if the deletion requester is the INVITEE
+   */
+  peerUserId: string;
+  /**
+   * term that schedule version(s) belong to
+   */
+  term: string;
+  /**
+   * shared schedule version(s) for deletion
+   */
+  versions: string[] | string;
+  /**
+   * whether the schedule version belongs to the requester
+   */
+  owner: boolean;
+};

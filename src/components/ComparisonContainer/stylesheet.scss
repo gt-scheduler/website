@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import '../../variables';
+
+.comparison-container {
+  height: auto;
+  .comparison-body {
+    display: flex;
+    flex-direction: column;
+
+    .comparison-content {
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+      flex: 1 1 auto;
+
+      p {
+        margin: 0px;
+        overflow: hidden;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: normal;
+
+        &.content-title {
+          font-weight: 700;
+          margin: 16px 12px 0px 12px;
+          border-bottom: 2px solid $color-border;
+        }
+
+        &.my-schedule-title {
+          font-weight: 700;
+          margin: 0px 12px 0px 12px;
+          border-bottom: 2px solid $color-border;
+        }
+
+        &.shared-with {
+          margin-bottom: 4px;
+        }
+      }
+
+      .friend {
+        padding-bottom: 10px;
+      }
+
+      .friend-email {
+        display: flex;
+        align-items: center;
+        p {
+          padding: 0px 2px 2px 12px;
+          text-align: center;
+        }
+      }
+
+      .checked {
+        p {
+          font-weight: 700;
+          font-size: 14px;
+        }
+      }
+
+      .schedule-name {
+        cursor: pointer;
+      }
+
+      .friend-name {
+        p {
+          font-weight: 575;
+          font-size: 16px;
+        }
+      }
+
+      .no-shared-schedules {
+        margin: 8px 12px;
+
+        p {
+          font-size: 13px;
+          font-weight: 400;
+          font-style: italic;
+          white-space: pre-wrap;
+        }
+
+        & > p {
+          margin: 0px 0px 6px;
+        }
+      }
+
+      .schedule-row {
+        .checkbox-container {
+          display: flex;
+          align-items: center;
+          position: relative;
+          height: 22px;
+
+          .checkbox {
+            margin-left: 12px;
+            border: 1px solid;
+            border-radius: 3px;
+            border-color: var(--theme-fg);
+            transition-duration: $theme-switch-transition-duration;
+            transition-property: border-color;
+
+            width: 12px;
+            height: 12px;
+
+            &:hover {
+              cursor: pointer;
+            }
+
+            &.indented {
+              margin-left: 24px;
+            }
+          }
+
+          .name {
+            margin-left: 12px;
+            margin-right: 12px;
+            min-width: 0;
+            flex-shrink: 1;
+
+            &.check {
+              margin-left: 8px;
+            }
+
+            p {
+              text-overflow: ellipsis;
+            }
+          }
+
+          .edit-input {
+            height: 22px;
+            border-radius: 4px;
+            padding: 4px;
+            flex: 1 1;
+            font-size: 12px;
+            font-weight: 500;
+            outline: none;
+            border: 1px solid var(--theme-fg);
+            margin-left: 8px;
+            min-width: 0px;
+
+            &.check {
+              margin-left: 4px;
+            }
+          }
+
+          .spacing {
+            flex: 1;
+          }
+
+          .tooltip {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+          }
+
+          .icon {
+            width: 27px;
+            height: 22px;
+            padding: 0px;
+            opacity: 0;
+          }
+
+          &:hover {
+            background-color: $color-border;
+
+            .icon {
+              opacity: 1;
+            }
+
+            .name {
+              margin-right: 0px;
+            }
+          }
+
+          &.editing {
+            .icon {
+              opacity: 1;
+            }
+          }
+
+          &.schedule-checkbox {
+            margin-top: 4px;
+            margin-bottom: 2px;
+          }
+        }
+
+        .palette {
+          margin: 0px 12px;
+          height: 50px;
+          border-radius: 4px;
+          overflow: hidden;
+          &.indented {
+            margin-left: 24px;
+          }
+        }
+      }
+
+      .shareback-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 12px;
+        margin-left: 10px;
+        margin-right: 10px;
+        border: 1px solid $color-neutral;
+        border-radius: 8px;
+        padding: 8px 10px;
+        gap: 6px;
+
+        p {
+          font-size: 12px;
+          line-height: normal;
+          font-style: oblique;
+          overflow: visible;
+        }
+
+        .shareback-button {
+          width: 100px;
+          height: 24px;
+          padding: 6px 10px;
+          font-size: 9px;
+          color: var(--theme-bg);
+          background-color: var(--theme-fg);
+          border-radius: 8px;
+          border: 1px solid rgba(128, 128, 128, 0.2);
+          margin-left: 5px;
+          font-weight: 650;
+          cursor: pointer;
+
+          &:hover {
+            @include dark {
+              background: $modal-foreground-color-dark;
+            }
+
+            @include light {
+              background: $modal-foreground-color-light;
+            }
+          }
+        }
+
+        .dont-shareback-button {
+          width: 100px;
+          height: 24px;
+          padding: 6px 10px;
+          font-size: 9px;
+          color: var(--theme-fg);
+          background-color: var(--theme-bg);
+          border-radius: 8px;
+          border: 1px solid $color-neutral;
+          margin-right: 5px;
+          font-weight: 650;
+          cursor: pointer;
+
+          &:hover {
+            @include dark {
+              background: $modal-foreground-color-light;
+            }
+
+            @include light {
+              background: $modal-foreground-color-dark;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.mobile .comparison-container {
+  flex: 1;
+  border-right: none;
+
+  .scroller {
+    width: auto;
+  }
+}
+
+.shared-schedule-modal {
+  h2 {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 18px;
+    overflow-wrap: break-word;
+  }
+
+  .cancel-button {
+    width: 26px;
+    height: 26px;
+    position: absolute;
+    top: 11px;
+    right: 11px;
+    border-radius: 50%;
+    color: $color-neutral;
+  }
+}

@@ -8,6 +8,7 @@ import ErrorBoundary from '../ErrorBoundary';
 import HeaderDisplay from '../HeaderDisplay';
 import Map from '../Map';
 import Finals from '../Finals';
+import DonateBanner from '../DonateBanner';
 import {
   AppNavigationContext,
   AppMobileNav,
@@ -16,6 +17,7 @@ import {
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
+import { Term } from '../../types';
 
 /**
  * Renders the actual content at the root of the app
@@ -38,6 +40,7 @@ function AppContentBase(): React.ReactElement {
         tabs={NAV_TABS}
         captureRef={captureRef}
       />
+      <DonateBanner />
       <ErrorBoundary
         // ErrorBoundary.fallback is a normal render prop, not a component.
         // eslint-disable-next-line react/no-unstable-nested-components
@@ -62,7 +65,6 @@ function AppContentBase(): React.ReactElement {
         {currentTabIndex === 0 && <Scheduler />}
         {currentTabIndex === 1 && <Map />}
         {currentTabIndex === 2 && <Finals />}
-
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
@@ -85,7 +87,7 @@ export type AppSkeletonProps = {
   children: React.ReactNode;
   accountState?: AccountContextValue;
   termsState?: {
-    terms: string[];
+    terms: Term[];
     currentTerm: string;
     onChangeTerm: (next: string) => void;
   };
@@ -120,6 +122,7 @@ export function AppSkeleton({
             : { type: 'loaded', ...termsState }
         }
         versionsState={{ type: 'loading' }}
+        skeleton
       />
       {children}
       <Attribution />

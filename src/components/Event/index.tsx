@@ -4,6 +4,7 @@ import {
   faPencil,
   faPalette,
   faTrash,
+  faClone,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -11,6 +12,7 @@ import {
   getContentClassName,
   periodToString,
   daysToString,
+  getRandomColor,
 } from '../../utils/misc';
 import { ActionRow, EventAdd, Palette } from '..';
 import { ScheduleContext } from '../../contexts';
@@ -30,6 +32,32 @@ export default function Event({
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
   const [formShown, setFormShown] = useState<boolean>(false);
+
+  const handleDuplicateEvent = useCallback(() => {
+    const eventId = new Date().getTime().toString();
+    const newEvent = {
+      id: eventId,
+      name: event.name,
+      period: {
+        start: event.period.start,
+        end: event.period.end,
+      },
+      days: event.days,
+    };
+
+    patchSchedule({
+      events: [...castDraft(events), castDraft(newEvent)],
+      colorMap: { ...colorMap, [eventId]: getRandomColor() },
+    });
+  }, [
+    colorMap,
+    event.days,
+    event.name,
+    event.period.end,
+    event.period.start,
+    events,
+    patchSchedule,
+  ]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
@@ -69,6 +97,12 @@ export default function Event({
                 tooltip: `Edit Color`,
                 id: `${event.id}-color`,
                 onClick: (): void => setPaletteShown(!paletteShown),
+              },
+              {
+                icon: faClone,
+                tooltip: 'Duplicate Event',
+                id: `${event.id}-duplicate`,
+                onClick: (): void => handleDuplicateEvent(),
               },
               {
                 icon: faTrash,
