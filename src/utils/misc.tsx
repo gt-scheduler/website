@@ -279,6 +279,10 @@ const getDateRange = (term: string): DateRange => {
   return { from, to };
 };
 
+export const getFullYear = (): number => {
+  return new Date().getFullYear();
+};
+
 // Difference between UTC and EST timezones in minutes
 export const EST_TIMEZONE_OFFSET = 240;
 

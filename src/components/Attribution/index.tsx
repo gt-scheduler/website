@@ -3,7 +3,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button } from '..';
-import { classes } from '../../utils/misc';
+import { classes, getFullYear } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
@@ -11,7 +11,7 @@ import './stylesheet.scss';
 
 export default function Attribution(): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
-  const year = new Date().getFullYear();
+  const year = getFullYear();
   return (
     <div className={classes('Attribution')}>
       {!mobile ? (
