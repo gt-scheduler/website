@@ -3,7 +3,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button } from '..';
-import { classes } from '../../utils/misc';
+import { classes, getFullYear } from '../../utils/misc';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 
@@ -11,6 +11,7 @@ import './stylesheet.scss';
 
 export default function Attribution(): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
+  const year = getFullYear();
   return (
     <div className={classes('Attribution')}>
       {!mobile ? (
@@ -23,12 +24,12 @@ export default function Attribution(): React.ReactElement {
       )}
 
       <p>
-        Copyright (c) 2023 with{' '}
+        Copyright (c) {year} with&nbsp;
         <span role="img" aria-label="love">
           ❤️
-        </span>{' '}
-        by <a href="https://jasonpark.me">Jinseo Park</a>,{' '}
-        <a href="https://bitsofgood.org">Bits of Good</a>, and{' '}
+        </span>
+        &nbsp;by <a href="https://jasonpark.me">Jinseo Park</a>,&nbsp;
+        <a href="https://bitsofgood.org">Bits of Good</a>, and&nbsp;
         <a href="https://github.com/gt-scheduler/website/graphs/contributors">
           {mobile ? 'others' : 'the GT Scheduler contributors'}
         </a>
