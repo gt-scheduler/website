@@ -1,0 +1,23 @@
+.banner {
+    width: 100%;
+    height: fit-content;
+    color: white;
+    background-color: #C56E5B;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+
+    .bannerButton {
+        display: inline-block;
+        padding: 10px 6px;
+    }
+
+    .bannerButton:hover {
+        text-decoration: underline;
+    }
+
+    .spacer {
+        width: 49px;
+    }
+}
