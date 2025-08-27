@@ -1,9 +1,9 @@
 import React from 'react';
 
 import Banner from '../Banner';
+import { DONATE_LINK } from '../../constants';
 
 const BANNER_LOCAL_STORAGE_KEY = '2024-04-01-spr2024-donate-banner';
-const DONATE_LINK = 'https://donorbox.org/gt-scheduler';
 
 function Content(): React.ReactElement {
   return (
