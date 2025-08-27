@@ -78,6 +78,8 @@ const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 const FIREBASE_PROJECT_ID = firebaseConfig.projectId || `gt-scheduler-web-dev`;
 const CLOUD_FUNCTION_BASE_URL = `https://us-east1-${FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
+const DONATE_LINK = 'https://opencollective.com/georgia-tech';
+
 const LARGE_DESKTOP_BREAKPOINT = 1200;
 const DESKTOP_BREAKPOINT = 1024;
 const LARGE_MOBILE_BREAKPOINT = 600;
@@ -93,6 +95,7 @@ export {
   CAMPUSES,
   BACKEND_BASE_URL,
   CLOUD_FUNCTION_BASE_URL,
+  DONATE_LINK,
   DESKTOP_BREAKPOINT,
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,

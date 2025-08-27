@@ -4,7 +4,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { classes } from '../../utils/misc';
-import { DESKTOP_BREAKPOINT } from '../../constants';
+import { DESKTOP_BREAKPOINT, DONATE_LINK } from '../../constants';
 import Modal from '../Modal';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import Button from '../Button';
@@ -126,7 +126,7 @@ export default function InformationModal(): React.ReactElement {
           label: 'Donate Today',
           onClick: (): void => {
             setShow(false);
-            window.open('https://donorbox.org/gt-scheduler');
+            window.open(DONATE_LINK);
           },
         },
       ]}

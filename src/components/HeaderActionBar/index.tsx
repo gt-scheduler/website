@@ -12,6 +12,7 @@ import { Button, InvitationModal } from '..';
 import {
   LARGE_MOBILE_BREAKPOINT,
   LARGE_DESKTOP_BREAKPOINT,
+  DONATE_LINK,
 } from '../../constants';
 import useMedia from '../../hooks/useMedia';
 import { AccountContextValue } from '../../contexts/account';
@@ -96,10 +97,7 @@ export default function HeaderActionBar({
 
   return (
     <div className={classes('header-action-bar', className)} style={style}>
-      <Button
-        href="https://donorbox.org/gt-scheduler"
-        className="header-action-bar__button"
-      >
+      <Button href={DONATE_LINK} className="header-action-bar__button">
         <FontAwesomeIcon
           className="header-action-bar__button-icon"
           fixedWidth
