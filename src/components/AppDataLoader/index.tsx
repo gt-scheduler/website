@@ -1,5 +1,5 @@
 import produce, { Immutable, Draft, original, castDraft } from 'immer';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import {
   TermsContext,
@@ -374,6 +374,9 @@ function ContextProvider({
   updateFriendInfo,
   children,
 }: ContextProviderProps): React.ReactElement {
+  const [currentTab, _setCurrentTab] = useState<number>(0);
+  const setCurrentTab = useCallback((next: number) => _setCurrentTab(next), []);
+
   // Create a `updateSchedule` function
   const updateSchedule = useCallback(
     (
@@ -482,6 +485,7 @@ function ContextProvider({
         currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
         versions: termScheduleData.versions,
+        currentTab,
       },
       {
         setTerm,
@@ -493,6 +497,7 @@ function ContextProvider({
         deleteFriendRecord,
         renameVersion,
         cloneVersion,
+        setCurrentTab,
       },
     ],
     [
@@ -513,6 +518,8 @@ function ContextProvider({
       renameVersion,
       cloneVersion,
       termScheduleData.versions,
+      currentTab,
+      setCurrentTab,
     ]
   );
 

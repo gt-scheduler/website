@@ -3,7 +3,7 @@ import { Immutable } from 'immer';
 
 import { FriendScheduleData } from '../../data/types';
 import { Section } from '../../data/beans';
-import { CLOSE, DAYS, OPEN } from '../../constants';
+import { CLOSE, DAYS, OPEN, COURSE_TABS } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { SectionBlocks, EventBlocks, CompareBlocks } from '..';
 import { ScheduleContext, FriendContext } from '../../contexts';
@@ -61,7 +61,7 @@ export default function Calendar({
   overlayFriendSchedules = [],
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, currentVersion, versions }] =
+  const [{ pinnedCrns, oscar, events, currentVersion, versions, currentTab }] =
     useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
