@@ -283,9 +283,6 @@ export const getFullYear = (): number => {
   return new Date().getFullYear();
 };
 
-// Difference between UTC and EST timezones in minutes
-export const EST_TIMEZONE_OFFSET = 240;
-
 /**
  * Exports the current schedule to a `.ics` file,
  * which allows for importing into a third-party calendar application.
@@ -309,8 +306,6 @@ export function exportCoursesToCalendar(
     return;
   }
 
-  const timezoneDiff = EST_TIMEZONE_OFFSET - new Date().getTimezoneOffset();
-
   const addEventsToCalendar = (
     period: Period,
     days: string[],
@@ -326,11 +321,11 @@ export function exportCoursesToCalendar(
     ) {
       begin.setDate(begin.getDate() + 1);
     }
-    const startWithOffset = period.start + timezoneDiff;
-    const endWithOffset = period.end + timezoneDiff;
-    begin.setHours(startWithOffset / 60, startWithOffset % 60);
+    const startTime = period.start;
+    const endTime = period.end;
+    begin.setHours(startTime / 60, startTime % 60);
     const end = new Date(begin.getTime());
-    end.setHours(endWithOffset / 60, endWithOffset % 60);
+    end.setHours(endTime / 60, endTime % 60);
     const rrule = {
       freq: 'WEEKLY',
       until: to,
