@@ -21,12 +21,36 @@ const ics = (uidDomain, prodId) => {
   }
 
   const SEPARATOR = navigator.appVersion.indexOf('Win') !== -1 ? '\r\n' : '\n';
-  const calendarEvents = [];
+
+  // Specifies EDT/EST timezone logic
+  const TZ_DEF = [
+    'BEGIN:VTIMEZONE',
+    'TZID:America/New_York',
+    'BEGIN:DAYLIGHT',
+    'TZOFFSETFROM:-0500',
+    'TZOFFSETTO:-0400',
+    'TZNAME:EDT',
+    'DTSTART:19700308T020000',
+    'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU',
+    'END:DAYLIGHT',
+    'BEGIN:STANDARD',
+    'TZOFFSETFROM:-0400',
+    'TZOFFSETTO:-0500',
+    'TZNAME:EST',
+    'DTSTART:19701101T020000',
+    'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU',
+    'END:STANDARD',
+    'END:VTIMEZONE',
+  ].join(SEPARATOR);
+
   const calendarStart = [
     'BEGIN:VCALENDAR',
     `PRODID:${prodId}`,
     'VERSION:2.0',
+    TZ_DEF,
   ].join(SEPARATOR);
+
+  const calendarEvents = [];
   const calendarEnd = `${SEPARATOR}END:VCALENDAR`;
   const BYDAY_VALUES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
@@ -132,11 +156,10 @@ const ics = (uidDomain, prodId) => {
         }
       }
 
-      // TODO add time and time zone? use moment to format?
       const start_date = new Date(begin);
       const end_date = new Date(stop);
       const now_date = new Date();
-
+      3;
       const start_year = `0000${start_date.getFullYear().toString()}`.slice(-4);
       const start_month = `00${(start_date.getMonth() + 1).toString()}`.slice(
         -2
@@ -153,32 +176,19 @@ const ics = (uidDomain, prodId) => {
       const end_minutes = `00${end_date.getMinutes().toString()}`.slice(-2);
       const end_seconds = `00${end_date.getSeconds().toString()}`.slice(-2);
 
-      const now_year = `0000${now_date.getFullYear().toString()}`.slice(-4);
-      const now_month = `00${(now_date.getMonth() + 1).toString()}`.slice(-2);
-      const now_day = `00${now_date.getDate().toString()}`.slice(-2);
-      const now_hours = `00${now_date.getHours().toString()}`.slice(-2);
-      const now_minutes = `00${now_date.getMinutes().toString()}`.slice(-2);
-      const now_seconds = `00${now_date.getSeconds().toString()}`.slice(-2);
+      // Uses getUTC since DTSTAMP not affected by TZID
+      const now_year = `0000${now_date.getUTCFullYear().toString()}`.slice(-4);
+      const now_month = `00${(now_date.getUTCMonth() + 1).toString()}`.slice(
+        -2
+      );
+      const now_day = `00${now_date.getUTCDate().toString()}`.slice(-2);
+      const now_hours = `00${now_date.getUTCHours().toString()}`.slice(-2);
+      const now_minutes = `00${now_date.getUTCMinutes().toString()}`.slice(-2);
+      const now_seconds = `00${now_date.getUTCSeconds().toString()}`.slice(-2);
+      const now = `${now_year}${now_month}${now_day}T${now_hours}${now_minutes}${now_seconds}Z`;
 
-      let start_time = '';
-      let end_time = '';
-      if (
-        start_hours +
-          start_minutes +
-          start_seconds +
-          end_hours +
-          end_minutes +
-          end_seconds !==
-        0
-      ) {
-        start_time = `T${start_hours}${start_minutes}${start_seconds}`;
-        end_time = `T${end_hours}${end_minutes}${end_seconds}`;
-      }
-      const now_time = `T${now_hours}${now_minutes}${now_seconds}`;
-
-      const start = start_year + start_month + start_day + start_time;
-      const end = end_year + end_month + end_day + end_time;
-      const now = now_year + now_month + now_day + now_time;
+      const start = `${start_year}${start_month}${start_day}T${start_hours}${start_minutes}${start_seconds}`;
+      const end = `${end_year}${end_month}${end_day}T${end_hours}${end_minutes}${end_seconds}`;
 
       // recurrence rrule vars
       let rruleString;
@@ -217,9 +227,9 @@ const ics = (uidDomain, prodId) => {
         `UID:${uid}@${uidDomain}`,
         'CLASS:PUBLIC',
         `DESCRIPTION:${description}`,
-        `DTSTAMP;VALUE=DATE-TIME:${now}`,
-        `DTSTART;VALUE=DATE-TIME:${start}`,
-        `DTEND;VALUE=DATE-TIME:${end}`,
+        `DTSTAMP:${now}`,
+        `DTSTART;TZID=America/New_York:${start}`,
+        `DTEND;TZID=America/New_York:${end}`,
         `LOCATION:${location}`,
         `SUMMARY;LANGUAGE=en-us:${subject}`,
         'TRANSP:TRANSPARENT',
