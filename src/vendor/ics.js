@@ -159,7 +159,7 @@ const ics = (uidDomain, prodId) => {
       const start_date = new Date(begin);
       const end_date = new Date(stop);
       const now_date = new Date();
-      3;
+
       const start_year = `0000${start_date.getFullYear().toString()}`.slice(-4);
       const start_month = `00${(start_date.getMonth() + 1).toString()}`.slice(
         -2
