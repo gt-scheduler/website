@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Immutable, castDraft } from 'immer';
@@ -174,6 +175,10 @@ export default function EventAdd({
     [onSubmit, submitDisabled]
   );
 
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
   return (
     <div className={classes('EventAdd', className)}>
       <form className="add">
@@ -189,6 +194,7 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={nameInputRef}
                   type="text"
                   value={eventName}
                   onChange={(e): void => setEventName(e.target.value)}
