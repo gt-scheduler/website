@@ -6,10 +6,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
+
 import { ScheduleContext, ThemeContext } from '../../contexts';
 import { TimeBlocks } from '..';
 import { SizeInfo, makeSizeInfoKey } from '../TimeBlocks';
-import { DAYS, OPEN, CLOSE } from '../../constants';
+import { DAYS, OPEN, CLOSE, RECURRING_EVENTS } from '../../constants';
 import { periodToString } from '../../utils/misc';
 import { Event } from '../../types';
 
@@ -51,7 +52,8 @@ export default function EventDrag({
   scheduleId,
   onCreate,
 }: EventDragProps): React.ReactElement | null {
-  const [, { updateSchedule, setCurrentTab }] = useContext(ScheduleContext);
+  const [, { updateSchedule, setCourseContainerTab }] =
+    useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -65,12 +67,15 @@ export default function EventDrag({
     anchor: number;
   } | null>(null);
 
-  const snapTo = (m: number): number => Math.round(m / snap) * snap;
+  const snapTo = useCallback(
+    (m: number): number => Math.round(m / snap) * snap,
+    [snap]
+  );
 
   const BLOCK_SELECTOR =
     '.meeting, .meeting--dragging, .meeting--clone, [data-meeting], [data-event], .Event';
 
-  // Build a minimal SizeInfo object for the ghost block so TimeBlocks can render it
+  // Build a SizeInfo object for the ghost block so TimeBlocks can render it
   const ghostSizeInfo: SizeInfo = useMemo(() => {
     if (!ghost) return {};
     const key = makeSizeInfoKey({ start: ghost.start, end: ghost.end });
@@ -86,7 +91,7 @@ export default function EventDrag({
     };
   }, [ghost]);
 
-  // scan beneath the overlay to tell whether the pointer is over an existing block
+  // scan beneath the overlay to tell whether pointer is over an existing block
   const isOverExistingBlock = useCallback(
     (clientX: number, clientY: number): boolean => {
       const root = rootRef.current;
@@ -103,7 +108,7 @@ export default function EventDrag({
     []
   );
 
-  // Convert a pointer position to (day column, minutes from OPEN) within the grid
+  // Convert a pointer position to (day column, minutes) within the grid
   const pointToDayTime = useCallback(
     (
       clientX: number,
@@ -128,7 +133,7 @@ export default function EventDrag({
 
       return { day, minutes };
     },
-    [daysRef, timesRef, snap]
+    [daysRef, timesRef, snapTo]
   );
 
   // Resize the ghost as the pointer moves, respecting bounds and min duration
@@ -157,7 +162,8 @@ export default function EventDrag({
     [enabled, isOverExistingBlock, pointToDayTime, minDuration]
   );
 
-  // dragging: resize ghost as the pointer moves up/down, respecting bounds and min duration
+  // dragging: resize ghost as the pointer moves
+  // up/down, respecting bounds and min duration
   const handlePointerMove = useCallback(
     (e: React.PointerEvent): void => {
       if (!pressRef.current || !draftRef.current) return;
@@ -232,12 +238,12 @@ export default function EventDrag({
           schedDraft.events.push(newEvent);
         });
         onCreate?.(newEvent);
-        setCurrentTab(1);
+        setCourseContainerTab(RECURRING_EVENTS); // RECURRING_EVENTS = 1
       }
 
       e.preventDefault();
     },
-    [defaultName, updateSchedule, onCreate, setCurrentTab]
+    [defaultName, updateSchedule, onCreate, setCourseContainerTab]
   );
 
   // Global pointerdown listener: start drag only when clicking empty space

@@ -75,6 +75,8 @@ const CAMPUSES: Record<string, string> = {
 };
 
 const COURSE_TABS = ['Courses', 'Recurring Events'];
+const COURSES = 0;
+const RECURRING_EVENTS = 1;
 
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 const FIREBASE_PROJECT_ID = firebaseConfig.projectId || `gt-scheduler-web-dev`;
@@ -90,6 +92,8 @@ export {
   OPEN,
   CLOSE,
   COURSE_TABS,
+  COURSES,
+  RECURRING_EVENTS,
   DAYS,
   PNG_SCALE_FACTOR,
   PALETTE,

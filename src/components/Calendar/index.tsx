@@ -62,8 +62,9 @@ export default function Calendar({
   overlayFriendSchedules = [],
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, currentVersion, versions, currentTab }] =
-    useContext(ScheduleContext);
+  const [
+    { pinnedCrns, oscar, events, currentVersion, versions, courseContainerTab },
+  ] = useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
 
@@ -509,7 +510,7 @@ export default function Calendar({
           ))}
       </div>
       <EventDrag
-        enabled={currentTab === 1}
+        enabled={courseContainerTab === 1}
         daysRef={daysRef}
         timesRef={timesRef}
         deviceHasHover={deviceHasHover}

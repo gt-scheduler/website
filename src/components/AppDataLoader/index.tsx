@@ -374,7 +374,7 @@ function ContextProvider({
   updateFriendInfo,
   children,
 }: ContextProviderProps): React.ReactElement {
-  const [currentTab, setCurrentTab] = useState<number>(0);
+  const [courseContainerTab, setCourseContainerTab] = useState<number>(0);
 
   // Create a `updateSchedule` function
   const updateSchedule = useCallback(
@@ -484,7 +484,7 @@ function ContextProvider({
         currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
         versions: termScheduleData.versions,
-        currentTab,
+        courseContainerTab,
       },
       {
         setTerm,
@@ -496,7 +496,7 @@ function ContextProvider({
         deleteFriendRecord,
         renameVersion,
         cloneVersion,
-        setCurrentTab,
+        setCourseContainerTab,
       },
     ],
     [
@@ -517,8 +517,8 @@ function ContextProvider({
       renameVersion,
       cloneVersion,
       termScheduleData.versions,
-      currentTab,
-      setCurrentTab,
+      courseContainerTab,
+      setCourseContainerTab,
     ]
   );
 
