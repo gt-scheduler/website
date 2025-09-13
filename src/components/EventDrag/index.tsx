@@ -6,12 +6,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { castDraft } from 'immer';
 
 import { ScheduleContext, ThemeContext } from '../../contexts';
 import { TimeBlocks } from '..';
 import { SizeInfo, makeSizeInfoKey } from '../TimeBlocks';
 import { DAYS, OPEN, CLOSE, RECURRING_EVENTS } from '../../constants';
-import { periodToString } from '../../utils/misc';
+import { getRandomColor, periodToString } from '../../utils/misc';
 import { Event } from '../../types';
 
 export type EventDragProps = {
@@ -32,16 +33,13 @@ export type EventDragProps = {
 
 type DraftEvent = { day: string; start: number; end: number };
 
-const genId = (): string =>
-  `evt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
-
 const DRAG_THRESHOLD_PX = 0;
 
 export default function EventDrag({
   enabled = true,
   className,
   defaultName = 'New Recurring Event',
-  minDuration = 15,
+  minDuration = 0,
   snap = 15,
   daysRef,
   timesRef,
@@ -52,7 +50,7 @@ export default function EventDrag({
   scheduleId,
   onCreate,
 }: EventDragProps): React.ReactElement | null {
-  const [, { updateSchedule, setCourseContainerTab }] =
+  const [{ colorMap, events }, { patchSchedule, setCourseContainerTab }] =
     useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
 
@@ -225,25 +223,37 @@ export default function EventDrag({
       pressRef.current = null;
       setGhost(null);
 
-      if (d && d.end > d.start) {
+      // Only create event if drag actually covered at least 5 minutes
+      if (d && d.end - d.start >= 5) {
+        const eventId = new Date().getTime().toString();
+
         const newEvent: Event = {
-          id: genId(),
+          id: eventId,
           name: defaultName,
           days: [d.day],
           period: { start: d.start, end: d.end },
-          autoOpen: true,
+          showEditForm: true,
         };
 
-        updateSchedule((schedDraft) => {
-          schedDraft.events.push(newEvent);
+        patchSchedule({
+          events: [...castDraft(events), newEvent],
+          colorMap: { ...colorMap, [eventId]: getRandomColor() },
         });
+
         onCreate?.(newEvent);
-        setCourseContainerTab(RECURRING_EVENTS); // RECURRING_EVENTS = 1
+        setCourseContainerTab(RECURRING_EVENTS);
       }
 
       e.preventDefault();
     },
-    [defaultName, updateSchedule, onCreate, setCourseContainerTab]
+    [
+      defaultName,
+      patchSchedule,
+      events,
+      colorMap,
+      onCreate,
+      setCourseContainerTab,
+    ]
   );
 
   // Global pointerdown listener: start drag only when clicking empty space
@@ -276,7 +286,7 @@ export default function EventDrag({
         pointerType: nativeEvent.pointerType,
         button: nativeEvent.button,
         preventDefault: (): void => nativeEvent.preventDefault(),
-      } as unknown as React.PointerEvent;
+      } as React.PointerEvent;
 
       // Reuse the same logic we use for onPointerDown on the overlay
       handlePointerDown(reactLikeEvent);

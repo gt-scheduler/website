@@ -82,7 +82,7 @@ export interface Event {
   name: string;
   period: Period;
   days: string[];
-  autoOpen?: boolean;
+  showEditForm?: boolean;
 }
 
 export interface Term {

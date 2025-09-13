@@ -3,7 +3,7 @@ import { Immutable } from 'immer';
 
 import { FriendScheduleData } from '../../data/types';
 import { Section } from '../../data/beans';
-import { CLOSE, DAYS, OPEN } from '../../constants';
+import { CLOSE, DAYS, OPEN, RECURRING_EVENTS } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { SectionBlocks, EventBlocks, CompareBlocks } from '..';
 import { ScheduleContext, FriendContext } from '../../contexts';
@@ -510,7 +510,7 @@ export default function Calendar({
           ))}
       </div>
       <EventDrag
-        enabled={courseContainerTab === 1}
+        enabled={courseContainerTab === RECURRING_EVENTS} // RECURRING_EVENTS = 1
         daysRef={daysRef}
         timesRef={timesRef}
         deviceHasHover={deviceHasHover}

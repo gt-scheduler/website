@@ -31,7 +31,9 @@ export default function Event({
 }: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
-  const [formShown, setFormShown] = useState<boolean>(Boolean(event.autoOpen));
+  const [formShown, setFormShown] = useState<boolean>(
+    Boolean(event.showEditForm)
+  );
 
   const handleDuplicateEvent = useCallback(() => {
     const eventId = new Date().getTime().toString();
@@ -59,19 +61,22 @@ export default function Event({
     patchSchedule,
   ]);
 
+  // this basically forces the edit form to only auto-focus once per render
   useEffect(() => {
-    if (!event.autoOpen) return;
+    if (!event.showEditForm) return; // skip if this event wasn't flagged (normal render)
 
     const targetEventId = event.id;
 
+    // Create a new events list where this event's flag is reset
     const nextEvents = castDraft(events).map((existingEvent) =>
       existingEvent.id === targetEventId
-        ? { ...existingEvent, autoOpen: false }
+        ? { ...existingEvent, showEditForm: false } // remove showEditForm flag
         : existingEvent
     );
 
+    // push updated events list back into global state with schedulecontext
     patchSchedule({ events: nextEvents });
-  }, [event.autoOpen, event.id, events, patchSchedule]);
+  }, [event.showEditForm, event.id, events, patchSchedule]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
