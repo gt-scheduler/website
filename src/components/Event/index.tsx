@@ -31,7 +31,7 @@ export default function Event({
 }: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
-  const [formShown, setFormShown] = useState<boolean>(false);
+  const [formShown, setFormShown] = useState<boolean>(Boolean(event.autoOpen));
 
   const handleDuplicateEvent = useCallback(() => {
     const eventId = new Date().getTime().toString();
@@ -58,6 +58,20 @@ export default function Event({
     events,
     patchSchedule,
   ]);
+
+  React.useEffect(() => {
+    if (!event.autoOpen) return;
+
+    const targetEventId = event.id;
+
+    const nextEvents = castDraft(events).map((existingEvent) =>
+      existingEvent.id === targetEventId
+        ? { ...existingEvent, autoOpen: false }
+        : existingEvent
+    );
+
+    patchSchedule({ events: nextEvents });
+  }, [event.autoOpen, event.id, events, patchSchedule]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
@@ -90,7 +104,7 @@ export default function Event({
             actions={[
               {
                 icon: faPencil,
-                onClick: (): void => setFormShown(!formShown),
+                onClick: (): void => setFormShown(true),
               },
               {
                 icon: faPalette,

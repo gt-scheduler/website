@@ -10,6 +10,7 @@ import { ScheduleContext, FriendContext } from '../../contexts';
 import { makeSizeInfoKey } from '../TimeBlocks';
 import { EventBlockPosition } from '../EventBlocks';
 import { SectionBlockPosition } from '../SectionBlocks';
+import EventDrag from '../EventDrag';
 import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
@@ -507,6 +508,12 @@ export default function Calendar({
             />
           ))}
       </div>
+      <EventDrag
+        enabled={currentTab === 1}
+        daysRef={daysRef}
+        timesRef={timesRef}
+        deviceHasHover={deviceHasHover}
+      />
       {!preview && hiddenSections.length > 0 && (
         <div className="hidden-sections">
           *Sections not shown in view:{' '}
