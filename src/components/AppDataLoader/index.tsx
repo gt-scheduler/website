@@ -10,6 +10,7 @@ import {
 } from '../../contexts';
 import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { Oscar } from '../../data/beans';
+import { COURSES } from '../../constants';
 import useVersionActions from '../../data/hooks/useVersionActions';
 import {
   Schedule,
@@ -374,7 +375,7 @@ function ContextProvider({
   updateFriendInfo,
   children,
 }: ContextProviderProps): React.ReactElement {
-  const [courseContainerTab, setCourseContainerTab] = useState<number>(0);
+  const [courseContainerTab, setCourseContainerTab] = useState<number>(COURSES);
 
   // Create a `updateSchedule` function
   const updateSchedule = useCallback(
