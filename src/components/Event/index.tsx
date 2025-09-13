@@ -1,5 +1,5 @@
 import { Immutable, castDraft } from 'immer';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useState, useEffect } from 'react';
 import {
   faPencil,
   faPalette,
@@ -59,7 +59,7 @@ export default function Event({
     patchSchedule,
   ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!event.autoOpen) return;
 
     const targetEventId = event.id;

@@ -374,8 +374,7 @@ function ContextProvider({
   updateFriendInfo,
   children,
 }: ContextProviderProps): React.ReactElement {
-  const [currentTab, _setCurrentTab] = useState<number>(0);
-  const setCurrentTab = useCallback((next: number) => _setCurrentTab(next), []);
+  const [currentTab, setCurrentTab] = useState<number>(0);
 
   // Create a `updateSchedule` function
   const updateSchedule = useCallback(
