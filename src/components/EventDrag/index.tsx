@@ -58,7 +58,7 @@ export default function EventDrag({
 
   const rootRef = useRef<HTMLDivElement | null>(null);
 
-  const [ghost, setGhost] = useState<DraftEvent | null>(null);
+  const [draftEvent, setDraftEvent] = useState<DraftEvent | null>(null);
   const draftRef = useRef<DraftEvent | null>(null);
   const pressRef = useRef<{
     x: number;
@@ -75,21 +75,25 @@ export default function EventDrag({
   const BLOCK_SELECTOR =
     '.meeting, .meeting--dragging, .meeting--clone, [data-meeting], [data-event], .Event';
 
-  // Build a SizeInfo object for the ghost block so TimeBlocks can render it
-  const ghostSizeInfo: SizeInfo = useMemo(() => {
-    if (!ghost) return {};
-    const key = makeSizeInfoKey({ start: ghost.start, end: ghost.end });
+  // Build a SizeInfo object for the draftEvent
+  // block so TimeBlocks can render it
+  const draftEventSizeInfo: SizeInfo = useMemo(() => {
+    if (!draftEvent) return {};
+    const key = makeSizeInfoKey({
+      start: draftEvent.start,
+      end: draftEvent.end,
+    });
     return {
-      [ghost.day]: {
+      [draftEvent.day]: {
         [key]: {
-          period: { start: ghost.start, end: ghost.end },
+          period: { start: draftEvent.start, end: draftEvent.end },
           id: 'draft',
           rowIndex: 0,
           rowSize: 1,
         },
       },
     };
-  }, [ghost]);
+  }, [draftEvent]);
 
   // scan beneath the overlay to tell whether pointer is over an existing block
   const isOverExistingBlock = useCallback(
@@ -136,7 +140,8 @@ export default function EventDrag({
     [daysRef, timesRef, snapTo]
   );
 
-  // Resize the ghost as the pointer moves, respecting bounds and min duration
+  // Resize the draftEvent as the pointer
+  // moves, respecting bounds and min duration
   const handlePointerDown = useCallback(
     (e: React.PointerEvent): void => {
       if (!enabled) return;
@@ -154,7 +159,7 @@ export default function EventDrag({
       const end0 = Math.min(CLOSE, start0 + minDuration);
       const draft0: DraftEvent = { day, start: start0, end: end0 };
       draftRef.current = draft0;
-      setGhost(draft0);
+      setDraftEvent(draft0);
 
       rootRef.current?.setPointerCapture(pointerId);
       e.preventDefault();
@@ -162,7 +167,7 @@ export default function EventDrag({
     [enabled, isOverExistingBlock, pointToDayTime, minDuration]
   );
 
-  // dragging: resize ghost as the pointer moves
+  // dragging: resize draftEvent as the pointer moves
   // up/down, respecting bounds and min duration
   const handlePointerMove = useCallback(
     (e: React.PointerEvent): void => {
@@ -200,7 +205,7 @@ export default function EventDrag({
 
       const next: DraftEvent = { day: pressDay, start, end };
       draftRef.current = next;
-      window.requestAnimationFrame(() => setGhost(next));
+      window.requestAnimationFrame(() => setDraftEvent(next));
 
       e.preventDefault();
     },
@@ -223,7 +228,7 @@ export default function EventDrag({
 
       draftRef.current = null;
       pressRef.current = null;
-      setGhost(null);
+      setDraftEvent(null);
 
       // Only create event if drag actually covered at least 5 minutes
       if (d && d.end - d.start >= 5) {
@@ -305,33 +310,39 @@ export default function EventDrag({
       onContextMenu={(e): void => {
         e.preventDefault();
       }}
-      style={{ pointerEvents: ghost ? 'auto' : 'none' }}
+      style={{ pointerEvents: draftEvent ? 'auto' : 'none' }}
     >
-      {ghost && (
+      {draftEvent && (
         <TimeBlocks
           className={`${theme}-content meeting--draft`}
           id="new-event-draft"
           meetingIndex={1}
-          period={{ start: ghost.start, end: ghost.end }}
-          tempStart={ghost.start}
-          days={[ghost.day]}
+          period={{ start: draftEvent.start, end: draftEvent.end }}
+          tempStart={draftEvent.start}
+          days={[draftEvent.day]}
           contentHeader={[{ className: 'event-name', content: defaultName }]}
           contentBody={[
             {
               className: 'period',
-              content: periodToString({ start: ghost.start, end: ghost.end }),
+              content: periodToString({
+                start: draftEvent.start,
+                end: draftEvent.end,
+              }),
             },
           ]}
           popover={[
             { name: 'Name', content: defaultName },
             {
               name: 'Time',
-              content: periodToString({ start: ghost.start, end: ghost.end }),
+              content: periodToString({
+                start: draftEvent.start,
+                end: draftEvent.end,
+              }),
             },
           ]}
           overlay={overlay}
           capture={false}
-          sizeInfo={ghostSizeInfo}
+          sizeInfo={draftEventSizeInfo}
           includeDetailsPopover={false}
           includeContent={includeContent}
           canBeTabFocused={canBeTabFocused}

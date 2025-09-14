@@ -511,13 +511,15 @@ export default function Calendar({
             />
           ))}
       </div>
-      <EventDrag
-        enabled={courseContainerTab === RECURRING_EVENTS}
-        daysRef={daysRef}
-        timesRef={timesRef}
-        deviceHasHover={deviceHasHover}
-        containerRef={calendarRef}
-      />
+      {!compare && (
+        <EventDrag
+          enabled={courseContainerTab === RECURRING_EVENTS}
+          daysRef={daysRef}
+          timesRef={timesRef}
+          deviceHasHover={deviceHasHover}
+          containerRef={calendarRef}
+        />
+      )}
       {!preview && hiddenSections.length > 0 && (
         <div className="hidden-sections">
           *Sections not shown in view:{' '}
