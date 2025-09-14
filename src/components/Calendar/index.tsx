@@ -77,6 +77,7 @@ export default function Calendar({
 
   const daysRef = React.useRef<HTMLDivElement>(null);
   const timesRef = React.useRef<HTMLDivElement>(null);
+  const calendarRef = React.useRef<HTMLDivElement>(null);
 
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
@@ -349,6 +350,7 @@ export default function Calendar({
         preview && 'preview',
         className
       )}
+      ref={calendarRef}
     >
       {!preview && (
         <div className="times" ref={timesRef}>
@@ -510,10 +512,11 @@ export default function Calendar({
           ))}
       </div>
       <EventDrag
-        enabled={courseContainerTab === RECURRING_EVENTS} // RECURRING_EVENTS = 1
+        enabled={courseContainerTab === RECURRING_EVENTS}
         daysRef={daysRef}
         timesRef={timesRef}
         deviceHasHover={deviceHasHover}
+        containerRef={calendarRef}
       />
       {!preview && hiddenSections.length > 0 && (
         <div className="hidden-sections">

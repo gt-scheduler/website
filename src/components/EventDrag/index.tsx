@@ -29,6 +29,7 @@ export type EventDragProps = {
   deviceHasHover?: boolean;
   scheduleId?: string;
   onCreate?: (ev: Event) => void;
+  containerRef?: React.RefObject<HTMLDivElement>;
 };
 
 type DraftEvent = { day: string; start: number; end: number };
@@ -49,6 +50,7 @@ export default function EventDrag({
   deviceHasHover = true,
   scheduleId,
   onCreate,
+  containerRef,
 }: EventDragProps): React.ReactElement | null {
   const [{ colorMap, events }, { patchSchedule, setCourseContainerTab }] =
     useContext(ScheduleContext);
@@ -256,48 +258,40 @@ export default function EventDrag({
     ]
   );
 
-  // Global pointerdown listener: start drag only when clicking empty space
-  useEffect((): void | (() => void) => {
-    if (!enabled) {
+  // Scoped pointerdown listener: only inside the calendar root
+  useEffect(() => {
+    if (!enabled) return;
+    if (!containerRef?.current) {
       return;
     }
 
-    // Runs for every pointer down anywhere on the page
-    function handleGlobalPointerDown(nativeEvent: PointerEvent): void {
-      const overlayNode = rootRef.current;
-      if (!overlayNode) {
-        return;
-      }
+    const container = containerRef.current;
 
+    function handleScopedPointerDown(nativeEvent: PointerEvent): void {
       const x = nativeEvent.clientX;
       const y = nativeEvent.clientY;
 
-      // If the pointer is over an existing event block, do nothing
-      const clickingExistingBlock = isOverExistingBlock(x, y);
-      if (clickingExistingBlock) {
-        return;
-      }
+      // ignore clicks on existing events
+      if (isOverExistingBlock(x, y)) return;
 
-      // Build the minimal shape that our React handler expects
       const reactLikeEvent = {
         clientX: x,
         clientY: y,
         pointerId: nativeEvent.pointerId,
         pointerType: nativeEvent.pointerType,
         button: nativeEvent.button,
-        preventDefault: (): void => nativeEvent.preventDefault(),
+        preventDefault: () => nativeEvent.preventDefault(),
       } as React.PointerEvent;
 
-      // Reuse the same logic we use for onPointerDown on the overlay
       handlePointerDown(reactLikeEvent);
     }
-    document.addEventListener('pointerdown', handleGlobalPointerDown);
 
-    // Remove the listener when disabled or on unmount
-    return function cleanup(): void {
-      document.removeEventListener('pointerdown', handleGlobalPointerDown);
+    container.addEventListener('pointerdown', handleScopedPointerDown);
+
+    return () => {
+      container.removeEventListener('pointerdown', handleScopedPointerDown);
     };
-  }, [enabled, handlePointerDown, isOverExistingBlock]);
+  }, [enabled, containerRef, handlePointerDown, isOverExistingBlock]);
 
   if (!enabled) return null;
 
