@@ -513,7 +513,11 @@ export default function Calendar({
       </div>
       {!compare && (
         <EventDrag
-          enabled={courseContainerTab === RECURRING_EVENTS}
+          enabled={
+            courseContainerTab === RECURRING_EVENTS &&
+            !compare &&
+            deviceHasHover
+          }
           daysRef={daysRef}
           timesRef={timesRef}
           deviceHasHover={deviceHasHover}

@@ -34,7 +34,8 @@ export type EventDragProps = {
 
 type DraftEvent = { day: string; start: number; end: number };
 
-const DRAG_THRESHOLD_PX = 0;
+const DRAG_THRESHOLD_PX = 14;
+const MIN_EVENT_DURATION = 14; // minutes
 
 export default function EventDrag({
   enabled = true,
@@ -231,7 +232,7 @@ export default function EventDrag({
       setDraftEvent(null);
 
       // Only create event if drag actually covered at least 5 minutes
-      if (d && d.end - d.start >= 5) {
+      if (d && d.end - d.start >= MIN_EVENT_DURATION) {
         const eventId = new Date().getTime().toString();
 
         const newEvent: Event = {
