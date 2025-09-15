@@ -231,7 +231,7 @@ export default function EventDrag({
       pressRef.current = null;
       setDraftEvent(null);
 
-      // Only create event if drag actually covered at least 5 minutes
+      // Only create event if drag actually covered at least 15 minutes
       if (d && d.end - d.start >= MIN_EVENT_DURATION) {
         const eventId = new Date().getTime().toString();
 
