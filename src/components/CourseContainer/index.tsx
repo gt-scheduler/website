@@ -22,7 +22,7 @@ export default function CourseContainer(): React.ReactElement {
         currentItem={courseContainerTab}
         onChangeItem={setCourseContainerTab}
       />
-      {COURSE_TABS[courseContainerTab] === COURSE_TABS[COURSES] ? ( // COURSES = 0
+      {COURSE_TABS[courseContainerTab] === COURSE_TABS[COURSES] ? (
         <div className="scroller">
           <div className="course-list">
             {desiredCourses.map((courseId) => {
