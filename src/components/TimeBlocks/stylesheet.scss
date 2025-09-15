@@ -161,3 +161,10 @@
   border-top-width: 2px;
   border-left-width: 2px;
 }
+
+.meeting-wrapper.only-time {
+  justify-content: center;   // vertical center
+  .ids {
+    display: none;
+  }
+}
