@@ -74,6 +74,10 @@ const CAMPUSES: Record<string, string> = {
   'Georgia Tech - Shanghai': 'Shanghai',
 };
 
+const COURSE_TABS = ['Courses', 'Recurring Events'];
+const COURSES = 0;
+const RECURRING_EVENTS = 1;
+
 const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 const FIREBASE_PROJECT_ID = firebaseConfig.projectId || `gt-scheduler-web-dev`;
 const CLOUD_FUNCTION_BASE_URL = `https://us-east1-${FIREBASE_PROJECT_ID}.cloudfunctions.net`;
@@ -87,6 +91,9 @@ const LARGE_MOBILE_BREAKPOINT = 600;
 export {
   OPEN,
   CLOSE,
+  COURSE_TABS,
+  COURSES,
+  RECURRING_EVENTS,
   DAYS,
   PNG_SCALE_FACTOR,
   PALETTE,

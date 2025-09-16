@@ -3,13 +3,14 @@ import { Immutable } from 'immer';
 
 import { FriendScheduleData } from '../../data/types';
 import { Section } from '../../data/beans';
-import { CLOSE, DAYS, OPEN } from '../../constants';
+import { CLOSE, DAYS, OPEN, RECURRING_EVENTS } from '../../constants';
 import { classes, timeToShortString } from '../../utils/misc';
 import { SectionBlocks, EventBlocks, CompareBlocks } from '..';
 import { ScheduleContext, FriendContext } from '../../contexts';
 import { makeSizeInfoKey } from '../TimeBlocks';
 import { EventBlockPosition } from '../EventBlocks';
 import { SectionBlockPosition } from '../SectionBlocks';
+import EventDrag from '../EventDrag';
 import { Period, Event } from '../../types';
 import useMedia from '../../hooks/useMedia';
 
@@ -61,8 +62,9 @@ export default function Calendar({
   overlayFriendSchedules = [],
   isAutosized = false,
 }: CalendarProps): React.ReactElement {
-  const [{ pinnedCrns, oscar, events, currentVersion, versions }] =
-    useContext(ScheduleContext);
+  const [
+    { pinnedCrns, oscar, events, currentVersion, versions, courseContainerTab },
+  ] = useContext(ScheduleContext);
 
   const [{ friends }] = useContext(FriendContext);
 
@@ -75,6 +77,7 @@ export default function Calendar({
 
   const daysRef = React.useRef<HTMLDivElement>(null);
   const timesRef = React.useRef<HTMLDivElement>(null);
+  const calendarRef = React.useRef<HTMLDivElement>(null);
 
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
@@ -347,6 +350,7 @@ export default function Calendar({
         preview && 'preview',
         className
       )}
+      ref={calendarRef}
     >
       {!preview && (
         <div className="times" ref={timesRef}>
@@ -507,6 +511,15 @@ export default function Calendar({
             />
           ))}
       </div>
+      <EventDrag
+        enabled={
+          courseContainerTab === RECURRING_EVENTS && !compare && deviceHasHover
+        }
+        daysRef={daysRef}
+        timesRef={timesRef}
+        deviceHasHover={deviceHasHover}
+        containerRef={calendarRef}
+      />
       {!preview && hiddenSections.length > 0 && (
         <div className="hidden-sections">
           *Sections not shown in view:{' '}

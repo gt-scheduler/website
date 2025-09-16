@@ -150,3 +150,21 @@
     }
   }
 }
+
+.TimeBlocks.meeting--draft {
+  --meeting-color: rgba(255, 255, 255, 0);
+  pointer-events: none;
+}
+
+.TimeBlocks.meeting--draft .meeting {
+  border: 2px solid #808080;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.meeting-wrapper.only-time {
+  justify-content: center;   // vertical center
+  .ids {
+    display: none;
+  }
+}
