@@ -78,6 +78,12 @@ const BACKEND_BASE_URL = 'https://gt-scheduler.azurewebsites.net';
 const FIREBASE_PROJECT_ID = firebaseConfig.projectId || `gt-scheduler-web-dev`;
 const CLOUD_FUNCTION_BASE_URL = `https://us-east1-${FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
+// Replace URL with served url if you want to run with a local crawler
+// eg. http://localhost:8080
+const CUSTOM_CRAWLER_URL = undefined;
+const CRAWLER_BASE_URL =
+  CUSTOM_CRAWLER_URL || 'https://gt-scheduler.github.io/crawler-v2';
+
 const DONATE_LINK = 'https://opencollective.com/georgia-tech';
 
 const LARGE_DESKTOP_BREAKPOINT = 1200;
@@ -87,6 +93,7 @@ const LARGE_MOBILE_BREAKPOINT = 600;
 export {
   OPEN,
   CLOSE,
+  CRAWLER_BASE_URL,
   DAYS,
   PNG_SCALE_FACTOR,
   PALETTE,
