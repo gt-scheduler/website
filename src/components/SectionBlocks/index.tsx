@@ -92,7 +92,7 @@ export default function SectionBlocks({
             popover={[
               {
                 name: 'Course Name',
-                content: section.course.title,
+                content: section.title,
               },
               {
                 name: 'Instructors',

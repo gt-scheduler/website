@@ -190,7 +190,12 @@ export type CrawlerSection = [
    * integer index into caches.gradeBases,
    * specifying the grading scheme of the class
    */
-  gradeBaseIndex: number
+  gradeBaseIndex: number,
+  /**
+   * the full, human-readable name of the section (e.g. "Accounting I"),
+   * since sections within the same course can have different names
+   */
+  fullName: string
 ];
 
 // Prerequisite types:
@@ -293,7 +298,9 @@ export interface CrawlerCaches {
  */
 export type CrawlerCourse = [
   /**
-   * the full, human-readable name of the course (e.g. "Accounting I")
+   * the full, human-readable name of the course (e.g. "Accounting I"),
+   * (**Note** that this is simply the title of the first section added to
+   * sections)
    */
   fullName: string,
   /**
