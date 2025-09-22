@@ -8,6 +8,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.2.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@reactour/tour": "^3.6.1",
     "@sentry/react": "^6.12.0",
     "@sentry/tracing": "^6.12.0",
     "@types/lodash": "^4.14.192",
