@@ -112,9 +112,16 @@ export default class Section {
         days: days === '&nbsp;' ? [] : days.split(''),
         where: decode(where),
         location: oscar.locations[locationIndex] ?? null,
-        instructors: instructors.map((instructor) =>
-          instructor.replace(/ \(P\)$/, '').trim()
-        ),
+        // place instructors with (P) first and trim all elements
+        instructors: instructors
+          .sort((a, b) => {
+            const aHasP = a.endsWith(' (P)');
+            const bHasP = b.endsWith(' (P)');
+            if (aHasP && !bHasP) return -1;
+            if (!aHasP && bHasP) return 1;
+            return 0;
+          })
+          .map((instructor) => instructor.replace(/ \(P\)$/, '').trim()),
         // We need some fallback here
         dateRange: oscar.dateRanges[dateRangeIndex] ?? {
           from: new Date(),

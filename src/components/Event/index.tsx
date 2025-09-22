@@ -1,5 +1,5 @@
 import { Immutable, castDraft } from 'immer';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useState, useEffect } from 'react';
 import {
   faPencil,
   faPalette,
@@ -31,7 +31,9 @@ export default function Event({
 }: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
-  const [formShown, setFormShown] = useState<boolean>(false);
+  const [formShown, setFormShown] = useState<boolean>(
+    Boolean(event.showEditForm)
+  );
 
   const handleDuplicateEvent = useCallback(() => {
     const eventId = new Date().getTime().toString();
@@ -58,6 +60,23 @@ export default function Event({
     events,
     patchSchedule,
   ]);
+
+  // this basically forces the edit form to only auto-focus once per render
+  useEffect(() => {
+    if (!event.showEditForm) return; // skip if this event wasn't flagged (normal render)
+
+    const targetEventId = event.id;
+
+    // Create a new events list where this event's flag is reset
+    const nextEvents = castDraft(events).map((existingEvent) =>
+      existingEvent.id === targetEventId
+        ? { ...existingEvent, showEditForm: false } // remove showEditForm flag
+        : existingEvent
+    );
+
+    // push updated events list back into global state with schedulecontext
+    patchSchedule({ events: nextEvents });
+  }, [event.showEditForm, event.id, events, patchSchedule]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
@@ -90,7 +109,7 @@ export default function Event({
             actions={[
               {
                 icon: faPencil,
-                onClick: (): void => setFormShown(!formShown),
+                onClick: (): void => setFormShown(true),
               },
               {
                 icon: faPalette,
