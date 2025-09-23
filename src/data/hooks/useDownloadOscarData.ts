@@ -10,9 +10,10 @@ import {
   sleep,
 } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
+import { CRAWLER_BASE_URL } from '../../constants';
 
 const constructTermDataUrl = (term: string): string =>
-  `https://gt-scheduler.github.io/crawler-v2/${term}.json`;
+  `${CRAWLER_BASE_URL}/${term}.json`;
 
 // Number of minutes between re-downloads of the oscar data
 const REFRESH_INTERVAL_MIN = 15;
@@ -42,7 +43,6 @@ export default function useDownloadOscarData(
   useEffect(() => {
     const loadOperation = new Cancellable();
     const url = constructTermDataUrl(term);
-
     async function loadAndRefresh(): Promise<void> {
       let isFirst = true;
       while (!loadOperation.isCancelled) {
