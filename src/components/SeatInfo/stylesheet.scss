@@ -1,0 +1,28 @@
+@import "../../variables";
+
+.SeatInfo {
+  padding: 4px;
+  display: flex;
+  justify-content: flex-end;
+
+  .seating-container {
+    display: flex;
+    flex-direction: row;
+
+    .seating {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      color: gray;
+
+      .seats,
+      .waitlist {
+        font-size: 0.8em;
+
+        .status {
+          color: white;
+        }
+      }
+    }
+  }
+}

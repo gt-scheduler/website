@@ -1,5 +1,4 @@
-import React, { useCallback, useContext, useId, useState } from 'react';
-import { Tooltip as ReactTooltip } from 'react-tooltip';
+import React, { useCallback, useContext, useId } from 'react';
 import {
   faBan,
   faChair,
@@ -12,8 +11,7 @@ import { ActionRow } from '..';
 import { OverlayCrnsContext, ScheduleContext } from '../../contexts';
 import { DELIVERY_MODES } from '../../constants';
 import { Section as SectionBean } from '../../data/beans';
-import { Seating } from '../../data/beans/Section';
-import { ErrorWithFields, softError } from '../../log';
+import SeatInfo from '../SeatInfo';
 
 import './stylesheet.scss';
 
@@ -33,30 +31,6 @@ export default function Section({
   const [{ term, pinnedCrns, excludedCrns }, { patchSchedule }] =
     useContext(ScheduleContext);
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
-  const [seating, setSeating] = useState<Seating>([[], 0]);
-
-  let hovering = false;
-  const handleHover = (): void => {
-    hovering = true;
-    setTimeout(() => {
-      if (hovering) {
-        section
-          .fetchSeating(term)
-          .then((newSeating) => {
-            setSeating(newSeating);
-          })
-          .catch((err) =>
-            softError(
-              new ErrorWithFields({
-                message: 'error while fetching seating',
-                source: err,
-                fields: { crn: section.crn, term: section.term },
-              })
-            )
-          );
-      }
-    }, 333);
-  };
 
   const excludeSection = useCallback(
     (sect: SectionBean) => {
@@ -85,7 +59,6 @@ export default function Section({
   );
 
   const excludeTooltipId = useId();
-  const sectionTooltipId = useId();
   return (
     <ActionRow
       label={section.id}
@@ -99,7 +72,6 @@ export default function Section({
         },
         {
           icon: faChair,
-          id: sectionTooltipId,
           href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
@@ -111,6 +83,7 @@ export default function Section({
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
+      <SeatInfo section={section} term={term} />
       <div className="section-details">
         <div className="delivery-mode">
           {section.deliveryMode != null
@@ -127,50 +100,6 @@ export default function Section({
             );
           })}
         </div>
-
-        <ReactTooltip
-          anchorId={sectionTooltipId}
-          className="tooltip"
-          variant="dark"
-          place="top"
-          afterShow={(): void => handleHover()}
-          afterHide={(): void => {
-            hovering = false;
-          }}
-        >
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <b>Seats Filled</b>
-                </td>
-                <td>
-                  {seating[0].length === 0
-                    ? `Loading...`
-                    : typeof seating[0][1] === 'number'
-                    ? `${seating[0][1] ?? '<unknown>'} of ${
-                        seating[0][0] ?? '<unknown>'
-                      }`
-                    : `N/A`}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <b>Waitlist Filled</b>
-                </td>
-                <td>
-                  {seating[0].length === 0
-                    ? `Loading...`
-                    : typeof seating[0][1] === 'number'
-                    ? `${seating[0][3] ?? '<unknown>'} of ${
-                        seating[0][2] ?? '<unknown>'
-                      }`
-                    : `N/A`}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </ReactTooltip>
       </div>
     </ActionRow>
   );
