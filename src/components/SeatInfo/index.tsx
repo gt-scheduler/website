@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
+import React from 'react';
+import useSWR from 'swr';
 
+import { getContentClassName } from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
 
 import './stylesheet.scss';
@@ -12,6 +15,7 @@ export type OccupiedInfo = {
 export type SeatInfoProps = {
   section: SectionBean;
   term: string;
+  color: string | undefined;
 };
 
 type SeatData = {
@@ -19,57 +23,56 @@ type SeatData = {
   waitlist: OccupiedInfo | null;
 };
 
+const fetchSeating = async (
+  section: SectionBean,
+  term: string
+): Promise<SeatData> => {
+  try {
+    const raw = await section.fetchSeating(term);
+
+    if (!raw[0] || raw[0].length < 4) {
+      return { inClass: null, waitlist: null };
+    }
+
+    const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
+      raw[0];
+
+    return {
+      inClass: {
+        occupied: Number(inClassOccupied ?? 0),
+        total: Number(inClassTotal ?? 0),
+      },
+      waitlist: {
+        occupied: Number(waitlistOccupied ?? 0),
+        total: Number(waitlistTotal ?? 0),
+      },
+    };
+  } catch (err) {
+    return { inClass: null, waitlist: null };
+  }
+};
+
 export default function SeatInfo({
   section,
   term,
+  color,
 }: SeatInfoProps): React.ReactElement {
-  const [seatData, setSeatData] = useState<SeatData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: seatData, isLoading } = useSWR<SeatData>(
+    ['seating', section.id, term],
+    () => fetchSeating(section, term)
+  );
 
-  useEffect(() => {
-    let mounted = true;
-    setIsLoading(true);
-
-    section
-      .fetchSeating(term)
-      .then((raw) => {
-        if (!mounted) return;
-        if (raw[0].length === 0) {
-          setSeatData({ inClass: null, waitlist: null });
-        } else {
-          setSeatData({
-            inClass: {
-              occupied: Number(raw[0][1] ?? 0),
-              total: Number(raw[0][0] ?? 0),
-            },
-            waitlist: {
-              occupied: Number(raw[0][3] ?? 0),
-              total: Number(raw[0][2] ?? 0),
-            },
-          });
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setSeatData({ inClass: null, waitlist: null });
-        }
-      })
-      .finally(() => {
-        if (mounted) setIsLoading(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [section, term]);
+  const textClass = getContentClassName(color);
+  const labelClass =
+    textClass === 'light-content' ? 'light-label' : 'dark-label';
 
   return (
     <div className="SeatInfo">
       <div className="seating-container">
         <div className="seating">
-          <span className="seats">
+          <span className={`seats ${labelClass}`}>
             Seats Filled{' '}
-            <span className="status">
+            <span className={`status ${textClass}`}>
               {isLoading
                 ? 'Loading...'
                 : seatData?.inClass
@@ -77,9 +80,9 @@ export default function SeatInfo({
                 : 'N/A'}
             </span>
           </span>
-          <span className="waitlist">
+          <span className={`waitlist ${labelClass}`}>
             Waitlist Filled{' '}
-            <span className="status">
+            <span className={`status ${textClass}`}>
               {isLoading
                 ? 'Loading...'
                 : seatData?.waitlist

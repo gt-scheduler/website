@@ -83,7 +83,7 @@ export default function Section({
       ]}
       style={pinned ? { backgroundColor: color } : undefined}
     >
-      <SeatInfo section={section} term={term} />
+      <SeatInfo section={section} term={term} color={color} />
       <div className="section-details">
         <div className="delivery-mode">
           {section.deliveryMode != null

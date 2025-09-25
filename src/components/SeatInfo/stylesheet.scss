@@ -13,14 +13,26 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      color: gray;
+      
 
       .seats,
       .waitlist {
         font-size: 0.8em;
 
-        .status {
-          color: white;
+        &.light-label {
+          color: $color-neutral; // color of title on light bg
+        }
+
+        &.dark-label {
+          color: $modal-foreground-color-dark; // color of title on dark bg
+        }
+
+        .status.light-content {
+          color: $theme-dark-card-background; // color of numbers on light bg
+        }
+
+        .status.dark-content { // color of numbers on dark bg
+          color: $theme-light-background;
         }
       }
     }
