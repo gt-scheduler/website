@@ -201,6 +201,7 @@ export function InvitationModalContent({
     AxiosResponse<{ link: string }>
   > => {
     const IdToken = await (accountContext as SignedIn).getToken();
+    console.log(IdToken);
     const data = JSON.stringify({
       IDToken: IdToken,
       term,

@@ -14,7 +14,8 @@ import LoginModal from '../LoginModal';
 import { DropdownMenu, DropdownMenuAction } from '../Select';
 import Spinner from '../Spinner';
 import { classes } from '../../utils/misc';
-import { isAuthEnabled } from '../../data/firebase';
+import { isAuthEnabled, auth } from '../../data/firebase';
+import axios, { AxiosPromise } from 'axios';
 
 import './stylesheet.scss';
 
@@ -23,7 +24,9 @@ export type AccountDropdownProps = {
   className?: string;
   style?: React.CSSProperties;
 };
-
+interface SsoLoginResponse {
+  redirectUrl: string;
+}
 /**
  * Renders the dropdown menu in the app header
  * that lets the user either:
@@ -48,6 +51,23 @@ export default function AccountDropdown({
     setTheme(newTheme);
   }, [theme, setTheme]);
 
+  const handleSSO = async (): Promise<void> => {
+    const user = auth.currentUser;
+    if (!user) {
+      return;
+    }
+    const idToken = await user.getIdToken(/* forceRefresh */ true);
+    const response = await axios.get<SsoLoginResponse>(
+      'http://localhost:5001/gt-scheduler-web-dev/us-east1/connectWithGtSso/sso/login',
+      {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      }
+    );
+    window.location.href = response.data.redirectUrl;
+  };
+
   if (!isAuthEnabled) return null;
 
   let items: DropdownMenuAction[];
@@ -70,6 +90,15 @@ export default function AccountDropdown({
           icon: faSignOutAlt,
           onClick: (): void => state.signOut(),
           id: 'sign-out-dropdown',
+        },
+        {
+          label: 'Connect with GT SSO',
+          id: 'connect-with-gt',
+          onClick: (): void => {
+            handleSSO().catch((err) => {
+              console.log(err);
+            });
+          },
         },
         {
           label: 'Theme',
