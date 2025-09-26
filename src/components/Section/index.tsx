@@ -1,10 +1,5 @@
 import React, { useCallback, useContext, useId } from 'react';
-import {
-  faBan,
-  faChair,
-  faThumbtack,
-  faTimes,
-} from '@fortawesome/free-solid-svg-icons';
+import { faBan, faThumbtack, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, periodToString } from '../../utils/misc';
 import { ActionRow } from '..';
@@ -69,10 +64,6 @@ export default function Section({
         {
           icon: pinned ? faTimes : faThumbtack,
           onClick: (): void => pinSection(section),
-        },
-        {
-          icon: faChair,
-          href: `https://oscar.gatech.edu/pls/bprod/bwckschd.p_disp_detail_sched?term_in=${term}&crn_in=${section.crn}`,
         },
         {
           icon: faBan,

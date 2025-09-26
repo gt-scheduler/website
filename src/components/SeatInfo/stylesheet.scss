@@ -15,8 +15,7 @@
       align-items: flex-end;
       
 
-      .seats,
-      .waitlist {
+      .seating-label {
         font-size: 0.8em;
 
         &.light-label {
@@ -27,11 +26,11 @@
           color: $modal-foreground-color-dark; // color of title on dark bg
         }
 
-        .status.light-content {
+        .seat-waitlist-stats.light-content {
           color: $theme-dark-card-background; // color of numbers on light bg
         }
 
-        .status.dark-content { // color of numbers on dark bg
+        .seat-waitlist-stats.dark-content { // color of numbers on dark bg
           color: $theme-light-background;
         }
       }

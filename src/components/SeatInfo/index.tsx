@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
 import useSWR from 'swr';
 
@@ -7,6 +6,7 @@ import { Section as SectionBean } from '../../data/beans';
 
 import './stylesheet.scss';
 
+// Seating information
 export type OccupiedInfo = {
   occupied: number;
   total: number;
@@ -18,11 +18,13 @@ export type SeatInfoProps = {
   color: string | undefined;
 };
 
+// Response from fetchSeating
 type SeatData = {
   inClass: OccupiedInfo | null;
   waitlist: OccupiedInfo | null;
 };
 
+// Fetch and normalize seating data for a section/term
 const fetchSeating = async (
   section: SectionBean,
   term: string
@@ -30,6 +32,7 @@ const fetchSeating = async (
   try {
     const raw = await section.fetchSeating(term);
 
+    // Handle missing or bad data, assuming less than 4 return values is invalid
     if (!raw[0] || raw[0].length < 4) {
       return { inClass: null, waitlist: null };
     }
@@ -37,20 +40,51 @@ const fetchSeating = async (
     const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
       raw[0];
 
+    // normalize raw values into an OccupiedInfo object
+    const toOccupiedInfo = (
+      total: unknown,
+      occupied: unknown
+    ): OccupiedInfo => ({
+      occupied: Number(occupied ?? 0),
+      total: Number(total ?? 0),
+    });
+
     return {
-      inClass: {
-        occupied: Number(inClassOccupied ?? 0),
-        total: Number(inClassTotal ?? 0),
-      },
-      waitlist: {
-        occupied: Number(waitlistOccupied ?? 0),
-        total: Number(waitlistTotal ?? 0),
-      },
+      inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
+      waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
     };
   } catch (err) {
     return { inClass: null, waitlist: null };
   }
 };
+
+// subcomponent for a single stat line (label + numbers)
+function SeatingStat({
+  label,
+  info,
+  isLoading,
+  textClass,
+  labelClass,
+}: {
+  label: string;
+  info: OccupiedInfo | null;
+  isLoading: boolean;
+  textClass: string;
+  labelClass: string;
+}): React.ReactElement {
+  return (
+    <span className={`seating-label ${labelClass}`}>
+      {label}{' '}
+      <span className={`seat-waitlist-stats ${textClass}`}>
+        {isLoading
+          ? 'Loading...'
+          : info?.total // "N/A" if info is null or total is 0
+          ? `${info.occupied}/${info.total}`
+          : 'N/A'}
+      </span>
+    </span>
+  );
+}
 
 export default function SeatInfo({
   section,
@@ -58,10 +92,11 @@ export default function SeatInfo({
   color,
 }: SeatInfoProps): React.ReactElement {
   const { data: seatData, isLoading } = useSWR<SeatData>(
-    ['seating', section.id, term],
+    ['seating', section.crn, term],
     () => fetchSeating(section, term)
   );
 
+  // Derive styling classes based on Section's color (passed down from Section)
   const textClass = getContentClassName(color);
   const labelClass =
     textClass === 'light-content' ? 'light-label' : 'dark-label';
@@ -70,26 +105,20 @@ export default function SeatInfo({
     <div className="SeatInfo">
       <div className="seating-container">
         <div className="seating">
-          <span className={`seats ${labelClass}`}>
-            Seats Filled{' '}
-            <span className={`status ${textClass}`}>
-              {isLoading
-                ? 'Loading...'
-                : seatData?.inClass
-                ? `${seatData.inClass.occupied}/${seatData.inClass.total}`
-                : 'N/A'}
-            </span>
-          </span>
-          <span className={`waitlist ${labelClass}`}>
-            Waitlist Filled{' '}
-            <span className={`status ${textClass}`}>
-              {isLoading
-                ? 'Loading...'
-                : seatData?.waitlist
-                ? `${seatData.waitlist.occupied}/${seatData.waitlist.total}`
-                : 'N/A'}
-            </span>
-          </span>
+          <SeatingStat
+            label="Seats Filled"
+            info={seatData?.inClass ?? null}
+            isLoading={isLoading}
+            textClass={textClass}
+            labelClass={labelClass}
+          />
+          <SeatingStat
+            label="Waitlist Filled"
+            info={seatData?.waitlist ?? null}
+            isLoading={isLoading}
+            textClass={textClass}
+            labelClass={labelClass}
+          />
         </div>
       </div>
     </div>
