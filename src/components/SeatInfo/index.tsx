@@ -78,7 +78,7 @@ function SeatingStat({
       <span className={`seat-waitlist-stats ${textClass}`}>
         {isLoading
           ? 'Loading...'
-          : info?.total // "N/A" if info is null or total is 0
+          : info
           ? `${info.occupied}/${info.total}`
           : 'N/A'}
       </span>
