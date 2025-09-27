@@ -18,7 +18,14 @@
 
       .seating-label {
         font-size: 0.8em;
-        color: $seat-info-label;
+
+        &.dark-label {
+          color: $seat-info-dark-label; // color of title on dark bg
+        }
+
+        &.light-label {
+          color: $seat-info-light-label;
+        }
 
         .seat-waitlist-stats.light-content {
           color: $theme-dark-card-background; // color of numbers on light bg
