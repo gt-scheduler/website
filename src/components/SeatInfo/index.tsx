@@ -1,7 +1,7 @@
 import React from 'react';
 import useSWR from 'swr';
 
-import { getContentClassName } from '../../utils/misc';
+import { getContentClassName, getLabelClassName } from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
 
 import './stylesheet.scss';
@@ -98,8 +98,7 @@ export default function SeatInfo({
 
   // Derive styling classes based on Section's color (passed down from Section)
   const textClass = getContentClassName(color);
-  const labelClass =
-    textClass === 'light-content' ? 'light-label' : 'dark-label';
+  const labelClass = getLabelClassName(color);
 
   return (
     <div className="SeatInfo">
