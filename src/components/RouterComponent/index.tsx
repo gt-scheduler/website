@@ -3,6 +3,8 @@ import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
 
 import App from '../App';
 import InviteBackLink from '../InviteBackLink';
+// TEMPORARY PAGE
+import SubmitMetrics from '../../sandbox/SubmitMetrics';
 
 export default function RouterComponent(): React.ReactElement {
   return (
@@ -10,6 +12,10 @@ export default function RouterComponent(): React.ReactElement {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/invite/:id" element={<InviteBackLink />} />
+
+        {/* THIS IS A TEMPORARY PAGE */}
+        <Route path="/sandbox/submitMetrics" element={<SubmitMetrics />} />
+
         <Route path="/pr-preview/:id">
           <Route path="" element={<App />} />
           <Route path="invite/:id" element={<InviteBackLink />} />

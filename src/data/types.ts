@@ -220,3 +220,15 @@ export type FriendScheduleData = Record<
     >;
   }
 >;
+
+export interface MetricTarget {
+  type: 'professor' | 'course' | 'section';
+  reference: string;
+}
+
+export interface SubmitMetricsRequestData {
+  metricName: 'difficulty' | 'recommended';
+  targets: MetricTarget[];
+  values: number[];
+  semester?: number;
+}
