@@ -1,7 +1,7 @@
 @import "../../variables";
 
 .SeatInfo {
-  padding: 4px;
+  padding: 5px;
   display: flex;
   justify-content: flex-end;
 
@@ -13,18 +13,12 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
+      gap: 4px;
       
 
       .seating-label {
         font-size: 0.8em;
-
-        &.light-label {
-          color: $color-neutral; // color of title on light bg
-        }
-
-        &.dark-label {
-          color: $modal-foreground-color-dark; // color of title on dark bg
-        }
+        color: $seat-info-label;
 
         .seat-waitlist-stats.light-content {
           color: $theme-dark-card-background; // color of numbers on light bg
