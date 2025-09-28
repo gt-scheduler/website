@@ -224,13 +224,12 @@ export type FriendScheduleData = Record<
 // Metrics system types
 // ====================
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
+// MetricNames are temporary
 export enum MetricName {
   DIFFICULTY = 'difficulty',
   RECOMMENDED = 'recommended',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
 export enum TargetType {
   PROFESSOR = 'professor',
   COURSE = 'course',
