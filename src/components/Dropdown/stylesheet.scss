@@ -1,0 +1,107 @@
+@import '../../variables';
+
+.Dropdown {
+  position: relative;
+  width: 100%;
+
+  .dropdown-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .dropdown-input {
+      position: relative;
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+      padding: 10px 8px;
+      height: 100%;
+
+      &::placeholder {
+        font-weight: normal;
+        color: $color-neutral;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .dropdown-clear {
+      background: none;
+      border: none;
+      color: $color-neutral;
+      font-size: 1.2rem;
+      padding: 0 8px;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &:hover {
+        @include light {
+          color: $theme-light-foreground;
+        }
+        @include dark {
+          color: $theme-dark-foreground;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    @include card;
+    @include light {
+      background-color: $theme-light-card-background;
+    }
+    @include dark {
+      background-color: $theme-dark-card-background;
+    }
+    border: 1px solid $color-border;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 2px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    .dropdown-loading,
+    .dropdown-no-results,
+    .dropdown-prompt {
+      padding: 12px 16px;
+      color: $color-neutral;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .dropdown-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba($color-neutral, 0.2);
+      transition: background-color 0.2s;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover,
+      &.focused {
+        background-color: rgba($color-neutral, 0.1);
+      }
+
+      &:active {
+        background-color: rgba($color-neutral, 0.2);
+      }
+    }
+  }
+}

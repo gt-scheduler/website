@@ -43,21 +43,16 @@ export default function Event({
         end: event.period.end,
       },
       days: event.days,
+      where:
+        'where' in event && typeof event.where === 'string' ? event.where : '',
+      location: 'location' in event && event.location ? event.location : null,
     };
 
     patchSchedule({
       events: [...castDraft(events), castDraft(newEvent)],
       colorMap: { ...colorMap, [eventId]: getRandomColor() },
     });
-  }, [
-    colorMap,
-    event.days,
-    event.name,
-    event.period.end,
-    event.period.start,
-    events,
-    patchSchedule,
-  ]);
+  }, [colorMap, event, events, patchSchedule]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
@@ -82,6 +77,7 @@ export default function Event({
       {!formShown && (
         <div
           className={classes('Event', contentClassName, 'default', className)}
+          // eslint-disable-next-line react/forbid-dom-props
           style={{ backgroundColor: color }}
           key={event.id}
         >

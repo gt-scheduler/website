@@ -10,9 +10,11 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
 
 export type MapLocation = {
-  section: string;
+  section?: string;
   id: string;
+  title?: string;
   coords: Location | null;
+  isEvent?: boolean;
 };
 
 export type MapViewProps = {
@@ -23,6 +25,7 @@ export default function MapView({
   locations,
 }: MapViewProps): React.ReactElement {
   // These initial coordinates start the map looking at the GT Atlanta campus
+  // We maintain focus on GT campus even when events are far away
   const [viewState, setViewState] = useState<ViewState>({
     latitude: 33.7765,
     longitude: -84.3963,
@@ -31,6 +34,7 @@ export default function MapView({
 
   const unknown: MapLocation[] = [];
   const coordsToLocationsMap = new Map<Location, MapLocation[]>();
+
   locations.forEach((location) => {
     if (location.coords === null) {
       unknown.push(location);
@@ -41,16 +45,25 @@ export default function MapView({
     }
   });
 
-  // Switch the map style based on the current theme.
-  // These are custom styles owned by the Mapbox account in the BitWarden.
-  // Public share links:
-  // Dark: https://api.mapbox.com/styles/v1/gt-scheduler/cktc4yzhm018w17ql65xa802o.html?fresh=true&title=copy&access_token=pk.eyJ1IjoiZ3Qtc2NoZWR1bGVyIiwiYSI6ImNrdGM0cXlqMDA0aXYyeHBma290Y2NyOTgifQ.S_A1gOu-FSQ8ywQFf2rr5A
-  // Light: https://api.mapbox.com/styles/v1/gt-scheduler/cktc4y61t018918qjynvngozg.html?fresh=true&title=copy&access_token=pk.eyJ1IjoiZ3Qtc2NoZWR1bGVyIiwiYSI6ImNrdGM0cXlqMDA0aXYyeHBma290Y2NyOTgifQ.S_A1gOu-FSQ8ywQFf2rr5A
+  // Use standard Mapbox styles instead of custom ones to avoid 403 errors
+  // Standard styles should work with any valid Mapbox token
   const [theme] = useContext(ThemeContext);
   const mapStyle =
     theme === 'dark'
-      ? 'mapbox://styles/gt-scheduler/cktc4yzhm018w17ql65xa802o' // gt-scheduler-dark
-      : 'mapbox://styles/gt-scheduler/cktc4y61t018918qjynvngozg'; // gt-scheduler-light
+      ? 'mapbox://styles/mapbox/dark-v10'
+      : 'mapbox://styles/mapbox/streets-v11';
+
+  // Get the MapBox token and provide helpful error if missing
+  const mapboxToken = process.env['REACT_APP_MAPBOX_TOKEN'] ?? '';
+  if (!mapboxToken) {
+    // MapBox token is missing - this will be logged in development
+    return (
+      <div className="mapbox error-message">
+        <p>Map cannot load: Missing MapBox API token</p>
+        <p>Please check that REACT_APP_MAPBOX_TOKEN is set in your .env file</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mapbox">
@@ -59,7 +72,7 @@ export default function MapView({
         width="100%"
         viewState={viewState}
         mapStyle={mapStyle}
-        mapboxApiAccessToken={process.env['REACT_APP_MAPBOX_TOKEN'] ?? ''}
+        mapboxApiAccessToken={mapboxToken}
         onViewStateChange={({
           viewState: newViewState,
         }: {
@@ -72,8 +85,10 @@ export default function MapView({
               <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
               <div className="pin-text">
                 {coordLocations.map((coordLocation) => (
-                  <div key={coordLocation.id + coordLocation.section}>
-                    {coordLocation.id} {coordLocation.section}
+                  <div key={coordLocation.id + (coordLocation.section || '')}>
+                    {coordLocation.isEvent
+                      ? coordLocation.title || coordLocation.id
+                      : `${coordLocation.id} ${coordLocation.section || ''}`}
                   </div>
                 ))}
               </div>
@@ -85,7 +100,9 @@ export default function MapView({
             <b>Undetermined</b>
             {unknown.map((location, i) => (
               <div className="class" key={i}>
-                {location.id} {location.section}
+                {location.isEvent
+                  ? location.title || location.id
+                  : `${location.id} ${location.section || ''}`}
               </div>
             ))}
           </div>

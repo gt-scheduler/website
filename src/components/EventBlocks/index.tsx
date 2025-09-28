@@ -3,12 +3,22 @@ import { Immutable, castDraft } from 'immer';
 
 import { daysToString, periodToString } from '../../utils/misc';
 import { TimeBlocks } from '..';
-import { Period, Event } from '../../types';
+import { Period, Event as EventData, Location } from '../../types';
 import { TimeBlockPosition, SizeInfo } from '../TimeBlocks';
 import { CLOSE, OPEN, DAYS } from '../../constants';
 import { ThemeContext, ScheduleContext } from '../../contexts';
 
 import './stylesheet.scss';
+
+// Type guard to check if event has location data
+function hasLocationData(
+  event: Immutable<EventData>
+): event is Immutable<EventData> & {
+  where: string;
+  location: Location | null;
+} {
+  return !!event && 'where' in event && typeof event.where === 'string';
+}
 
 export interface EventBlockPosition extends TimeBlockPosition {
   rowIndex: number;
@@ -19,7 +29,7 @@ export interface EventBlockPosition extends TimeBlockPosition {
 
 export type EventBlocksProps = {
   className?: string;
-  event: Immutable<Event>;
+  event: Immutable<EventData>;
   owner?: string;
   scheduleName?: string;
   scheduleId?: string;
@@ -133,7 +143,7 @@ export default function EventBlocks({
       setDragging(false);
 
       // Update the event time in firestore/local storage once done dragging
-      const newEvents = castDraft(events).map((existingEvent: Event) => {
+      const newEvents = castDraft(events).map((existingEvent: EventData) => {
         if (existingEvent.id === event.id) {
           return {
             ...existingEvent,
@@ -234,6 +244,14 @@ export default function EventBlocks({
                     (event.period.end - event.period.start),
                 }),
               },
+              ...(hasLocationData(event)
+                ? [
+                    {
+                      className: 'location',
+                      content: event.where.split(',')[0] || '',
+                    },
+                  ]
+                : []),
             ]
           : []
       }
@@ -249,6 +267,14 @@ export default function EventBlocks({
             periodToString(event.period),
           ].join(' '),
         },
+        ...(hasLocationData(event)
+          ? [
+              {
+                name: 'Location',
+                content: event.where,
+              },
+            ]
+          : []),
       ])}
       overlay={overlay}
       capture={capture}

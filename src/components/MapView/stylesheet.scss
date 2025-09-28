@@ -1,4 +1,4 @@
-@import "../../variables";
+@import '../../variables';
 
 .mapbox {
   height: 100%;
@@ -61,6 +61,11 @@
     position: absolute;
     bottom: 30px;
     right: 10px;
+  }
+
+  .error-message {
+    padding: 20px;
+    text-align: center;
   }
 }
 

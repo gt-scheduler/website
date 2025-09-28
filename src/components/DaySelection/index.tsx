@@ -3,7 +3,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
 import { classes, getContentClassName } from '../../utils/misc';
-import { Period } from '../../types';
+import { Period, Event } from '../../types';
 import { ThemeContext } from '../../contexts';
 
 import './stylesheet.scss';
@@ -28,10 +28,13 @@ export interface CourseDateItem {
   title: string;
   times: Period | undefined;
   daysOfWeek: string[];
+  section?: string;
+  isEvent?: boolean;
 }
 
 export type DaySelectionProps = {
   courseDateMap: Record<Day, CourseDateItem[]>;
+  unpicturedEvents: Event[];
   activeDay: Day | '';
   setActiveDay: (next: Day | '') => void;
 };
@@ -53,6 +56,7 @@ const DARK_COLOR_PALETTE = [
 
 export default function DaySelection({
   courseDateMap,
+  unpicturedEvents,
   activeDay,
   setActiveDay,
 }: DaySelectionProps): React.ReactElement {
@@ -95,6 +99,7 @@ export default function DaySelection({
               getContentClassName(colorPalette[i]),
               'default'
             )}
+            // eslint-disable-next-line react/forbid-dom-props
             style={{ backgroundColor: colorPalette[i] }}
           >
             <ActionRow
@@ -111,9 +116,7 @@ export default function DaySelection({
             {activeDay === date && (
               <div className="dropdown-content">
                 {courses == null || courses.length === 0 ? (
-                  <div className="course-content" style={{ padding: 8 }}>
-                    No classes this day!
-                  </div>
+                  <div className="course-content">No classes this day!</div>
                 ) : (
                   courses.map((course) => {
                     let timeLabel = 'TBA';
@@ -125,8 +128,12 @@ export default function DaySelection({
 
                     return (
                       <div className="course-content" key={course.id}>
-                        <div className="course-id">{course.id}</div>
-                        <span className="course-row">{course.title}</span>
+                        <div className="course-id">
+                          {course.isEvent ? course.title : course.id}
+                        </div>
+                        {!course.isEvent && (
+                          <span className="course-row">{course.title}</span>
+                        )}
                         <span className="course-row">
                           {course.daysOfWeek} {timeLabel}
                         </span>
@@ -139,6 +146,20 @@ export default function DaySelection({
           </div>
         );
       })}
+
+      {/* Unpictured Events Section */}
+      {unpicturedEvents.length > 0 && (
+        <div className="unpictured-section">
+          <div className="unpictured-header">*Sections not shown in map:</div>
+          <div className="unpictured-content">
+            {unpicturedEvents.map((event) => (
+              <div key={event.id} className="unpictured-event">
+                {event.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

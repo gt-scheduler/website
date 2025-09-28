@@ -82,6 +82,8 @@ export interface Event {
   name: string;
   period: Period;
   days: string[];
+  where?: string;
+  location?: Location | null;
 }
 
 export interface Term {

@@ -9,12 +9,26 @@ import React, {
 import { Immutable, castDraft } from 'immer';
 
 import Button from '../Button';
+import LocationPicker from '../LocationPicker';
 import { classes, getRandomColor, timeToString } from '../../utils/misc';
 import { DAYS } from '../../constants';
 import { ScheduleContext } from '../../contexts';
-import { Event as EventData } from '../../types';
+import { Event as EventData, Location } from '../../types';
 
 import './stylesheet.scss';
+
+// Type guard to check if event has location data
+function hasLocationData(
+  event: unknown
+): event is EventData & { where: string; location: Location | null } {
+  return (
+    event !== null &&
+    typeof event === 'object' &&
+    event !== undefined &&
+    'where' in event &&
+    typeof (event as { where: unknown }).where === 'string'
+  );
+}
 
 export type EventAddProps = {
   className?: string;
@@ -38,6 +52,15 @@ export default function EventAdd({
   const [end, setEnd] = useState(
     event?.period.end ? timeToString(event.period.end, false, true) : ''
   );
+  const [location, setLocation] = useState<{
+    where: string;
+    location: Location | null;
+  } | null>(
+    event && hasLocationData(event)
+      ? { where: event.where, location: event.location }
+      : null
+  );
+
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
 
@@ -115,6 +138,8 @@ export default function EventAdd({
                 end: parsedEnd,
               },
               days: selectedTags,
+              where: location?.where || '',
+              location: location?.location || null,
             }
           : existingEvent
       );
@@ -136,6 +161,8 @@ export default function EventAdd({
           end: parsedEnd,
         },
         days: selectedTags,
+        where: location?.where || '',
+        location: location?.location || null,
       };
 
       patchSchedule({
@@ -147,6 +174,7 @@ export default function EventAdd({
       setSelectedTags([]);
       setStart('');
       setEnd('');
+      setLocation(null);
     }
   }, [
     event,
@@ -154,6 +182,7 @@ export default function EventAdd({
     start,
     end,
     selectedTags,
+    location,
     events,
     colorMap,
     patchSchedule,
@@ -242,6 +271,7 @@ export default function EventAdd({
                   value={start}
                   onChange={handleStartChange}
                   onKeyDown={handleKeyDown}
+                  aria-label="Start time"
                 />
               </td>
             </tr>
@@ -257,6 +287,25 @@ export default function EventAdd({
                   value={end}
                   onChange={handleEndChange}
                   onKeyDown={handleKeyDown}
+                  aria-label="End time"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div className={classes('label', location?.where && 'active')}>
+                  Location
+                </div>
+              </td>
+              <td className="input">
+                <LocationPicker
+                  value={location}
+                  onChange={(locationData): void => {
+                    setLocation(locationData);
+                  }}
+                  onClear={(): void => {
+                    setLocation(null);
+                  }}
                 />
               </td>
             </tr>
