@@ -220,3 +220,31 @@ export type FriendScheduleData = Record<
     >;
   }
 >;
+
+// Metrics system types
+// ====================
+
+// MetricNames are temporary
+export enum MetricName {
+  DIFFICULTY = 'difficulty',
+  RECOMMENDED = 'recommended',
+}
+
+export enum TargetType {
+  PROFESSOR = 'professor',
+  COURSE = 'course',
+  SECTION = 'section',
+}
+
+export interface MetricTarget {
+  type: TargetType;
+  reference: string;
+}
+
+export type SubmitMetricsRequestData = {
+  IDToken: string;
+  metricName: MetricName;
+  targets: MetricTarget[];
+  values: number[];
+  semester?: number;
+};
