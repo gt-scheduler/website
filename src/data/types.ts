@@ -221,14 +221,31 @@ export type FriendScheduleData = Record<
   }
 >;
 
+// Metrics system types
+// ====================
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+export enum MetricName {
+  DIFFICULTY = 'difficulty',
+  RECOMMENDED = 'recommended',
+}
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+export enum TargetType {
+  PROFESSOR = 'professor',
+  COURSE = 'course',
+  SECTION = 'section',
+}
+
 export interface MetricTarget {
-  type: 'professor' | 'course' | 'section';
+  type: TargetType;
   reference: string;
 }
 
-export interface SubmitMetricsRequestData {
-  metricName: 'difficulty' | 'recommended';
+export type SubmitMetricsRequestData = {
+  IDToken: string;
+  metricName: MetricName;
   targets: MetricTarget[];
   values: number[];
   semester?: number;
-}
+};

@@ -5,9 +5,15 @@ import { Immutable } from 'immer';
 import { auth } from '../firebase';
 import { ErrorWithFields, softError } from '../../log';
 import { SubmitMetricsRequestData } from '../types';
-import { LoadingState } from '../../types';
+import {
+  LoadingState,
+  LoadingStateLoaded,
+  LoadingStateError,
+  LoadingStateLoading,
+} from '../../types';
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
+import { validateMetricData } from '../../utils/validation';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import useDeepCompareEffect from '../../hooks/useDeepCompareEffect';
 
@@ -16,21 +22,16 @@ type HookResult = {
 };
 
 const url = `${CLOUD_FUNCTION_BASE_URL}/submitMetrics`;
-
 const MAX_RETRIES = 3;
 
-/**
- * Submits metrics data to a Firebase cloud function for the given request data.
- * Retries up to 3 times on errors
- */
 export default function useSubmitMetrics({
   requestData,
 }: {
-  requestData: Immutable<SubmitMetricsRequestData>;
+  requestData: Immutable<Omit<SubmitMetricsRequestData, 'IDToken'>>;
 }): LoadingState<HookResult> {
   const [state, setState] = useState<LoadingState<HookResult>>({
     type: 'loading',
-  });
+  } as LoadingStateLoading);
 
   useDeepCompareEffect(() => {
     const submitOperation = new Cancellable();
@@ -38,12 +39,13 @@ export default function useSubmitMetrics({
     async function submit(): Promise<void> {
       setState({
         type: 'loading',
-      });
+      } as LoadingStateLoading);
 
       if (!validateMetricData(requestData)) {
         const validationError = new ErrorWithFields({
           message: 'an error occurred while validating metrics data',
         });
+
         softError(
           new ErrorWithFields({
             message: 'validation failed for metrics submission',
@@ -55,12 +57,14 @@ export default function useSubmitMetrics({
             },
           })
         );
+
         setState({
           type: 'error',
           error: validationError,
           stillLoading: false,
           overview: validationError.message,
-        });
+        } as LoadingStateError);
+
         return;
       }
 
@@ -71,10 +75,7 @@ export default function useSubmitMetrics({
             IDToken: await auth.currentUser?.getIdToken(),
             ...requestData,
           });
-          /* eslint-disable max-len */
-          // This request should be made with content type is application/x-www-form-urlencoded.
-          // This is done to prevent a pre-flight CORS request made to the firebase function.
-          /* eslint-enable max-len */
+
           const promise = axios({
             method: 'POST',
             url,
@@ -92,7 +93,7 @@ export default function useSubmitMetrics({
           setState({
             type: 'loaded',
             result: { success: true },
-          });
+          } as LoadingStateLoaded<HookResult>);
 
           return;
         } catch (err) {
@@ -121,7 +122,7 @@ export default function useSubmitMetrics({
                   }),
             stillLoading: attemptNumber < MAX_RETRIES,
             overview: String(err),
-          });
+          } as LoadingStateError);
 
           await exponentialBackoff(attemptNumber);
           attemptNumber += 1;
@@ -143,58 +144,10 @@ export default function useSubmitMetrics({
       );
     });
 
-    // Cancel the submission when this cleans up
     return (): void => {
       submitOperation.cancel();
     };
   }, [requestData, setState]);
 
   return state;
-}
-
-function validateMetricData(data: unknown): boolean {
-  if (typeof data !== 'object' || data === null) return false;
-  const d = data as SubmitMetricsRequestData;
-
-  if (!['difficulty', 'recommended'].includes(d.metricName)) return false;
-  if (!Array.isArray(d.targets)) return false;
-
-  for (const target of d.targets) {
-    if (typeof target !== 'object' || target === null) return false;
-    if (!['professor', 'course', 'section'].includes(target.type)) return false;
-    if (typeof target.reference !== 'string') return false;
-
-    switch (target.type) {
-      case 'course': {
-        // ABCD 1234
-        if (!/^[A-Z]+ \d{4}$/.test(target.reference)) return false;
-        break;
-      }
-
-      case 'professor': {
-        // FirstName LastName
-        const nameParts = target.reference.split(' ');
-        if (nameParts.length !== 2) return false;
-        break;
-      }
-
-      case 'section': {
-        // ABC01
-        if (!/^[A-Z]+\d+$/.test(target.reference)) return false;
-        break;
-      }
-
-      default: {
-        return false;
-      }
-    }
-  }
-
-  // YYYYMM
-  if (d.semester !== undefined) {
-    if (typeof d.semester !== 'number') return false;
-    if (!/^\d{6}$/.test(String(d.semester))) return false;
-  }
-
-  return true;
 }

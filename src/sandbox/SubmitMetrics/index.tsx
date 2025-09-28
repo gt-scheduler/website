@@ -1,6 +1,12 @@
+// DELETE LATER
+
 import React, { useState } from 'react';
 
-import { SubmitMetricsRequestData, MetricTarget } from '../../data/types';
+import {
+  SubmitMetricsRequestData,
+  MetricTarget,
+  MetricName,
+} from '../../data/types';
 import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
 
 export default function SubmitMetrics(): React.ReactElement {
@@ -9,9 +15,7 @@ export default function SubmitMetrics(): React.ReactElement {
     values: [],
   });
 
-  const [metricName, setMetricName] = useState<
-    '' | 'difficulty' | 'recommended'
-  >('');
+  const [metricName, setMetricName] = useState<MetricName | ''>('');
   const [semester, setSemester] = useState<number | undefined>(undefined);
   const [targetsJson, setTargetsJson] = useState('');
   const [valuesJson, setValuesJson] = useState('');
@@ -43,7 +47,7 @@ export default function SubmitMetrics(): React.ReactElement {
   const handleMetricNameChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ): void => {
-    setMetricName(e.target.value as '' | 'difficulty' | 'recommended');
+    setMetricName(e.target.value as MetricName | '');
   };
 
   const handleSemesterChange = (
@@ -77,8 +81,8 @@ export default function SubmitMetrics(): React.ReactElement {
             style={{ color: 'black', backgroundColor: 'white' }}
           >
             <option value="">Select</option>
-            <option value="difficulty">difficulty</option>
-            <option value="recommended">recommended</option>
+            <option value={MetricName.DIFFICULTY}>difficulty</option>
+            <option value={MetricName.RECOMMENDED}>recommended</option>
           </select>
         </label>
         <br />
