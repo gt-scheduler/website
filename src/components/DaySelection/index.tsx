@@ -99,7 +99,6 @@ export default function DaySelection({
               getContentClassName(colorPalette[i]),
               'default'
             )}
-            // eslint-disable-next-line react/forbid-dom-props
             style={{ backgroundColor: colorPalette[i] }}
           >
             <ActionRow

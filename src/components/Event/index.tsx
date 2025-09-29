@@ -77,7 +77,6 @@ export default function Event({
       {!formShown && (
         <div
           className={classes('Event', contentClassName, 'default', className)}
-          // eslint-disable-next-line react/forbid-dom-props
           style={{ backgroundColor: color }}
           key={event.id}
         >
