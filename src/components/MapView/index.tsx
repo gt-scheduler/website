@@ -5,6 +5,7 @@ import { faMapPin } from '@fortawesome/free-solid-svg-icons';
 
 import { Location } from '../../types';
 import { ThemeContext } from '../../contexts';
+import { ScheduleBlockEventType } from '../DaySelection';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
@@ -14,7 +15,7 @@ export type MapLocation = {
   id: string;
   title?: string;
   coords: Location | null;
-  isEvent?: boolean;
+  type: ScheduleBlockEventType;
 };
 
 export type MapViewProps = {
@@ -89,7 +90,7 @@ export default function MapView({
               <div className="pin-text">
                 {coordLocations.map((coordLocation) => (
                   <div key={coordLocation.id + (coordLocation.section || '')}>
-                    {coordLocation.isEvent
+                    {coordLocation.type === ScheduleBlockEventType.CustomEvent
                       ? coordLocation.title || coordLocation.id
                       : `${coordLocation.id} ${coordLocation.section || ''}`}
                   </div>
@@ -103,7 +104,7 @@ export default function MapView({
             <b>Undetermined</b>
             {unknown.map((location, i) => (
               <div className="class" key={i}>
-                {location.isEvent
+                {location.type === ScheduleBlockEventType.CustomEvent
                   ? location.title || location.id
                   : `${location.id} ${location.section || ''}`}
               </div>

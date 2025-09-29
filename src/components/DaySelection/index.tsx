@@ -23,17 +23,22 @@ export function isDay(rawDay: string): rawDay is Day {
   }
 }
 
-export interface CourseDateItem {
+// eslint-disable-next-line no-shadow
+export enum ScheduleBlockEventType {
+  Course = 'course',
+  CustomEvent = 'event',
+}
+export interface ScheduleBlockDateItem {
   id: string;
   title: string;
   times: Period | undefined;
   daysOfWeek: string[];
+  type: ScheduleBlockEventType;
   section?: string;
-  isEvent?: boolean;
 }
 
 export type DaySelectionProps = {
-  courseDateMap: Record<Day, CourseDateItem[]>;
+  courseDateMap: Record<Day, ScheduleBlockDateItem[]>;
   unpicturedEvents: Event[];
   activeDay: Day | '';
   setActiveDay: (next: Day | '') => void;
@@ -128,9 +133,11 @@ export default function DaySelection({
                     return (
                       <div className="course-content" key={course.id}>
                         <div className="course-id">
-                          {course.isEvent ? course.title : course.id}
+                          {course.type === ScheduleBlockEventType.CustomEvent
+                            ? course.title
+                            : course.id}
                         </div>
-                        {!course.isEvent && (
+                        {course.type === ScheduleBlockEventType.Course && (
                           <span className="course-row">{course.title}</span>
                         )}
                         <span className="course-row">

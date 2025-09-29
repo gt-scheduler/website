@@ -2,17 +2,20 @@ import React, { useContext, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
 import { ScheduleContext } from '../../contexts';
-import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
+import DaySelection, {
+  ScheduleBlockDateItem,
+  ScheduleBlockEventType,
+  Day,
+  isDay,
+} from '../DaySelection';
 import { Meeting, Event, Location } from '../../types';
 
 import './stylesheet.scss';
 
 // Construct combined course data
 // to pass to `<MapView>` and `<DaySelection>`
-type CombinedCourseData = CourseDateItem & {
+type CombinedCourseData = ScheduleBlockDateItem & {
   coords: Location | null;
-  section?: string;
-  isEvent?: boolean;
 };
 
 export default function Map(): React.ReactElement {
@@ -43,6 +46,7 @@ export default function Map(): React.ReactElement {
         times: firstMeeting.period,
         daysOfWeek: firstMeeting.days,
         section: section.id,
+        type: ScheduleBlockEventType.Course,
         coords: firstMeeting.location,
       });
       courseDateMap[day] = courses;
@@ -79,8 +83,8 @@ export default function Map(): React.ReactElement {
           title: event.name,
           times: event.period,
           daysOfWeek: [...event.days],
+          type: ScheduleBlockEventType.CustomEvent,
           coords: eventLocation,
-          isEvent: true,
         };
         courses.push(courseData);
       } else {
@@ -90,8 +94,8 @@ export default function Map(): React.ReactElement {
           title: event.name,
           times: event.period,
           daysOfWeek: [...event.days],
+          type: ScheduleBlockEventType.CustomEvent,
           coords: null,
-          isEvent: true,
         };
         courses.push(courseData);
 
@@ -134,7 +138,7 @@ export default function Map(): React.ReactElement {
         title: item.title,
         section: item.section,
         coords: item.coords,
-        isEvent: item.isEvent,
+        type: item.type,
       }));
   }
 
