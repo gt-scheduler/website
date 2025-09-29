@@ -45,13 +45,16 @@ export default function MapView({
     }
   });
 
-  // Use standard Mapbox styles instead of custom ones to avoid 403 errors
-  // Standard styles should work with any valid Mapbox token
+  // Switch the map style based on the current theme.
+  // These are custom styles owned by the Mapbox account in the BitWarden.
+  // Public share links:
+  // Dark: https://api.mapbox.com/styles/v1/gt-scheduler/cktc4yzhm018w17ql65xa802o.html?fresh=true&title=copy&access_token=pk.eyJ1IjoiZ3Qtc2NoZWR1bGVyIiwiYSI6ImNrdGM0cXlqMDA0aXYyeHBma290Y2NyOTgifQ.S_A1gOu-FSQ8ywQFf2rr5A
+  // Light: https://api.mapbox.com/styles/v1/gt-scheduler/cktc4y61t018918qjynvngozg.html?fresh=true&title=copy&access_token=pk.eyJ1IjoiZ3Qtc2NoZWR1bGVyIiwiYSI6ImNrdGM0cXlqMDA0aXYyeHBma290Y2NyOTgifQ.S_A1gOu-FSQ8ywQFf2rr5A
   const [theme] = useContext(ThemeContext);
   const mapStyle =
     theme === 'dark'
-      ? 'mapbox://styles/mapbox/dark-v10'
-      : 'mapbox://styles/mapbox/streets-v11';
+      ? 'mapbox://styles/gt-scheduler/cktc4yzhm018w17ql65xa802o' // gt-scheduler-dark
+      : 'mapbox://styles/gt-scheduler/cktc4y61t018918qjynvngozg'; // gt-scheduler-light
 
   // Get the MapBox token and provide helpful error if missing
   const mapboxToken = process.env['REACT_APP_MAPBOX_TOKEN'] ?? '';
