@@ -1,7 +1,7 @@
 import { firebaseConfig } from './data/firebase';
 
-const OPEN = 8 * 60;
-const CLOSE = 22 * 60;
+const OPEN = 6 * 60;
+const CLOSE = 24 * 60 - 1; // 11:59 PM
 const DAYS = ['M', 'T', 'W', 'R', 'F'];
 
 const PNG_SCALE_FACTOR = 2;

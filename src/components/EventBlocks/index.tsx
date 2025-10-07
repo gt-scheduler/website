@@ -181,7 +181,7 @@ export default function EventBlocks({
             ref.current.offsetHeight / 2
         ) /
           timesRef.current.getBoundingClientRect().height) *
-          (CLOSE - OPEN) +
+          (CLOSE + 1 - OPEN) +
           OPEN) /
           5
       ) * 5;

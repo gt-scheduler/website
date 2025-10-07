@@ -139,7 +139,7 @@ export default function Finals(): React.ReactElement {
   return (
     <div className="FinalsContainer">
       <div className="times">
-        {new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
+        {new Array((CLOSE + 1 - OPEN) / 60).fill(0).map((_, i) => {
           const time = OPEN + i * 60;
           return (
             <div className="time" key={time}>
