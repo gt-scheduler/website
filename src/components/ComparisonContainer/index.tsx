@@ -770,11 +770,7 @@ function ScheduleRow({
         )}
       </div>
       {hasPalette && palette && setFriendScheduleColor && setPaletteInfo && (
-        <Palette
-          className={classes('palette', type === 'Schedule' && 'indented')}
-          onSelectColor={setFriendScheduleColor}
-          color={color ?? null}
-        />
+        <Palette onSelectColor={setFriendScheduleColor} color={color ?? null} />
       )}
     </div>
   );

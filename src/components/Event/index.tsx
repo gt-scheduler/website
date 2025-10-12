@@ -169,7 +169,6 @@ export default function Event({
           </ActionRow>
           {paletteShown && (
             <Palette
-              className="palette"
               onSelectColor={(col): void =>
                 patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
               }

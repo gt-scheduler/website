@@ -6,13 +6,11 @@ import { DEFAULT_PALETTE, PRESET_PALETTE } from '../../constants';
 import './stylesheet.scss';
 
 export type PaletteProps = {
-  className?: string;
   color: string | null;
   onSelectColor: (newColor: string) => void;
 };
 
 export default function Palette({
-  className,
   color,
   onSelectColor,
 }: PaletteProps): React.ReactElement {

@@ -298,7 +298,6 @@ export default function Course({
       )}
       {paletteShown && (
         <Palette
-          className="palette"
           onSelectColor={(col): void =>
             patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
           }
