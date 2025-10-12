@@ -774,7 +774,6 @@ function ScheduleRow({
           className={classes('palette', type === 'Schedule' && 'indented')}
           onSelectColor={setFriendScheduleColor}
           color={color ?? null}
-          onMouseLeave={(): void => setPaletteInfo('')}
         />
       )}
     </div>

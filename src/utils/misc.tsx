@@ -7,7 +7,12 @@ import { saveAs } from 'file-saver';
 import { Immutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
-import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
+import {
+  DAYS,
+  DEFAULT_PALETTE,
+  PRESET_PALETTE,
+  PNG_SCALE_FACTOR,
+} from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
   DateRange,
@@ -70,9 +75,10 @@ export const daysToString = (days: readonly string[] | string[]): string => {
 };
 
 export const getRandomColor = (): string => {
-  const colors = PALETTE.flat();
-  const index = (Math.random() * colors.length) | 0;
-  return colors[index] ?? '#333333';
+  const colors = [...PRESET_PALETTE, ...DEFAULT_PALETTE].flat();
+  const uniqueColors = Array.from(new Set(colors));
+  const index = Math.floor(Math.random() * uniqueColors.length);
+  return uniqueColors[index] ?? '#333333';
 };
 
 const getLuminance = (color: string): number => {

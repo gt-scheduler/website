@@ -6,7 +6,7 @@ const DAYS = ['M', 'T', 'W', 'R', 'F'];
 
 const PNG_SCALE_FACTOR = 2;
 
-const PALETTE = [
+const DEFAULT_PALETTE = [
   [
     '#4D4D4D',
     '#999999',
@@ -48,6 +48,53 @@ const PALETTE = [
     '#0062B1',
     '#653294',
     '#AB149E',
+  ],
+];
+
+const PRESET_PALETTE = [
+  [
+    '#6E95F2',
+    '#B0AFF3',
+    '#FE8F31',
+    '#FEBF23',
+    '#FEF30B',
+    '#8FE6FE',
+    '#BDF23C',
+    '#FFB6E2',
+    '#FF7B66',
+  ],
+  [
+    '#123445',
+    '#1E4E4A',
+    '#275D54',
+    '#528B3A',
+    '#8CA242',
+    '#C1BB3C',
+    '#E09039',
+    '#DB713C',
+    '#D15C46',
+  ],
+  [
+    '#D1C3B0',
+    '#DAAF86',
+    '#CFA389',
+    '#DFC1AE',
+    '#ECE0CE',
+    '#D3BFAC',
+    '#B3907D',
+    '#819673',
+    '#6A796C',
+  ],
+  [
+    '#738096',
+    '#C9D1D8',
+    '#D5BB67',
+    '#CB6F64',
+    '#983F3F',
+    '#6A211D',
+    '#57683B',
+    '#404F44',
+    '#0D0D0D',
   ],
 ];
 
@@ -103,7 +150,8 @@ export {
   RECURRING_EVENTS,
   DAYS,
   PNG_SCALE_FACTOR,
-  PALETTE,
+  DEFAULT_PALETTE,
+  PRESET_PALETTE,
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,

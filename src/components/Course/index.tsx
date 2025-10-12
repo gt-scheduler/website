@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useRef,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {
   faAngleDown,
   faAngleUp,
@@ -38,6 +44,25 @@ export default function Course({
     { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
     { patchSchedule },
   ] = useContext(ScheduleContext);
+
+  const courseRef = useRef<HTMLDivElement>(null);
+
+  useEffect((): (() => void) => {
+    const handleClickOutside = (event: MouseEvent): void => {
+      if (
+        courseRef.current &&
+        !courseRef.current.contains(event.target as Node)
+      ) {
+        setPaletteShown(false);
+        setExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return (): void => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const course = oscar.findCourse(courseId);
@@ -136,6 +161,7 @@ export default function Course({
   ): void => {
     setPrereqOpen(nextPrereqOpen);
     setExpanded(nextExpanded);
+    setPaletteShown(false);
   };
   const prereqAction = {
     icon: faShareAlt,
@@ -145,6 +171,23 @@ export default function Course({
     },
     tooltip: 'View Prerequisites',
     id: `${course.id}-prerequisites`,
+  };
+
+  const paletteControl = (
+    nextPaletteOpen: boolean,
+    nextExpanded: boolean
+  ): void => {
+    setPaletteShown(nextPaletteOpen);
+    setExpanded(nextExpanded);
+    setPrereqOpen(false);
+  };
+  const paletteAction = {
+    icon: faPalette,
+    onClick: (): void => {
+      paletteControl(!paletteShown, !paletteShown);
+    },
+    tooltip: 'Edit Color',
+    id: `${course.id}-color`,
   };
 
   const pinnedSections = course.sections.filter((section) =>
@@ -160,6 +203,7 @@ export default function Course({
       className={classes('Course', contentClassName, 'default', className)}
       style={{ backgroundColor: color }}
       key={course.id}
+      ref={courseRef}
     >
       <ActionRow
         label={[
@@ -175,12 +219,7 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
-                {
-                  icon: faPalette,
-                  onClick: (): void => setPaletteShown(!paletteShown),
-                  tooltip: 'Edit Color',
-                  id: `${course.id}-color`,
-                },
+                paletteAction,
                 {
                   icon: faTrash,
                   onClick: (): void => handleRemoveCourse(course),
@@ -211,18 +250,8 @@ export default function Course({
             )}
           </div>
         )}
-        {paletteShown && (
-          <Palette
-            className="palette"
-            onSelectColor={(col): void =>
-              patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
-            }
-            color={color ?? null}
-            onMouseLeave={(): void => setPaletteShown(false)}
-          />
-        )}
       </ActionRow>
-      {expanded && !prereqOpen && (
+      {expanded && !prereqOpen && !paletteShown && (
         <div className={classes('hover-container', 'nested')}>
           {includedInstructors.map((name) => {
             let instructorGpa: number | undefined = 0;
@@ -266,6 +295,15 @@ export default function Course({
       )}
       {expanded && prereqOpen && prereqs !== null && (
         <Prerequisite course={course} prereqs={prereqs} />
+      )}
+      {paletteShown && (
+        <Palette
+          className="palette"
+          onSelectColor={(col): void =>
+            patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
+          }
+          color={color ?? null}
+        />
       )}
     </div>
   );

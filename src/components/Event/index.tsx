@@ -1,5 +1,11 @@
 import { Immutable, castDraft } from 'immer';
-import React, { useCallback, useContext, useState, useEffect } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from 'react';
 import {
   faPencil,
   faPalette,
@@ -34,6 +40,21 @@ export default function Event({
   const [formShown, setFormShown] = useState<boolean>(
     Boolean(event.showEditForm)
   );
+  const eventRef = useRef<HTMLDivElement>(null);
+
+  useEffect((): (() => void) => {
+    const handlePointerOutside = (e: PointerEvent): void => {
+      if (eventRef.current && !eventRef.current.contains(e.target as Node)) {
+        setPaletteShown(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerOutside);
+
+    return (): void => {
+      document.removeEventListener('pointerdown', handlePointerOutside);
+    };
+  }, []);
 
   const handleDuplicateEvent = useCallback(() => {
     const eventId = new Date().getTime().toString();
@@ -103,13 +124,17 @@ export default function Event({
           className={classes('Event', contentClassName, 'default', className)}
           style={{ backgroundColor: color }}
           key={event.id}
+          ref={eventRef}
         >
           <ActionRow
             label={[event.name].join(' ')}
             actions={[
               {
                 icon: faPencil,
-                onClick: (): void => setFormShown(true),
+                onClick: (): void => {
+                  setFormShown(true);
+                  setPaletteShown(false);
+                },
               },
               {
                 icon: faPalette,
@@ -121,7 +146,10 @@ export default function Event({
                 icon: faClone,
                 tooltip: 'Duplicate Event',
                 id: `${event.id}-duplicate`,
-                onClick: (): void => handleDuplicateEvent(),
+                onClick: (): void => {
+                  handleDuplicateEvent();
+                  setPaletteShown(false);
+                },
               },
               {
                 icon: faTrash,
@@ -138,17 +166,16 @@ export default function Event({
                 )}
               </span>
             </div>
-            {paletteShown && (
-              <Palette
-                className="palette"
-                onSelectColor={(col): void =>
-                  patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
-                }
-                color={color ?? null}
-                onMouseLeave={(): void => setPaletteShown(false)}
-              />
-            )}
           </ActionRow>
+          {paletteShown && (
+            <Palette
+              className="palette"
+              onSelectColor={(col): void =>
+                patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
+              }
+              color={color ?? null}
+            />
+          )}
         </div>
       )}
       {formShown && (
