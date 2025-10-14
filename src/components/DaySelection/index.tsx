@@ -35,6 +35,7 @@ export interface ScheduleBlockDateItem {
   daysOfWeek: string[];
   type: ScheduleBlockEventType;
   section?: string;
+  where?: string;
 }
 
 export type DaySelectionProps = {
@@ -140,6 +141,10 @@ export default function DaySelection({
                         {course.type === ScheduleBlockEventType.Course && (
                           <span className="course-row">{course.title}</span>
                         )}
+                        {course.type === ScheduleBlockEventType.CustomEvent &&
+                          course.where && (
+                            <span className="course-row">{course.where}</span>
+                          )}
                         <span className="course-row">
                           {course.daysOfWeek} {timeLabel}
                         </span>

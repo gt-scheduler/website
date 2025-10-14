@@ -85,6 +85,7 @@ export default function Map(): React.ReactElement {
           daysOfWeek: [...event.days],
           type: ScheduleBlockEventType.CustomEvent,
           coords: eventLocation,
+          where: eventWhere,
         };
         courses.push(courseData);
       } else {
@@ -96,6 +97,7 @@ export default function Map(): React.ReactElement {
           daysOfWeek: [...event.days],
           type: ScheduleBlockEventType.CustomEvent,
           coords: null,
+          where: eventWhere,
         };
         courses.push(courseData);
 
