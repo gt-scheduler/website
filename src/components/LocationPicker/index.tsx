@@ -688,6 +688,21 @@ export default function LocationPicker({
     },
     [onChange, retrieveCoordinates]
   );
+
+  const handleCustomLocation = useCallback((): void => {
+    if (!searchTerm.trim()) {
+      return;
+    }
+
+    // Create a custom location with no coordinates
+    const customLocation = {
+      where: searchTerm.trim(),
+      location: null,
+    };
+
+    onChange(customLocation);
+    setSearchTerm('');
+  }, [searchTerm, onChange]);
   const handleClear = useCallback((): void => {
     setSearchTerm('');
     if (onClear) {
@@ -707,6 +722,7 @@ export default function LocationPicker({
         onClear={handleClear}
         isLoading={isLoading}
         disabled={disabled}
+        onCustomLocation={handleCustomLocation}
       />
     </div>
   );

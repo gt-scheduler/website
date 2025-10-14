@@ -21,6 +21,7 @@ export interface DropdownProps {
   onClear?: () => void;
   isLoading?: boolean;
   disabled?: boolean;
+  onCustomLocation?: () => void;
 }
 
 export default function Dropdown({
@@ -34,6 +35,7 @@ export default function Dropdown({
   onClear,
   isLoading = false,
   disabled = false,
+  onCustomLocation,
 }: DropdownProps): ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -112,6 +114,12 @@ export default function Dropdown({
           if (selectedOption) {
             handleSelect(selectedOption);
           }
+        } else if (searchTerm.trim() && onCustomLocation) {
+          // If no option is focused and there's a search term, use custom location
+          onCustomLocation();
+          setIsOpen(false);
+          setFocusedIndex(-1);
+          inputRef.current?.blur();
         }
         break;
       case 'Escape':
@@ -175,24 +183,52 @@ export default function Dropdown({
           ) : !searchTerm.trim() ? (
             <div className="dropdown-prompt">Start typing...</div>
           ) : options.length === 0 ? (
-            <div className="dropdown-no-results">No results found</div>
+            <div className="dropdown-custom-option-container">
+              {onCustomLocation && (
+                <div
+                  className="dropdown-custom-option"
+                  onClick={(): void => {
+                    onCustomLocation();
+                    setIsOpen(false);
+                    setFocusedIndex(-1);
+                  }}
+                >
+                  Use &quot;{searchTerm}&quot; as custom location
+                </div>
+              )}
+              <div className="dropdown-no-results">No results found</div>
+            </div>
           ) : (
-            options.map((option, index) => (
-              <div
-                key={option.key}
-                ref={(el): void => {
-                  optionRefs.current[index] = el;
-                }}
-                className={classes(
-                  'dropdown-option',
-                  index === focusedIndex && 'focused'
-                )}
-                onClick={(): void => handleSelect(option)}
-                onMouseEnter={(): void => setFocusedIndex(index)}
-              >
-                {option.content}
-              </div>
-            ))
+            <>
+              {onCustomLocation && searchTerm.trim() && (
+                <div
+                  className="dropdown-custom-option"
+                  onClick={(): void => {
+                    onCustomLocation();
+                    setIsOpen(false);
+                    setFocusedIndex(-1);
+                  }}
+                >
+                  Use &quot;{searchTerm}&quot; as custom location
+                </div>
+              )}
+              {options.map((option, index) => (
+                <div
+                  key={option.key}
+                  ref={(el): void => {
+                    optionRefs.current[index] = el;
+                  }}
+                  className={classes(
+                    'dropdown-option',
+                    index === focusedIndex && 'focused'
+                  )}
+                  onClick={(): void => handleSelect(option)}
+                  onMouseEnter={(): void => setFocusedIndex(index)}
+                >
+                  {option.content}
+                </div>
+              ))}
+            </>
           )}
         </div>
       )}

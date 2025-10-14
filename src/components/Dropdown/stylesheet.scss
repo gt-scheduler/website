@@ -84,6 +84,38 @@
       text-align: center;
     }
 
+    .dropdown-custom-option-container {
+      .dropdown-no-results {
+        padding: 12px 16px;
+        color: $color-neutral;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+    }
+
+    .dropdown-custom-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-style: italic;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid rgba($color-neutral, 0.2);
+      @include light {
+        color: #0066cc;
+      }
+      @include dark {
+        color: #66b3ff;
+      }
+
+      &:hover {
+        background-color: rgba($color-neutral, 0.1);
+      }
+
+      &:active {
+        background-color: rgba($color-neutral, 0.2);
+      }
+    }
+
     .dropdown-option {
       padding: 12px 16px;
       cursor: pointer;
