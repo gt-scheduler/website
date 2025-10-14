@@ -58,21 +58,13 @@ export default function Dropdown({
     optionRefs.current = optionRefs.current.slice(0, options.length);
   }, [options]);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent): void => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-        setFocusedIndex(-1);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const handleBlur = (): void => {
+    // pls dont edit this set timeout everything breaks
+    setTimeout(() => {
+      setIsOpen(false);
+      setFocusedIndex(-1);
+    }, 200);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newValue = e.target.value;
@@ -162,6 +154,7 @@ export default function Dropdown({
           value={displayValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
+          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           disabled={disabled}
         />
@@ -188,7 +181,8 @@ export default function Dropdown({
               {onCustomLocation && (
                 <div
                   className="dropdown-custom-option"
-                  onClick={(): void => {
+                  onMouseDown={(e): void => {
+                    e.preventDefault(); // Prevent input blur
                     onCustomLocation();
                     setIsOpen(false);
                     setFocusedIndex(-1);
@@ -204,7 +198,8 @@ export default function Dropdown({
               {onCustomLocation && searchTerm.trim() && (
                 <div
                   className="dropdown-custom-option"
-                  onClick={(): void => {
+                  onMouseDown={(e): void => {
+                    e.preventDefault(); // Prevent input blur
                     onCustomLocation();
                     setIsOpen(false);
                     setFocusedIndex(-1);
@@ -223,7 +218,10 @@ export default function Dropdown({
                     'dropdown-option',
                     index === focusedIndex && 'focused'
                   )}
-                  onClick={(): void => handleSelect(option)}
+                  onMouseDown={(e): void => {
+                    e.preventDefault(); // Prevent input blur
+                    handleSelect(option);
+                  }}
                   onMouseEnter={(): void => setFocusedIndex(index)}
                 >
                   {option.content}
