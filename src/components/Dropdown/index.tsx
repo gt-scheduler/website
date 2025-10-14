@@ -115,7 +115,7 @@ export default function Dropdown({
             handleSelect(selectedOption);
           }
         } else if (searchTerm.trim() && onCustomLocation) {
-          // If no option is focused and there's a search term, use custom location
+          // No option is focused and there's a search term, use custom location
           onCustomLocation();
           setIsOpen(false);
           setFocusedIndex(-1);
@@ -148,7 +148,8 @@ export default function Dropdown({
     setFocusedIndex(-1);
   };
 
-  const displayValue = value && !isOpen ? String(value) : searchTerm;
+  const displayValue =
+    value && !isOpen && typeof value === 'string' ? value : searchTerm;
 
   return (
     <div className={classes('Dropdown', className)} ref={dropdownRef}>
