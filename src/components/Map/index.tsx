@@ -29,6 +29,9 @@ export default function Map(): React.ReactElement {
     F: [],
   };
 
+  // Track unpictured events (sections/events without location)
+  const unpicturedEvents: Event[] = [];
+
   // Construct the course data for the first meeting of each class
   pinnedCrns.forEach((crn) => {
     const section = oscar.findSection(crn);
@@ -36,6 +39,17 @@ export default function Map(): React.ReactElement {
     const { meetings } = section;
     if (meetings.length === 0) return;
     const firstMeeting = meetings[0] as Meeting;
+
+    // Check if section has no location - add to unpictured events
+    if (!firstMeeting.location && firstMeeting.period) {
+      const virtualEvent: Event = {
+        id: `virtual-${section.course.id}-${section.id}`,
+        name: `${section.course.id} ${section.id}`,
+        days: [...firstMeeting.days],
+        period: firstMeeting.period,
+      };
+      unpicturedEvents.push(virtualEvent);
+    }
 
     firstMeeting.days.forEach((day) => {
       if (!isDay(day)) return;
@@ -52,9 +66,6 @@ export default function Map(): React.ReactElement {
       courseDateMap[day] = courses;
     });
   });
-
-  // Add events to the course data and track unpictured events
-  const unpicturedEvents: Event[] = [];
 
   events.forEach((event) => {
     // Check if event has location data - be more defensive about type checking
