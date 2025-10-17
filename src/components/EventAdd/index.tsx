@@ -126,6 +126,8 @@ export default function EventAdd({
   const onSubmit = useCallback((): void => {
     const parsedStart = parseTime(start);
     const parsedEnd = parseTime(end);
+    const eventWhere = location?.where || '';
+    const eventLocation = location?.location || null;
 
     if (event) {
       const newEvents = castDraft(events).map((existingEvent) =>
@@ -138,8 +140,8 @@ export default function EventAdd({
                 end: parsedEnd,
               },
               days: selectedTags,
-              where: location?.where || '',
-              location: location?.location || null,
+              where: eventWhere,
+              location: eventLocation,
             }
           : existingEvent
       );
@@ -161,8 +163,8 @@ export default function EventAdd({
           end: parsedEnd,
         },
         days: selectedTags,
-        where: location?.where || '',
-        location: location?.location || null,
+        where: eventWhere,
+        location: eventLocation,
       };
 
       patchSchedule({
