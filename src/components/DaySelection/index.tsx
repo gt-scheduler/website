@@ -143,7 +143,10 @@ export default function DaySelection({
                         )}
                         {course.type === ScheduleBlockEventType.CustomEvent &&
                           course.where && (
-                            <span className="course-row">{course.where}</span>
+                            <span className="course-row">
+                              {/* avoid showing full address */}
+                              {course.where.split(',')[0]}
+                            </span>
                           )}
                         <span className="course-row">
                           {course.daysOfWeek} {timeLabel}
@@ -165,7 +168,8 @@ export default function DaySelection({
           <div className="unpictured-content">
             {unpicturedEvents.map((event) => (
               <div key={event.id} className="unpictured-event">
-                {event.name}
+                <div>{event.name}</div>
+                {event.where && <div>{event.where.split(',')[0]}</div>}
               </div>
             ))}
           </div>
