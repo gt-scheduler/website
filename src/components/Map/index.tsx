@@ -99,38 +99,26 @@ export default function Map(): React.ReactElement {
       if (!isDay(day)) return;
       const scheduleBlocks = courseDateMap[day] ?? [];
 
-      if (hasValidLocation) {
-        // Add event with location to map and sidebar
-        const courseData: CombinedCourseData = {
-          id: event.id,
-          title: event.name,
-          times: event.period,
-          daysOfWeek: [...event.days],
-          type: ScheduleBlockEventType.CustomEvent,
-          coords: eventLocation,
-          where: eventWhere,
-        };
-        scheduleBlocks.push(courseData);
-      } else {
-        // Add event without location to sidebar only
-        const courseData: CombinedCourseData = {
-          id: event.id,
-          title: event.name,
-          times: event.period,
-          daysOfWeek: [...event.days],
-          type: ScheduleBlockEventType.CustomEvent,
-          coords: null,
-          where: eventWhere,
-        };
-        scheduleBlocks.push(courseData);
+      const courseData: CombinedCourseData = {
+        id: event.id,
+        title: event.name,
+        times: event.period,
+        daysOfWeek: [...event.days],
+        type: ScheduleBlockEventType.CustomEvent,
+        coords: hasValidLocation ? eventLocation : null,
+        where: eventWhere,
+      };
+      scheduleBlocks.push(courseData);
 
-        // Track unpictured events (avoid duplicates)
-        if (!unpicturedEvents.some((e) => e.id === event.id)) {
-          unpicturedEvents.push({
-            ...event,
-            days: [...event.days],
-          });
-        }
+      // Track unpictured events (avoid duplicates)
+      if (
+        !hasValidLocation &&
+        !unpicturedEvents.some((e) => e.id === event.id)
+      ) {
+        unpicturedEvents.push({
+          ...event,
+          days: [...event.days],
+        });
       }
 
       courseDateMap[day] = scheduleBlocks;
