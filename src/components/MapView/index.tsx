@@ -11,9 +11,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
 
 export type MapLocation = {
-  section?: string;
   id: string;
-  title?: string;
+  title: string;
   coords: Location | null;
   type: ScheduleBlockEventType;
 };
@@ -21,6 +20,12 @@ export type MapLocation = {
 export type MapViewProps = {
   locations: MapLocation[];
 };
+
+function getDisplayText(location: MapLocation): string {
+  return location.type === ScheduleBlockEventType.CustomEvent
+    ? location.title
+    : `${location.id} ${location.title}`;
+}
 
 export default function MapView({
   locations,
@@ -88,11 +93,9 @@ export default function MapView({
             <Marker key={i} latitude={coords.lat} longitude={coords.long}>
               <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
               <div className="pin-text">
-                {coordLocations.map((coordLocation) => (
-                  <div key={coordLocation.id + (coordLocation.section || '')}>
-                    {coordLocation.type === ScheduleBlockEventType.CustomEvent
-                      ? coordLocation.title || coordLocation.id
-                      : `${coordLocation.id} ${coordLocation.section || ''}`}
+                {coordLocations.map((location) => (
+                  <div key={`${location.id}-${location.title}`}>
+                    {getDisplayText(location)}
                   </div>
                 ))}
               </div>
@@ -104,9 +107,7 @@ export default function MapView({
             <b>Undetermined</b>
             {unknown.map((location, i) => (
               <div className="class" key={i}>
-                {location.type === ScheduleBlockEventType.CustomEvent
-                  ? location.title || location.id
-                  : `${location.id} ${location.section || ''}`}
+                {getDisplayText(location)}
               </div>
             ))}
           </div>
