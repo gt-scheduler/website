@@ -164,15 +164,13 @@ export default function DaySelection({
       {/* Unpictured Events Section */}
       {unpicturedEvents.length > 0 && (
         <div className="unpictured-section">
-          <div className="unpictured-header">*Sections not shown in map:</div>
-          <div className="unpictured-content">
-            {unpicturedEvents.map((event) => (
-              <div key={event.id} className="unpictured-event">
-                <div>{event.name}</div>
-                {event.where && <div>{event.where.split(',')[0]}</div>}
-              </div>
-            ))}
-          </div>
+          *Sections not shown in map:{' '}
+          {unpicturedEvents.map((event, index) => (
+            <span key={event.id}>
+              {event.name}
+              {index < unpicturedEvents.length - 1 ? ', ' : ''}
+            </span>
+          ))}
         </div>
       )}
     </div>
