@@ -144,7 +144,7 @@ export default function DaySelection({
                         {course.type === ScheduleBlockEventType.CustomEvent &&
                           course.where && (
                             <span className="course-row">
-                              {/* avoid showing full address */}
+                              {/* avoid showing full address is there a better way to format this? */}
                               {course.where.split(',')[0]}
                             </span>
                           )}

@@ -18,6 +18,22 @@ type CombinedCourseData = ScheduleBlockDateItem & {
   coords: Location | null;
 };
 
+// Utility function to check if an event has valid location data for map display
+function hasValidLocationData(
+  where: unknown,
+  location: unknown
+): location is Location {
+  return (
+    typeof where === 'string' &&
+    location !== null &&
+    typeof location === 'object' &&
+    'lat' in location &&
+    'long' in location &&
+    typeof location.lat === 'number' &&
+    typeof location.long === 'number'
+  );
+}
+
 export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns, events }] = useContext(ScheduleContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('M');
@@ -53,8 +69,8 @@ export default function Map(): React.ReactElement {
 
     firstMeeting.days.forEach((day) => {
       if (!isDay(day)) return;
-      const courses = courseDateMap[day] ?? [];
-      courses.push({
+      const scheduleBlocks = courseDateMap[day] ?? [];
+      scheduleBlocks.push({
         id: section.course.id,
         title: section.course.title,
         times: firstMeeting.period,
@@ -63,7 +79,7 @@ export default function Map(): React.ReactElement {
         type: ScheduleBlockEventType.Course,
         coords: firstMeeting.location,
       });
-      courseDateMap[day] = courses;
+      courseDateMap[day] = scheduleBlocks;
     });
   });
 
@@ -77,15 +93,11 @@ export default function Map(): React.ReactElement {
     const eventLocation = eventWithLocation.location;
 
     // Check if event has valid location data for map display
-    const hasValidLocation =
-      typeof eventWhere === 'string' &&
-      eventLocation &&
-      typeof eventLocation.lat === 'number' &&
-      typeof eventLocation.long === 'number';
+    const hasValidLocation = hasValidLocationData(eventWhere, eventLocation);
 
     event.days.forEach((day) => {
       if (!isDay(day)) return;
-      const courses = courseDateMap[day] ?? [];
+      const scheduleBlocks = courseDateMap[day] ?? [];
 
       if (hasValidLocation) {
         // Add event with location to map and sidebar
@@ -98,7 +110,7 @@ export default function Map(): React.ReactElement {
           coords: eventLocation,
           where: eventWhere,
         };
-        courses.push(courseData);
+        scheduleBlocks.push(courseData);
       } else {
         // Add event without location to sidebar only
         const courseData: CombinedCourseData = {
@@ -110,7 +122,7 @@ export default function Map(): React.ReactElement {
           coords: null,
           where: eventWhere,
         };
-        courses.push(courseData);
+        scheduleBlocks.push(courseData);
 
         // Track unpictured events (avoid duplicates)
         if (!unpicturedEvents.some((e) => e.id === event.id)) {
@@ -121,7 +133,7 @@ export default function Map(): React.ReactElement {
         }
       }
 
-      courseDateMap[day] = courses;
+      courseDateMap[day] = scheduleBlocks;
     });
   }); // Sort each list of course data by their times
   const sortedCourseDateMap: Record<Day, CombinedCourseData[]> = {
