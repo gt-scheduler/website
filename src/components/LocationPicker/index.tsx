@@ -4,9 +4,12 @@ import Dropdown, { DropdownOption } from '../Dropdown';
 import { Location } from '../../types';
 import { classes } from '../../utils/misc';
 import {
-  GT_CAMPUS_CENTER,
-  FALLBACK_GT_LOCATIONS,
-} from '../../utils/mapbox/constants';
+  retrieveCoordinates,
+  searchMapBoxLocations,
+  filterGTLocations,
+  sortByGTPriority,
+  formatLocationFromSuggestion,
+} from '../../utils/mapbox';
 
 import './stylesheet.scss';
 
@@ -19,79 +22,6 @@ export interface LocationPickerProps {
   ) => void;
   onClear?: () => void;
   disabled?: boolean;
-}
-
-interface MapBoxGeometry {
-  type: string;
-  coordinates: [number, number];
-}
-
-interface MapBoxFeature {
-  type: string;
-  geometry: MapBoxGeometry;
-  properties: Record<string, unknown>;
-}
-
-interface MapBoxRetrieveResponse {
-  type: string;
-  features: MapBoxFeature[];
-}
-
-interface MapBoxSuggestion {
-  name: string;
-  name_preferred?: string;
-  mapbox_id: string;
-  feature_type: string;
-  address?: string;
-  full_address?: string;
-  place_formatted?: string;
-  context?: {
-    country?: {
-      name: string;
-      country_code: string;
-      country_code_alpha_3: string;
-    };
-    region?: {
-      name: string;
-      region_code: string;
-      region_code_full: string;
-    };
-    postcode?: {
-      name: string;
-    };
-    district?: {
-      name: string;
-    };
-    place?: {
-      name: string;
-    };
-    locality?: {
-      name: string;
-    };
-    neighborhood?: {
-      name: string;
-    };
-    street?: {
-      name: string;
-    };
-  };
-  language?: string;
-  maki?: string;
-  poi_category?: string[];
-  poi_category_ids?: string[];
-  external_ids?: {
-    foursquare?: string;
-    facebook?: string;
-  };
-  metadata?: {
-    primary_photo?: string[];
-    other_photos?: string[];
-  };
-}
-
-interface MapBoxSearchBoxResponse {
-  suggestions: MapBoxSuggestion[];
-  attribution: string;
 }
 
 export default function LocationPicker({
@@ -109,40 +39,6 @@ export default function LocationPicker({
   // Get MapBox access token from environment or use a fallback
   const MAPBOX_ACCESS_TOKEN = process.env['REACT_APP_MAPBOX_TOKEN'] || '';
 
-  // Function to retrieve coordinates from MapBox using mapbox_id
-  const retrieveCoordinates = useCallback(
-    async (mapboxId: string): Promise<Location | null> => {
-      try {
-        // Correct MapBox Search Box API retrieve endpoint format
-        const url = new URL(
-          `https://api.mapbox.com/search/searchbox/v1/retrieve/${mapboxId}`
-        );
-        url.searchParams.set('access_token', MAPBOX_ACCESS_TOKEN);
-        url.searchParams.set('session_token', `session_${Date.now()}`);
-
-        const response = await fetch(url.toString());
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = (await response.json()) as MapBoxRetrieveResponse;
-
-        if (data.features && data.features[0] && data.features[0].geometry) {
-          const coords = data.features[0].geometry.coordinates;
-          const result = {
-            lat: coords[1],
-            long: coords[0],
-          };
-          return result;
-        }
-        return null;
-      } catch (error) {
-        return null;
-      }
-    },
-    [MAPBOX_ACCESS_TOKEN]
-  );
-
   const searchLocations = useCallback(
     async (query: string): Promise<void> => {
       if (!query.trim()) {
@@ -153,9 +49,7 @@ export default function LocationPicker({
       setIsLoading(true);
 
       // First, check if the query matches any GT locations
-      const matchingGTLocations = FALLBACK_GT_LOCATIONS.filter((location) =>
-        location.name.toLowerCase().includes(query.toLowerCase())
-      );
+      const matchingGTLocations = filterGTLocations(query);
 
       // Create fallback options from GT locations
       const fallbackOptions: DropdownOption[] = matchingGTLocations.map(
@@ -175,78 +69,19 @@ export default function LocationPicker({
       );
 
       try {
-        // Try MapBox Search Box API (correct format)
-        const url = new URL(
-          'https://api.mapbox.com/search/searchbox/v1/suggest'
+        // Try MapBox Search Box API
+        const suggestions = await searchMapBoxLocations(
+          query,
+          MAPBOX_ACCESS_TOKEN
         );
-        url.searchParams.set('q', query);
-        url.searchParams.set('access_token', MAPBOX_ACCESS_TOKEN);
-        url.searchParams.set('session_token', `session_${Date.now()}`);
-        url.searchParams.set(
-          'proximity',
-          `${GT_CAMPUS_CENTER.longitude},${GT_CAMPUS_CENTER.latitude}`
-        );
-        url.searchParams.set('country', 'US');
-        url.searchParams.set('limit', '10');
-        url.searchParams.set('language', 'en');
-        url.searchParams.set('types', 'poi,address,place');
-
-        const response = await fetch(url.toString());
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = (await response.json()) as MapBoxSearchBoxResponse;
 
         // Sort results to prioritize Georgia Tech locations
-        const sortedSuggestions = data.suggestions.sort((a, b) => {
-          const aName = a.name || a.name_preferred || '';
-          const aAddress =
-            a.full_address || a.place_formatted || a.address || '';
-          const aText = `${aName} ${aAddress}`.toLowerCase();
+        const sortedSuggestions = sortByGTPriority(suggestions);
 
-          const bName = b.name || b.name_preferred || '';
-          const bAddress =
-            b.full_address || b.place_formatted || b.address || '';
-          const bText = `${bName} ${bAddress}`.toLowerCase();
-
-          // Check if the suggestion contains any GT location names or keywords
-          const gtKeywords = [
-            'georgia tech',
-            'georgia institute of technology',
-            'gt',
-            ...FALLBACK_GT_LOCATIONS.flatMap((loc) => [
-              loc.name.toLowerCase(),
-              // Extract key words from location names
-              ...loc.name
-                .toLowerCase()
-                .split(/[\s()&-]+/)
-                .filter((word) => word.length > 2),
-            ]),
-          ];
-
-          const aIsGT = gtKeywords.some((keyword) => aText.includes(keyword));
-          const bIsGT = gtKeywords.some((keyword) => bText.includes(keyword));
-
-          if (aIsGT && !bIsGT) return -1;
-          if (!aIsGT && bIsGT) return 1;
-          return 0; // Keep original order for non-GT locations
-        });
-
-        // For Search Box API, we need a separate retrieve call for coordinates
         // Create options without coordinates and fetch them when selected
         const searchApiOptions: DropdownOption[] = sortedSuggestions.map(
           (suggestion) => {
-            const name =
-              suggestion.name || suggestion.name_preferred || 'Unknown';
-            const address =
-              suggestion.full_address ||
-              suggestion.place_formatted ||
-              suggestion.address ||
-              `${suggestion.context?.locality?.name || ''}, ${
-                suggestion.context?.region?.region_code || ''
-              }`;
+            const { name, address } = formatLocationFromSuggestion(suggestion);
 
             return {
               key: suggestion.mapbox_id,
@@ -350,7 +185,7 @@ export default function LocationPicker({
 
       // If this is a Search Box API result without coordinates, retrieve them
       if (selectedValue.mapbox_id && !selectedValue.location) {
-        retrieveCoordinates(selectedValue.mapbox_id).then(
+        retrieveCoordinates(selectedValue.mapbox_id, MAPBOX_ACCESS_TOKEN).then(
           (coordinates) => {
             const finalValue = {
               where: selectedValue.where,
@@ -370,7 +205,7 @@ export default function LocationPicker({
 
       setSearchTerm(''); // Clear search term after selection
     },
-    [onChange, retrieveCoordinates]
+    [onChange, MAPBOX_ACCESS_TOKEN]
   );
 
   const handleCustomLocation = useCallback((): void => {
