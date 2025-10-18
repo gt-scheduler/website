@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import ReactMapGL, { Marker, NavigationControl, ViewState } from 'react-map-gl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin } from '@fortawesome/free-solid-svg-icons';
@@ -6,6 +6,7 @@ import { faMapPin } from '@fortawesome/free-solid-svg-icons';
 import { Location } from '../../types';
 import { ThemeContext } from '../../contexts';
 import { ScheduleBlockEventType } from '../DaySelection';
+import { batchGetDistances } from '../../utils/mapbox/travelTimes';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
@@ -20,6 +21,7 @@ export type MapLocation = {
 
 export type MapViewProps = {
   locations: MapLocation[];
+  activeDay?: string;
 };
 
 function getDisplayText(location: MapLocation): string {
@@ -30,6 +32,7 @@ function getDisplayText(location: MapLocation): string {
 
 export default function MapView({
   locations,
+  activeDay = '',
 }: MapViewProps): React.ReactElement {
   // These initial coordinates start the map looking at the GT Atlanta campus
   // We maintain focus on GT campus even when events are far away
@@ -38,6 +41,44 @@ export default function MapView({
     longitude: -84.3963,
     zoom: 15,
   });
+
+  const [travelTimes, setTravelTimes] = useState<Map<string, number> | null>(
+    null
+  );
+  const [isLoadingTravelTimes, setIsLoadingTravelTimes] = useState(false);
+
+  // Use useMemo to avoid recalculating when locations array reference changes
+  const validLocations = useMemo(() => {
+    return locations
+      .filter(
+        (location): location is MapLocation & { coords: Location } =>
+          location.coords !== null
+      )
+      .map((location) => location.coords);
+  }, [locations]);
+
+  useEffect(() => {
+    const calculateTravelTimes = async (): Promise<void> => {
+      // Don't calculate for "All Days" view
+      if (activeDay === 'ALL' || validLocations.length < 2) {
+        setTravelTimes(null);
+        return;
+      }
+
+      setIsLoadingTravelTimes(true);
+      try {
+        const travelTimesResult = await batchGetDistances(validLocations);
+        setTravelTimes(travelTimesResult);
+      } catch (error) {
+        console.error('Failed to calculate travel times:', error);
+        setTravelTimes(null);
+      } finally {
+        setIsLoadingTravelTimes(false);
+      }
+    };
+
+    calculateTravelTimes().catch(console.error);
+  }, [validLocations, activeDay]);
 
   const unknown: MapLocation[] = [];
   // Use string keys (lat,long) instead of Location objects for proper grouping
