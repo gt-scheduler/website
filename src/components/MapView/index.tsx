@@ -42,10 +42,10 @@ export default function MapView({
     zoom: 15,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [travelTimes, setTravelTimes] = useState<Map<string, number> | null>(
     null
   );
-  const [isLoadingTravelTimes, setIsLoadingTravelTimes] = useState(false);
 
   // Use useMemo to avoid recalculating when locations array reference changes
   const validLocations = useMemo(() => {
@@ -65,19 +65,17 @@ export default function MapView({
         return;
       }
 
-      setIsLoadingTravelTimes(true);
       try {
         const travelTimesResult = await batchGetDistances(validLocations);
         setTravelTimes(travelTimesResult);
       } catch (error) {
-        console.error('Failed to calculate travel times:', error);
         setTravelTimes(null);
-      } finally {
-        setIsLoadingTravelTimes(false);
       }
     };
 
-    calculateTravelTimes().catch(console.error);
+    calculateTravelTimes().catch(() => {
+      // Error already handled inside calculateTravelTimes function
+    });
   }, [validLocations, activeDay]);
 
   const unknown: MapLocation[] = [];
