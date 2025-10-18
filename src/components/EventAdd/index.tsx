@@ -40,6 +40,7 @@ export default function EventAdd({
     event?.period.end ? timeToString(event.period.end, false, true) : ''
   );
   const [submitDisabled, setSubmitDisabled] = useState(true);
+  const [discardDisabled, setDiscardDisabled] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -56,6 +57,21 @@ export default function EventAdd({
     }
   }, [eventName, selectedTags, start, end, error]);
 
+  useEffect(() => {
+    // For existing events, always enable discard (it deletes the event)
+    // For new events, only enable if any field has been filled
+    if (event) {
+      setDiscardDisabled(false);
+    } else {
+      const anyFieldFilled =
+        eventName.length > 0 ||
+        selectedTags.length > 0 ||
+        start !== '' ||
+        end !== '';
+      setDiscardDisabled(!anyFieldFilled);
+    }
+  }, [event, eventName, selectedTags, start, end]);
+
   const parseTime = useCallback((time: string): number => {
     const split = time.split(':').map((str) => Number(str));
 
@@ -64,6 +80,33 @@ export default function EventAdd({
     }
     return -1; // invalid time string
   }, []);
+
+  const onDiscard = useCallback((): void => {
+    if (event) {
+      // If editing an existing event, delete it
+      const newEvents = castDraft(events).filter(
+        (existingEvent) => existingEvent.id !== event.id
+      );
+      const newColorMap = { ...colorMap };
+      delete newColorMap[event.id];
+
+      patchSchedule({
+        events: newEvents,
+        colorMap: newColorMap,
+      });
+
+      if (setFormShown) {
+        setFormShown(false);
+      }
+    } else {
+      // If creating a new event, just clear the form
+      setEventName('');
+      setSelectedTags([]);
+      setStart('');
+      setEnd('');
+      setError('');
+    }
+  }, [event, events, colorMap, patchSchedule, setFormShown]);
 
   const handleStartChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>): void => {
@@ -268,14 +311,24 @@ export default function EventAdd({
             </tr>
             <tr>
               <td colSpan={2} className="submit">
-                <Button
-                  className="button"
-                  disabled={submitDisabled}
-                  onClick={onSubmit}
-                  id="event-add-button"
-                >
-                  {event?.id ? 'Save' : 'Add'}
-                </Button>
+                <div className="button-container">
+                  <Button
+                    className="button discard-button"
+                    disabled={discardDisabled}
+                    onClick={onDiscard}
+                    id="event-discard-button"
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    className="button add-button"
+                    disabled={submitDisabled}
+                    onClick={onSubmit}
+                    id="event-add-button"
+                  >
+                    {event?.id ? 'Save' : 'Add'}
+                  </Button>
+                </div>
                 {error && <div className="error">{error}</div>}
               </td>
             </tr>
