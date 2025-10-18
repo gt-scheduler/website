@@ -39,15 +39,26 @@ export default function MapView({
   });
 
   const unknown: MapLocation[] = [];
-  const coordsToLocationsMap = new Map<Location, MapLocation[]>();
+  // Use string keys (lat,long) instead of Location objects for proper grouping
+  const coordsToLocationsMap = new Map<
+    string,
+    { coords: Location; locations: MapLocation[] }
+  >();
 
   locations.forEach((location) => {
     if (location.coords === null) {
       unknown.push(location);
-    } else if (coordsToLocationsMap.has(location.coords)) {
-      coordsToLocationsMap.get(location.coords)?.push(location);
     } else {
-      coordsToLocationsMap.set(location.coords, [location]);
+      const coordKey = `${location.coords.lat},${location.coords.long}`;
+      const existing = coordsToLocationsMap.get(coordKey);
+      if (existing) {
+        existing.locations.push(location);
+      } else {
+        coordsToLocationsMap.set(coordKey, {
+          coords: location.coords,
+          locations: [location],
+        });
+      }
     }
   });
 
@@ -88,8 +99,8 @@ export default function MapView({
           viewState: ViewState;
         }): void => setViewState(newViewState)}
       >
-        {Array.from(coordsToLocationsMap.entries()).map(
-          ([coords, coordLocations], i) => (
+        {Array.from(coordsToLocationsMap.values()).map(
+          ({ coords, locations: coordLocations }, i) => (
             <Marker key={i} latitude={coords.lat} longitude={coords.long}>
               <FontAwesomeIcon icon={faMapPin} className="pin-icon" />
               <div className="pin-text">
