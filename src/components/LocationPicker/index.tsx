@@ -1,15 +1,10 @@
-import React, { useState, useCallback, useEffect, ReactElement } from 'react';
+import React, { useCallback, useMemo, ReactElement } from 'react';
 
 import Dropdown, { DropdownOption } from '../Dropdown';
 import { Location } from '../../types';
 import { classes } from '../../utils/misc';
-import {
-  retrieveCoordinates,
-  searchMapBoxLocations,
-  filterGTLocations,
-  sortByGTPriority,
-  formatLocationFromSuggestion,
-} from '../../utils/mapbox';
+import { retrieveCoordinates } from '../../utils/mapbox';
+import { useLocationSearch } from './useLocationSearch';
 
 import './stylesheet.scss';
 
@@ -32,143 +27,34 @@ export default function LocationPicker({
   onClear,
   disabled = false,
 }: LocationPickerProps): ReactElement {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [options, setOptions] = useState<DropdownOption[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
   // Get MapBox access token from environment or use a fallback
   const MAPBOX_ACCESS_TOKEN = process.env['REACT_APP_MAPBOX_TOKEN'] || '';
 
-  const searchLocations = useCallback(
-    async (query: string): Promise<void> => {
-      if (!query.trim()) {
-        setOptions([]);
-        return;
-      }
+  const { searchTerm, optionsData, isLoading, setSearchTerm } =
+    useLocationSearch(MAPBOX_ACCESS_TOKEN);
 
-      setIsLoading(true);
-
-      // First, check if the query matches any GT locations
-      const matchingGTLocations = filterGTLocations(query);
-
-      // Create fallback options from GT locations
-      const fallbackOptions: DropdownOption[] = matchingGTLocations.map(
-        (location) => ({
-          key: `gt-${location.name}`,
-          content: (
-            <div className="location-option">
-              <div className="location-name">{location.name}</div>
-              <div className="location-address">{location.address}</div>
-            </div>
-          ),
-          value: {
-            where: `${location.name}, ${location.address}`,
-            location: location.coords,
-          },
-        })
-      );
-
-      try {
-        // Try MapBox Search Box API
-        const suggestions = await searchMapBoxLocations(
-          query,
-          MAPBOX_ACCESS_TOKEN
-        );
-
-        // Sort results to prioritize Georgia Tech locations
-        const sortedSuggestions = sortByGTPriority(suggestions);
-
-        // Create options without coordinates and fetch them when selected
-        const searchApiOptions: DropdownOption[] = sortedSuggestions.map(
-          (suggestion) => {
-            const { name, address } = formatLocationFromSuggestion(suggestion);
-
-            return {
-              key: suggestion.mapbox_id,
-              content: (
-                <div className="location-option">
-                  <div className="location-name">{name}</div>
-                  <div className="location-address">{address}</div>
-                </div>
-              ),
-              value: {
-                where: `${name}${address ? `, ${address}` : ''}`,
-                location: null, // Will be fetched when selected
-                mapbox_id: suggestion.mapbox_id, // Store for coordinate retrieval
-              },
-            };
-          }
-        );
-
-        // Combine GT locations first, then Search API results (avoid dupes)
-        const combinedOptions = [
-          ...fallbackOptions,
-          ...searchApiOptions.filter(
-            (option) =>
-              !fallbackOptions.some((fallback) => {
-                const fallbackValue = fallback.value as {
-                  where: string;
-                  location: Location | null;
-                };
-                const optionValue = option.value as {
-                  where: string;
-                  location: Location | null;
-                  mapbox_id?: string;
-                };
-                const fallbackName =
-                  fallbackValue.where?.split(',')[0]?.toLowerCase() || '';
-                const optionName =
-                  optionValue.where?.split(',')[0]?.toLowerCase() || '';
-                return (
-                  fallbackName.includes(optionName) ||
-                  optionName.includes(fallbackName)
-                );
-              })
-          ),
-        ];
-
-        setOptions(combinedOptions);
-      } catch (error) {
-        // If MapBox fails, use fallback GT locations + error if no matches
-        if (fallbackOptions.length > 0) {
-          setOptions(fallbackOptions);
-        } else {
-          setOptions([
-            {
-              key: 'search-error',
-              content: (
-                <div className="location-option">
-                  <div className="location-name">Search failed</div>
-                  <div className="location-address">
-                    Please try again or check your connection
-                  </div>
-                </div>
-              ),
-              value: null,
-            },
-          ]);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [MAPBOX_ACCESS_TOKEN]
+  // Convert optionsData to Dropdown options with React elements
+  const options: DropdownOption[] = useMemo(
+    () =>
+      optionsData.map((optionData) => ({
+        key: optionData.key,
+        content: (
+          <div className="location-option">
+            <div className="location-name">{optionData.locationName}</div>
+            <div className="location-address">{optionData.locationAddress}</div>
+          </div>
+        ),
+        value: optionData.value,
+      })),
+    [optionsData]
   );
 
-  // Debounce search requests
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      searchLocations(searchTerm).catch(() => {
-        // Silently handle search errors
-      });
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, searchLocations]);
-
-  const handleSearchChange = useCallback((newSearchTerm: string): void => {
-    setSearchTerm(newSearchTerm);
-  }, []);
+  const handleSearchChange = useCallback(
+    (newSearchTerm: string): void => {
+      setSearchTerm(newSearchTerm);
+    },
+    [setSearchTerm]
+  );
 
   const handleSelect = useCallback(
     (option: DropdownOption): void => {
@@ -205,7 +91,7 @@ export default function LocationPicker({
 
       setSearchTerm(''); // Clear search term after selection
     },
-    [onChange, MAPBOX_ACCESS_TOKEN]
+    [onChange, MAPBOX_ACCESS_TOKEN, setSearchTerm]
   );
 
   const handleCustomLocation = useCallback((): void => {
@@ -221,13 +107,13 @@ export default function LocationPicker({
 
     onChange(customLocation);
     setSearchTerm('');
-  }, [searchTerm, onChange]);
+  }, [searchTerm, onChange, setSearchTerm]);
   const handleClear = useCallback((): void => {
     setSearchTerm('');
     if (onClear) {
       onClear();
     }
-  }, [onClear]);
+  }, [onClear, setSearchTerm]);
 
   return (
     <div className={classes('LocationPicker', className)}>
