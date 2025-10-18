@@ -1,6 +1,24 @@
 import { getDistanceBetweenLocations, batchGetDistances } from './travelTimes';
 
+// Mock fetch globally
+global.fetch = jest.fn();
+
+// Mock environment variable
+const originalEnv = process.env['REACT_APP_MAPBOX_TOKEN'];
+
 describe('Travel Times', () => {
+  beforeEach(() => {
+    (global.fetch as jest.Mock).mockClear();
+    process.env['REACT_APP_MAPBOX_TOKEN'] = 'mock-token';
+  });
+
+  afterAll(() => {
+    if (originalEnv) {
+      process.env['REACT_APP_MAPBOX_TOKEN'] = originalEnv;
+    } else {
+      delete process.env['REACT_APP_MAPBOX_TOKEN'];
+    }
+  });
   test('should return 0 for same location', async () => {
     const loc = { lat: 33.773568, long: -84.395957 };
     const result = await getDistanceBetweenLocations(loc, loc);
@@ -38,6 +56,15 @@ describe('Travel Times', () => {
   });
 
   test('should use Directions API fallback for custom locations', async () => {
+    // Mock successful API response
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => ({
+        code: 'Ok',
+        routes: [{ duration: 300 }],
+      }),
+    });
+
     // Use coordinates that are NOT in the GT_DISTANCE_MATRIX
     const customLoc1 = { lat: 33.75, long: -84.4 }; // Custom location
     const customLoc2 = { lat: 33.76, long: -84.41 }; // Custom location
@@ -48,12 +75,14 @@ describe('Travel Times', () => {
     expect(result).not.toBeNull();
     expect(typeof result).toBe('number');
     expect(result).toBeGreaterThan(0);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   test('should handle Directions API errors gracefully', async () => {
     // Mock fetch to simulate API error
-    const originalFetch = global.fetch;
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+    (global.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error('Network error')
+    );
 
     const customLoc1 = { lat: 33.75, long: -84.4 };
     const customLoc2 = { lat: 33.76, long: -84.41 };
@@ -62,12 +91,18 @@ describe('Travel Times', () => {
 
     // Should return null when API fails
     expect(result).toBeNull();
-
-    // Restore original fetch
-    global.fetch = originalFetch;
   });
 
   test('should handle mixed GT and custom locations', async () => {
+    // Mock successful API response
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => ({
+        code: 'Ok',
+        routes: [{ duration: 250 }],
+      }),
+    });
+
     const skiles = { lat: 33.773568, long: -84.395957 }; // GT location (in matrix)
     const customLoc = { lat: 33.75, long: -84.4 }; // Custom location (not in matrix)
 
@@ -77,24 +112,17 @@ describe('Travel Times', () => {
     expect(result).not.toBeNull();
     expect(typeof result).toBe('number');
     expect(result).toBeGreaterThan(0);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   test('should prefer matrix over Directions API for GT locations', async () => {
     const skiles = { lat: 33.773568, long: -84.395957 };
     const clough = { lat: 33.774909, long: -84.396404 };
 
-    // Mock fetch to ensure it's not called for GT locations
-    const originalFetch = global.fetch;
-    const mockFetch = jest.fn();
-    global.fetch = mockFetch;
-
     const result = await getDistanceBetweenLocations(skiles, clough);
 
     // Should return matrix value without calling Directions API
     expect(result).toBeCloseTo(227.9, 1);
-    expect(mockFetch).not.toHaveBeenCalled();
-
-    // Restore original fetch
-    global.fetch = originalFetch;
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });
