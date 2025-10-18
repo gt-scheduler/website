@@ -1,6 +1,6 @@
 import { Location } from './types';
 
-// GT building locations extracted from ritwic/add-loc-to-recurring-events branch
+// GT building locations from ritwic/add-loc-to-recurring-events branch
 // These are the fallback locations used in the LocationPicker component
 export interface GTLocation {
   name: string;
