@@ -80,7 +80,7 @@ export default function Map(): React.ReactElement {
         activeDay={activeDay}
         setActiveDay={setActiveDay}
       />
-      <MapView locations={activeLocations} />
+      <MapView locations={activeLocations} activeDay={activeDay} />
     </div>
   );
 }
