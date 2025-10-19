@@ -18,6 +18,9 @@ import {
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
+import { GT_LOCATIONS } from '../../mapConstants/gtLocations';
+import DISTANCE_MATRIX from '../../mapConstants/distanceMatrix.json';
+
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
 
@@ -222,6 +225,45 @@ export default class Oscar {
         const sum = starts.reduce<number>((tot, min) => tot + (min ?? 0), 0);
         const avg = sum / starts.length;
         return -avg;
+      }),
+      new SortingOption('Least Travel Time', (combination) => {
+        const getIndexByCoords = (lat: number, long: number): number =>
+          GT_LOCATIONS.findIndex(
+            (loc) => loc.coords.lat === lat && loc.coords.long === long
+          );
+
+        const getTravel = (
+          from: Location | null,
+          to: Location | null
+        ): number => {
+          if (!from || !to) return 0;
+
+          const i = getIndexByCoords(from.lat, from.long);
+          const j = getIndexByCoords(to.lat, to.long);
+
+          if (i === -1 || j === -1) return 0;
+          return DISTANCE_MATRIX[i]?.[j] ?? 0;
+        };
+
+        let total = 0;
+
+        for (let c = 0; c < combination.crns.length - 1; c++) {
+          const crnA = combination.crns[c];
+          const crnB = combination.crns[c + 1];
+
+          if (crnA && crnB) {
+            const sectionA = this.findSection(crnA);
+            const sectionB = this.findSection(crnB);
+
+            if (sectionA && sectionB) {
+              const locA = sectionA.meetings[0]?.location ?? null;
+              const locB = sectionB.meetings[0]?.location ?? null;
+              total += getTravel(locA, locB);
+            }
+          }
+        }
+
+        return total;
       }),
     ];
   }
