@@ -1,5 +1,6 @@
 import { Immutable } from 'immer';
 import { decode } from 'html-entities';
+import axios from 'axios';
 
 import { Course, Section, SortingOption } from '.';
 import {
@@ -18,7 +19,6 @@ import {
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
-import axios from 'axios';
 import { PlannedCountsData } from '../types';
 
 const PLANNED_COUNTS_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getPlannedCounts`;
@@ -247,7 +247,15 @@ export default class Oscar {
     try {
       plannedCounts = (await axios.get<PlannedCountsData>(url)).data;
     } catch (err) {
-      console.error('Failed to fetch planned counts:', err);
+      softError(
+        new ErrorWithFields({
+          message: 'could not retrieve plannedCounts',
+          fields: {
+            term,
+          },
+        })
+      );
+      return new Oscar(data, term);
     }
 
     return new Oscar(data, term, plannedCounts);
