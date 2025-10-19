@@ -17,6 +17,11 @@ import {
   Meeting,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import axios from 'axios';
+import { PlannedCountsData } from '../types';
+
+const PLANNED_COUNTS_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getPlannedCounts`;
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
@@ -52,7 +57,14 @@ export default class Oscar {
 
   sortingOptions: SortingOption[];
 
-  constructor(data: OscarConstructionDate, public term: string) {
+  plannedCounts: PlannedCountsData | undefined;
+
+  constructor(
+    data: OscarConstructionDate,
+    public term: string,
+    plannedCounts?: PlannedCountsData
+  ) {
+    this.plannedCounts = plannedCounts;
     const { courses, caches, updatedAt, version } = data;
 
     this.periods = caches.periods.map((period, i) => {
@@ -224,6 +236,21 @@ export default class Oscar {
         return -avg;
       }),
     ];
+  }
+
+  static async create(
+    data: OscarConstructionDate,
+    term: string
+  ): Promise<Oscar> {
+    const url = `${PLANNED_COUNTS_API_URL}?term=${term}`;
+    let plannedCounts: PlannedCountsData | undefined;
+    try {
+      plannedCounts = (await axios.get<PlannedCountsData>(url)).data;
+    } catch (err) {
+      console.error('Failed to fetch planned counts:', err);
+    }
+
+    return new Oscar(data, term, plannedCounts);
   }
 
   findCourse(courseId: string): Course | undefined {

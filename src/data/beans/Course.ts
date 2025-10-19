@@ -66,8 +66,11 @@ export default class Course {
 
   term: string;
 
+  plannedCount: number | undefined;
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
+    this.plannedCount = oscar.plannedCounts?.courseCounts[courseId];
     const [title, sections, prereqs] = data;
 
     this.id = courseId;
