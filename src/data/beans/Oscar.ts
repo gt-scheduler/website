@@ -17,11 +17,7 @@ import {
   Meeting,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
-import {
-  GT_DISTANCE_MATRIX,
-  findGTLocationByCoords,
-  getTravel,
-} from '../../mapConstants';
+import { getTravel } from '../../mapConstants';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
