@@ -6,7 +6,7 @@ export const GT_CAMPUS_CENTER = {
   latitude: 33.7756,
 };
 
-// Fallback GT locations with coordinates - SINGLE SOURCE OF TRUTH
+// Fallback GT locations - about 300 lines
 export const FALLBACK_GT_LOCATIONS = [
   {
     name: 'Skiles',
