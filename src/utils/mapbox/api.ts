@@ -17,8 +17,10 @@ export async function retrieveCoordinates(
     const url = new URL(
       `https://api.mapbox.com/search/searchbox/v1/retrieve/${mapboxId}`
     );
-    url.searchParams.set('access_token', accessToken);
-    url.searchParams.set('session_token', `session_${Date.now()}`);
+    url.search = new URLSearchParams({
+      access_token: accessToken,
+      session_token: `session_${Date.now()}`,
+    }).toString();
 
     const response = await fetch(url.toString());
     if (!response.ok) {
@@ -48,17 +50,16 @@ export async function searchMapBoxLocations(
   accessToken: string
 ): Promise<MapBoxSuggestion[]> {
   const url = new URL('https://api.mapbox.com/search/searchbox/v1/suggest');
-  url.searchParams.set('q', query);
-  url.searchParams.set('access_token', accessToken);
-  url.searchParams.set('session_token', `session_${Date.now()}`);
-  url.searchParams.set(
-    'proximity',
-    `${GT_CAMPUS_CENTER.longitude},${GT_CAMPUS_CENTER.latitude}`
-  );
-  url.searchParams.set('country', 'US');
-  url.searchParams.set('limit', '10');
-  url.searchParams.set('language', 'en');
-  url.searchParams.set('types', 'poi,address,place');
+  url.search = new URLSearchParams({
+    q: query,
+    access_token: accessToken,
+    session_token: `session_${Date.now()}`,
+    proximity: `${GT_CAMPUS_CENTER.longitude},${GT_CAMPUS_CENTER.latitude}`,
+    country: 'US',
+    limit: '10',
+    language: 'en',
+    types: 'poi,address,place',
+  }).toString();
 
   const response = await fetch(url.toString());
 
