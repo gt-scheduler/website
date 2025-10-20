@@ -26,7 +26,7 @@ export function isDay(rawDay: string): rawDay is Day {
 // eslint-disable-next-line no-shadow
 export enum ScheduleBlockEventType {
   Course = 'course',
-  CustomEvent = 'event',
+  CustomEvent = 'customEvent',
 }
 export interface ScheduleBlockDateItem {
   id: string;
