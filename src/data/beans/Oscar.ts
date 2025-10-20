@@ -17,7 +17,11 @@ import {
   Meeting,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
-import { GT_DISTANCE_MATRIX, findGTLocationByCoords } from '../../mapConstants';
+import {
+  GT_DISTANCE_MATRIX,
+  findGTLocationByCoords,
+  getTravel,
+} from '../../mapConstants';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
@@ -225,21 +229,6 @@ export default class Oscar {
         return -avg;
       }),
       new SortingOption('Least Travel Time', (combination) => {
-        const getTravel = (
-          from: Location | null,
-          to: Location | null
-        ): number => {
-          if (!from || !to) return 0;
-
-          const fromLoc = findGTLocationByCoords(from);
-          const toLoc = findGTLocationByCoords(to);
-          if (!fromLoc || !toLoc) return 0;
-
-          const key = `${fromLoc.coords.lat},${fromLoc.coords.long}|${toLoc.coords.lat},${toLoc.coords.long}`;
-
-          return GT_DISTANCE_MATRIX[key] ?? 0;
-        };
-
         let total = 0;
         for (let c = 0; c < combination.crns.length - 1; c++) {
           const crnA = combination.crns[c];

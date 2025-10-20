@@ -3153,3 +3153,15 @@ export function findGTLocationByCoords(
     ) || null
   );
 }
+
+export function getTravel(from: Location | null, to: Location | null): number {
+  if (!from || !to) return 0;
+
+  const fromLoc = findGTLocationByCoords(from);
+  const toLoc = findGTLocationByCoords(to);
+  if (!fromLoc || !toLoc) return 0;
+
+  const key = `${fromLoc.coords.lat},${fromLoc.coords.long}|${toLoc.coords.lat},${toLoc.coords.long}`;
+
+  return GT_DISTANCE_MATRIX[key] ?? 0;
+}
