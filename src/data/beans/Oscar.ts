@@ -321,13 +321,22 @@ export default class Oscar {
               dfs(courseIndex + 1, [...crns, lecture.crn]);
             });
         } else {
+          let progressed = false;
           (course.onlyLectures ?? []).filter(isIncluded).forEach((lecture) => {
             if (hasConflict(lecture)) return;
-            lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+            const validLabs = (lecture.associatedLabs ?? []).filter(isIncluded);
+            if (validLabs.length === 0) return;
+            validLabs.forEach((lab) => {
               if (hasConflict(lab)) return;
+              progressed = true;
               dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
             });
           });
+
+          // Prevents dfs stalling when no lecture-lab pairs exist
+          // (usually happens for VIPs) by ignoring the class altogether
+          if (!progressed) dfs(courseIndex + 1, crns);
+
           (course.allInOnes ?? []).filter(isIncluded).forEach((section) => {
             if (hasConflict(section)) return;
             dfs(courseIndex + 1, [...crns, section.crn]);
