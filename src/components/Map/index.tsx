@@ -172,7 +172,10 @@ export default function Map(): React.ReactElement {
         activeDay={activeDay}
         setActiveDay={setActiveDay}
       />
-      <MapView locations={activeLocations} activeDay={activeDay} />
+      <MapView
+        locations={activeLocations}
+        showTravelTimes={activeDay !== 'ALL'}
+      />
     </div>
   );
 }
