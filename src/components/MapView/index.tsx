@@ -18,12 +18,12 @@ export type MapLocation = {
 
 export type MapViewProps = {
   locations: MapLocation[];
-  activeDay?: string;
+  showTravelTimes?: boolean;
 };
 
 export default function MapView({
   locations,
-  activeDay = '',
+  showTravelTimes = false,
 }: MapViewProps): React.ReactElement {
   // These initial coordinates start the map looking at the GT Atlanta campus
   const [viewState, setViewState] = useState<ViewState>({
@@ -49,8 +49,8 @@ export default function MapView({
 
   useEffect(() => {
     const calculateTravelTimes = async (): Promise<void> => {
-      // Don't calculate for "All Days" view
-      if (activeDay === 'ALL' || validLocations.length < 2) {
+      // Don't calculate if showTravelTimes is false or insufficient locations
+      if (!showTravelTimes || validLocations.length < 2) {
         setTravelTimes(null);
         return;
       }
@@ -66,7 +66,7 @@ export default function MapView({
     calculateTravelTimes().catch(() => {
       // Error already handled inside calculateTravelTimes function
     });
-  }, [validLocations, activeDay]);
+  }, [validLocations, showTravelTimes]);
 
   const unknown: MapLocation[] = [];
   const coordsToLocationsMap = new Map<Location, MapLocation[]>();
