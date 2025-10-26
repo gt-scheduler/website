@@ -1,0 +1,36 @@
+.Breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  padding: 8px 12px;
+  font-family: 'Roboto';
+
+  .list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .item {
+      display: flex;
+      align-items: center;
+
+      // &:not(:last-child)::after {
+      //   content: '›';
+      //   margin: 0 8px;
+      //   color: #aaa;
+      //   font-size: 18px;
+      // }
+
+      .link {
+        color: #8bd6fb;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .label {
+        font-weight: 500;
+      }
+    }
+  }
+}

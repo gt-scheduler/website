@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
 
 import App from '../App';
 import InviteBackLink from '../InviteBackLink';
+import ProfessorInfo from '../../sandbox/ProfessorInfo';
 
 export default function RouterComponent(): React.ReactElement {
   return (
@@ -14,6 +15,7 @@ export default function RouterComponent(): React.ReactElement {
           <Route path="" element={<App />} />
           <Route path="invite/:id" element={<InviteBackLink />} />
         </Route>
+        <Route path="/sandbox/ProfessorInfo" element={<ProfessorInfo />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
