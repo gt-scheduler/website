@@ -1,5 +1,6 @@
-import { FALLBACK_GT_LOCATIONS, GTLocation } from './constants';
-import { MapBoxSuggestion } from './types';
+import { FALLBACK_GT_LOCATIONS, GT_DISTANCE_MATRIX } from './constants';
+import { GTLocation, MapBoxSuggestion } from './types';
+import { Location } from '../../types';
 
 /**
  * Filter GT locations based on search query
@@ -66,4 +67,30 @@ export function formatLocationFromSuggestion(suggestion: MapBoxSuggestion): {
     }`;
 
   return { name, address };
+}
+
+// Helper function to find GT location by coordinates (with tolerance)
+export function findGTLocationByCoords(
+  coords: Location,
+  tolerance = 0.0001
+): GTLocation | null {
+  return (
+    FALLBACK_GT_LOCATIONS.find(
+      (location) =>
+        Math.abs(location.coords.lat - coords.lat) < tolerance &&
+        Math.abs(location.coords.long - coords.long) < tolerance
+    ) || null
+  );
+}
+
+export function getTravel(from: Location | null, to: Location | null): number {
+  if (!from || !to) return 0;
+
+  const fromLoc = findGTLocationByCoords(from);
+  const toLoc = findGTLocationByCoords(to);
+  if (!fromLoc || !toLoc) return 0;
+
+  const key = `${fromLoc.coords.lat},${fromLoc.coords.long}|${toLoc.coords.lat},${toLoc.coords.long}`;
+
+  return GT_DISTANCE_MATRIX[key] ?? 0;
 }

@@ -1,3 +1,5 @@
+import { Location } from '../../types';
+
 export interface MapBoxGeometry {
   type: string;
   coordinates: [number, number];
@@ -69,4 +71,13 @@ export interface MapBoxSuggestion {
 export interface MapBoxSearchBoxResponse {
   suggestions: MapBoxSuggestion[];
   attribution: string;
+}
+
+export type LocationKey = string;
+export type DistanceMatrixEntry = number;
+
+export interface GTLocation {
+  name: string;
+  address: string;
+  coords: Location;
 }

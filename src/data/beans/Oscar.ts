@@ -17,7 +17,7 @@ import {
   Meeting,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
-import { getTravel } from '../../mapConstants';
+import { getTravel } from '../../utils/mapbox/misc';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
