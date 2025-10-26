@@ -45,21 +45,16 @@ export default function Event({
         end: event.period.end,
       },
       days: event.days,
+      where:
+        'where' in event && typeof event.where === 'string' ? event.where : '',
+      location: 'location' in event && event.location ? event.location : null,
     };
 
     patchSchedule({
       events: [...castDraft(events), castDraft(newEvent)],
       colorMap: { ...colorMap, [eventId]: getRandomColor() },
     });
-  }, [
-    colorMap,
-    event.days,
-    event.name,
-    event.period.end,
-    event.period.start,
-    events,
-    patchSchedule,
-  ]);
+  }, [colorMap, event, events, patchSchedule]);
 
   // this basically forces the edit form to only auto-focus once per render
   useEffect(() => {
