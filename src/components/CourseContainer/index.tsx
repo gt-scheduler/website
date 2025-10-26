@@ -1,26 +1,28 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import ago from 's-ago';
 
 import { Button, Course, CourseAdd, Event, EventAdd } from '..';
 import { ScheduleContext } from '../../contexts';
 import CourseNavMenu from '../CourseNavMenu';
+import { COURSE_TABS, COURSES } from '../../constants';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
 
 export default function CourseContainer(): React.ReactElement {
-  const [{ oscar, events, desiredCourses }] = useContext(ScheduleContext);
-  const courseTabs = ['Courses', 'Recurring Events'];
-  const [currentTab, setCurrentTab] = useState(0);
+  const [
+    { oscar, events, desiredCourses, courseContainerTab },
+    { setCourseContainerTab },
+  ] = useContext(ScheduleContext);
 
   return (
     <div className="CourseContainer">
       <CourseNavMenu
-        items={courseTabs}
-        currentItem={currentTab}
-        onChangeItem={setCurrentTab}
+        items={COURSE_TABS}
+        currentItem={courseContainerTab}
+        onChangeItem={setCourseContainerTab}
       />
-      {courseTabs[currentTab] === courseTabs[0] ? (
+      {COURSE_TABS[courseContainerTab] === COURSE_TABS[COURSES] ? (
         <div className="scroller">
           <div className="course-list">
             {desiredCourses.map((courseId) => {

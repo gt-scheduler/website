@@ -8,10 +8,11 @@ import { ThemeContext } from '../../contexts';
 
 import './stylesheet.scss';
 
-export type Day = 'M' | 'T' | 'W' | 'R' | 'F';
+export type Day = 'ALL' | 'M' | 'T' | 'W' | 'R' | 'F';
 
 export function isDay(rawDay: string): rawDay is Day {
   switch (rawDay) {
+    case 'ALL':
     case 'M':
     case 'T':
     case 'W':
@@ -46,6 +47,7 @@ export type DaySelectionProps = {
 };
 
 const LIGHT_COLOR_PALETTE = [
+  '#D3C5E3',
   '#FCB9AA',
   '#FFDBCC',
   '#ECEAE4',
@@ -53,6 +55,7 @@ const LIGHT_COLOR_PALETTE = [
   '#55CBCD',
 ];
 const DARK_COLOR_PALETTE = [
+  '#433b4a',
   '#5e3931',
   '#704737',
   '#685a30',
@@ -67,6 +70,7 @@ export default function DaySelection({
   setActiveDay,
 }: DaySelectionProps): React.ReactElement {
   const daysOfTheWeek = [
+    'All Days',
     'Monday',
     'Tuesday',
     'Wednesday',
@@ -121,7 +125,11 @@ export default function DaySelection({
             {activeDay === date && (
               <div className="dropdown-content">
                 {courses == null || courses.length === 0 ? (
-                  <div className="course-content">No classes this day!</div>
+                  <div className="course-content" style={{ padding: 8 }}>
+                    {activeDay === 'ALL'
+                      ? 'No classes this week!'
+                      : 'No classes this day!'}
+                  </div>
                 ) : (
                   courses.map((course) => {
                     let timeLabel = 'TBA';

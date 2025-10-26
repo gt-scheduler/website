@@ -84,6 +84,7 @@ export interface Event {
   days: string[];
   where?: string;
   location?: Location | null;
+  showEditForm?: boolean;
 }
 
 export interface Term {

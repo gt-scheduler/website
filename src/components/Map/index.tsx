@@ -36,8 +36,9 @@ function hasValidLocationData(
 
 export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns, events }] = useContext(ScheduleContext);
-  const [activeDay, setActiveDay] = useState<Day | ''>('M');
+  const [activeDay, setActiveDay] = useState<Day | ''>('ALL');
   const courseDateMap: Record<Day, CombinedCourseData[]> = {
+    ALL: [],
     M: [],
     T: [],
     W: [],
@@ -125,17 +126,25 @@ export default function Map(): React.ReactElement {
     });
   }); // Sort each list of course data by their times
   const sortedCourseDateMap: Record<Day, CombinedCourseData[]> = {
+    ALL: [],
     M: [],
     T: [],
     W: [],
     R: [],
     F: [],
   };
+  const seenCourseIds = new Set<string>();
   Object.entries(courseDateMap).forEach(([day, courseDataList]) => {
-    if (!isDay(day)) return;
+    if (!isDay(day) || day === 'ALL') return;
     sortedCourseDateMap[day] = courseDataList.sort(
       (a, b) => (a.times?.start ?? 0) - (b.times?.start ?? 0)
     );
+    sortedCourseDateMap[day].forEach((course) => {
+      if (!seenCourseIds.has(course.id)) {
+        seenCourseIds.add(course.id);
+        sortedCourseDateMap.ALL.push({ ...course });
+      }
+    });
   });
 
   let activeLocations: MapLocation[] = [];

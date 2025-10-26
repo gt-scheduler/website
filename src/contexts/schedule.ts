@@ -10,6 +10,7 @@ import {
   TermScheduleData,
 } from '../data/types';
 import { ErrorWithFields } from '../log';
+import { COURSES } from '../constants';
 
 type ExtraData = {
   term: string;
@@ -17,6 +18,7 @@ type ExtraData = {
   currentFriends: Record<string, FriendShareData>;
   allFriends: Record<string, Record<string, FriendShareData>>;
   allVersionNames: { id: string; name: string }[];
+  courseContainerTab: number;
   // `oscar` is included below as a separate type
 };
 
@@ -38,6 +40,7 @@ export type ScheduleContextSetters = {
   renameVersion: (id: string, newName: string) => void;
   cloneVersion: (id: string, newName: string) => void;
   deleteFriendRecord: (versionId: string, friendId: string) => void;
+  setCourseContainerTab: (tab: number) => void;
 };
 export type ScheduleContextValue = [
   ScheduleContextData,
@@ -48,6 +51,7 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
     term: '',
     currentVersion: '',
     currentFriends: {},
+    courseContainerTab: COURSES,
     allVersionNames: [],
     allFriends: {},
     oscar: EMPTY_OSCAR,
@@ -126,6 +130,12 @@ export const ScheduleContext = React.createContext<ScheduleContextValue>([
           id,
           newName,
         },
+      });
+    },
+    setCourseContainerTab: (tab: number): void => {
+      throw new ErrorWithFields({
+        message: 'empty ScheduleContext.setCourseContainerTab value being used',
+        fields: { tab },
       });
     },
   },

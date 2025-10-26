@@ -75,15 +75,27 @@ export const getRandomColor = (): string => {
   return colors[index] ?? '#333333';
 };
 
-export const getContentClassName = (color: string | undefined): string => {
-  if (color == null) return 'light-content';
-  const r = parseInt(color.substring(1, 3), 16);
-  const g = parseInt(color.substring(3, 5), 16);
-  const b = parseInt(color.substring(5, 7), 16);
-  return r * 0.299 + g * 0.587 + b * 0.114 > 128
-    ? 'light-content'
-    : 'dark-content';
+const getLuminance = (color: string): number => {
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  return r * 0.299 + g * 0.587 + b * 0.114;
 };
+
+const getContrastClass = (
+  color: string | undefined,
+  lightClass: string,
+  darkClass: string
+): string => {
+  if (!color) return lightClass;
+  return getLuminance(color) > 128 ? lightClass : darkClass;
+};
+
+export const getContentClassName = (color?: string): string =>
+  getContrastClass(color, 'light-content', 'dark-content');
+
+export const getLabelClassName = (color?: string): string =>
+  getContrastClass(color, 'light-label', 'dark-label');
 
 export const hasConflictBetweenMeetings = (
   meeting1: Meeting | Immutable<Event>,
@@ -283,9 +295,6 @@ export const getFullYear = (): number => {
   return new Date().getFullYear();
 };
 
-// Difference between UTC and EST timezones in minutes
-export const EST_TIMEZONE_OFFSET = 240;
-
 /**
  * Exports the current schedule to a `.ics` file,
  * which allows for importing into a third-party calendar application.
@@ -309,8 +318,6 @@ export function exportCoursesToCalendar(
     return;
   }
 
-  const timezoneDiff = EST_TIMEZONE_OFFSET - new Date().getTimezoneOffset();
-
   const addEventsToCalendar = (
     period: Period,
     days: string[],
@@ -326,11 +333,11 @@ export function exportCoursesToCalendar(
     ) {
       begin.setDate(begin.getDate() + 1);
     }
-    const startWithOffset = period.start + timezoneDiff;
-    const endWithOffset = period.end + timezoneDiff;
-    begin.setHours(startWithOffset / 60, startWithOffset % 60);
+    const startTime = period.start;
+    const endTime = period.end;
+    begin.setHours(startTime / 60, startTime % 60);
     const end = new Date(begin.getTime());
-    end.setHours(endWithOffset / 60, endWithOffset % 60);
+    end.setHours(endTime / 60, endTime % 60);
     const rrule = {
       freq: 'WEEKLY',
       until: to,

@@ -1,5 +1,5 @@
 import produce, { Immutable, Draft, original, castDraft } from 'immer';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import {
   TermsContext,
@@ -10,6 +10,7 @@ import {
 } from '../../contexts';
 import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { Oscar } from '../../data/beans';
+import { COURSES } from '../../constants';
 import useVersionActions from '../../data/hooks/useVersionActions';
 import {
   Schedule,
@@ -374,6 +375,8 @@ function ContextProvider({
   updateFriendInfo,
   children,
 }: ContextProviderProps): React.ReactElement {
+  const [courseContainerTab, setCourseContainerTab] = useState<number>(COURSES);
+
   // Create a `updateSchedule` function
   const updateSchedule = useCallback(
     (
@@ -482,6 +485,7 @@ function ContextProvider({
         currentFriends: scheduleVersion.friends ?? {},
         ...castDraft(scheduleVersion.schedule),
         versions: termScheduleData.versions,
+        courseContainerTab,
       },
       {
         setTerm,
@@ -493,6 +497,7 @@ function ContextProvider({
         deleteFriendRecord,
         renameVersion,
         cloneVersion,
+        setCourseContainerTab,
       },
     ],
     [
@@ -513,6 +518,8 @@ function ContextProvider({
       renameVersion,
       cloneVersion,
       termScheduleData.versions,
+      courseContainerTab,
+      setCourseContainerTab,
     ]
   );
 

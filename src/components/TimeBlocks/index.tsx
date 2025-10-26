@@ -194,6 +194,8 @@ function MeetingDayBlock({
   useRootClose(outerRef, handleRootClose, {
     disabled: !isSelected,
   });
+  const duration = period.end - period.start;
+  const isDraft = color === undefined;
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
 
@@ -252,26 +254,29 @@ function MeetingDayBlock({
         }}
       >
         {includeContent && (
-          <div className="meeting-wrapper">
+          <div
+            className={classes(
+              'meeting-wrapper',
+              isDraft && duration <= 15 && 'only-time'
+            )}
+          >
             <div className="ids">
-              {contentHeader.map((content, i) => {
-                return (
+              {(!isDraft || duration > 15) &&
+                contentHeader.map((content, i) => (
                   <span
                     className={content.className}
                     key={`content-header-${i}`}
                   >
                     {content.content}&nbsp;
                   </span>
-                );
-              })}
+                ))}
             </div>
-            {contentBody.map((content, i) => {
-              return (
-                <span className={content.className} key={`content-body-${i}`}>
-                  {content.content}
-                </span>
-              );
-            })}
+
+            {contentBody.map((content, i) => (
+              <span className={content.className} key={`content-body-${i}`}>
+                {content.content}
+              </span>
+            ))}
           </div>
         )}
       </BlockElement>
