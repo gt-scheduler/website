@@ -17,6 +17,7 @@ import {
   Meeting,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import { getTravel } from '../../mapConstants';
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
@@ -223,6 +224,26 @@ export default class Oscar {
         const avg = sum / starts.length;
         return -avg;
       }),
+      new SortingOption('Least Travel Time', (combination) => {
+        let total = 0;
+        for (let c = 0; c < combination.crns.length - 1; c++) {
+          const crnA = combination.crns[c];
+          const crnB = combination.crns[c + 1];
+
+          if (crnA && crnB) {
+            const sectionA = this.findSection(crnA);
+            const sectionB = this.findSection(crnB);
+
+            if (sectionA && sectionB) {
+              const locA = sectionA.meetings[0]?.location ?? null;
+              const locB = sectionB.meetings[0]?.location ?? null;
+
+              total += getTravel(locA, locB);
+            }
+          }
+        }
+        return total;
+      }),
     ];
   }
 
@@ -285,13 +306,22 @@ export default class Oscar {
               dfs(courseIndex + 1, [...crns, lecture.crn]);
             });
         } else {
+          let progressed = false;
           (course.onlyLectures ?? []).filter(isIncluded).forEach((lecture) => {
             if (hasConflict(lecture)) return;
-            lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+            const validLabs = (lecture.associatedLabs ?? []).filter(isIncluded);
+            if (validLabs.length === 0) return;
+            validLabs.forEach((lab) => {
               if (hasConflict(lab)) return;
+              progressed = true;
               dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
             });
           });
+
+          // Prevents dfs stalling when no lecture-lab pairs exist
+          // (usually happens for VIPs) by ignoring the class altogether
+          if (!progressed) dfs(courseIndex + 1, crns);
+
           (course.allInOnes ?? []).filter(isIncluded).forEach((section) => {
             if (hasConflict(section)) return;
             dfs(courseIndex + 1, [...crns, section.crn]);
