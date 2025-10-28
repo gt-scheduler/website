@@ -12,7 +12,7 @@ import { Immutable, castDraft } from 'immer';
 import Button from '../Button';
 import LocationPicker from '../LocationPicker';
 import { classes, getRandomColor, timeToString } from '../../utils/misc';
-import { DAYS } from '../../constants';
+import { CLOSE, DAYS, OPEN } from '../../constants';
 import { ScheduleContext } from '../../contexts';
 import { Event as EventData, Location } from '../../types';
 
@@ -99,8 +99,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(end);
       if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1320) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
+      } else if (parsedStart < OPEN || parsedEnd > CLOSE) {
+        setError('Event must be between 06:00 AM and 11:59 PM.');
       }
     },
     [end, parseTime]
@@ -117,8 +117,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(newEnd);
       if (parsedStart !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1320) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
+      } else if (parsedStart < OPEN || parsedEnd > CLOSE) {
+        setError('Event must be between 06:00 AM and 11:59 PM.');
       }
     },
     [start, parseTime]
