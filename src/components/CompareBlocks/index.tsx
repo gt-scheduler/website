@@ -104,8 +104,8 @@ export default function CompareBlocks({
               },
               {
                 name: 'Course Name',
-                // After confirmation that all environments only serve new 8-field data,
-                // we can remove the existence check for `section.sectionTitle`.
+                // after confirming that only new section data is served,
+                // we can remove this check for `section.sectionTitle`.
                 content:
                   section.course.number === '8803' && section.sectionTitle
                     ? section.sectionTitle
