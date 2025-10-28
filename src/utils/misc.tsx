@@ -346,7 +346,12 @@ export function exportCoursesToCalendar(
     section.meetings.forEach((meeting) => {
       if (!meeting.period || !meeting.days.length) return;
       const subject = section.course.id;
-      const description = section.course.title;
+      // After confirmation that all environments only serve new section data,
+      // we can remove the existence check for `section.sectionTitle`.
+      const description =
+        section.course.number === '8803' && section.sectionTitle
+          ? section.sectionTitle
+          : section.course.title;
       const location = meeting.where;
       addEventsToCalendar(
         meeting.period,

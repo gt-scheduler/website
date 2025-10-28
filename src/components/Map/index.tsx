@@ -35,7 +35,12 @@ export default function Map(): React.ReactElement {
       if (!isDay(day)) return;
       const courseItem: CombinedCourseData = {
         id: section.course.id,
-        title: section.course.title,
+        // After confirmation that all environments only serve new 8-field data,
+        // we can remove the existence check for `section.sectionTitle`.
+        title:
+          section.course.number === '8803' && section.sectionTitle
+            ? section.sectionTitle
+            : section.course.title,
         times: firstMeeting.period,
         daysOfWeek: firstMeeting.days,
         section: section.id,

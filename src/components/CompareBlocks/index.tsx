@@ -104,7 +104,12 @@ export default function CompareBlocks({
               },
               {
                 name: 'Course Name',
-                content: section.course.title,
+                // After confirmation that all environments only serve new 8-field data,
+                // we can remove the existence check for `section.sectionTitle`.
+                content:
+                  section.course.number === '8803' && section.sectionTitle
+                    ? section.sectionTitle
+                    : section.course.title,
               },
               {
                 name: 'Instructors',
