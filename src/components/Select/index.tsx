@@ -277,7 +277,7 @@ export default function Select<Id extends string | number>({
                               className="option__action-button"
                               onClick={(e): void => {
                                 e.stopPropagation();
-                                // Start a new edit (ignore any in-progress edits)
+                                // Start new edit (ignore any in-progress edits)
                                 setInputId(optionId);
                                 setInputValue(optionLabel);
                                 setInputEditAction(action);

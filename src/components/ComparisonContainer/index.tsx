@@ -31,7 +31,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import InvitationModal from '../InvitationModal';
 import ComparisonContainerShareBack from '../ComparisonContainerShareBack/ComparisonContainerShareBack';
-import { ScheduleDeletionRequest, Palette as PaletteType } from '../../types';
+import { ScheduleDeletionRequest } from '../../types';
 
 import './stylesheet.scss';
 
@@ -85,22 +85,9 @@ export default function ComparisonContainer({
   const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
   const [
-    {
-      allVersionNames,
-      currentVersion,
-      colorMap,
-      term,
-      palette,
-      versions: scheduleVersions,
-    },
+    { allVersionNames, currentVersion, colorMap, term, palette },
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
-
-  const versionPalettes: Record<string, string> = {};
-
-  Object.entries(scheduleVersions).forEach(([versionId, versionData]) => {
-    versionPalettes[versionId] = versionData.schedule.palette;
-  });
 
   const [{ friends }, { renameFriend }] = useContext(FriendContext);
 
@@ -130,7 +117,14 @@ export default function ComparisonContainer({
     if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
       patchSchedule({ colorMap: newColorMap });
     }
-  }, [friends, currentVersion, colorMap, patchSchedule, allVersionNames]);
+  }, [
+    friends,
+    currentVersion,
+    colorMap,
+    palette,
+    patchSchedule,
+    allVersionNames,
+  ]);
 
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {

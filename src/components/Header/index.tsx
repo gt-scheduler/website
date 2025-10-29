@@ -104,15 +104,11 @@ export default function Header({
 
       // Assign each course a unique color from the palette
       for (const courseId of Object.keys(colorMap)) {
-        if (availableColors.length > 0) {
-          // Use next unique color
-          newColorMap[courseId] = availableColors.shift()!;
-        } else {
-          // If we run out of colors, randomly reuse one
-          newColorMap[courseId] = paletteArray[
+        newColorMap[courseId] =
+          availableColors.shift() ??
+          (paletteArray[
             Math.floor(Math.random() * paletteArray.length)
-          ] as string;
-        }
+          ] as string);
       }
 
       patchSchedule({

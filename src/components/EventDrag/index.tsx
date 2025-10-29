@@ -261,6 +261,7 @@ export default function EventDrag({
       patchSchedule,
       events,
       colorMap,
+      palette,
       onCreate,
       setCourseContainerTab,
     ]

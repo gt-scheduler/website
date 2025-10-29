@@ -80,6 +80,7 @@ export default function Event({
     event.period.end,
     event.period.start,
     events,
+    palette,
     patchSchedule,
   ]);
 

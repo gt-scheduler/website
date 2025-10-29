@@ -158,6 +158,7 @@ export default function EventAdd({
     selectedTags,
     events,
     colorMap,
+    palette,
     patchSchedule,
     parseTime,
     setFormShown,

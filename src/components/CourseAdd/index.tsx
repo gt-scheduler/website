@@ -143,7 +143,15 @@ export default function CourseAdd({
       setKeyword('');
       inputRef.current?.focus();
     },
-    [filter, desiredCourses, excludedCrns, colorMap, inputRef, patchSchedule]
+    [
+      filter,
+      desiredCourses,
+      excludedCrns,
+      colorMap,
+      inputRef,
+      palette,
+      patchSchedule,
+    ]
   );
 
   const handleKeyDown = useCallback(
