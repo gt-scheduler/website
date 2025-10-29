@@ -28,7 +28,8 @@ export default function EventAdd({
   event,
   setFormShown,
 }: EventAddProps): React.ReactElement {
-  const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
+  const [{ events, colorMap, palette }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [eventName, setEventName] = useState(event?.name || '');
   const [selectedTags, setSelectedTags] = useState(
     event?.days ? [...event.days] : []
@@ -141,7 +142,7 @@ export default function EventAdd({
 
       patchSchedule({
         events: [...castDraft(events), newEvent],
-        colorMap: { ...colorMap, [eventId]: getRandomColor() },
+        colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
       });
 
       setEventName('');

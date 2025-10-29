@@ -1,0 +1,44 @@
+@import '../../variables';
+
+.Palette-container {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  background-color: var(--theme-bg);
+
+  .Palette {
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    cursor: pointer;
+    padding: 16px;
+    
+    &:hover {
+      background: var(--modal-divider, #505050);
+    }
+
+    .palette-header {
+      color: var(--theme-fg);
+      margin-bottom: 8px;
+    }
+
+    .palette-row,
+    .preset-row {
+      display: flex;
+      align-items: center;
+      align-self: stretch;
+
+      .color {
+        flex: 1;
+        display: flex;
+        position: relative;
+      }
+    }
+
+    .palette-row .color {
+      aspect-ratio: 1 / 1;
+    }
+  }
+}

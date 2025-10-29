@@ -41,7 +41,7 @@ export default function Course({
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap, palette },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -173,23 +173,6 @@ export default function Course({
     id: `${course.id}-prerequisites`,
   };
 
-  const paletteControl = (
-    nextPaletteOpen: boolean,
-    nextExpanded: boolean
-  ): void => {
-    setPaletteShown(nextPaletteOpen);
-    setExpanded(nextExpanded);
-    setPrereqOpen(false);
-  };
-  const paletteAction = {
-    icon: faPalette,
-    onClick: (): void => {
-      paletteControl(!paletteShown, !paletteShown);
-    },
-    tooltip: 'Edit Color',
-    id: `${course.id}-color`,
-  };
-
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
   );
@@ -219,7 +202,14 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
-                paletteAction,
+                {
+                  icon: faPalette,
+                  onClick: (): void => {
+                    setPaletteShown(!paletteShown);
+                  },
+                  tooltip: 'Edit Color',
+                  id: `${course.id}-color`,
+                },
                 {
                   icon: faTrash,
                   onClick: (): void => handleRemoveCourse(course),
@@ -250,8 +240,19 @@ export default function Course({
             )}
           </div>
         )}
+        {paletteShown && (
+          <Palette
+            className="palette"
+            palette={palette}
+            onSelectColor={(col): void =>
+              patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
+            }
+            color={color ?? null}
+            onMouseLeave={(): void => setPaletteShown(false)}
+          />
+        )}
       </ActionRow>
-      {expanded && !prereqOpen && !paletteShown && (
+      {expanded && !prereqOpen && (
         <div className={classes('hover-container', 'nested')}>
           {includedInstructors.map((name) => {
             let instructorGpa: number | undefined = 0;
@@ -295,14 +296,6 @@ export default function Course({
       )}
       {expanded && prereqOpen && prereqs !== null && (
         <Prerequisite course={course} prereqs={prereqs} />
-      )}
-      {paletteShown && (
-        <Palette
-          onSelectColor={(col): void =>
-            patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
-          }
-          color={color ?? null}
-        />
       )}
     </div>
   );

@@ -72,8 +72,10 @@ function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
 export default function CourseAdd({
   className,
 }: CourseAddProps): React.ReactElement {
-  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
-    useContext(ScheduleContext);
+  const [
+    { oscar, desiredCourses, excludedCrns, colorMap, palette },
+    { patchSchedule },
+  ] = useContext(ScheduleContext);
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
@@ -136,7 +138,7 @@ export default function CourseAdd({
       patchSchedule({
         desiredCourses: [...desiredCourses, course.id],
         excludedCrns: [...excludedCrns, ...toBeExcludedCrns],
-        colorMap: { ...colorMap, [course.id]: getRandomColor() },
+        colorMap: { ...colorMap, [course.id]: getRandomColor(palette) },
       });
       setKeyword('');
       inputRef.current?.focus();

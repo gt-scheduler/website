@@ -37,6 +37,7 @@ export type SelectProps<Id extends string | number> = {
 export interface SelectOption<Id extends string | number> {
   id: Id;
   label: string;
+  content?: React.ReactNode;
 
   // Used to specify any inline actions (buttons)
   // These are visible when hovering the option on desktop,
@@ -183,120 +184,129 @@ export default function Select<Id extends string | number>({
           className="option-container"
           style={desiredItemWidth != null ? { width: desiredItemWidth } : {}}
         >
-          {options.map(({ id: optionId, label: optionLabel, actions = [] }) => (
-            <div
-              key={String(optionId)}
-              className={classes(
-                'option',
-                optionId === inputId && 'option--inputting'
-              )}
-            >
-              {inputId === optionId ? (
-                <AutoFocusInput
-                  className="option__input"
-                  value={inputValue}
-                  onChange={(e): void => setInputValue(e.target.value)}
-                  placeholder={optionLabel}
-                  onKeyDown={handleKeyDown}
-                />
-              ) : (
-                <Button
-                  className="option__button"
-                  key={optionId}
-                  onClick={(): void => onChange(optionId)}
-                >
-                  {optionLabel}
-                </Button>
-              )}
-              {actions.map((action, i) => (
-                <React.Fragment key={i}>
-                  {action.type === 'button' ? (
-                    <>
-                      <Button
-                        className="option__action-button"
-                        onClick={(e): void => {
-                          e.stopPropagation();
+          {options.map(
+            ({
+              id: optionId,
+              label: optionLabel,
+              content: optionContent,
+              actions = [],
+            }) => (
+              <div
+                key={String(optionId)}
+                className={classes(
+                  'option',
+                  optionId === inputId && 'option--inputting'
+                )}
+              >
+                {inputId === optionId ? (
+                  <AutoFocusInput
+                    className="option__input"
+                    value={inputValue}
+                    onChange={(e): void => setInputValue(e.target.value)}
+                    placeholder={optionLabel}
+                    onKeyDown={handleKeyDown}
+                  />
+                ) : (
+                  <Button
+                    className="option__button"
+                    key={optionId}
+                    onClick={(): void => onChange(optionId)}
+                  >
+                    {optionLabel}
 
-                          // Abandon any in-progress edit
-                          if (inputId !== null) abandonEdit();
+                    {optionContent}
+                  </Button>
+                )}
+                {actions.map((action, i) => (
+                  <React.Fragment key={i}>
+                    {action.type === 'button' ? (
+                      <>
+                        <Button
+                          className="option__action-button"
+                          onClick={(e): void => {
+                            e.stopPropagation();
 
-                          action.onClick(optionId);
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          fixedWidth
-                          id={action.id}
-                          icon={action.icon}
-                        />
-                      </Button>
-                      {action.tooltip && (
-                        <ReactTooltip
-                          anchorId={action.id}
-                          variant="dark"
-                          place="left"
+                            // Abandon any in-progress edit
+                            if (inputId !== null) abandonEdit();
+
+                            action.onClick(optionId);
+                          }}
                         >
-                          {action.tooltip}
-                        </ReactTooltip>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {optionId === inputId ? (
-                        <>
-                          <Button
-                            className="option__action-button"
-                            onClick={(e): void => {
-                              e.stopPropagation();
-                              tryCommit();
-                            }}
+                          <FontAwesomeIcon
+                            fixedWidth
+                            id={action.id}
+                            icon={action.icon}
+                          />
+                        </Button>
+                        {action.tooltip && (
+                          <ReactTooltip
+                            anchorId={action.id}
+                            variant="dark"
+                            place="left"
                           >
-                            <FontAwesomeIcon fixedWidth icon={faCheck} />
-                          </Button>
-                          <Button
-                            className="option__action-button"
-                            onClick={(e): void => {
-                              e.stopPropagation();
-                              abandonEdit();
-                            }}
-                          >
-                            <FontAwesomeIcon fixedWidth icon={faTimes} />
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            className="option__action-button"
-                            onClick={(e): void => {
-                              e.stopPropagation();
-                              // Start a new edit (ignore any in-progress edits)
-                              setInputId(optionId);
-                              setInputValue(optionLabel);
-                              setInputEditAction(action);
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              fixedWidth
-                              icon={action.icon}
-                              id={action.id}
-                            />
-                          </Button>
-                          {action.tooltip && (
-                            <ReactTooltip
-                              anchorId={action.id}
-                              variant="dark"
-                              place="left"
+                            {action.tooltip}
+                          </ReactTooltip>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {optionId === inputId ? (
+                          <>
+                            <Button
+                              className="option__action-button"
+                              onClick={(e): void => {
+                                e.stopPropagation();
+                                tryCommit();
+                              }}
                             >
-                              {action.tooltip}
-                            </ReactTooltip>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          ))}
+                              <FontAwesomeIcon fixedWidth icon={faCheck} />
+                            </Button>
+                            <Button
+                              className="option__action-button"
+                              onClick={(e): void => {
+                                e.stopPropagation();
+                                abandonEdit();
+                              }}
+                            >
+                              <FontAwesomeIcon fixedWidth icon={faTimes} />
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              className="option__action-button"
+                              onClick={(e): void => {
+                                e.stopPropagation();
+                                // Start a new edit (ignore any in-progress edits)
+                                setInputId(optionId);
+                                setInputValue(optionLabel);
+                                setInputEditAction(action);
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                fixedWidth
+                                icon={action.icon}
+                                id={action.id}
+                              />
+                            </Button>
+                            {action.tooltip && (
+                              <ReactTooltip
+                                anchorId={action.id}
+                                variant="dark"
+                                place="left"
+                              >
+                                {action.tooltip}
+                              </ReactTooltip>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            )
+          )}
           {onClickNew !== undefined && (
             <div className="option" id={id ? `${id}-new-button` : undefined}>
               <Button className="option__button" onClick={onClickNew}>

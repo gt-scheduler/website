@@ -10,7 +10,8 @@ import { Oscar, Section } from '../data/beans';
 import {
   DAYS,
   DEFAULT_PALETTE,
-  PRESET_PALETTE,
+  DEEP_PALETTE,
+  SOFT_PALETTE,
   PNG_SCALE_FACTOR,
 } from '../constants';
 import { ErrorWithFields, softError } from '../log';
@@ -19,6 +20,7 @@ import {
   Event,
   ICS,
   Meeting,
+  Palette,
   Period,
   PrerequisiteClause,
   Theme,
@@ -74,8 +76,14 @@ export const daysToString = (days: readonly string[] | string[]): string => {
   return DAYS.filter((day) => set.has(day)).join('');
 };
 
-export const getRandomColor = (): string => {
-  const colors = [...PRESET_PALETTE, ...DEFAULT_PALETTE].flat();
+export const getRandomColor = (palette: Palette): string => {
+  const paletteColors =
+    palette === 'default'
+      ? DEFAULT_PALETTE
+      : palette === 'soft'
+      ? SOFT_PALETTE
+      : DEEP_PALETTE;
+  const colors = paletteColors.flat();
   const uniqueColors = Array.from(new Set(colors));
   const index = Math.floor(Math.random() * uniqueColors.length);
   return uniqueColors[index] ?? '#333333';

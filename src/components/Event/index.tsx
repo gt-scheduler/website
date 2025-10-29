@@ -36,7 +36,8 @@ export default function Event({
   event,
 }: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
-  const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
+  const [{ events, colorMap, palette }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [formShown, setFormShown] = useState<boolean>(
     Boolean(event.showEditForm)
   );
@@ -70,7 +71,7 @@ export default function Event({
 
     patchSchedule({
       events: [...castDraft(events), castDraft(newEvent)],
-      colorMap: { ...colorMap, [eventId]: getRandomColor() },
+      colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
     });
   }, [
     colorMap,
@@ -166,15 +167,18 @@ export default function Event({
                 )}
               </span>
             </div>
+            {paletteShown && (
+              <Palette
+                className="palette"
+                palette={palette}
+                onSelectColor={(col): void =>
+                  patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
+                }
+                color={color ?? null}
+                onMouseLeave={(): void => setPaletteShown(false)}
+              />
+            )}
           </ActionRow>
-          {paletteShown && (
-            <Palette
-              onSelectColor={(col): void =>
-                patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
-              }
-              color={color ?? null}
-            />
-          )}
         </div>
       )}
       {formShown && (

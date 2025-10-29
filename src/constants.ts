@@ -51,52 +51,47 @@ const DEFAULT_PALETTE = [
   ],
 ];
 
-const PRESET_PALETTE = [
+const SOFT_PALETTE = [
   [
-    '#6E95F2',
-    '#B0AFF3',
-    '#FE8F31',
-    '#FEBF23',
-    '#FEF30B',
-    '#8FE6FE',
-    '#BDF23C',
-    '#FFB6E2',
-    '#FF7B66',
-  ],
-  [
-    '#123445',
-    '#1E4E4A',
-    '#275D54',
-    '#528B3A',
-    '#8CA242',
-    '#C1BB3C',
-    '#E09039',
-    '#DB713C',
-    '#D15C46',
-  ],
-  [
-    '#D1C3B0',
-    '#DAAF86',
-    '#CFA389',
-    '#DFC1AE',
-    '#ECE0CE',
-    '#D3BFAC',
-    '#B3907D',
-    '#819673',
-    '#6A796C',
-  ],
-  [
-    '#738096',
-    '#C9D1D8',
-    '#D5BB67',
-    '#CB6F64',
-    '#983F3F',
-    '#6A211D',
-    '#57683B',
-    '#404F44',
-    '#0D0D0D',
+    '#FFFFCC',
+    '#FFCC99',
+    '#FFCCCC',
+    '#FF99CC',
+    '#FFCCFF',
+    '#CC99FF',
+    '#CCCCFF',
+    '#99CCFF',
+    '#CCFFFF',
+    '#99FFCC',
+    '#CCFFCC',
+    '#CCFF99',
   ],
 ];
+
+const DEEP_PALETTE = [
+  [
+    '#692D2C',
+    '#B0847A',
+    '#B9A698',
+    '#D6C149',
+    '#E7E2DC',
+    '#A9A3C1',
+    '#AADAEE',
+    '#91B4D2',
+    '#2A96D7',
+    '#BCDBD3',
+    '#516F31',
+    '#353F2A',
+  ],
+];
+
+const PALETTES = {
+  default: DEFAULT_PALETTE,
+  soft: SOFT_PALETTE,
+  deep: DEEP_PALETTE,
+};
+
+export type PaletteKey = keyof typeof PALETTES;
 
 const ASYNC_DELIVERY_MODE = 'Remote Asynchronous Course';
 
@@ -151,7 +146,8 @@ export {
   DAYS,
   PNG_SCALE_FACTOR,
   DEFAULT_PALETTE,
-  PRESET_PALETTE,
+  SOFT_PALETTE,
+  DEEP_PALETTE,
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,
