@@ -7,7 +7,6 @@ import { Palette, Term } from '../../types';
 import { DEFAULT_PALETTE, SOFT_PALETTE, DEEP_PALETTE } from '../../constants';
 
 import './stylesheet.scss';
-import { getRandomColor } from '../../utils/misc';
 
 export type HeaderProps = {
   currentTab: number;
