@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
+
 import { classes } from '../../utils/misc';
-import './stylesheet.scss';
 import RateEntry, { StarsValue, TimeValue } from '../RateEntry';
 import Select from '../Select';
 import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
 import {
   MetricName,
-  TargetType,
   SubmitMetricsRequestData,
+  TargetType,
 } from '../../data/types';
+
+import './stylesheet.scss';
 
 type RateCardProps = {
   courseOptions: { id: string; label: string }[];

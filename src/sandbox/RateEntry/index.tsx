@@ -1,4 +1,5 @@
 import React from 'react';
+
 import RateCard from '../../components/RateCard';
 
 export default function RateEntryPage(): React.ReactElement {

@@ -3,9 +3,7 @@ import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
 
 import App from '../App';
 import InviteBackLink from '../InviteBackLink';
-
-// TEMP
-import RateEntryPage from '../../sandbox/RateEntry';
+import RateEntryPage from '../../sandbox/RateEntry'; // TEMP
 
 export default function RouterComponent(): React.ReactElement {
   return (
