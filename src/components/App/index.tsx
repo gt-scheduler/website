@@ -60,8 +60,7 @@ export default function App(): React.ReactElement {
             )}
           >
             {/* TODO: Remove this conditional Before merging #380 */}
-            {process.env.NODE_ENV === 'development' &&
-            window.location.pathname.startsWith('/sandbox') ? (
+            {window.location.pathname.startsWith('/sandbox') ? (
               // Sandbox-only route
               <CourseInfoSandbox />
             ) : (
