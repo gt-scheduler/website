@@ -1,0 +1,41 @@
+.MetricsCard {
+  display: flex;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: 'Roboto', sans-serif;
+
+  .metrics-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: 40px;
+      padding-right: 40px;
+      border-right: 1px solid #505050;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      .metric-value {
+        font-size: 20px;
+      }
+
+      .metric-unit {
+        font-size: 14px;
+        font-weight: normal;
+      }
+
+      .metric-label {
+        font-size: 14px;
+        color: #ccc;
+        margin-top: 4px;
+      }
+    }
+  }
+}

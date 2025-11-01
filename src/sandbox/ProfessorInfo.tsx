@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Breadcrumb } from '../components';
 import { BreadcrumbItem } from '../components/Breadcrumb';
+import MetricsCard from '../components/MetricsCard';
 
 export default function ProfessorInfo(): React.ReactElement {
   const breadcrumbItem1: BreadcrumbItem = {
@@ -11,9 +12,17 @@ export default function ProfessorInfo(): React.ReactElement {
   const breadcrumbItem2: BreadcrumbItem = { label: 'LMC 3705 Section Details' };
   const breadcrumbsList = [breadcrumbItem1, breadcrumbItem2];
 
+  const metrics = [
+    { label: 'Overall Rating', value: '3.91/5' },
+    { label: 'Course GPA', value: '3.91' },
+    { label: 'Level of Difficulty', value: '3.4/5' },
+    { label: 'Course GPA', value: '14.5', unit: 'hrs/week' },
+  ];
+
   return (
     <div>
       <Breadcrumb items={breadcrumbsList} />
+      <MetricsCard metrics={metrics} />
     </div>
   );
 }
