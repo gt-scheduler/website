@@ -1,0 +1,83 @@
+@import '../../variables';
+
+.rateentry {
+  height: 140px;
+  width: 100%;
+  border: 1px solid $color-border;
+  padding-inline: 24px;
+  padding-block: 15px;
+
+  .heading {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .stars-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    .labels {
+      width: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      color: $modal-foreground-color-dark;
+    }
+
+    .star {
+      font-size: 44px;
+      color: #d79758;
+    }
+  }
+
+  .time-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    gap: 24px;
+
+    .time-input-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .time-input {
+        aspect-ratio: 1 / 1;
+        height: 32px;
+        width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: $color-neutral;
+        font-size: 14px;
+        color: #fff;
+        border: none;
+        outline: none;
+        text-align: center;
+
+        // remove spinner
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        -moz-appearance: textfield;
+
+        &:focus {
+          outline: none;
+          border: none;
+        }
+      }
+
+      .time-label {
+        font-size: 14px;
+      }
+    }
+  }
+}
