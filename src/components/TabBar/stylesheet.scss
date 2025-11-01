@@ -1,0 +1,40 @@
+@import '../../variables';
+
+.TabBar {
+  display: flex;
+  align-items: center;
+  background-color: $tab-bar-background;
+  border-radius: 8px;
+  padding: 4px 8px;
+  overflow-x: auto;
+
+  .tab {
+    font-size: 0.9em;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: $tab-bar-text-unselected; // likely something like $color-neutral-light
+    white-space: nowrap;
+    transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &.active {
+      background-color: rgba($color-neutral, 0.3); // adjust to match your active background tone
+      color: white;
+      font-weight: 600;
+    }
+  }
+
+  // 👇 when enableSelect is false, make all tab text white
+  &.unselectable {
+    .tab {
+      color: white;
+      cursor: default;
+      opacity: 1; // make sure they don’t appear dim
+    }
+  }
+}
