@@ -1,11 +1,10 @@
 @import '../../variables';
 
 .rateentry {
-  height: 140px;
+  height: 180px;
   width: 100%;
   border: 1px solid $color-border;
-  padding-inline: 24px;
-  padding-block: 15px;
+  padding: 32px 24px;
 
   .heading {
     font-weight: bold;
@@ -17,7 +16,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
     cursor: pointer;
 
     .labels {
@@ -30,7 +29,7 @@
     }
 
     .star {
-      font-size: 44px;
+      font-size: 48px;
       color: #d79758;
     }
   }
