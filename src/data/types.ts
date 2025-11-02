@@ -220,3 +220,9 @@ export type FriendScheduleData = Record<
     >;
   }
 >;
+
+export type PlannedCountsData = {
+  term: string;
+  courseCounts: Record<string, number>;
+  sectionCounts: Record<string, number>;
+};
