@@ -1,7 +1,9 @@
 import { firebaseConfig } from './data/firebase';
 
-const OPEN = 8 * 60;
-const CLOSE = 22 * 60;
+const OPEN = 6 * 60;
+const CLOSE = 24 * 60 - 1; // 11:59 PM
+const FINALS_OPEN = 8 * 60;
+const FINALS_CLOSE = 22 * 60;
 const DAYS = ['M', 'T', 'W', 'R', 'F'];
 
 const PNG_SCALE_FACTOR = 2;
@@ -97,6 +99,8 @@ const LARGE_MOBILE_BREAKPOINT = 600;
 export {
   OPEN,
   CLOSE,
+  FINALS_OPEN,
+  FINALS_CLOSE,
   CRAWLER_BASE_URL,
   COURSE_TABS,
   COURSES,
