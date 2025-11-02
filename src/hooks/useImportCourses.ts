@@ -13,7 +13,7 @@ import { getRandomColor } from '../utils/misc';
  *
  * @example
  * const importCourses = useImportCourses();
- * importCourses('CS 1331,MATH 3012,CS 3210');
+ * importCourses('CS 1332,CS 2110,PSYC 1101');
  */
 export default function useImportCourses(): (courseString: string) => void {
   const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
@@ -33,28 +33,14 @@ export default function useImportCourses(): (courseString: string) => void {
 
       // Process each course name
       courseNames.forEach((courseName) => {
-        // Normalize the course name format (e.g., "CS1331" -> "CS 1331")
-        // Mitigate for different formatting of course string
-        let normalizedName = courseName;
-        const results = /^([A-Z]+)(\d.*)$/i.exec(courseName);
-        if (results != null) {
-          const [, subject, number] = results as unknown as [
-            string,
-            string,
-            string
-          ];
-          normalizedName = `${subject} ${number}`;
-        }
-
         // Search for the course in oscar.courses
-        const course = oscar.courses.find((c) => c.id === normalizedName);
+        const course = oscar.courses.find((c) => c.id === courseName);
 
         // If the course is found and not already in desiredCourses, add it
         if (course && !desiredCourses.includes(course.id)) {
           newDesiredCourses.push(course.id);
 
-          // Exclude sections that don't have decided times or don't match filters
-          // (following the same logic as CourseAdd)
+          // Exclude sections that don't have decided times
           const toBeExcludedCrns = course.sections
             .filter((section) => {
               const timeDecided =
