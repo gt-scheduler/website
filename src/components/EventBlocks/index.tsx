@@ -208,6 +208,8 @@ export default function EventBlocks({
     tempStartRef.current = start;
   };
 
+  const isDraft = !event.isSaved;
+
   return (
     <TimeBlocks
       className={className}
@@ -253,10 +255,10 @@ export default function EventBlocks({
       overlay={overlay}
       capture={capture}
       sizeInfo={sizeInfo}
-      includeDetailsPopover={!dragging && includeDetailsPopover}
+      includeDetailsPopover={!dragging && includeDetailsPopover && !isDraft}
       includeContent={includeContent}
-      canBeTabFocused={canBeTabFocused}
-      onSelectMeeting={onSelectMeeting}
+      canBeTabFocused={canBeTabFocused && !isDraft}
+      onSelectMeeting={isDraft ? undefined : onSelectMeeting}
       schedule={scheduleId}
       selectedMeeting={selectedMeeting}
       deviceHasHover={deviceHasHover}

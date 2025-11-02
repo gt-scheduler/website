@@ -227,6 +227,7 @@ export default function EventDrag({
 
       const { current: d } = draftRef;
 
+      // Clear draft state and refs immediately
       draftRef.current = null;
       pressRef.current = null;
       setDraftEvent(null);
@@ -241,6 +242,7 @@ export default function EventDrag({
           days: [d.day],
           period: { start: d.start, end: d.end },
           showEditForm: true,
+          isSaved: false, // Mark as unsaved draft
         };
 
         patchSchedule({

@@ -40,7 +40,6 @@ export default function EventAdd({
     event?.period.end ? timeToString(event.period.end, false, true) : ''
   );
   const [submitDisabled, setSubmitDisabled] = useState(true);
-  const [discardDisabled, setDiscardDisabled] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -57,21 +56,6 @@ export default function EventAdd({
     }
   }, [eventName, selectedTags, start, end, error]);
 
-  useEffect(() => {
-    // For existing events, always enable discard (it deletes the event)
-    // For new events, only enable if any field has been filled
-    if (event) {
-      setDiscardDisabled(false);
-    } else {
-      const anyFieldFilled =
-        eventName.length > 0 ||
-        selectedTags.length > 0 ||
-        start !== '' ||
-        end !== '';
-      setDiscardDisabled(!anyFieldFilled);
-    }
-  }, [event, eventName, selectedTags, start, end]);
-
   const parseTime = useCallback((time: string): number => {
     const split = time.split(':').map((str) => Number(str));
 
@@ -83,28 +67,35 @@ export default function EventAdd({
 
   const onDiscard = useCallback((): void => {
     if (event) {
-      // If editing an existing event, delete it
-      const newEvents = castDraft(events).filter(
-        (existingEvent) => existingEvent.id !== event.id
-      );
-      const newColorMap = { ...colorMap };
-      delete newColorMap[event.id];
+      // If this event has never been saved (it's a new draft),
+      // delete it entirely
+      if (!event.isSaved) {
+        // Remove the event from the schedule
+        const newEvents = castDraft(events).filter(
+          (existingEvent) => existingEvent.id !== event.id
+        );
+        const newColorMap = { ...colorMap };
+        delete newColorMap[event.id];
 
-      patchSchedule({
-        events: newEvents,
-        colorMap: newColorMap,
-      });
-
-      if (setFormShown) {
+        patchSchedule({
+          events: newEvents,
+          colorMap: newColorMap,
+        });
+      } else if (setFormShown) {
+        // If editing an existing saved event,
+        // just close the form to revert changes
         setFormShown(false);
       }
     } else {
-      // If creating a new event, just clear the form
+      // If creating a new event (not yet in schedule), just clear the form
       setEventName('');
       setSelectedTags([]);
       setStart('');
       setEnd('');
       setError('');
+      // Force clear the time input fields
+      if (startInputRef.current) startInputRef.current.value = '';
+      if (endInputRef.current) endInputRef.current.value = '';
     }
   }, [event, events, colorMap, patchSchedule, setFormShown]);
 
@@ -159,6 +150,7 @@ export default function EventAdd({
                 end: parsedEnd,
               },
               days: selectedTags,
+              isSaved: true, // Mark as saved
             }
           : existingEvent
       );
@@ -180,6 +172,7 @@ export default function EventAdd({
           end: parsedEnd,
         },
         days: selectedTags,
+        isSaved: true, // Mark as saved
       };
 
       patchSchedule({
@@ -219,6 +212,8 @@ export default function EventAdd({
   );
 
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const startInputRef = useRef<HTMLInputElement>(null);
+  const endInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
@@ -287,6 +282,7 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={startInputRef}
                   type="time"
                   value={start}
                   onChange={handleStartChange}
@@ -302,6 +298,7 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={endInputRef}
                   type="time"
                   value={end}
                   onChange={handleEndChange}
@@ -314,7 +311,6 @@ export default function EventAdd({
                 <div className="button-container">
                   <Button
                     className="button discard-button"
-                    disabled={discardDisabled}
                     onClick={onDiscard}
                     id="event-discard-button"
                   >
