@@ -41,21 +41,6 @@ export default function Event({
   const [formShown, setFormShown] = useState<boolean>(
     Boolean(event.showEditForm)
   );
-  const eventRef = useRef<HTMLDivElement>(null);
-
-  useEffect((): (() => void) => {
-    const handlePointerOutside = (e: PointerEvent): void => {
-      if (eventRef.current && !eventRef.current.contains(e.target as Node)) {
-        setPaletteShown(false);
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerOutside);
-
-    return (): void => {
-      document.removeEventListener('pointerdown', handlePointerOutside);
-    };
-  }, []);
 
   const handleDuplicateEvent = useCallback(() => {
     const eventId = new Date().getTime().toString();
@@ -126,7 +111,6 @@ export default function Event({
           className={classes('Event', contentClassName, 'default', className)}
           style={{ backgroundColor: color }}
           key={event.id}
-          ref={eventRef}
         >
           <ActionRow
             label={[event.name].join(' ')}

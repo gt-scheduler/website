@@ -85,6 +85,8 @@ export default function Header({
 
   const setPalette = useCallback(
     (newPalette: Palette): void => {
+      if (newPalette === palette) return;
+
       let paletteArray: string[];
 
       switch (newPalette) {
@@ -100,23 +102,17 @@ export default function Header({
       }
 
       const newColorMap: Record<string, string> = {};
-      const availableColors = [...paletteArray]; // copy to avoid mutation
 
-      // Assign each course a unique color from the palette
-      for (const courseId of Object.keys(colorMap)) {
-        newColorMap[courseId] =
-          availableColors.shift() ??
-          (paletteArray[
-            Math.floor(Math.random() * paletteArray.length)
-          ] as string);
-      }
+      Object.keys(colorMap).forEach((courseId, i) => {
+        newColorMap[courseId] = paletteArray[i % paletteArray.length] as string;
+      });
 
       patchSchedule({
         colorMap: newColorMap,
         palette: newPalette,
       });
     },
-    [colorMap, patchSchedule]
+    [colorMap, patchSchedule, palette]
   );
 
   const paletteState = useMemo(

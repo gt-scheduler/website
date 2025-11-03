@@ -45,25 +45,6 @@ export default function Course({
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
-  const courseRef = useRef<HTMLDivElement>(null);
-
-  useEffect((): (() => void) => {
-    const handleClickOutside = (event: MouseEvent): void => {
-      if (
-        courseRef.current &&
-        !courseRef.current.contains(event.target as Node)
-      ) {
-        setPaletteShown(false);
-        setExpanded(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return (): void => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   useEffect(() => {
     const course = oscar.findCourse(courseId);
     if (course == null) return;
@@ -186,7 +167,6 @@ export default function Course({
       className={classes('Course', contentClassName, 'default', className)}
       style={{ backgroundColor: color }}
       key={course.id}
-      ref={courseRef}
     >
       <ActionRow
         label={[
