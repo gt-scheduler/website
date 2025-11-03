@@ -1,11 +1,5 @@
 import { Immutable, castDraft } from 'immer';
-import React, {
-  useCallback,
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-} from 'react';
+import React, { useCallback, useContext, useState, useEffect } from 'react';
 import {
   faPencil,
   faPalette,

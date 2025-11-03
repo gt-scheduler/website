@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useRef,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   faAngleDown,
   faAngleUp,
