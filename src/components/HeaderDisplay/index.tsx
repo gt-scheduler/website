@@ -11,13 +11,19 @@ import { getSemesterName } from '../../utils/semesters';
 import { Button, Select, Tab } from '..';
 import { LoadingSelect, SelectAction } from '../Select';
 import Spinner from '../Spinner';
-import { getNextVersionName } from '../../utils/misc';
-import { DESKTOP_BREAKPOINT, LARGE_MOBILE_BREAKPOINT } from '../../constants';
+import { getNextVersionName, classes } from '../../utils/misc';
+import {
+  DESKTOP_BREAKPOINT,
+  LARGE_MOBILE_BREAKPOINT,
+  DEFAULT_PALETTE,
+  SOFT_PALETTE,
+  DEEP_PALETTE,
+} from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import HeaderActionBar from '../HeaderActionBar';
 import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
-import { Term } from '../../types';
+import { Term, Palette } from '../../types';
 import Toast, { notifyToast } from '../Toast';
 
 import './stylesheet.scss';
@@ -44,6 +50,14 @@ type TermsState =
       onChangeTerm: (next: string) => void;
     };
 
+type PaletteState =
+  | { type: 'loading' }
+  | {
+      type: 'loaded';
+      palette: Palette;
+      setPalette: (newPalette: Palette) => void;
+    };
+
 export type HeaderDisplayProps = {
   totalCredits?: number | null;
   currentTab: number;
@@ -58,6 +72,7 @@ export type HeaderDisplayProps = {
   enableDownloadCalendar?: boolean;
   termsState: TermsState;
   versionsState: VersionState;
+  paletteState: PaletteState;
   accountState: AccountContextValue | { type: 'loading' };
   skeleton: boolean;
 };
@@ -83,6 +98,7 @@ export default function HeaderDisplay({
   enableDownloadCalendar = false,
   termsState,
   versionsState,
+  paletteState,
   accountState,
   skeleton = true,
 }: HeaderDisplayProps): React.ReactElement {
@@ -149,6 +165,23 @@ export default function HeaderDisplay({
       )}
       {/* Version selector */}
       <VersionSelector state={versionsState} />
+
+      {/* Palette selector */}
+      {!mobile && (
+        <>
+          {paletteState.type === 'loaded' ? (
+            <Select
+              className="palette"
+              desiredItemWidth={337}
+              options={paletteOptions}
+              current={paletteState.palette ?? 'default'}
+              onChange={paletteState.setPalette}
+            />
+          ) : (
+            <LoadingSelect />
+          )}
+        </>
+      )}
 
       <span className="credits">
         {totalCredits === null ? (
@@ -316,3 +349,63 @@ function VersionSelector({ state }: VersionSelectorProps): React.ReactElement {
     </>
   );
 }
+
+const paletteOptions = [
+  {
+    id: 'default' as Palette,
+    label: 'Default Palette',
+    content: (
+      <div className={classes('Palette-select')}>
+        {DEFAULT_PALETTE.map((colors, i) => (
+          <div className="palette-row" key={i}>
+            {colors.map((paletteColor) => (
+              <div
+                className={classes('color', 'frame')}
+                key={paletteColor}
+                style={{ backgroundColor: paletteColor }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: 'soft' as Palette,
+    label: 'Soft Palette',
+    content: (
+      <div className={classes('Palette-select')}>
+        {SOFT_PALETTE.map((colors, i) => (
+          <div className="palette-row" key={i}>
+            {colors.map((paletteColor) => (
+              <div
+                className={classes('color', 'frame')}
+                key={paletteColor}
+                style={{ backgroundColor: paletteColor }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: 'deep' as Palette,
+    label: 'Deep Palette',
+    content: (
+      <div className={classes('Palette-select')}>
+        {DEEP_PALETTE.map((colors, i) => (
+          <div className="palette-row" key={i}>
+            {colors.map((paletteColor) => (
+              <div
+                className={classes('color', 'frame')}
+                key={paletteColor}
+                style={{ backgroundColor: paletteColor }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    ),
+  },
+];

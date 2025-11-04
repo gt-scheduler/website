@@ -39,6 +39,7 @@
     "react-transition-group": "^4.4.2",
     "react-virtualized": "^9.21.2",
     "s-ago": "^2.2.0",
+    "swr": "^2.3.6",
     "tslib": "2.3.0",
     "use-local-storage-state": "^18.1.2",
     "uuid": "^9.0.0"

@@ -6,7 +6,7 @@ const DAYS = ['M', 'T', 'W', 'R', 'F'];
 
 const PNG_SCALE_FACTOR = 2;
 
-const PALETTE = [
+const DEFAULT_PALETTE = [
   [
     '#4D4D4D',
     '#999999',
@@ -50,6 +50,48 @@ const PALETTE = [
     '#AB149E',
   ],
 ];
+
+const SOFT_PALETTE = [
+  [
+    '#FFFFCC',
+    '#FFCC99',
+    '#FFCCCC',
+    '#FF99CC',
+    '#FFCCFF',
+    '#CC99FF',
+    '#CCCCFF',
+    '#99CCFF',
+    '#CCFFFF',
+    '#99FFCC',
+    '#CCFFCC',
+    '#CCFF99',
+  ],
+];
+
+const DEEP_PALETTE = [
+  [
+    '#692D2C',
+    '#B0847A',
+    '#B9A698',
+    '#D6C149',
+    '#E7E2DC',
+    '#A9A3C1',
+    '#AADAEE',
+    '#91B4D2',
+    '#2A96D7',
+    '#BCDBD3',
+    '#516F31',
+    '#353F2A',
+  ],
+];
+
+const PALETTES = {
+  default: DEFAULT_PALETTE,
+  soft: SOFT_PALETTE,
+  deep: DEEP_PALETTE,
+};
+
+export type PaletteKey = keyof typeof PALETTES;
 
 const ASYNC_DELIVERY_MODE = 'Remote Asynchronous Course';
 
@@ -103,7 +145,9 @@ export {
   RECURRING_EVENTS,
   DAYS,
   PNG_SCALE_FACTOR,
-  PALETTE,
+  DEFAULT_PALETTE,
+  SOFT_PALETTE,
+  DEEP_PALETTE,
   ASYNC_DELIVERY_MODE,
   DELIVERY_MODES,
   CAMPUSES,
