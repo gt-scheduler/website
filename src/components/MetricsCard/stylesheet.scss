@@ -1,3 +1,5 @@
+@import '../../variables.scss';
+
 .MetricsCard {
   display: flex;
   padding: 16px;
@@ -16,7 +18,7 @@
       align-items: center;
       margin-left: 40px;
       padding-right: 40px;
-      border-right: 1px solid #505050;
+      border-right: 1px solid $color-border;
 
       &:last-child {
         border-right: none;
@@ -33,8 +35,9 @@
 
       .metric-label {
         font-size: 14px;
-        color: #ccc;
         margin-top: 4px;
+        @include dark(color, $seat-info-dark-label);
+        @include light(color, $seat-info-light-label);
       }
     }
   }

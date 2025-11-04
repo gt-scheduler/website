@@ -1,15 +1,23 @@
+@import '../../variables';
+
 .ProfessorInfo {
   padding: 20px;
-  min-height: 100vh;
   font-family: 'Roboto', sans-serif;
+  border-radius: 5px;
+  margin: 16px;
+
+  @include dark(background, $theme-dark-card-background);
+  @include light(background, $theme-light-card-background);
+
+  @extend %colored-link-container;
 
   .professor-header {
-    margin-bottom: 30px;
-
+    padding: 0px;
+    
     .professor-name {
       font-size: 20px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin: 0px;
     }
   }
 
@@ -21,27 +29,28 @@
       display: flex;
       padding: 16px 20px;
       font-size: 14px;
-      color: #adadad;
-      border-bottom: 1px solid #505050;
+      border-bottom: 1px solid $color-border;
+
+      @include dark(color, $seat-info-dark-label);
+      @include light(color, $seat-info-light-label);
 
       .header-cell {
         display: flex;
         align-items: center;
 
-        &:nth-child(1) { width: 60px; margin-right: 20px; } // Action
-        &:nth-child(2) { width: 80px; margin-right: 20px; } // CRN
-        &:nth-child(3) { width: 80px; margin-right: 20px; } // Sect
-        &:nth-child(4) { width: 80px; margin-right: 20px; } // Day
-        &:nth-child(5) { width: 150px; margin-right: 20px; } // Time
-
-        &:nth-child(6) { width: 100px; margin-left: auto; margin-right: 20px; } // Seats
-        &:nth-child(7) { width: 100px; margin-right: 20px; } // Waitlist
-        &:nth-child(8) { width: 200px; } // Location
+        &:nth-child(1) { width: 60px; margin-right: 20px; }
+        &:nth-child(2) { width: 80px; margin-right: 20px; }
+        &:nth-child(3) { width: 80px; margin-right: 20px; }
+        &:nth-child(4) { width: 80px; margin-right: 20px; }
+        &:nth-child(5) { width: 150px; margin-right: 20px; }
+        &:nth-child(6) { width: 100px; margin-left: auto; margin-right: 20px; }
+        &:nth-child(7) { width: 100px; margin-right: 20px; }
+        &:nth-child(8) { width: 200px; }
       }
     }
 
     .section-row {
-      border-bottom: 1px solid #505050;
+      border-bottom: 1px solid $color-border;
 
       &:last-child {
         border-bottom: none;
@@ -54,23 +63,25 @@
 
         .section-cell {
           font-size: 14px;
-          color: #fff;
           display: flex;
           align-items: center;
+
+          // Theme-aware text colors
+          @include dark(color, $theme-dark-foreground);
+          @include light(color, $theme-light-foreground);
 
           &.action-cell {
             justify-content: center;
           }
 
-          &:nth-child(1) { width: 60px; margin-right: 20px; } // Action
-          &:nth-child(2) { width: 80px; margin-right: 20px; } // CRN
-          &:nth-child(3) { width: 80px; margin-right: 20px; } // Sect
-          &:nth-child(4) { width: 80px; margin-right: 20px; } // Day
-          &:nth-child(5) { width: 150px; margin-right: 20px; } // Time
-
-          &:nth-child(6) { width: 100px; margin-left: auto; margin-right: 20px; } // Seats
-          &:nth-child(7) { width: 100px; margin-right: 20px; } // Waitlist
-          &:nth-child(8) { width: 200px; } // Location
+          &:nth-child(1) { width: 60px; margin-right: 20px; }
+          &:nth-child(2) { width: 80px; margin-right: 20px; }
+          &:nth-child(3) { width: 80px; margin-right: 20px; }
+          &:nth-child(4) { width: 80px; margin-right: 20px; }
+          &:nth-child(5) { width: 150px; margin-right: 20px; }
+          &:nth-child(6) { width: 100px; margin-left: auto; margin-right: 20px; }
+          &:nth-child(7) { width: 100px; margin-right: 20px; }
+          &:nth-child(8) { width: 200px; }
         }
 
         .action-button {
@@ -85,6 +96,8 @@
 
           svg {
             font-size: 16px;
+            @include dark(color, $theme-dark-foreground);
+            @include light(color, $theme-light-foreground);
           }
         }
       }

@@ -132,7 +132,7 @@ export default function ProfessorInfoCard({
   return (
     <div className="ProfessorInfo">
       <div className="professor-header">
-        <h1 className="professor-name">{professorName}</h1>
+        <p className="professor-name">{professorName}</p>
       </div>
 
       <div className="sections-container">
