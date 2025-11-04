@@ -19,6 +19,7 @@
 
   .date {
     @include card;
+    margin-bottom: 0px;
 
     // Include theme switch transition
     transition-duration: $theme-switch-transition-duration;
