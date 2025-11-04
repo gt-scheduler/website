@@ -12,6 +12,8 @@ export function isTheme(theme: string): theme is Theme {
   }
 }
 
+export type Palette = 'default' | 'soft' | 'deep';
+
 export type LoadingState<T> =
   | LoadingStateLoaded<T>
   | LoadingStateLoading

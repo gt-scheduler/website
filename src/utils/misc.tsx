@@ -7,13 +7,20 @@ import { saveAs } from 'file-saver';
 import { Immutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
-import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
+import {
+  DAYS,
+  DEFAULT_PALETTE,
+  DEEP_PALETTE,
+  SOFT_PALETTE,
+  PNG_SCALE_FACTOR,
+} from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
   DateRange,
   Event,
   ICS,
   Meeting,
+  Palette,
   Period,
   PrerequisiteClause,
   Theme,
@@ -69,10 +76,17 @@ export const daysToString = (days: readonly string[] | string[]): string => {
   return DAYS.filter((day) => set.has(day)).join('');
 };
 
-export const getRandomColor = (): string => {
-  const colors = PALETTE.flat();
-  const index = (Math.random() * colors.length) | 0;
-  return colors[index] ?? '#333333';
+export const getRandomColor = (palette: Palette): string => {
+  const paletteColors =
+    palette === 'default'
+      ? DEFAULT_PALETTE
+      : palette === 'soft'
+      ? SOFT_PALETTE
+      : DEEP_PALETTE;
+  const colors = paletteColors.flat();
+  const uniqueColors = Array.from(new Set(colors));
+  const index = Math.floor(Math.random() * uniqueColors.length);
+  return uniqueColors[index] ?? '#333333';
 };
 
 const getLuminance = (color: string): number => {

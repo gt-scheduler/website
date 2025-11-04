@@ -53,8 +53,10 @@ export default function EventDrag({
   onCreate,
   containerRef,
 }: EventDragProps): React.ReactElement | null {
-  const [{ colorMap, events }, { patchSchedule, setCourseContainerTab }] =
-    useContext(ScheduleContext);
+  const [
+    { colorMap, events, palette },
+    { patchSchedule, setCourseContainerTab },
+  ] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -262,7 +264,7 @@ export default function EventDrag({
 
         patchSchedule({
           events: [...castDraft(events), newEvent],
-          colorMap: { ...colorMap, [eventId]: getRandomColor() },
+          colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
         });
 
         onCreate?.(newEvent);
@@ -276,6 +278,7 @@ export default function EventDrag({
       patchSchedule,
       events,
       colorMap,
+      palette,
       onCreate,
       setCourseContainerTab,
     ]

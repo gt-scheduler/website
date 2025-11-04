@@ -30,7 +30,8 @@ export default function Event({
   event,
 }: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
-  const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
+  const [{ events, colorMap, palette }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [formShown, setFormShown] = useState<boolean>(
     Boolean(event.showEditForm)
   );
@@ -53,9 +54,9 @@ export default function Event({
 
     patchSchedule({
       events: [...castDraft(events), castDraft(newEvent)],
-      colorMap: { ...colorMap, [eventId]: getRandomColor() },
+      colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
     });
-  }, [colorMap, event, events, patchSchedule]);
+  }, [colorMap, event, events, palette, patchSchedule]);
 
   // this basically forces the edit form to only auto-focus once per render
   useEffect(() => {
@@ -112,7 +113,10 @@ export default function Event({
             actions={[
               {
                 icon: faPencil,
-                onClick: (): void => setFormShown(true),
+                onClick: (): void => {
+                  setFormShown(true);
+                  setPaletteShown(false);
+                },
               },
               {
                 icon: faPalette,
@@ -124,7 +128,10 @@ export default function Event({
                 icon: faClone,
                 tooltip: 'Duplicate Event',
                 id: `${event.id}-duplicate`,
-                onClick: (): void => handleDuplicateEvent(),
+                onClick: (): void => {
+                  handleDuplicateEvent();
+                  setPaletteShown(false);
+                },
               },
               {
                 icon: faTrash,
@@ -144,6 +151,7 @@ export default function Event({
             {paletteShown && (
               <Palette
                 className="palette"
+                palette={palette}
                 onSelectColor={(col): void =>
                   patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
                 }

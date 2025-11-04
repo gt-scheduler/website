@@ -1,6 +1,6 @@
 import { castImmutable, Immutable } from 'immer';
 
-import { Event } from '../types';
+import { Event, Palette } from '../types';
 import { generateRandomId } from '../utils/misc';
 
 // This file defines all of the possible types that the schedule data can take
@@ -71,6 +71,7 @@ export const defaultSchedule: Immutable<Schedule> = {
   events: [],
   colorMap: {},
   sortingOptionIndex: 0,
+  palette: 'default' as Palette,
 };
 
 export const generateScheduleVersionId = (): string =>
@@ -168,6 +169,7 @@ export interface Version3Schedule {
   events: Event[];
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
+  palette: Palette;
 }
 
 export type FriendIds = Record<string, string[]>;

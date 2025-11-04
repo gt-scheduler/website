@@ -85,7 +85,7 @@ export default function ComparisonContainer({
   const [invitationModalEmail, setInvitationModalEmail] = useState('');
 
   const [
-    { allVersionNames, currentVersion, colorMap, term },
+    { allVersionNames, currentVersion, colorMap, term, palette },
     { deleteVersion, renameVersion, patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -98,26 +98,33 @@ export default function ComparisonContainer({
     allVersionNames.forEach((versionName) => {
       const version = versionName.id;
       if (!(version in newColorMap)) {
-        newColorMap[version] = getRandomColor();
+        newColorMap[version] = getRandomColor(palette);
       }
     });
     if (!(currentVersion in newColorMap)) {
-      newColorMap[currentVersion] = getRandomColor();
+      newColorMap[currentVersion] = getRandomColor(palette);
     }
     Object.entries(friends).forEach((friend) => {
       if (!(friend[0] in newColorMap)) {
-        newColorMap[friend[0]] = getRandomColor();
+        newColorMap[friend[0]] = getRandomColor(palette);
       }
       Object.keys(friend[1].versions).forEach((schedule) => {
         if (!(schedule in newColorMap)) {
-          newColorMap[schedule] = getRandomColor();
+          newColorMap[schedule] = getRandomColor(palette);
         }
       });
     });
     if (Object.keys(newColorMap).length !== Object.keys(colorMap).length) {
       patchSchedule({ colorMap: newColorMap });
     }
-  }, [friends, currentVersion, colorMap, patchSchedule, allVersionNames]);
+  }, [
+    friends,
+    currentVersion,
+    colorMap,
+    palette,
+    patchSchedule,
+    allVersionNames,
+  ]);
 
   const handleEdit = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -567,6 +574,7 @@ function ScheduleRow({
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [showEditTooltip, setShowEditTooltip] = useState(false);
   const [showRemoveTooltip, setShowRemoveTooltip] = useState(false);
+  const [{ palette }] = useContext(ScheduleContext);
 
   const edit =
     hasEdit &&
@@ -575,7 +583,7 @@ function ScheduleRow({
     editInfo.id === id &&
     editInfo.owner === owner;
 
-  const palette = hasPalette && paletteInfo === id;
+  const paletteBool = hasPalette && paletteInfo === id;
 
   return (
     <div
@@ -663,7 +671,7 @@ function ScheduleRow({
           >
             <Button
               className="icon"
-              onClick={(): void => setPaletteInfo(palette ? '' : id)}
+              onClick={(): void => setPaletteInfo(paletteBool ? '' : id)}
               key={`${id}-palette`}
             >
               <FontAwesomeIcon icon={faPalette} size="xs" />
@@ -769,14 +777,18 @@ function ScheduleRow({
           </div>
         )}
       </div>
-      {hasPalette && palette && setFriendScheduleColor && setPaletteInfo && (
-        <Palette
-          className={classes('palette', type === 'Schedule' && 'indented')}
-          onSelectColor={setFriendScheduleColor}
-          color={color ?? null}
-          onMouseLeave={(): void => setPaletteInfo('')}
-        />
-      )}
+      {hasPalette &&
+        paletteBool &&
+        setFriendScheduleColor &&
+        setPaletteInfo && (
+          <Palette
+            className={classes('palette', type === 'Schedule' && 'indented')}
+            palette={palette}
+            onSelectColor={setFriendScheduleColor}
+            color={color ?? null}
+            onMouseLeave={(): void => setPaletteInfo('')}
+          />
+        )}
     </div>
   );
 }
