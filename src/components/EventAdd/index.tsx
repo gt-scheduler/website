@@ -88,6 +88,40 @@ export default function EventAdd({
     return -1; // invalid time string
   }, []);
 
+  const onDiscard = useCallback((): void => {
+    if (event) {
+      // If this event has never been saved (it's a new draft),
+      // delete it entirely
+      if (!event.isSaved) {
+        // Remove the event from the schedule
+        const newEvents = castDraft(events).filter(
+          (existingEvent) => existingEvent.id !== event.id
+        );
+        const newColorMap = { ...colorMap };
+        delete newColorMap[event.id];
+
+        patchSchedule({
+          events: newEvents,
+          colorMap: newColorMap,
+        });
+      } else if (setFormShown) {
+        // If editing an existing saved event,
+        // just close the form to revert changes
+        setFormShown(false);
+      }
+    } else {
+      // If creating a new event (not yet in schedule), just clear the form
+      setEventName('');
+      setSelectedTags([]);
+      setStart('');
+      setEnd('');
+      setError('');
+      // Force clear the time input fields
+      if (startInputRef.current) startInputRef.current.value = '';
+      if (endInputRef.current) endInputRef.current.value = '';
+    }
+  }, [event, events, colorMap, patchSchedule, setFormShown]);
+
   const handleStartChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>): void => {
       const newStart = e.target.value;
@@ -141,6 +175,7 @@ export default function EventAdd({
                 end: parsedEnd,
               },
               days: selectedTags,
+              isSaved: true, // Mark as saved
               where: eventWhere,
               location: eventLocation,
             }
@@ -164,6 +199,7 @@ export default function EventAdd({
           end: parsedEnd,
         },
         days: selectedTags,
+        isSaved: true, // Mark as saved
         where: eventWhere,
         location: eventLocation,
       };
@@ -207,6 +243,8 @@ export default function EventAdd({
   );
 
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const startInputRef = useRef<HTMLInputElement>(null);
+  const endInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
@@ -275,6 +313,7 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={startInputRef}
                   type="time"
                   value={start}
                   onChange={handleStartChange}
@@ -291,6 +330,7 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={endInputRef}
                   type="time"
                   value={end}
                   onChange={handleEndChange}
@@ -319,14 +359,23 @@ export default function EventAdd({
             </tr>
             <tr>
               <td colSpan={2} className="submit">
-                <Button
-                  className="button"
-                  disabled={submitDisabled}
-                  onClick={onSubmit}
-                  id="event-add-button"
-                >
-                  {event?.id ? 'Save' : 'Add'}
-                </Button>
+                <div className="button-container">
+                  <Button
+                    className="button discard-button"
+                    onClick={onDiscard}
+                    id="event-discard-button"
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    className="button add-button"
+                    disabled={submitDisabled}
+                    onClick={onSubmit}
+                    id="event-add-button"
+                  >
+                    {event?.id ? 'Save' : 'Add'}
+                  </Button>
+                </div>
                 {error && <div className="error">{error}</div>}
               </td>
             </tr>

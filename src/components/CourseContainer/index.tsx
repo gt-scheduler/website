@@ -34,7 +34,7 @@ export default function CourseContainer(): React.ReactElement {
       ) : (
         <div className="scroller">
           {events.map((event) => (
-            <Event className="event" event={event} />
+            <Event className="event" event={event} key={event.id} />
           ))}
           <EventAdd className="event-add" />
         </div>
