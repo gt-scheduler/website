@@ -15,13 +15,6 @@
       display: flex;
       align-items: center;
 
-      // &:not(:last-child)::after {
-      //   content: '›';
-      //   margin: 0 8px;
-      //   color: #aaa;
-      //   font-size: 18px;
-      // }
-
       .link {
         color: #8bd6fb;
         text-decoration: none;
@@ -30,6 +23,11 @@
 
       .label {
         font-weight: 500;
+      }
+
+      .separator {
+        margin: 0 6px;
+        font-size: 12px;
       }
     }
   }

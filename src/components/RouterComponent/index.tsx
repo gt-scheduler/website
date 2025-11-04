@@ -9,13 +9,14 @@ export default function RouterComponent(): React.ReactElement {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<App />}>
+          <Route path="sandbox/ProfessorInfo" element={<ProfessorInfo />} />
+        </Route>
         <Route path="/invite/:id" element={<InviteBackLink />} />
         <Route path="/pr-preview/:id">
           <Route path="" element={<App />} />
           <Route path="invite/:id" element={<InviteBackLink />} />
         </Route>
-        <Route path="/sandbox/ProfessorInfo" element={<ProfessorInfo />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>

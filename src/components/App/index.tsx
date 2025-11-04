@@ -19,6 +19,8 @@ import InformationModal from '../InformationModal';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+import ProfessorInfo from '../../sandbox/ProfessorInfo';
+import { Outlet } from 'react-router-dom';
 
 export default function App(): React.ReactElement {
   // Grab the current theme (light/dark) from local storage.
@@ -66,6 +68,7 @@ export default function App(): React.ReactElement {
                 then it displays an error screen. */}
               <AppDataLoader>
                 <AppContent />
+                <Outlet />
               </AppDataLoader>
             </AppNavigation>
             <Feedback />

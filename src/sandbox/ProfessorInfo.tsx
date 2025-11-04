@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { Breadcrumb } from '../components';
+import { Breadcrumb, ProfessorInfoCard } from '../components';
 import { BreadcrumbItem } from '../components/Breadcrumb';
 import MetricsCard from '../components/MetricsCard';
+import { ScheduleContext } from '../contexts';
+import AppDataLoader from '../components/AppDataLoader';
+import useDownloadOscarData from '../data/hooks/useDownloadOscarData';
 
 export default function ProfessorInfo(): React.ReactElement {
   const breadcrumbItem1: BreadcrumbItem = {
@@ -19,10 +22,17 @@ export default function ProfessorInfo(): React.ReactElement {
     { label: 'Course GPA', value: '14.5', unit: 'hrs/week' },
   ];
 
+  const [{ oscar }] = useContext(ScheduleContext);
+  const professorName = 'Frederic Faulkner';
+  const course = oscar.findCourse('CS 1332');
+
   return (
     <div>
       <Breadcrumb items={breadcrumbsList} />
       <MetricsCard metrics={metrics} />
+      {course ? (
+        <ProfessorInfoCard professorName={professorName} course={course} />
+      ) : null}
     </div>
   );
 }
