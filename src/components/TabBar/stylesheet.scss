@@ -4,37 +4,37 @@
   display: flex;
   align-items: center;
   background-color: $tab-bar-background;
-  border-radius: 8px;
-  padding: 4px 8px;
-  overflow-x: auto;
+  border-radius: 10px;
+  padding: 2px;
 
   .tab {
-    font-size: 0.9em;
-    padding: 8px 14px;
+    width: 100px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
     border-radius: 8px;
     margin-right: 8px;
     cursor: pointer;
-    color: $tab-bar-text-unselected; // likely something like $color-neutral-light
+    color: $tab-bar-text-unselected;
     white-space: nowrap;
+    user-select: none;
     transition: background-color 0.2s, color 0.2s, opacity 0.2s;
 
-    &:hover {
-      opacity: 0.9;
-    }
-
     &.active {
-      background-color: rgba($color-neutral, 0.3); // adjust to match your active background tone
+      background-color: rgba($color-neutral, 0.3);
       color: white;
-      font-weight: 600;
+      font-weight: 700;
     }
   }
 
-  // 👇 when enableSelect is false, make all tab text white
   &.unselectable {
     .tab {
       color: white;
       cursor: default;
-      opacity: 1; // make sure they don’t appear dim
+      opacity: 1;
     }
   }
 }
