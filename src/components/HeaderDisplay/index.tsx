@@ -166,16 +166,21 @@ export default function HeaderDisplay({
       {/* Version selector */}
       <VersionSelector state={versionsState} />
 
-      {paletteState.type === 'loaded' ? (
-        <Select
-          className="palette"
-          desiredItemWidth={337}
-          options={paletteOptions}
-          current={paletteState.palette ?? 'default'}
-          onChange={paletteState.setPalette}
-        />
-      ) : (
-        <LoadingSelect />
+      {/* Palette selector */}
+      {!mobile && (
+        <>
+          {paletteState.type === 'loaded' ? (
+            <Select
+              className="palette"
+              desiredItemWidth={337}
+              options={paletteOptions}
+              current={paletteState.palette ?? 'default'}
+              onChange={paletteState.setPalette}
+            />
+          ) : (
+            <LoadingSelect />
+          )}
+        </>
       )}
 
       <span className="credits">
