@@ -117,6 +117,7 @@ export default function EventAdd({
       setStart('');
       setEnd('');
       setError('');
+      setLocation(null);
       // Force clear the time input fields
       if (startInputRef.current) startInputRef.current.value = '';
       if (endInputRef.current) endInputRef.current.value = '';
@@ -365,6 +366,14 @@ export default function EventAdd({
                   <Button
                     className="button discard-button"
                     onClick={onDiscard}
+                    disabled={
+                      !eventName &&
+                      !start &&
+                      !end &&
+                      selectedTags.length === 0 &&
+                      !location &&
+                      !event?.isSaved
+                    }
                     id="event-discard-button"
                   >
                     Discard
