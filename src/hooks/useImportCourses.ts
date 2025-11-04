@@ -16,8 +16,10 @@ import { getRandomColor } from '../utils/misc';
  * importCourses('CS 1332,CS 2110,PSYC 1101');
  */
 export default function useImportCourses(): (courseString: string) => void {
-  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
-    useContext(ScheduleContext);
+  const [
+    { oscar, desiredCourses, excludedCrns, colorMap, palette },
+    { patchSchedule },
+  ] = useContext(ScheduleContext);
 
   const importCourses = useCallback(
     (courseString: string) => {
@@ -56,7 +58,7 @@ export default function useImportCourses(): (courseString: string) => void {
           newExcludedCrns.push(...toBeExcludedCrns);
 
           // Assign a random color to the course
-          newColorMap[course.id] = getRandomColor();
+          newColorMap[course.id] = getRandomColor(palette);
         }
       });
 
