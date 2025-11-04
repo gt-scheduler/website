@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pr-preview/pr-392/static/css/main.3cfd4e86.css",
+    "main.js": "/pr-preview/pr-392/static/js/main.55742714.js",
+    "index.html": "/pr-preview/pr-392/index.html",
+    "main.3cfd4e86.css.map": "/pr-preview/pr-392/static/css/main.3cfd4e86.css.map",
+    "main.55742714.js.map": "/pr-preview/pr-392/static/js/main.55742714.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3cfd4e86.css",
+    "static/js/main.55742714.js"
+  ]
+}
