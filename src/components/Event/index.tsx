@@ -46,26 +46,22 @@ export default function Event({
         end: event.period.end,
       },
       days: event.days,
+      isSaved: true, // Duplicated events are considered saved
+      where:
+        'where' in event && typeof event.where === 'string' ? event.where : '',
+      location: 'location' in event && event.location ? event.location : null,
     };
 
     patchSchedule({
       events: [...castDraft(events), castDraft(newEvent)],
       colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
     });
-  }, [
-    colorMap,
-    event.days,
-    event.name,
-    event.period.end,
-    event.period.start,
-    events,
-    palette,
-    patchSchedule,
-  ]);
+  }, [colorMap, event, events, palette, patchSchedule]);
 
   // this basically forces the edit form to only auto-focus once per render
   useEffect(() => {
     if (!event.showEditForm) return; // skip if this event wasn't flagged (normal render)
+    if (!event.isSaved) return; // skip for draft events to avoid race condition with discard
 
     const targetEventId = event.id;
 
@@ -78,7 +74,7 @@ export default function Event({
 
     // push updated events list back into global state with schedulecontext
     patchSchedule({ events: nextEvents });
-  }, [event.showEditForm, event.id, events, patchSchedule]);
+  }, [event.showEditForm, event.isSaved, event.id, events, patchSchedule]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
@@ -97,6 +93,12 @@ export default function Event({
 
   const color = colorMap[event.id];
   const contentClassName = color != null && getContentClassName(color);
+
+  // Safety check: if the event has been removed from the schedule, don't render
+  const eventExists = events.some((e) => e.id === event.id);
+  if (!eventExists) {
+    return null;
+  }
 
   return (
     <div>

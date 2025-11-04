@@ -10,12 +10,26 @@ import React, {
 import { Immutable, castDraft } from 'immer';
 
 import Button from '../Button';
+import LocationPicker from '../LocationPicker';
 import { classes, getRandomColor, timeToString } from '../../utils/misc';
-import { DAYS } from '../../constants';
+import { CLOSE, DAYS, OPEN } from '../../constants';
 import { ScheduleContext } from '../../contexts';
-import { Event as EventData } from '../../types';
+import { Event as EventData, Location } from '../../types';
 
 import './stylesheet.scss';
+
+// Type guard to check if event has location data
+function hasLocationData(
+  event: unknown
+): event is EventData & { where: string; location: Location | null } {
+  return (
+    event !== null &&
+    typeof event === 'object' &&
+    event !== undefined &&
+    'where' in event &&
+    typeof (event as { where: unknown }).where === 'string'
+  );
+}
 
 export type EventAddProps = {
   className?: string;
@@ -40,6 +54,15 @@ export default function EventAdd({
   const [end, setEnd] = useState(
     event?.period.end ? timeToString(event.period.end, false, true) : ''
   );
+  const [location, setLocation] = useState<{
+    where: string;
+    location: Location | null;
+  } | null>(
+    event && hasLocationData(event)
+      ? { where: event.where, location: event.location }
+      : null
+  );
+
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [error, setError] = useState('');
 
@@ -66,6 +89,41 @@ export default function EventAdd({
     return -1; // invalid time string
   }, []);
 
+  const onDiscard = useCallback((): void => {
+    if (event) {
+      // If this event has never been saved (it's a new draft),
+      // delete it entirely
+      if (!event.isSaved) {
+        // Remove the event from the schedule
+        const newEvents = castDraft(events).filter(
+          (existingEvent) => existingEvent.id !== event.id
+        );
+        const newColorMap = { ...colorMap };
+        delete newColorMap[event.id];
+
+        patchSchedule({
+          events: newEvents,
+          colorMap: newColorMap,
+        });
+      } else if (setFormShown) {
+        // If editing an existing saved event,
+        // just close the form to revert changes
+        setFormShown(false);
+      }
+    } else {
+      // If creating a new event (not yet in schedule), just clear the form
+      setEventName('');
+      setSelectedTags([]);
+      setStart('');
+      setEnd('');
+      setError('');
+      setLocation(null);
+      // Force clear the time input fields
+      if (startInputRef.current) startInputRef.current.value = '';
+      if (endInputRef.current) endInputRef.current.value = '';
+    }
+  }, [event, events, colorMap, patchSchedule, setFormShown]);
+
   const handleStartChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>): void => {
       const newStart = e.target.value;
@@ -77,8 +135,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(end);
       if (parsedEnd !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1320) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
+      } else if (parsedStart < OPEN || parsedEnd > CLOSE) {
+        setError('Event must be between 06:00 AM and 11:59 PM.');
       }
     },
     [end, parseTime]
@@ -95,8 +153,8 @@ export default function EventAdd({
       const parsedEnd = parseTime(newEnd);
       if (parsedStart !== -1 && parsedEnd <= parsedStart) {
         setError('Start time must be before end time.');
-      } else if (parsedStart < 480 || parsedEnd > 1320) {
-        setError('Event must be between 08:00 AM and 10:00 PM.');
+      } else if (parsedStart < OPEN || parsedEnd > CLOSE) {
+        setError('Event must be between 06:00 AM and 11:59 PM.');
       }
     },
     [start, parseTime]
@@ -105,6 +163,8 @@ export default function EventAdd({
   const onSubmit = useCallback((): void => {
     const parsedStart = parseTime(start);
     const parsedEnd = parseTime(end);
+    const eventWhere = location?.where || '';
+    const eventLocation = location?.location || null;
 
     if (event) {
       const newEvents = castDraft(events).map((existingEvent) =>
@@ -117,6 +177,9 @@ export default function EventAdd({
                 end: parsedEnd,
               },
               days: selectedTags,
+              isSaved: true, // Mark as saved
+              where: eventWhere,
+              location: eventLocation,
             }
           : existingEvent
       );
@@ -138,6 +201,9 @@ export default function EventAdd({
           end: parsedEnd,
         },
         days: selectedTags,
+        isSaved: true, // Mark as saved
+        where: eventWhere,
+        location: eventLocation,
       };
 
       patchSchedule({
@@ -149,6 +215,7 @@ export default function EventAdd({
       setSelectedTags([]);
       setStart('');
       setEnd('');
+      setLocation(null);
     }
   }, [
     event,
@@ -156,6 +223,7 @@ export default function EventAdd({
     start,
     end,
     selectedTags,
+    location,
     events,
     colorMap,
     palette,
@@ -178,6 +246,8 @@ export default function EventAdd({
   );
 
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const startInputRef = useRef<HTMLInputElement>(null);
+  const endInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
@@ -246,10 +316,12 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={startInputRef}
                   type="time"
                   value={start}
                   onChange={handleStartChange}
                   onKeyDown={handleKeyDown}
+                  aria-label="Start time"
                 />
               </td>
             </tr>
@@ -261,23 +333,60 @@ export default function EventAdd({
               </td>
               <td className="input">
                 <input
+                  ref={endInputRef}
                   type="time"
                   value={end}
                   onChange={handleEndChange}
                   onKeyDown={handleKeyDown}
+                  aria-label="End time"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div className={classes('label', location?.where && 'active')}>
+                  Location
+                </div>
+              </td>
+              <td className="input">
+                <LocationPicker
+                  value={location}
+                  onChange={(locationData): void => {
+                    setLocation(locationData);
+                  }}
+                  onClear={(): void => {
+                    setLocation(null);
+                  }}
                 />
               </td>
             </tr>
             <tr>
               <td colSpan={2} className="submit">
-                <Button
-                  className="button"
-                  disabled={submitDisabled}
-                  onClick={onSubmit}
-                  id="event-add-button"
-                >
-                  {event?.id ? 'Save' : 'Add'}
-                </Button>
+                <div className="button-container">
+                  <Button
+                    className="button discard-button"
+                    onClick={onDiscard}
+                    disabled={
+                      !eventName &&
+                      !start &&
+                      !end &&
+                      selectedTags.length === 0 &&
+                      !location &&
+                      !event?.isSaved
+                    }
+                    id="event-discard-button"
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    className="button add-button"
+                    disabled={submitDisabled}
+                    onClick={onSubmit}
+                    id="event-add-button"
+                  >
+                    {event?.id ? 'Save' : 'Add'}
+                  </Button>
+                </div>
                 {error && <div className="error">{error}</div>}
               </td>
             </tr>

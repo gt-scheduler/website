@@ -84,7 +84,10 @@ export interface Event {
   name: string;
   period: Period;
   days: string[];
+  where?: string;
+  location?: Location | null;
   showEditForm?: boolean;
+  isSaved?: boolean; // Tracks if event has been saved at least once
 }
 
 export interface Term {
