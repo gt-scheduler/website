@@ -6,9 +6,12 @@ import { Course, Section } from '../../data/beans';
 import { Metric } from '../MetricsCard';
 
 import './stylesheet.scss';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import ActionRow from '../ActionRow';
 import { OccupiedInfo } from '../SeatInfo';
+
 import useSWR from 'swr';
 
 export type ProfessorInfoCardProps = {
