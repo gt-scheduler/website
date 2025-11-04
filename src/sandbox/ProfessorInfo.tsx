@@ -4,8 +4,6 @@ import { Breadcrumb, ProfessorInfoCard } from '../components';
 import { BreadcrumbItem } from '../components/Breadcrumb';
 import MetricsCard from '../components/MetricsCard';
 import { ScheduleContext } from '../contexts';
-import AppDataLoader from '../components/AppDataLoader';
-import useDownloadOscarData from '../data/hooks/useDownloadOscarData';
 
 export default function ProfessorInfo(): React.ReactElement {
   const breadcrumbItem1: BreadcrumbItem = {

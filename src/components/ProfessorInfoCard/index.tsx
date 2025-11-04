@@ -1,18 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
+import useSWR from 'swr';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { ScheduleContext } from '../../contexts';
 import { Course, Section } from '../../data/beans';
-import { Metric } from '../MetricsCard';
-
-import './stylesheet.scss';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import ActionRow from '../ActionRow';
 import { OccupiedInfo } from '../SeatInfo';
 
-import useSWR from 'swr';
+import './stylesheet.scss';
 
 export type ProfessorInfoCardProps = {
   professorName: string;
@@ -39,7 +35,6 @@ const fetchSeating = async (
     const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
       raw[0];
 
-    // normalize raw values into an OccupiedInfo object
     const toOccupiedInfo = (
       total: unknown,
       occupied: unknown
@@ -59,26 +54,22 @@ const fetchSeating = async (
 
 function SectionRow({
   section,
-  course,
   term,
   isPinned,
   onAdd,
 }: {
   section: Section;
-  course: Course;
   term: string;
   isPinned: boolean;
   onAdd: () => void;
 }): React.ReactElement {
   const meeting = section.meetings[0];
 
-  // Use SWR like SeatInfo does
   const { data: seatData, isLoading } = useSWR<SeatData>(
     ['seating', section.crn, term],
     () => fetchSeating(section, term)
   );
 
-  // Format the seat data like SeatInfo does
   const formatSeatData = (info: OccupiedInfo | null): string => {
     if (isLoading) return 'Loading...';
     if (!info) return 'N/A';
@@ -138,22 +129,6 @@ export default function ProfessorInfoCard({
     patchSchedule({ pinnedCrns: [...pinnedCrns, section.crn] });
   };
 
-  useEffect(() => {
-    const fetchAllSeating = async (): Promise<void> => {
-      for (const section of sections) {
-        try {
-          await section.fetchSeating(course.term);
-        } catch (error) {
-          console.error(`Failed to fetch seating for ${section.crn}:`, error);
-        }
-      }
-    };
-
-    fetchAllSeating().catch((error) => {
-      console.error('Failed to fetch seating data:', error);
-    });
-  }, [sections]);
-
   return (
     <div className="ProfessorInfo">
       <div className="professor-header">
@@ -177,7 +152,6 @@ export default function ProfessorInfoCard({
             <SectionRow
               key={section.crn}
               section={section}
-              course={course}
               term={course.term}
               isPinned={pinnedCrns.includes(section.crn)}
               onAdd={(): void => handleAddSection(section)}
@@ -189,7 +163,6 @@ export default function ProfessorInfoCard({
   );
 }
 
-// Helper function to format time (you might already have this)
 function formatTime(minutes: number): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
