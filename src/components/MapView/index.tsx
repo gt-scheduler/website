@@ -14,6 +14,7 @@ export type MapLocation = {
   id: string;
   title: string;
   coords: Location | null;
+  section?: string;
   type: ScheduleBlockEventType;
 };
 
@@ -24,7 +25,7 @@ export type MapViewProps = {
 function getDisplayText(location: MapLocation): string {
   return location.type === ScheduleBlockEventType.CustomEvent
     ? location.title
-    : `${location.id} ${location.title}`;
+    : [location.id, location.section].filter(Boolean).join(' ');
 }
 
 export default function MapView({
