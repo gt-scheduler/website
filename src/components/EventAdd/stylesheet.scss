@@ -10,11 +10,13 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    overflow: visible;
 
     table {
       border-collapse: collapse;
       table-layout: auto;
       width: 100%;
+      overflow: visible;
 
       tr:last-child {
         border-bottom: none;
@@ -22,6 +24,7 @@
 
       tr {
         border-bottom: 1px solid $color-border;
+        overflow: visible;
 
         .label {
           opacity: 0.5;
@@ -39,6 +42,7 @@
           display: flex;
           align-items: center;
           position: relative;
+          overflow: visible;
 
           input {
             position: relative;
