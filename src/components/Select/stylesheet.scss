@@ -151,3 +151,39 @@ $max-item-width: 320px;
     }
   }
 }
+
+.Palette-select {
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  cursor: pointer;
+  margin-top: 10px;
+  
+  &:hover {
+    background: var(--modal-divider, #505050);
+  }
+
+  .palette-header {
+    color: var(--theme-fg);
+    margin-bottom: 8px;
+  }
+
+  .palette-row,
+  .preset-row {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+
+    .color {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+  }
+
+  .palette-row .color {
+    aspect-ratio: 1 / 1;
+  }
+}
