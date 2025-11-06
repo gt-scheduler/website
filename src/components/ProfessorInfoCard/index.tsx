@@ -9,6 +9,8 @@ import ActionRow from '../ActionRow';
 import { OccupiedInfo } from '../SeatInfo';
 
 import './stylesheet.scss';
+import { formatTime, getRandomColor } from '../../utils/misc';
+import { Schedule } from '../../data/types';
 
 export type ProfessorInfoCardProps = {
   professorName: string;
@@ -87,9 +89,7 @@ function SectionRow({
           >
             <FontAwesomeIcon
               icon={isPinned ? faCheck : faPlus}
-              style={{
-                color: '#8BD6FB',
-              }}
+              className="action-icon"
             />
           </button>
         </div>
@@ -123,10 +123,19 @@ export default function ProfessorInfoCard({
   const sections: Section[] = course.sections.filter((section: Section) => {
     return section.instructors[0] === professorName;
   });
-  const [{ pinnedCrns }, { patchSchedule }] = useContext(ScheduleContext);
+  const [{ pinnedCrns, desiredCourses, colorMap }, { patchSchedule }] =
+    useContext(ScheduleContext);
 
   const handleAddSection = (section: Section): void => {
-    patchSchedule({ pinnedCrns: [...pinnedCrns, section.crn] });
+    const updates: Partial<Schedule> = {
+      pinnedCrns: [...pinnedCrns, section.crn],
+    };
+    if (!desiredCourses.includes(course.id)) {
+      updates.desiredCourses = [...desiredCourses, course.id];
+      const color = getRandomColor();
+      updates.colorMap = { ...colorMap, [course.id]: color };
+    }
+    patchSchedule(updates);
   };
 
   return (
@@ -161,12 +170,4 @@ export default function ProfessorInfoCard({
       </div>
     </div>
   );
-}
-
-function formatTime(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const period = hours >= 12 ? 'pm' : 'am';
-  const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
-  return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
 }

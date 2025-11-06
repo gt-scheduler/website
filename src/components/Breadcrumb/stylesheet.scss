@@ -1,9 +1,10 @@
+@import '../../variables.scss';
+
 .Breadcrumb {
   display: flex;
   align-items: center;
   font-size: 16px;
   padding: 8px 12px;
-  font-family: 'Roboto';
 
   .list {
     display: flex;
@@ -16,7 +17,7 @@
       align-items: center;
 
       .link {
-        color: #8bd6fb;
+        color: $course-page-link-color;
         text-decoration: none;
         font-weight: 500;
       }

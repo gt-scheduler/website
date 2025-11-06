@@ -489,6 +489,14 @@ export function lexicographicCompare(a: string, b: string): number {
   return -1;
 }
 
+export function formatTime(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const period = hours >= 12 ? 'pm' : 'am';
+  const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+  return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+}
+
 // Edit this map to control how locations are abbreviated.
 // Prefer adding new entries to this map over changing the location strings,
 // since old schedules can still be opened in the app.

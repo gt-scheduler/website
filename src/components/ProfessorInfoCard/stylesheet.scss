@@ -22,7 +22,6 @@
   }
 
   .sections-container {
-    border-radius: 8px;
     overflow: hidden;
 
     .sections-header {
@@ -66,7 +65,6 @@
           display: flex;
           align-items: center;
 
-          // Theme-aware text colors
           @include dark(color, $theme-dark-foreground);
           @include light(color, $theme-light-foreground);
 
@@ -96,8 +94,10 @@
 
           svg {
             font-size: 16px;
-            @include dark(color, $theme-dark-foreground);
-            @include light(color, $theme-light-foreground);
+          }
+
+          .action-icon {
+            color: $course-page-link-color;
           }
         }
       }
