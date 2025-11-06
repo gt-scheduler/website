@@ -6,11 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ScheduleContext } from '../../contexts';
 import { Course, Section } from '../../data/beans';
 import ActionRow from '../ActionRow';
-import { OccupiedInfo } from '../SeatInfo';
-
-import './stylesheet.scss';
 import { formatTime, getRandomColor } from '../../utils/misc';
 import { Schedule } from '../../data/types';
+import { OccupiedInfo } from '../../data/beans/Section';
+
+import './stylesheet.scss';
 
 export type ProfessorInfoCardProps = {
   professorName: string;
@@ -20,38 +20,6 @@ export type ProfessorInfoCardProps = {
 type SeatData = {
   inClass: OccupiedInfo | null;
   waitlist: OccupiedInfo | null;
-};
-
-const fetchSeating = async (
-  section: Section,
-  term: string
-): Promise<SeatData> => {
-  try {
-    const raw = await section.fetchSeating(term);
-
-    // Handle missing or bad data, assuming less than 4 return values is invalid
-    if (!raw[0] || raw[0].length < 4) {
-      return { inClass: null, waitlist: null };
-    }
-
-    const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
-      raw[0];
-
-    const toOccupiedInfo = (
-      total: unknown,
-      occupied: unknown
-    ): OccupiedInfo => ({
-      occupied: Number(occupied ?? 0),
-      total: Number(total ?? 0),
-    });
-
-    return {
-      inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
-      waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
-    };
-  } catch (err) {
-    return { inClass: null, waitlist: null };
-  }
 };
 
 function SectionRow({
@@ -69,7 +37,7 @@ function SectionRow({
 
   const { data: seatData, isLoading } = useSWR<SeatData>(
     ['seating', section.crn, term],
-    () => fetchSeating(section, term)
+    () => section.getSeatData(term)
   );
 
   const formatSeatData = (info: OccupiedInfo | null): string => {
@@ -123,7 +91,7 @@ export default function ProfessorInfoCard({
   const sections: Section[] = course.sections.filter((section: Section) => {
     return section.instructors[0] === professorName;
   });
-  const [{ pinnedCrns, desiredCourses, colorMap }, { patchSchedule }] =
+  const [{ pinnedCrns, desiredCourses, colorMap, palette }, { patchSchedule }] =
     useContext(ScheduleContext);
 
   const handleAddSection = (section: Section): void => {
@@ -132,7 +100,7 @@ export default function ProfessorInfoCard({
     };
     if (!desiredCourses.includes(course.id)) {
       updates.desiredCourses = [...desiredCourses, course.id];
-      const color = getRandomColor();
+      const color = getRandomColor(palette);
       updates.colorMap = { ...colorMap, [course.id]: color };
     }
     patchSchedule(updates);

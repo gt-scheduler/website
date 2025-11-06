@@ -25,16 +25,16 @@
       }
 
       .metric-value {
-        font-size: 20px;
+        font-size: 1.25em;
       }
 
       .metric-unit {
-        font-size: 14px;
+        font-size: 0.875em;
         font-weight: normal;
       }
 
       .metric-label {
-        font-size: 14px;
+        font-size: 0.875em;
         margin-top: 4px;
         @include dark(color, $seat-info-dark-label);
         @include light(color, $seat-info-light-label);

@@ -2,7 +2,6 @@
 
 .ProfessorInfo {
   padding: 20px;
-  font-family: 'Roboto', sans-serif;
   border-radius: 5px;
   margin: 16px;
 
@@ -13,9 +12,9 @@
 
   .professor-header {
     padding: 0px;
-    
+
     .professor-name {
-      font-size: 20px;
+      font-size: 1.25em;
       font-weight: bold;
       margin: 0px;
     }
@@ -27,7 +26,7 @@
     .sections-header {
       display: flex;
       padding: 16px 20px;
-      font-size: 14px;
+      font-size: 0.875em;
       border-bottom: 1px solid $color-border;
 
       @include dark(color, $seat-info-dark-label);
@@ -37,14 +36,38 @@
         display: flex;
         align-items: center;
 
-        &:nth-child(1) { width: 60px; margin-right: 20px; }
-        &:nth-child(2) { width: 80px; margin-right: 20px; }
-        &:nth-child(3) { width: 80px; margin-right: 20px; }
-        &:nth-child(4) { width: 80px; margin-right: 20px; }
-        &:nth-child(5) { width: 150px; margin-right: 20px; }
-        &:nth-child(6) { width: 100px; margin-left: auto; margin-right: 20px; }
-        &:nth-child(7) { width: 100px; margin-right: 20px; }
-        &:nth-child(8) { width: 200px; }
+        &:nth-child(1) {
+          width: 60px;
+          margin-right: 20px;
+        }
+        &:nth-child(2) {
+          width: 80px;
+          margin-right: 20px;
+        }
+        &:nth-child(3) {
+          width: 80px;
+          margin-right: 20px;
+        }
+        &:nth-child(4) {
+          width: 80px;
+          margin-right: 20px;
+        }
+        &:nth-child(5) {
+          width: 150px;
+          margin-right: 20px;
+        }
+        &:nth-child(6) {
+          width: 100px;
+          margin-left: auto;
+          margin-right: 20px;
+        }
+        &:nth-child(7) {
+          width: 100px;
+          margin-right: 20px;
+        }
+        &:nth-child(8) {
+          width: 200px;
+        }
       }
     }
 
@@ -61,7 +84,7 @@
         align-items: center;
 
         .section-cell {
-          font-size: 14px;
+          font-size: 0.875em;
           display: flex;
           align-items: center;
 
@@ -72,14 +95,38 @@
             justify-content: center;
           }
 
-          &:nth-child(1) { width: 60px; margin-right: 20px; }
-          &:nth-child(2) { width: 80px; margin-right: 20px; }
-          &:nth-child(3) { width: 80px; margin-right: 20px; }
-          &:nth-child(4) { width: 80px; margin-right: 20px; }
-          &:nth-child(5) { width: 150px; margin-right: 20px; }
-          &:nth-child(6) { width: 100px; margin-left: auto; margin-right: 20px; }
-          &:nth-child(7) { width: 100px; margin-right: 20px; }
-          &:nth-child(8) { width: 200px; }
+          &:nth-child(1) {
+            width: 60px;
+            margin-right: 20px;
+          }
+          &:nth-child(2) {
+            width: 80px;
+            margin-right: 20px;
+          }
+          &:nth-child(3) {
+            width: 80px;
+            margin-right: 20px;
+          }
+          &:nth-child(4) {
+            width: 80px;
+            margin-right: 20px;
+          }
+          &:nth-child(5) {
+            width: 150px;
+            margin-right: 20px;
+          }
+          &:nth-child(6) {
+            width: 100px;
+            margin-left: auto;
+            margin-right: 20px;
+          }
+          &:nth-child(7) {
+            width: 100px;
+            margin-right: 20px;
+          }
+          &:nth-child(8) {
+            width: 200px;
+          }
         }
 
         .action-button {
@@ -91,10 +138,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-
-          svg {
-            font-size: 16px;
-          }
+          font-size: 1em;
 
           .action-icon {
             color: $course-page-link-color;
