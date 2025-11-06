@@ -49,36 +49,40 @@ function SectionRow({
   return (
     <ActionRow key={section.crn} className="section-row" label="" actions={[]}>
       <div className="section-content">
-        <div className="section-cell action-cell">
-          <button
-            type="button"
-            className="action-button"
-            onClick={(): void => (isPinned ? undefined : onAdd())}
-          >
-            <FontAwesomeIcon
-              icon={isPinned ? faCheck : faPlus}
-              className="action-icon"
-            />
-          </button>
-        </div>
+        <div className="left-group">
+          <div className="row-cell action-cell">
+            <button
+              type="button"
+              className="action-button"
+              onClick={(): void => (isPinned ? undefined : onAdd())}
+            >
+              <FontAwesomeIcon
+                icon={isPinned ? faCheck : faPlus}
+                className="action-icon"
+              />
+            </button>
+          </div>
 
-        <div className="section-cell">{section.crn}</div>
-        <div className="section-cell">{section.id}</div>
-        <div className="section-cell">{meeting?.days.join('') || 'TBA'}</div>
-        <div className="section-cell">
-          {meeting?.period
-            ? `${formatTime(meeting.period.start)}-${formatTime(
-                meeting.period.end
-              )}`
-            : 'TBA'}
+          <div className="row-cell">{section.crn}</div>
+          <div className="row-cell">{section.id}</div>
+          <div className="row-cell">{meeting?.days.join('') || 'TBA'}</div>
+          <div className="row-cell">
+            {meeting?.period
+              ? `${formatTime(meeting.period.start)}-${formatTime(
+                  meeting.period.end
+                )}`
+              : 'TBA'}
+          </div>
         </div>
-        <div className="section-cell">
-          {formatSeatData(seatData?.inClass ?? null)}
+        <div className="right-group">
+          <div className="row-cell">
+            {formatSeatData(seatData?.inClass ?? null)}
+          </div>
+          <div className="row-cell">
+            {formatSeatData(seatData?.waitlist ?? null)}
+          </div>
+          <div className="row-cell">{meeting?.where || 'TBA'}</div>
         </div>
-        <div className="section-cell">
-          {formatSeatData(seatData?.waitlist ?? null)}
-        </div>
-        <div className="section-cell">{meeting?.where || 'TBA'}</div>
       </div>
     </ActionRow>
   );
@@ -114,14 +118,18 @@ export default function ProfessorInfoCard({
 
       <div className="sections-container">
         <div className="sections-header">
-          <div className="header-cell" />
-          <div className="header-cell">CRN</div>
-          <div className="header-cell">Sect.</div>
-          <div className="header-cell">Day</div>
-          <div className="header-cell">Time</div>
-          <div className="header-cell">Seats Filled</div>
-          <div className="header-cell">Waitlist</div>
-          <div className="header-cell">Location</div>
+          <div className="left-group">
+            <div className="row-cell" />
+            <div className="row-cell">CRN</div>
+            <div className="row-cell">Sect.</div>
+            <div className="row-cell">Day</div>
+            <div className="row-cell">Time</div>
+          </div>
+          <div className="right-group">
+            <div className="row-cell">Seats Filled</div>
+            <div className="row-cell">Waitlist</div>
+            <div className="row-cell">Location</div>
+          </div>
         </div>
 
         {sections.map((section) => {
