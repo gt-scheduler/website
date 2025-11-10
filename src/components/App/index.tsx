@@ -1,6 +1,5 @@
 import React from 'react';
 import { TooltipProvider } from 'react-tooltip';
-import { Outlet } from 'react-router-dom';
 
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
@@ -67,7 +66,6 @@ export default function App(): React.ReactElement {
                 then it displays an error screen. */}
               <AppDataLoader>
                 <AppContent />
-                <Outlet />
               </AppDataLoader>
             </AppNavigation>
             <Feedback />
