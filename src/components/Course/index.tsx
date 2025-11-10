@@ -6,6 +6,7 @@ import {
   faPalette,
   faPlus,
   faTrash,
+  faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, getContentClassName } from '../../utils/misc';
@@ -176,6 +177,15 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
+                {
+                  icon: faCircleInfo,
+                  // TODO: on click, open section details modal
+                  // onClick: (): void => {
+                  //   setPaletteShown(!paletteShown);
+                  // },
+                  tooltip: 'View Section Details',
+                  id: `${course.id}-details`,
+                },
                 {
                   icon: faPalette,
                   onClick: (): void => {

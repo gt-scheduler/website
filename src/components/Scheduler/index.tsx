@@ -77,7 +77,7 @@ export default function Scheduler(): React.ReactElement {
           {(!mobile || tabIndex === 0) && <CourseContainer />}
           {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
-            <div className="calendar-container">
+            <div className="scheduler-container">
               <Calendar
                 className="calendar"
                 overlayCrns={overlayCrns}
