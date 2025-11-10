@@ -28,21 +28,20 @@
       align-items: stretch;
       overflow-y: auto;
 
-      .view-modes-toggle {
+      .view-mode-section {
+        display: flex;
+        align-items: center;
         font-weight: bold;
         font-size: 1em;
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
+        gap: 16px;
+        margin-left: 16px;
+        margin-top: 16px;
 
-        .test {
-          display: flex;
-          flex-direction: row;
-          height: 2rem;
-          width: 8rem;
-          background: black;
-          &:hover {
-            background: transparent !important;
+        .view-mode-tab-bar {
+          background: $view-mode-tab-bar-background;
+          padding: 0.25em;
+          .tab {
+            width: 128px;
           }
         }
       }

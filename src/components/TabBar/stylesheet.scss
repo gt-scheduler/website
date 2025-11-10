@@ -16,12 +16,12 @@
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     border-radius: 8px;
-    margin-right: 8px;
     cursor: pointer;
     color: $tab-bar-text-unselected;
     white-space: nowrap;
     user-select: none;
     transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+    gap: 8px;
 
     &.active {
       background-color: rgba($color-neutral, 0.3);

@@ -3,13 +3,18 @@ import React from 'react';
 import { classes } from '../../utils/misc';
 
 import './stylesheet.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+type FontAwesomeProps = React.ComponentProps<typeof FontAwesomeIcon>;
 
 export type TabBarItem = {
   key: string;
   label: string;
+  icon?: FontAwesomeProps['icon'];
 };
 
 type TabBarProps = {
+  className?: string;
   enableSelect?: boolean;
   items: TabBarItem[];
   selected?: TabBarItem;
@@ -17,13 +22,16 @@ type TabBarProps = {
 };
 
 export default function TabBar({
+  className,
   enableSelect = false,
   items,
   selected,
   onSelect,
 }: TabBarProps): React.ReactElement {
   return (
-    <div className={classes('TabBar', !enableSelect && 'unselectable')}>
+    <div
+      className={classes('TabBar', !enableSelect && 'unselectable', className)}
+    >
       {items.map((item) => {
         const isActive = selected?.key === item.key;
         return (
@@ -34,7 +42,10 @@ export default function TabBar({
               if (enableSelect && onSelect) onSelect(item.key);
             }}
           >
-            {item.label}
+            {item.icon && (
+              <FontAwesomeIcon icon={item.icon} className="tab-icon" />
+            )}
+            <span className="tab-label">{item.label}</span>
           </div>
         );
       })}
