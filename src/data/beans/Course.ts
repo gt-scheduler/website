@@ -4,6 +4,7 @@ import { decode } from 'html-entities';
 import { Oscar, Section } from '.';
 import {
   CourseGpa,
+  CourseMetrics,
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
@@ -26,6 +27,11 @@ const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCou
 
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
+
+const COURSE_METRICS_API_URL = `http://127.0.0.1:5001/gt-scheduler-web-dev/us-east1/getMetrics`;
+
+const METRICS_CACHE_LOCAL_STORAGE_KEY = 'course-metrics-cache-1';
+const METRICS_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 interface SectionGroupMeeting {
   days: string[];
@@ -209,6 +215,93 @@ export default class Course {
       }
     });
     return groups;
+  }
+
+  async fetchCourseMetrics(): Promise<CourseMetrics> {
+    type MetricsCache = Record<string, MetricsCacheItem>;
+    interface MetricsCacheItem {
+      d: CourseMetrics;
+      exp: string;
+    }
+    console.log(`fetching metrics for ${this.id}`);
+
+    try {
+      const rawCache = window.localStorage.getItem(
+        METRICS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        const cache: MetricsCache = JSON.parse(
+          rawCache
+        ) as unknown as MetricsCache;
+        const cacheItem = cache[this.id];
+        if (cacheItem != null) {
+          const now = new Date().toISOString();
+          if (now < cacheItem.exp) {
+            return cacheItem.d;
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
+    const courseMetrics = await this.fetchCourseMetricsInner();
+    if (courseMetrics === null) {
+      return { difficulties: [], workloads: [], overalls: [] };
+    }
+
+    const exp = new Date();
+    exp.setDate(exp.getDate() + METRICS_CACHE_EXPIRATION_DURATION_DAYS);
+    try {
+      let cache: MetricsCache = {};
+      const rawCache = window.localStorage.getItem(
+        METRICS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        cache = JSON.parse(rawCache) as unknown as MetricsCache;
+      }
+
+      cache[this.id] = { d: courseMetrics, exp: exp.toISOString() };
+      const rawUpdatedCache = JSON.stringify(cache);
+      window.localStorage.setItem(
+        METRICS_CACHE_LOCAL_STORAGE_KEY,
+        rawUpdatedCache
+      );
+    } catch (err) {
+      // Ignore
+    }
+
+    console.log(courseMetrics);
+
+    return courseMetrics;
+  }
+
+  private async fetchCourseMetricsInner(): Promise<CourseMetrics | null> {
+    const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
+    const encodedCourse = encodeURIComponent(id);
+    const url = `${COURSE_METRICS_API_URL}?courseID=${encodedCourse}`;
+
+    let responseData: CourseMetrics;
+    try {
+      responseData = (await axios.get<CourseMetrics>(url)).data;
+    } catch (err) {
+      if (!isAxiosNetworkError(err)) {
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching course metrics from backend API',
+            source: err,
+            fields: {
+              baseId: this.id,
+              cleanedId: id,
+              url,
+            },
+          })
+        );
+      }
+
+      return null;
+    }
+    return responseData;
   }
 
   async fetchGpa(): Promise<CourseGpa> {

@@ -101,6 +101,8 @@ export function InvitationModalContent({
 
   const sendInvitation = useCallback(async (): Promise<void> => {
     const IdToken = await (accountContext as SignedIn).getToken();
+    console.log('hello');
+    console.log(IdToken);
     const data = JSON.stringify({
       IDToken: IdToken,
       term,
@@ -201,6 +203,8 @@ export function InvitationModalContent({
     AxiosResponse<{ link: string }>
   > => {
     const IdToken = await (accountContext as SignedIn).getToken();
+    console.log('hi');
+    console.log(IdToken);
     const data = JSON.stringify({
       IDToken: IdToken,
       term,

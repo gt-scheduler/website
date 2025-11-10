@@ -104,6 +104,12 @@ export interface CourseGpa {
   [instructor: string]: number | undefined;
 }
 
+export interface CourseMetrics {
+  difficulties: number[];
+  workloads: number[];
+  overalls: number[];
+}
+
 // Meeting type (imported as `CrawlerMeeting`):
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts
 
