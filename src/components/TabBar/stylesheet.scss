@@ -1,0 +1,40 @@
+@import '../../variables';
+
+.TabBar {
+  display: flex;
+  align-items: center;
+  background-color: $tab-bar-background;
+  border-radius: 10px;
+  padding: 2px;
+
+  .tab {
+    width: 100px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: $tab-bar-text-unselected;
+    white-space: nowrap;
+    user-select: none;
+    transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+
+    &.active {
+      background-color: rgba($color-neutral, 0.3);
+      color: white;
+      font-weight: 700;
+    }
+  }
+
+  &.unselectable {
+    .tab {
+      color: white;
+      cursor: default;
+      opacity: 1;
+    }
+  }
+}

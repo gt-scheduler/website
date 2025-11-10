@@ -1,0 +1,15 @@
+@import '../../variables';
+
+.CardContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  background-color: $content-card-background;
+  border-left: 8px solid $content-card-background;
+  border-right: 0px;
+  border-radius: 5px;
+  padding: 20px;
+  width: 100%;
+  height: fit-content;
+}
