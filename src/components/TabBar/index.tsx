@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
+
 import { classes } from '../../utils/misc';
+
 import './stylesheet.scss';
 
 export type TabBarItem = {
