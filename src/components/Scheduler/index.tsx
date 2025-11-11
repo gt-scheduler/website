@@ -19,6 +19,7 @@ import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStor
 import useScreenWidth from '../../hooks/useScreenWidth';
 import TabBar from '../TabBar';
 import { AppNavigationContext } from '../App/navigation';
+import CourseDetailsContainer from '../CourseDetailsContainer';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -129,9 +130,7 @@ export default function Scheduler(): React.ReactElement {
               )}
 
               {currentSchedulerPage.type === 'course-details' && (
-                <div className="course-details-view">
-                  <h2>Course Details View</h2>
-                </div>
+                <CourseDetailsContainer />
               )}
 
               {currentSchedulerPage.type === 'section-details' && (

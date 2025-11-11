@@ -25,7 +25,8 @@
 
     &.active {
       background-color: rgba($color-neutral, 0.3);
-      color: white;
+      @include dark(color, $theme-light-background);
+      @include light(color, $theme-dark-background);
       font-weight: 700;
     }
   }

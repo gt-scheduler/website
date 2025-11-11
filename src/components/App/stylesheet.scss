@@ -31,15 +31,16 @@
       .view-mode-section {
         display: flex;
         align-items: center;
-        font-weight: bold;
         font-size: 1em;
         gap: 16px;
         margin-left: 16px;
         margin-top: 16px;
 
         .view-mode-tab-bar {
-          background: $view-mode-tab-bar-background;
+          @include dark(background, $view-mode-tab-bar-background-dark);
+          @include light(background, $view-mode-tab-bar-background-light);
           padding: 0.25em;
+
           .tab {
             width: 128px;
           }
