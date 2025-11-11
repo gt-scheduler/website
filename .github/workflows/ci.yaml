@@ -47,6 +47,7 @@ jobs:
         run: yarn build
         env:
           CI: 'true'
+          REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
           PUBLIC_URL: ${{ env.npm_package_homepage }}/pr-preview/pr-${{ github.event.number }}/
           REACT_APP_PREVIEW: 'true'
           REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY_DEV }}
