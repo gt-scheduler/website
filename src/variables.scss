@@ -30,8 +30,14 @@ $modal-foreground-color-light: #555555;
 $modal-strong-foreground-color-dark: #dddddd;
 $modal-strong-foreground-color-light: #444444;
 
+$content-card-background: #3b3b3b;
+$tab-bar-background: #3b3b3b;
+$tab-bar-gradient: #323232;
+$tab-bar-text-unselected: #9d9d9d;
 $seat-info-dark-label: rgba(255, 255, 255, 0.50);
 $seat-info-light-label: #848173;
+
+$course-page-link-color: #8bd6fb;
 
 @mixin card {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
