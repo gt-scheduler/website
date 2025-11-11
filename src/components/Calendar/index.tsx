@@ -354,7 +354,7 @@ export default function Calendar({
     >
       {!preview && (
         <div className="times" ref={timesRef}>
-          {new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
+          {new Array((CLOSE + 1 - OPEN) / 60).fill(0).map((_, i) => {
             const time = OPEN + i * 60;
             return (
               <div className="time" key={time}>

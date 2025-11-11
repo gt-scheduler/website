@@ -1,4 +1,4 @@
-$calendar-height: 920px;
+$calendar-height: 1180px;
 $calendar-width: 720px;
 $time-width: 48px;
 $day-height: 40px;
@@ -34,6 +34,8 @@ $content-card-background: #3b3b3b;
 $tab-bar-background: #3b3b3b;
 $tab-bar-gradient: #323232;
 $tab-bar-text-unselected: #9d9d9d;
+$seat-info-dark-label: rgba(255, 255, 255, 0.50);
+$seat-info-light-label: #848173;
 
 @mixin card {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
