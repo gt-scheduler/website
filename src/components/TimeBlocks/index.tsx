@@ -272,11 +272,19 @@ function MeetingDayBlock({
                 ))}
             </div>
 
-            {contentBody.map((content, i) => (
-              <span className={content.className} key={`content-body-${i}`}>
-                {content.content}
-              </span>
-            ))}
+            {contentBody.map((content, i) => {
+              const name = String(content.className).toLowerCase();
+              const durationMinutes = period.end - period.start;
+              const shouldHideLocation =
+                (name === 'location' || name === 'where') &&
+                durationMinutes < 49;
+              if (shouldHideLocation) return null;
+              return (
+                <span className={content.className} key={`content-body-${i}`}>
+                  {content.content}
+                </span>
+              );
+            })}
           </div>
         )}
       </BlockElement>
