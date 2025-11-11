@@ -4,12 +4,15 @@ import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
 import App from '../App';
 import InviteBackLink from '../InviteBackLink';
 import RateEntryPage from '../../sandbox/RateEntry'; // TEMP
+import RatingsPage from '../RatingsPage';
 
 export default function RouterComponent(): React.ReactElement {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<App />}>
+          <Route path="ratings" element={<RatingsPage />} />
+        </Route>
         <Route path="/invite/:id" element={<InviteBackLink />} />
         <Route path="/pr-preview/:id">
           <Route path="" element={<App />} />

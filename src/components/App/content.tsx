@@ -1,4 +1,5 @@
 import React, { useContext, useRef } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { Header, Scheduler, Attribution, Calendar } from '..';
 import { ReactErrorDetails } from '../ErrorDetails';
@@ -29,6 +30,8 @@ function AppContentBase(): React.ReactElement {
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
+
+  const location = useLocation();
 
   return (
     <>
@@ -62,9 +65,15 @@ function AppContentBase(): React.ReactElement {
           </SkeletonContent>
         )}
       >
-        {currentTabIndex === 0 && <Scheduler />}
-        {currentTabIndex === 1 && <Map />}
-        {currentTabIndex === 2 && <Finals />}
+        {!location.pathname.includes('ratings') && (
+          <>
+            {currentTabIndex === 0 && <Scheduler />}
+            {currentTabIndex === 1 && <Map />}
+            {currentTabIndex === 2 && <Finals />}
+          </>
+        )}
+
+        <Outlet />
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />

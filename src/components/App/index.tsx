@@ -1,5 +1,6 @@
 import React from 'react';
 import { TooltipProvider } from 'react-tooltip';
+import { Outlet } from 'react-router-dom';
 
 import { classes } from '../../utils/misc';
 import Feedback from '../Feedback';
