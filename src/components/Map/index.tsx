@@ -40,6 +40,7 @@ export default function Map(): React.ReactElement {
         daysOfWeek: firstMeeting.days,
         section: section.id,
         coords: firstMeeting.location,
+        where: firstMeeting.where ?? null,
       };
       courseDateMap[day].push(courseItem);
     });

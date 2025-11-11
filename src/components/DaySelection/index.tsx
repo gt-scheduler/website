@@ -29,6 +29,7 @@ export interface CourseDateItem {
   title: string;
   times: Period | undefined;
   daysOfWeek: string[];
+  where?: string | null;
 }
 
 export type DaySelectionProps = {
@@ -133,6 +134,9 @@ export default function DaySelection({
                       <div className="course-content" key={course.id}>
                         <div className="course-id">{course.id}</div>
                         <span className="course-row">{course.title}</span>
+                        {course.where && (
+                          <span className="course-row">{course.where}</span>
+                        )}
                         <span className="course-row">
                           {course.daysOfWeek} {timeLabel}
                         </span>
