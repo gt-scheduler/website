@@ -4,6 +4,7 @@ import MapView, { MapLocation } from '../MapView';
 import { ScheduleContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 import { Meeting } from '../../types';
+import { getSectionCourseTitle } from '../../utils/misc';
 
 import './stylesheet.scss';
 
@@ -35,12 +36,7 @@ export default function Map(): React.ReactElement {
       if (!isDay(day)) return;
       const courseItem: CombinedCourseData = {
         id: section.course.id,
-        // After confirmation that all environments only serve new 8-field data,
-        // we can remove the existence check for `section.sectionTitle`.
-        title:
-          section.course.number === '8803' && section.sectionTitle
-            ? section.sectionTitle
-            : section.course.title,
+        title: getSectionCourseTitle(section),
         times: firstMeeting.period,
         daysOfWeek: firstMeeting.days,
         section: section.id,

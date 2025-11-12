@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
 
-import { abbreviateLocation, periodToString } from '../../utils/misc';
+import {
+  abbreviateLocation,
+  getSectionCourseTitle,
+  periodToString,
+} from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { Period } from '../../types';
 import { TimeBlocks } from '..';
@@ -92,12 +96,7 @@ export default function SectionBlocks({
             popover={[
               {
                 name: 'Course Name',
-                // after confirming that only new section data is served,
-                // we can remove this check for `section.sectionTitle`.
-                content:
-                  section.course.number === '8803' && section.sectionTitle
-                    ? section.sectionTitle
-                    : section.course.title,
+                content: getSectionCourseTitle(section),
               },
               {
                 name: 'Instructors',
