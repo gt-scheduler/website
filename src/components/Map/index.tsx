@@ -55,17 +55,27 @@ export default function Map(): React.ReactElement {
     R: [],
     F: [],
   };
-  const seenCourseIds = new Set<string>();
+  const seenCourseKeys = new Set<string>();
   Object.entries(courseDateMap).forEach(([day, courseDataList]) => {
     if (!isDay(day) || day === 'ALL') return;
     sortedCourseDateMap[day] = courseDataList.sort(
       (a, b) => (a.times?.start ?? 0) - (b.times?.start ?? 0)
     );
     sortedCourseDateMap[day].forEach((course) => {
-      if (!seenCourseIds.has(course.id)) {
-        seenCourseIds.add(course.id);
-        sortedCourseDateMap.ALL.push({ ...course });
-      }
+      // `course` is the lightweight map entry
+      // `courseBean` is the full Oscar course record
+      const courseBean = oscar.findCourse(course.id);
+      const sectionBean = courseBean?.sections.find(
+        (section) => section.id === course.section
+      );
+      // Normal courses dedupe by course ID; multi-topic courses dedupe by
+      // course ID plus their unique section title.
+      const dedupeKey = sectionBean?.course.isMultipleTopics
+        ? `${course.id}:${sectionBean?.sectionTitle ?? course.section}`
+        : course.id;
+      if (seenCourseKeys.has(dedupeKey)) return;
+      seenCourseKeys.add(dedupeKey);
+      sortedCourseDateMap.ALL.push({ ...course });
     });
   });
 
