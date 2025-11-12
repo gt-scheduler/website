@@ -1,11 +1,21 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
-import ReactMapGL, { Marker, NavigationControl, ViewState } from 'react-map-gl';
+import ReactMapGL, {
+  Layer,
+  LayerProps,
+  Marker,
+  NavigationControl,
+  Source,
+  ViewState,
+} from 'react-map-gl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin } from '@fortawesome/free-solid-svg-icons';
 
 import { Location } from '../../types';
 import { ThemeContext } from '../../contexts';
-import { batchGetDistances } from '../../utils/mapbox/travelTimes';
+import {
+  batchGetDistances,
+  createLocationKey,
+} from '../../utils/mapbox/travelTimes';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './stylesheet.scss';
@@ -32,7 +42,6 @@ export default function MapView({
     zoom: 15,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [travelTimes, setTravelTimes] = useState<Map<string, number> | null>(
     null
   );
@@ -49,7 +58,6 @@ export default function MapView({
 
   useEffect(() => {
     const calculateTravelTimes = async (): Promise<void> => {
-      // Don't calculate if showTravelTimes is false or insufficient locations
       if (!showTravelTimes || validLocations.length < 2) {
         setTravelTimes(null);
         return;
@@ -64,9 +72,74 @@ export default function MapView({
     };
 
     calculateTravelTimes().catch(() => {
-      // Error already handled inside calculateTravelTimes function
+      setTravelTimes(null);
     });
   }, [validLocations, showTravelTimes]);
+
+  type TravelSegment = {
+    id: string;
+    from: Location;
+    to: Location;
+    midpoint: Location;
+    duration: number | null;
+  };
+
+  const travelSegments = useMemo<TravelSegment[]>(() => {
+    if (!showTravelTimes || validLocations.length < 2) return [];
+
+    const segments: TravelSegment[] = [];
+    for (let i = 0; i < validLocations.length - 1; i += 1) {
+      const start = validLocations[i];
+      const end = validLocations[i + 1];
+      if (start != null && end != null) {
+        const key = createLocationKey(start, end);
+        const duration = travelTimes?.get(key) ?? null;
+
+        segments.push({
+          id: key,
+          from: start,
+          to: end,
+          midpoint: {
+            lat: (start.lat + end.lat) / 2,
+            long: (start.long + end.long) / 2,
+          },
+          duration,
+        });
+      }
+    }
+
+    return segments;
+  }, [showTravelTimes, validLocations, travelTimes]);
+
+  const segmentsWithDuration = useMemo(
+    () =>
+      travelSegments.filter(
+        (segment): segment is TravelSegment & { duration: number } =>
+          segment.duration !== null
+      ),
+    [travelSegments]
+  );
+
+  const travelLineGeoJson = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: segmentsWithDuration.map((segment, index) => ({
+        type: 'Feature' as const,
+        id: `travel-line-${segment.id}-${index}`,
+        properties: {
+          duration: segment.duration,
+        },
+        geometry: {
+          type: 'LineString' as const,
+          coordinates: [
+            [segment.from.long, segment.from.lat],
+            [segment.to.long, segment.to.lat],
+          ],
+        },
+      })),
+    }),
+    [segmentsWithDuration]
+  );
 
   const unknown: MapLocation[] = [];
   const coordsToLocationsMap = new Map<Location, MapLocation[]>();
@@ -91,6 +164,34 @@ export default function MapView({
       ? 'mapbox://styles/gt-scheduler/cktc4yzhm018w17ql65xa802o' // gt-scheduler-dark
       : 'mapbox://styles/gt-scheduler/cktc4y61t018918qjynvngozg'; // gt-scheduler-light
 
+  const travelLineLayerStyle = useMemo<LayerProps>(() => {
+    const techGold = '#B3A369';
+    return {
+      id: 'travel-lines',
+      type: 'line',
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round',
+      },
+      paint: {
+        'line-width': 4.5,
+        'line-color': techGold,
+        'line-opacity': 1,
+      },
+    };
+  }, []);
+
+  const formatTravelDuration = (durationInSeconds: number): string => {
+    if (durationInSeconds < 60) {
+      return '< 1 min';
+    }
+    const minutes = Math.round(durationInSeconds / 60);
+    return `${minutes} min`;
+  };
+
+  const shouldShowTravelLines =
+    showTravelTimes && segmentsWithDuration.length > 0;
+
   return (
     <div className="mapbox">
       <ReactMapGL
@@ -105,6 +206,15 @@ export default function MapView({
           viewState: ViewState;
         }): void => setViewState(newViewState)}
       >
+        {shouldShowTravelLines && (
+          <Source
+            id="travel-lines-source"
+            type="geojson"
+            data={travelLineGeoJson}
+          >
+            <Layer {...travelLineLayerStyle} />
+          </Source>
+        )}
         {Array.from(coordsToLocationsMap.entries()).map(
           ([coords, coordLocations], i) => (
             <Marker key={i} latitude={coords.lat} longitude={coords.long}>
@@ -119,6 +229,21 @@ export default function MapView({
             </Marker>
           )
         )}
+        {shouldShowTravelLines &&
+          segmentsWithDuration.map((segment) => (
+            <Marker
+              key={`travel-label-${segment.id}`}
+              latitude={segment.midpoint.lat}
+              longitude={segment.midpoint.long}
+            >
+              <div className="travel-label">
+                <span aria-hidden="true" className="travel-label__icon">
+                  🚶
+                </span>
+                {formatTravelDuration(segment.duration)}
+              </div>
+            </Marker>
+          ))}
         {unknown.length > 0 && (
           <div className="unknown-container">
             <b>Undetermined</b>
