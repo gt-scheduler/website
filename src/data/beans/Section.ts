@@ -9,6 +9,18 @@ import Oscar from './Oscar';
 import { CrawlerMeeting, Meeting } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
+// Seating information
+export type OccupiedInfo = {
+  occupied: number;
+  total: number;
+};
+
+// Response from fetchSeating
+export type SeatData = {
+  inClass: OccupiedInfo | null;
+  waitlist: OccupiedInfo | null;
+};
+
 export type Seating = [
   seating:
     | [] // Loading state
@@ -151,6 +163,38 @@ export default class Section {
     // inside `Course.constructor`
     this.associatedLabs = [];
     this.associatedLectures = [];
+  }
+
+  /**
+   * Fetches and formats seating data for this section
+   */
+  async getSeatData(term: string): Promise<SeatData> {
+    try {
+      const raw = await this.fetchSeating(term);
+
+      // Handle missing or bad data
+      if (!raw[0] || raw[0].length < 4) {
+        return { inClass: null, waitlist: null };
+      }
+
+      const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
+        raw[0];
+
+      const toOccupiedInfo = (
+        total: unknown,
+        occupied: unknown
+      ): OccupiedInfo => ({
+        occupied: Number(occupied ?? 0),
+        total: Number(total ?? 0),
+      });
+
+      return {
+        inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
+        waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
+      };
+    } catch (err) {
+      return { inClass: null, waitlist: null };
+    }
   }
 
   async fetchSeating(term: string): Promise<Seating> {

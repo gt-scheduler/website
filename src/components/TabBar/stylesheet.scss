@@ -1,20 +1,35 @@
 @import '../../variables';
 
+.TabBarContainer {
+  position: relative;
+  // width: 100%;
+  overflow: hidden;
+}
+
 .TabBar {
   display: flex;
   align-items: center;
   background-color: $tab-bar-background;
   border-radius: 10px;
   padding: 2px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   .tab {
-    width: 100px;
+    min-width: 100px;
+    padding-left: 14px;
+    padding-right: 14px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Roboto', sans-serif;
-    font-size: 14px;
+    font-size: 0.875em;
     border-radius: 8px;
     cursor: pointer;
     color: $tab-bar-text-unselected;
@@ -32,6 +47,9 @@
   }
 
   &.unselectable {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    justify-content: flex-start;
     .tab {
       color: white;
       cursor: default;
@@ -39,3 +57,42 @@
     }
   }
 }
+
+.fade-right,
+.fade-left {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fade-right {
+  right: 0;
+  background: linear-gradient(
+    to right,
+    rgba($tab-bar-gradient, 0),
+    rgba($tab-bar-gradient, 1)
+  );
+  border-radius: 0 10px 10px 0;
+}
+
+.fade-left {
+  left: 0;
+  background: linear-gradient(
+    to left,
+    rgba($tab-bar-gradient, 0),
+    rgba($tab-bar-gradient, 1)
+  );
+  border-radius: 10px 0 0 10px;
+}
+
+@media (max-width: 600px) {
+  .TabBar {
+    .tab {
+      margin-right: 0;
+    }
+  }
+}
+

@@ -1,0 +1,63 @@
+@import '../../variables.scss';
+
+.MetricsCard {
+  padding: 16px;
+
+  container-type: inline-size;
+  container-name: metrics-card;
+
+  .metrics-list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    align-items: start;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 40px;
+      border-right: 1px solid $color-border;
+
+      width: auto;
+      justify-self: center;
+      align-self: start;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      .metric-value {
+        font-size: 1.25em;
+      }
+
+      .metric-unit {
+        font-size: 0.875em;
+      }
+
+      .metric-label {
+        font-size: 0.875em;
+        margin-top: 4px;
+        @include dark(color, $seat-info-dark-label);
+        @include light(color, $seat-info-light-label);
+      }
+    }
+  }
+
+  @container metrics-card (max-width: 800px) {
+    .metrics-list {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      grid-auto-flow: row;
+      grid-row-gap: 40px;
+
+      .metric-item {
+        border-right: none;
+        padding: 0 24px;
+      }
+    }
+  }
+}
