@@ -9,7 +9,6 @@ export default function CourseDetailsContainer(): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
 
   if (desiredCourses.length === 0) {
-    console.log('no courses selected');
     return (
       <div className="empty-container">
         {/* TODO: insert image here */}
@@ -20,7 +19,10 @@ export default function CourseDetailsContainer(): React.ReactElement {
   }
 
   return (
-    <div>hi</div>
-    // TODO: display CourseInfoCards for each desired course
+    <div className="cards-container">
+      {desiredCourses.map((course) => {
+        return <CourseInfoCard course={oscar.courseMap[course]} />;
+      })}
+    </div>
   );
 }

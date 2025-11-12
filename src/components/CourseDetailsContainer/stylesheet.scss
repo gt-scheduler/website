@@ -7,16 +7,20 @@
   align-items: center;
   color: $color-neutral;
   flex: 1;
+
+  .empty-title {
+    font-size: 1.125em;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .empty-description {
+    width: 170px;
+    font-size: 0.875em;
+    text-align: center;
+  }
 }
 
-.empty-title {
-  font-size: 1.125em;
-  font-weight: bold;
-  text-align: center;
-}
-
-.empty-description {
-  width: 170px;
-  font-size: 0.875em;
-  text-align: center;
+.cards-container {
+  margin: 20px 16px 16px 16px;
 }

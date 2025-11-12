@@ -33,6 +33,7 @@ export default function Course({
   const [expanded, setExpanded] = useState<boolean>(false);
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
+  const [courseModalOpen, setCourseModalOpen] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
@@ -157,6 +158,14 @@ export default function Course({
     0
   );
 
+  const handleOpenCourseModal = useCallback(() => {
+    setCourseModalOpen(true);
+  }, []);
+
+  const handleCloseCourseModal = useCallback(() => {
+    setCourseModalOpen(false);
+  }, []);
+
   return (
     <div
       className={classes('Course', contentClassName, 'default', className)}
@@ -179,10 +188,7 @@ export default function Course({
                 prereqAction,
                 {
                   icon: faCircleInfo,
-                  // TODO: on click, open section details modal
-                  // onClick: (): void => {
-                  //   setPaletteShown(!paletteShown);
-                  // },
+                  onClick: handleOpenCourseModal,
                   tooltip: 'View Section Details',
                   id: `${course.id}-details`,
                 },
@@ -280,6 +286,12 @@ export default function Course({
       )}
       {expanded && prereqOpen && prereqs !== null && (
         <Prerequisite course={course} prereqs={prereqs} />
+      )}
+      {courseModalOpen && (
+        <CourseInfoModal
+          course={course}
+          onClose={handleCloseCourseModal}
+        />
       )}
     </div>
   );
