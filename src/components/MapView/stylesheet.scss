@@ -3,6 +3,8 @@
 .mapbox {
   height: 100%;
   width: 100%;
+  position: relative;
+  flex: 1;
 
   .pin-text {
     // right: svg width
@@ -67,6 +69,27 @@
     padding: 20px;
     text-align: center;
   }
+
+  .travel-label {
+    @extend %floating-box;
+    padding: 4px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    transform: translate(-50%, -12px);
+    white-space: nowrap;
+    pointer-events: none;
+    border: none;
+    background: rgba(15, 23, 42, 0.92);
+    color: #f8fafc;
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+
+    &__icon {
+      font-size: 13px;
+    }
+  }
+
 }
 
 %floating-box {

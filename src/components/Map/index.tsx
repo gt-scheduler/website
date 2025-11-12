@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
 import { ScheduleContext } from '../../contexts';
@@ -37,6 +37,20 @@ function hasValidLocationData(
 export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns, events }] = useContext(ScheduleContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('ALL');
+  const [showTravelTimes, setShowTravelTimes] = useState(false);
+  const isTravelToggleDisabled = activeDay === '' || activeDay === 'ALL';
+  let travelToggleLabel = 'Show travel times';
+  if (isTravelToggleDisabled) {
+    travelToggleLabel = 'Select a weekday to view travel times';
+  } else if (showTravelTimes) {
+    travelToggleLabel = 'Hide travel times';
+  }
+
+  useEffect(() => {
+    if (isTravelToggleDisabled && showTravelTimes) {
+      setShowTravelTimes(false);
+    }
+  }, [isTravelToggleDisabled, showTravelTimes]);
   const courseDateMap: Record<Day, CombinedCourseData[]> = {
     ALL: [],
     M: [],
@@ -172,10 +186,24 @@ export default function Map(): React.ReactElement {
         activeDay={activeDay}
         setActiveDay={setActiveDay}
       />
-      <MapView
-        locations={activeLocations}
-        showTravelTimes={activeDay !== 'ALL'}
-      />
+      <div className="map-view-panel">
+        <button
+          type="button"
+          className={`travel-toggle travel-toggle-floating${
+            showTravelTimes ? ' travel-toggle--active' : ''
+          }`}
+          onClick={(): void => setShowTravelTimes((prev) => !prev)}
+          disabled={isTravelToggleDisabled}
+          aria-pressed={showTravelTimes}
+        >
+          <span className="travel-toggle__indicator" aria-hidden="true" />
+          <span className="travel-toggle__label">{travelToggleLabel}</span>
+        </button>
+        <MapView
+          locations={activeLocations}
+          showTravelTimes={showTravelTimes}
+        />
+      </div>
     </div>
   );
 }
