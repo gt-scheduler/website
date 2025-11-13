@@ -154,10 +154,6 @@ export default function Course({
     (credits, section) => credits + section.credits,
     0
   );
-  const courseTitle = course.isMultipleTopics
-    ? 'Multiple Topics'
-    : course.title;
-
   return (
     <div
       className={classes('Course', contentClassName, 'default', className)}
@@ -194,7 +190,7 @@ export default function Course({
         }
       >
         <div className="course-row">
-          <span className="course-title">{courseTitle}</span>
+          <span className="course-title">{course.title}</span>
           <span className="section-crns">
             {pinnedSections.map((section) => section.crn).join(', ')}
           </span>

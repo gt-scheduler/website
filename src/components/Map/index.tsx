@@ -4,7 +4,10 @@ import MapView, { MapLocation } from '../MapView';
 import { ScheduleContext } from '../../contexts';
 import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 import { Meeting } from '../../types';
-import { getSectionCourseTitle } from '../../utils/misc';
+import {
+  MULTIPLE_TOPICS_COURSE_TITLE,
+  getSectionCourseTitle,
+} from '../../utils/misc';
 
 import './stylesheet.scss';
 
@@ -70,9 +73,10 @@ export default function Map(): React.ReactElement {
       );
       // Normal courses dedupe by course ID; multi-topic courses dedupe by
       // course ID plus their unique section title.
-      const dedupeKey = sectionBean?.course.isMultipleTopics
-        ? `${course.id}:${sectionBean?.sectionTitle ?? course.section}`
-        : course.id;
+      const dedupeKey =
+        sectionBean?.course.title === MULTIPLE_TOPICS_COURSE_TITLE
+          ? `${course.id}:${sectionBean?.sectionTitle ?? course.section}`
+          : course.id;
       if (seenCourseKeys.has(dedupeKey)) return;
       seenCourseKeys.add(dedupeKey);
       sortedCourseDateMap.ALL.push({ ...course });

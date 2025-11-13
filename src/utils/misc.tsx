@@ -174,11 +174,15 @@ export function humanizeArrayReact<T>(
   );
 }
 
+export const MULTIPLE_TOPICS_COURSE_TITLE = 'Multiple Topics';
+
 export const getSectionCourseTitle = (section: Section): string => {
-  if (section.course.isMultipleTopics && section.sectionTitle) {
+  if (
+    section.course.title === MULTIPLE_TOPICS_COURSE_TITLE &&
+    section.sectionTitle
+  ) {
     return section.sectionTitle;
   }
-
   return section.course.title;
 };
 

@@ -54,8 +54,6 @@ export default class Course {
 
   prereqs: CrawlerPrerequisites | undefined;
 
-  isMultipleTopics: boolean;
-
   hasLab: boolean;
 
   onlyLectures: Section[] | undefined;
@@ -110,12 +108,6 @@ export default class Course {
       }
     );
     this.prereqs = prereqs;
-    const uniqueSectionTitles = new Set(
-      this.sections
-        .map((section) => section.sectionTitle.trim())
-        .filter((sectionTitle) => sectionTitle.length > 0)
-    );
-    this.isMultipleTopics = uniqueSectionTitles.size >= 2;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)
