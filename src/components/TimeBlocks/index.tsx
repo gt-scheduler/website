@@ -1,4 +1,4 @@
-import React, { useContext, useId, useEffect, useState } from 'react';
+import React, { useContext, useId } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { useRootClose } from 'react-overlays';
 
