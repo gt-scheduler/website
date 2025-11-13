@@ -1,4 +1,4 @@
-import React, { useContext, useId } from 'react';
+import React, { useContext, useId, useEffect, useState } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { useRootClose } from 'react-overlays';
 
@@ -198,7 +198,6 @@ function MeetingDayBlock({
   const isDraft = color === undefined;
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
-
   return (
     <div ref={outerRef}>
       <BlockElement
@@ -274,11 +273,13 @@ function MeetingDayBlock({
 
             {contentBody.map((content, i) => {
               const name = String(content.className).toLowerCase();
-              const durationMinutes = period.end - period.start;
-              const shouldHideLocation =
-                (name === 'location' || name === 'where') &&
-                durationMinutes < 49;
-              if (shouldHideLocation) return null;
+              const isLocation = name === 'location' || name === 'where';
+              const isMobile =
+                typeof window !== 'undefined' &&
+                window.matchMedia('(max-width: 768px)').matches;
+              if (isLocation && period.end - period.start <= 30) return null;
+              if (isMobile && isLocation && period.end - period.start <= 49)
+                return null;
               return (
                 <span className={content.className} key={`content-body-${i}`}>
                   {content.content}

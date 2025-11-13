@@ -168,14 +168,11 @@
     display: none;
   }
 }
-// DRAFT
-/* Prevent custom events (and any meeting) text from overflowing vertically or horizontally */
 .meeting {
-  overflow: hidden; /* ← this is key */
-  clip-path: inset(0); /* prevents visual bleeding in some browsers */
+  overflow: hidden;
+  clip-path: inset(0);
 }
 
-/* Prevent long text (like location) from spilling outside the meeting wrapper */
 .meeting-wrapper {
   overflow: hidden;
   max-height: 100%;
@@ -190,14 +187,15 @@
     line-height: 1.1;
     max-width: 100%;
   }
+
+  .where {
+    flex-shrink: 1;
+  }
 }
 
-/* Specific tightening for long custom event locations */
-.meeting-wrapper .where {
-  flex-shrink: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 100%;
+.mobile .meeting .meeting-wrapper {
+  .location,
+  .where {
+    white-space: nowrap !important;
+  }
 }
-
