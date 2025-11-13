@@ -187,17 +187,6 @@ export default function MapView({
       : 'mapbox://styles/gt-scheduler/cktc4y61t018918qjynvngozg'; // gt-scheduler-light
 
   // Get the MapBox token and provide helpful error if missing
-  const mapboxToken = process.env['REACT_APP_MAPBOX_TOKEN'] ?? '';
-  if (!mapboxToken) {
-    // MapBox token is missing - this will be logged in development
-    return (
-      <div className="mapbox error-message">
-        <p>Map cannot load: Missing MapBox API token</p>
-        <p>Please check that REACT_APP_MAPBOX_TOKEN is set in your .env file</p>
-      </div>
-    );
-  }
-
   const travelLineLayerStyle = useMemo<LayerProps>(() => {
     const techGold = '#B3A369';
     return {
@@ -214,6 +203,17 @@ export default function MapView({
       },
     };
   }, []);
+
+  const mapboxToken = process.env['REACT_APP_MAPBOX_TOKEN'] ?? '';
+  if (!mapboxToken) {
+    // MapBox token is missing - this will be logged in development
+    return (
+      <div className="mapbox error-message">
+        <p>Map cannot load: Missing MapBox API token</p>
+        <p>Please check that REACT_APP_MAPBOX_TOKEN is set in your .env file</p>
+      </div>
+    );
+  }
 
   const formatTravelDuration = (durationInSeconds: number): string => {
     if (durationInSeconds < 60) {
