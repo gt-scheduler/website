@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
-import { classes, getContentClassName } from '../../utils/misc';
+import { classes, getContentClassName, daysToString } from '../../utils/misc';
 import { Period, Event } from '../../types';
 import { ThemeContext } from '../../contexts';
 
@@ -157,7 +157,7 @@ export default function DaySelection({
                           </span>
                         )}
                         <span className="course-row">
-                          {course.daysOfWeek} {timeLabel}
+                          {daysToString(course.daysOfWeek)} {timeLabel}
                         </span>
                       </div>
                     );
