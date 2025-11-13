@@ -71,22 +71,22 @@
   }
 
   .travel-label {
-    @extend %floating-box;
-    padding: 4px 10px;
-    font-size: 15px;
+    padding: 6px 12px;
+    font-size: 14px;
     font-weight: 600;
     transform: translate(-50%, -12px);
     white-space: nowrap;
     pointer-events: none;
-    border: none;
-    background: rgba(15, 23, 42, 0.92);
-    color: #f8fafc;
+    border-radius: 6px;
+    background: $travel-time-blue;
+    color: #ffffff;
     display: inline-flex;
-    gap: 4px;
+    gap: 6px;
     align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
     &__icon {
-      font-size: 13px;
+      font-size: 14px;
     }
   }
 

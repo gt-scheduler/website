@@ -8,7 +8,7 @@ import ReactMapGL, {
   ViewState,
 } from 'react-map-gl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapPin } from '@fortawesome/free-solid-svg-icons';
+import { faMapPin, faPersonWalking } from '@fortawesome/free-solid-svg-icons';
 
 import { Location } from '../../types';
 import { ThemeContext } from '../../contexts';
@@ -186,9 +186,8 @@ export default function MapView({
       ? 'mapbox://styles/gt-scheduler/cktc4yzhm018w17ql65xa802o' // gt-scheduler-dark
       : 'mapbox://styles/gt-scheduler/cktc4y61t018918qjynvngozg'; // gt-scheduler-light
 
-  // Get the MapBox token and provide helpful error if missing
+  // Define travel line layer style with blue dashed lines
   const travelLineLayerStyle = useMemo<LayerProps>(() => {
-    const techGold = '#B3A369';
     return {
       id: 'travel-lines',
       type: 'line',
@@ -197,9 +196,10 @@ export default function MapView({
         'line-join': 'round',
       },
       paint: {
-        'line-width': 4.5,
-        'line-color': techGold,
+        'line-width': 3,
+        'line-color': '#589BD5',
         'line-opacity': 1,
+        'line-dasharray': [2, 2],
       },
     };
   }, []);
@@ -271,9 +271,11 @@ export default function MapView({
               longitude={segment.midpoint.long}
             >
               <div className="travel-label">
-                <span aria-hidden="true" className="travel-label__icon">
-                  🚶
-                </span>
+                <FontAwesomeIcon
+                  icon={faPersonWalking}
+                  className="travel-label__icon"
+                  aria-hidden="true"
+                />
                 {formatTravelDuration(segment.duration)}
               </div>
             </Marker>
