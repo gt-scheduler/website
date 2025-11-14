@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
+import ToggleButton from '../ToggleButton';
 import { ScheduleContext } from '../../contexts';
 import DaySelection, {
   ScheduleBlockDateItem,
@@ -187,18 +188,13 @@ export default function Map(): React.ReactElement {
         setActiveDay={setActiveDay}
       />
       <div className="map-view-panel">
-        <button
-          type="button"
-          className={`travel-toggle travel-toggle-floating${
-            showTravelTimes ? ' travel-toggle--active' : ''
-          }`}
-          onClick={(): void => setShowTravelTimes((prev) => !prev)}
+        <ToggleButton
+          label={travelToggleLabel}
+          active={showTravelTimes}
           disabled={isTravelToggleDisabled}
-          aria-pressed={showTravelTimes}
-        >
-          <span className="travel-toggle__indicator" aria-hidden="true" />
-          <span className="travel-toggle__label">{travelToggleLabel}</span>
-        </button>
+          onClick={(): void => setShowTravelTimes((prev) => !prev)}
+          className="travel-toggle-floating"
+        />
         <MapView
           locations={activeLocations}
           showTravelTimes={showTravelTimes}
