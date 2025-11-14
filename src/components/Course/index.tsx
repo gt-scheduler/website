@@ -17,7 +17,6 @@ import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
-import { load } from 'cheerio';
 
 export type CourseProps = {
   className?: string;
@@ -41,7 +40,6 @@ export default function Course({
   ] = useContext(ScheduleContext);
 
   useEffect(() => {
-    console.log(`Loading GPA and metrics for ${courseId}`);
     const course = oscar.findCourse(courseId);
     if (course == null) return;
     if (isSearching) return;
@@ -58,35 +56,10 @@ export default function Course({
       }
     }
 
-    async function loadCourseMetrics(): Promise<void> {
-      if (course == null) return;
-
-      const promise = course.fetchCourseMetrics();
-      const result = await loadOperation.perform(promise);
-      if (!result.cancelled) {
-        console.log(
-          `Metrics for ${course.id}, ${JSON.stringify(result.value)}`
-        );
-      }
-    }
-
     loadCourseGpa().catch((err) => {
       softError(
         new ErrorWithFields({
           message: 'error fetching course GPA',
-          source: err,
-          fields: {
-            courseId,
-            term: course.term,
-          },
-        })
-      );
-    });
-
-    loadCourseMetrics().catch((err) => {
-      softError(
-        new ErrorWithFields({
-          message: 'error fetching course metrics',
           source: err,
           fields: {
             courseId,

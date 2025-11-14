@@ -4,7 +4,6 @@ import { decode } from 'html-entities';
 import { Oscar, Section } from '.';
 import {
   CourseGpa,
-  CourseMetrics,
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
@@ -17,6 +16,7 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { getTermFromSemesterName } from '../../utils/semesters';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -27,11 +27,6 @@ const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCou
 
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
-
-const COURSE_METRICS_API_URL = `http://127.0.0.1:5001/gt-scheduler-web-dev/us-east1/getMetrics`;
-
-const METRICS_CACHE_LOCAL_STORAGE_KEY = 'course-metrics-cache-1';
-const METRICS_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 interface SectionGroupMeeting {
   days: string[];
@@ -56,6 +51,8 @@ export default class Course {
 
   title: string;
 
+  description?: string;
+
   sections: Section[];
 
   prereqs: CrawlerPrerequisites | undefined;
@@ -74,10 +71,12 @@ export default class Course {
 
   plannedCount: number | undefined;
 
+  additionalTermInfo: Record<string, string[]>;
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
     this.plannedCount = oscar.plannedCounts?.courseCounts[courseId];
-    const [title, sections, prereqs] = data;
+    const [title, sections, prereqs, description] = data;
 
     this.id = courseId;
     const [subject, number] = this.id.split(' ');
@@ -96,6 +95,9 @@ export default class Course {
     this.number = number;
 
     this.title = decode(title);
+    this.description = decode(description);
+    this.additionalTermInfo = {};
+
     this.sections = Object.entries(sections).flatMap<Section>(
       ([sectionId, sectionData]) => {
         if (sectionData == null) return [];
@@ -217,93 +219,6 @@ export default class Course {
     return groups;
   }
 
-  async fetchCourseMetrics(): Promise<CourseMetrics> {
-    type MetricsCache = Record<string, MetricsCacheItem>;
-    interface MetricsCacheItem {
-      d: CourseMetrics;
-      exp: string;
-    }
-    console.log(`fetching metrics for ${this.id}`);
-
-    try {
-      const rawCache = window.localStorage.getItem(
-        METRICS_CACHE_LOCAL_STORAGE_KEY
-      );
-      if (rawCache != null) {
-        const cache: MetricsCache = JSON.parse(
-          rawCache
-        ) as unknown as MetricsCache;
-        const cacheItem = cache[this.id];
-        if (cacheItem != null) {
-          const now = new Date().toISOString();
-          if (now < cacheItem.exp) {
-            return cacheItem.d;
-          }
-        }
-      }
-    } catch (err) {
-      // Ignore
-    }
-
-    const courseMetrics = await this.fetchCourseMetricsInner();
-    if (courseMetrics === null) {
-      return { difficulties: [], workloads: [], overalls: [] };
-    }
-
-    const exp = new Date();
-    exp.setDate(exp.getDate() + METRICS_CACHE_EXPIRATION_DURATION_DAYS);
-    try {
-      let cache: MetricsCache = {};
-      const rawCache = window.localStorage.getItem(
-        METRICS_CACHE_LOCAL_STORAGE_KEY
-      );
-      if (rawCache != null) {
-        cache = JSON.parse(rawCache) as unknown as MetricsCache;
-      }
-
-      cache[this.id] = { d: courseMetrics, exp: exp.toISOString() };
-      const rawUpdatedCache = JSON.stringify(cache);
-      window.localStorage.setItem(
-        METRICS_CACHE_LOCAL_STORAGE_KEY,
-        rawUpdatedCache
-      );
-    } catch (err) {
-      // Ignore
-    }
-
-    console.log(courseMetrics);
-
-    return courseMetrics;
-  }
-
-  private async fetchCourseMetricsInner(): Promise<CourseMetrics | null> {
-    const id = `${this.subject} ${this.number.replace(/\D/g, '')}`;
-    const encodedCourse = encodeURIComponent(id);
-    const url = `${COURSE_METRICS_API_URL}?courseID=${encodedCourse}`;
-
-    let responseData: CourseMetrics;
-    try {
-      responseData = (await axios.get<CourseMetrics>(url)).data;
-    } catch (err) {
-      if (!isAxiosNetworkError(err)) {
-        softError(
-          new ErrorWithFields({
-            message: 'error fetching course metrics from backend API',
-            source: err,
-            fields: {
-              baseId: this.id,
-              cleanedId: id,
-              url,
-            },
-          })
-        );
-      }
-
-      return null;
-    }
-    return responseData;
-  }
-
   async fetchGpa(): Promise<CourseGpa> {
     // Note: if `CourseGpa` ever changes,
     // the cache needs to be invalidated
@@ -312,6 +227,7 @@ export default class Course {
     interface GpaCacheItem {
       d: CourseGpa;
       exp: string;
+      additionalTermInfo: Record<string, string[]>;
     }
 
     // Try to look in the cache for a cached course gpa item
@@ -329,6 +245,9 @@ export default class Course {
           // Use lexicographic comparison on date strings
           // (since they are ISO 8601)
           if (now < cacheItem.exp) {
+            if (cacheItem.additionalTermInfo) {
+              this.additionalTermInfo = cacheItem.additionalTermInfo;
+            }
             return cacheItem.d;
           }
         }
@@ -354,7 +273,11 @@ export default class Course {
         cache = JSON.parse(rawCache) as unknown as GpaCache;
       }
 
-      cache[this.id] = { d: courseGpa, exp: exp.toISOString() };
+      cache[this.id] = {
+        d: courseGpa,
+        exp: exp.toISOString(),
+        additionalTermInfo: this.additionalTermInfo,
+      };
       const rawUpdatedCache = JSON.stringify(cache);
       window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
     } catch (err) {
@@ -432,6 +355,7 @@ export default class Course {
           class_size_group: classSizeGroup,
           instructor_name: rawInstructorName,
           GPA: gpa,
+          Term,
         } = historicalSectionData;
 
         if (typeof classSizeGroup !== 'string') return;
@@ -476,6 +400,18 @@ export default class Course {
           instructorName = `${firstName} ${lastName}`;
         }
 
+        // Store instructors for each term
+        const termKey = String(Term);
+        if (!this.additionalTermInfo[termKey]) {
+          this.additionalTermInfo[termKey] = [];
+        }
+        const alreadyAdded = this.additionalTermInfo[termKey]!.some(
+          (p) => p === instructorName
+        );
+        if (!alreadyAdded) {
+          this.additionalTermInfo[termKey]!.push(instructorName);
+        }
+
         // Add the section GPA to the overall GPA
         overall.count += classSizeEstimate;
         overall.sum += gpa * classSizeEstimate;
@@ -501,6 +437,26 @@ export default class Course {
           gpaMap[instructorName] = instructorGpa.sum / instructorGpa.count;
         }
       });
+
+      // After populating this.additionalTermInfo with all terms
+      // Keep only the 5 most recent terms (excluding current term)
+      const currentTerm = this.term;
+
+      const sortedTermKeys = Object.keys(this.additionalTermInfo)
+        .filter((termKey) => getTermFromSemesterName(termKey) !== currentTerm) // exclude current term
+        .sort((a, b) =>
+          getTermFromSemesterName(b)!.localeCompare(getTermFromSemesterName(a)!)
+        ) // reverse chronological
+        .slice(0, 5); // take only 5 most recent
+
+      const filteredAdditionalTermInfo: Record<string, string[]> = {};
+
+      sortedTermKeys.forEach((termKey) => {
+        filteredAdditionalTermInfo[termKey] =
+          this.additionalTermInfo[termKey] ?? [];
+      });
+
+      this.additionalTermInfo = filteredAdditionalTermInfo;
       return gpaMap;
     } catch (err) {
       softError(
@@ -532,11 +488,11 @@ interface CourseDetailsAPIResponse {
     }
   ];
   raw: Array<{
-    instructor_gt_username: string | unknown;
     instructor_name: string | unknown;
     link: string | unknown;
     class_size_group: string | unknown;
     GPA: number | unknown;
+    Term: string | unknown;
     A: number | unknown;
     B: number | unknown;
     C: number | unknown;
