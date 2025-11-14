@@ -171,6 +171,8 @@
 .meeting {
   overflow: hidden;
   clip-path: inset(0);
+  container-type: size;
+  container-name: meeting-block;
 }
 
 .meeting-wrapper {
@@ -195,7 +197,15 @@
 
 .mobile .meeting .meeting-wrapper {
   .location,
-  .where {
+  .where,
+  .period {
     white-space: nowrap !important;
+  }
+}
+
+@container meeting-block (max-height: 50px) {
+  .meeting-wrapper .location,
+  .meeting-wrapper .where {
+    display: none;
   }
 }

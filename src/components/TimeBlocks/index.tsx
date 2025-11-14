@@ -271,21 +271,11 @@ function MeetingDayBlock({
                 ))}
             </div>
 
-            {contentBody.map((content, i) => {
-              const name = String(content.className).toLowerCase();
-              const isLocation = name === 'location' || name === 'where';
-              const isMobile =
-                typeof window !== 'undefined' &&
-                window.matchMedia('(max-width: 768px)').matches;
-              if (isLocation && period.end - period.start <= 30) return null;
-              if (isMobile && isLocation && period.end - period.start <= 49)
-                return null;
-              return (
-                <span className={content.className} key={`content-body-${i}`}>
-                  {content.content}
-                </span>
-              );
-            })}
+            {contentBody.map((content, i) => (
+              <span className={content.className} key={`content-body-${i}`}>
+                {content.content}
+              </span>
+            ))}
           </div>
         )}
       </BlockElement>
