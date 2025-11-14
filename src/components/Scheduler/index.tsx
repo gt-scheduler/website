@@ -20,6 +20,7 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 import TabBar from '../TabBar';
 import { AppNavigationContext } from '../App/navigation';
 import CourseDetailsContainer from '../CourseDetailsContainer';
+import SectionDetailsContainer from '../SectionDetailsContainer';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -135,7 +136,7 @@ export default function Scheduler(): React.ReactElement {
 
               {currentSchedulerPage.type === 'section-details' && (
                 <div className="section-details-view">
-                  <h2>Section Details for {currentSchedulerPage.courseId}</h2>
+                  <SectionDetailsContainer />
                 </div>
               )}
             </div>

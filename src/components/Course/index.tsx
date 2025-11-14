@@ -158,13 +158,13 @@ export default function Course({
     0
   );
 
-  const handleOpenCourseModal = useCallback(() => {
+  const handleOpenCourseModal = (): void => {
     setCourseModalOpen(true);
-  }, []);
+  };
 
-  const handleCloseCourseModal = useCallback(() => {
+  const handleCloseCourseModal = (): void => {
     setCourseModalOpen(false);
-  }, []);
+  };
 
   return (
     <div

@@ -13,13 +13,14 @@ import { AccountContextValue } from '../../contexts/account';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
+import { Course } from '../../data/beans';
 
 export const NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
 export type SchedulerPageState =
   | { type: 'calendar' }
   | { type: 'course-details' }
-  | { type: 'section-details'; courseId: string };
+  | { type: 'section-details'; course: Course };
 
 export type AppNavigationContextValue = {
   currentTabIndex: number;

@@ -21,7 +21,7 @@ export default function CourseDetailsContainer(): React.ReactElement {
   return (
     <div className="cards-container">
       {desiredCourses.map((course) => {
-        return <CourseInfoCard course={oscar.courseMap[course]} />;
+        return <CourseInfoCard course={oscar.findCourse(course)} />;
       })}
     </div>
   );
