@@ -288,10 +288,7 @@ export default function Course({
         <Prerequisite course={course} prereqs={prereqs} />
       )}
       {courseModalOpen && (
-        <CourseInfoModal
-          course={course}
-          onClose={handleCloseCourseModal}
-        />
+        <CourseInfoModal course={course} onClose={handleCloseCourseModal} />
       )}
     </div>
   );
