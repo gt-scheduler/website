@@ -3,8 +3,6 @@
 .travel-toggle {
   border-radius: 999px;
   border: none;
-  background-color: $toggle-background;
-  color: $theme-light-background;
   padding: 8px 14px 8px 8px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -15,12 +13,28 @@
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
   transition: transform 150ms ease, background-color 150ms ease;
 
+  @include dark {
+    background-color: $toggle-background-dark;
+    color: $theme-dark-foreground;
+  }
+
+  @include light {
+    background-color: $toggle-background-light;
+    color: $theme-light-foreground;
+  }
+
   &:hover:not(:disabled) {
     transform: translateY(-1px);
   }
 
   &.travel-toggle--active {
-    background-color: $toggle-background-active;
+    @include dark {
+      background-color: $toggle-background-active-dark;
+    }
+
+    @include light {
+      background-color: $toggle-background-active-light;
+    }
   }
 
   &:disabled {
@@ -32,21 +46,35 @@
     width: 36px;
     height: 20px;
     border-radius: 999px;
-    background-color: $toggle-indicator-background;
     position: relative;
     transition: background-color 150ms ease;
+
+    @include dark {
+      background-color: $toggle-indicator-background-dark;
+    }
+
+    @include light {
+      background-color: $toggle-indicator-background-light;
+    }
 
     &::after {
       content: '';
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background-color: $theme-light-background;
       position: absolute;
       top: 2px;
       left: 2px;
       transition: transform 150ms ease,
         background-color 150ms ease;
+
+      @include dark {
+        background-color: $theme-dark-foreground;
+      }
+
+      @include light {
+        background-color: $theme-light-foreground;
+      }
     }
   }
 
@@ -56,7 +84,14 @@
 
       &::after {
         transform: translateX(16px);
-        background-color: $theme-dark-background;
+
+        @include dark {
+          background-color: $theme-dark-background;
+        }
+
+        @include light {
+          background-color: $theme-light-background;
+        }
       }
     }
   }
