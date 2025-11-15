@@ -15,8 +15,13 @@ export default function CourseInfoModal({
   onHide,
 }: CourseInfoModalProps): React.ReactElement {
   return (
-    <Modal show={show} onHide={onHide} className="course-info-modal">
-      <CourseInfo courseId={courseId} infoType="long" />
+    <Modal
+      width={930}
+      show={show}
+      onHide={onHide}
+      className="course-info-modal"
+    >
+      <CourseInfo courseId={courseId} infoType="long" isModal onHide={onHide} />
     </Modal>
   );
 }

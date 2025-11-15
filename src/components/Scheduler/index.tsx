@@ -16,8 +16,10 @@ import {
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
-import CourseInfo from '../CourseInfo';
-import CourseInfoCard from '../CourseInfoCard';
+// uncomment the following to test
+// import CourseInfo from '../CourseInfo';
+// import CourseInfoCard from '../CourseInfoCard';
+// import CourseInfoModal from '../CourseInfoModal';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -59,6 +61,13 @@ export default function Scheduler(): React.ReactElement {
     [setCompareState, setOverlaySchedules]
   );
 
+  // uncomment the following to test
+  // const [showModal, setShowModal] = useState(true);
+
+  // const handleCloseModal = () => {
+  //   setShowModal(false);
+  // };
+
   return (
     <>
       {mobile && (
@@ -80,9 +89,16 @@ export default function Scheduler(): React.ReactElement {
           {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">
+              {
+                // uncomment the following to test:
+                /* <CourseInfoModal
+                courseId="CS 1332"
+                show={showModal}
+                onHide={handleCloseModal}
+              />
               <CourseInfoCard courseId="CS 1332" />
-
-              <CourseInfo courseId="CS 1332" infoType="long" />
+              <CourseInfo courseId="CS 1332" infoType="long" /> */
+              }
               <Calendar
                 className="calendar"
                 overlayCrns={overlayCrns}
