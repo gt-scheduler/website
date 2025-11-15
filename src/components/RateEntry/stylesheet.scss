@@ -3,8 +3,9 @@
 .rateentry {
   height: 180px;
   width: 100%;
-  border: 1px solid $color-border;
   padding: 32px 24px;
+  border-radius: 10px;
+  background: $theme-dark-card-background;
 
   .heading {
     font-weight: bold;
@@ -43,22 +44,24 @@
 
     .time-input-group {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 6px;
 
       .time-input {
         aspect-ratio: 1 / 1;
         height: 32px;
-        width: 32px;
+        width: 52px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: $color-neutral;
+        background: #515151;
         font-size: 14px;
         color: #fff;
         border: none;
         outline: none;
         text-align: center;
+        border-radius: 5px;
 
         // remove spinner
         &::-webkit-inner-spin-button,
@@ -66,7 +69,6 @@
           -webkit-appearance: none;
           margin: 0;
         }
-        -moz-appearance: textfield;
 
         &:focus {
           outline: none;

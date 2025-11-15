@@ -1,5 +1,5 @@
-import React, { useContext, useRef } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import React, { useContext, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Header, Scheduler, Attribution, Calendar } from '..';
 import { ReactErrorDetails } from '../ErrorDetails';
@@ -19,6 +19,7 @@ import {
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
+import RatingsPage from '../RatingsPage';
 
 /**
  * Renders the actual content at the root of the app
@@ -33,17 +34,23 @@ function AppContentBase(): React.ReactElement {
 
   const location = useLocation();
 
+  useEffect(() => {
+    if (window.location.hash.includes('#/ratings')) {
+      setTabIndex(3);
+    }
+  }, [location.key, setTabIndex]);
   return (
     <>
       <AppMobileNav captureRef={captureRef} />
       <Header
+        minimal={currentTabIndex === 3}
         currentTab={currentTabIndex}
         onChangeTab={setTabIndex}
         onToggleMenu={openDrawer}
         tabs={NAV_TABS}
         captureRef={captureRef}
       />
-      <SurveyBanner />
+      {currentTabIndex !== 3 && <SurveyBanner />}
       <ErrorBoundary
         // ErrorBoundary.fallback is a normal render prop, not a component.
         // eslint-disable-next-line react/no-unstable-nested-components
@@ -65,15 +72,11 @@ function AppContentBase(): React.ReactElement {
           </SkeletonContent>
         )}
       >
-        {!location.pathname.includes('ratings') && (
-          <>
-            {currentTabIndex === 0 && <Scheduler />}
-            {currentTabIndex === 1 && <Map />}
-            {currentTabIndex === 2 && <Finals />}
-          </>
-        )}
+        {currentTabIndex === 0 && <Scheduler />}
+        {currentTabIndex === 1 && <Map />}
+        {currentTabIndex === 2 && <Finals />}
+        {currentTabIndex === 3 && <RatingsPage />}
 
-        <Outlet />
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />

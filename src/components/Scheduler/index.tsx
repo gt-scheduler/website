@@ -17,6 +17,7 @@ import {
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import { AppNavigationContext } from '../App/navigation';
 import { faStarHalfStroke } from '@fortawesome/free-solid-svg-icons';
 
 /**
@@ -42,6 +43,8 @@ export default function Scheduler(): React.ReactElement {
   const { compare, pinned, pinSelf, expanded, setCompareState } =
     useCompareStateFromStorage({ pinDefault: [currentVersion] });
   const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
+
+  const { setTabIndex: setAppTabIndex } = useContext(AppNavigationContext);
 
   const handleCompareSchedules = useCallback(
     (
@@ -82,10 +85,17 @@ export default function Scheduler(): React.ReactElement {
             <div className="calendar-container">
               <div className="buttons-container">
                 <div>View Mode</div>
-                <a href="/#/ratings" className="rate-button">
+                <button
+                  type="button"
+                  onClick={(): void => {
+                    const newUrl = `${window.location.origin}${window.location.pathname}#/ratings`;
+                    window.open(newUrl, '_blank');
+                  }}
+                  className="rate-button"
+                >
                   <FontAwesomeIcon fixedWidth icon={faStarHalfStroke} />
                   <div>Rate my courses</div>
-                </a>
+                </button>
               </div>
               <Calendar
                 className="calendar"

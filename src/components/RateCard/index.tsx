@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import RateEntry, { StarsValue, TimeValue } from '../RateEntry';
-import Select from '../Select';
-import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
 import {
   MetricName,
   SubmitMetricsRequestData,
@@ -13,15 +11,17 @@ import {
 import './stylesheet.scss';
 
 type RateCardProps = {
-  courseOptions: { id: string; label: string }[];
-  sectionOptions: { id: string; label: string }[];
-  professorOptions: { id: string; label: string }[];
+  course: string;
+  section: string;
+  instructor: string;
+  onChange: (data: Partial<SubmitMetricsRequestData>) => void;
 };
 
 export default function RateCard({
-  courseOptions,
-  sectionOptions,
-  professorOptions,
+  course,
+  section,
+  instructor,
+  onChange,
 }: RateCardProps): React.ReactElement {
   const [overallRating, setOverallRating] = useState<StarsValue>(null);
   const [levelOfDifficulty, setLevelOfDifficulty] = useState<StarsValue>(null);
@@ -30,25 +30,11 @@ export default function RateCard({
     minutes: null,
   });
 
-  const [course, setCourse] = useState(courseOptions[0]?.id ?? '');
-  const [section, setSection] = useState(sectionOptions[0]?.id ?? '');
-  const [professor, setProfessor] = useState(professorOptions[0]?.id ?? '');
-
-  const [formData, setFormData] = useState<Partial<SubmitMetricsRequestData>>({
-    metricName: MetricName.DIFFICULTY,
-    targets: [],
-    values: [],
-  });
-
-  useSubmitMetrics({
-    requestData: formData as SubmitMetricsRequestData,
-  });
-
-  function submitMetrics(): void {
+  useEffect(() => {
     const targets = [
       { type: TargetType.COURSE, reference: course },
       { type: TargetType.SECTION, reference: section },
-      { type: TargetType.PROFESSOR, reference: professor },
+      { type: TargetType.PROFESSOR, reference: instructor },
     ];
 
     const values: number[] = [];
@@ -59,45 +45,20 @@ export default function RateCard({
       values.push(totalMinutes);
     }
 
-    setFormData({
+    const data: Partial<SubmitMetricsRequestData> = {
       metricName: MetricName.DIFFICULTY,
       targets,
       values,
-    });
-  }
+    };
+
+    onChange(data);
+  }, [overallRating, levelOfDifficulty, workload]);
 
   return (
     <div className={classes('ratecard')}>
-      <div className="dropdown-container">
-        <div className="dropdown-group">
-          <div className="dropdown-label">Course:</div>
-          <Select
-            current={course}
-            onChange={setCourse}
-            options={courseOptions}
-            menuAnchor="left"
-          />
-        </div>
-
-        <div className="dropdown-group">
-          <div className="dropdown-label">Section:</div>
-          <Select
-            current={section}
-            onChange={setSection}
-            options={sectionOptions}
-            menuAnchor="left"
-          />
-        </div>
-
-        <div className="dropdown-group">
-          <div className="dropdown-label">Professor:</div>
-          <Select
-            current={professor}
-            onChange={setProfessor}
-            options={professorOptions}
-            menuAnchor="left"
-          />
-        </div>
+      <div className="card-header">
+        <div className="course-header">{course}</div>
+        <div className="instructor-header">Instructor: {instructor}</div>
       </div>
 
       <div className="entry-container">
@@ -128,10 +89,6 @@ export default function RateCard({
           onChange={setWorkload}
         />
       </div>
-
-      <button className="submit-button" type="button" onClick={submitMetrics}>
-        Submit
-      </button>
     </div>
   );
 }

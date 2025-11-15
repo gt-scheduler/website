@@ -60,6 +60,7 @@ export type HeaderDisplayProps = {
   versionsState: VersionState;
   accountState: AccountContextValue | { type: 'loading' };
   skeleton: boolean;
+  minimal?: boolean;
 };
 
 /**
@@ -85,6 +86,7 @@ export default function HeaderDisplay({
   versionsState,
   accountState,
   skeleton = true,
+  minimal = false,
 }: HeaderDisplayProps): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
@@ -105,6 +107,17 @@ export default function HeaderDisplay({
       }
     }
   }, [termsState, skeleton]);
+
+  if (minimal) {
+    return (
+      <div className="Header">
+        <div className="logo">
+          <span className="gt">GT </span>
+          <span className="scheduler">Scheduler</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="Header">

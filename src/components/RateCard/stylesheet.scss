@@ -1,32 +1,27 @@
 @import '../../variables';
 
 .ratecard {
-  width: 800px;
-  padding: 16px 32px 16px 32px;
-  background-color: $theme-dark-card-background;
-  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  width: 100%;
+  gap: 2rem;
+  max-height: 75vh;
+  overflow: hidden;
 
-  .dropdown-container {
+  .card-header {
     display: flex;
-    justify-content: flex-start;
-    gap: 24px;
+    flex-direction: column;
+    text-align: start;
+    flex-shrink: 0;
+    gap: 8px;
 
-    .dropdown-group {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .dropdown-label {
-      font-size: 14px;
+    .course-header {
       font-weight: bold;
+      font-size: 24px;
     }
 
-    .Select .option-container {
-      background-color: $theme-dark-card-background;
+    .instructor-header {
+      font-size: 16px;
     }
   }
 
@@ -34,30 +29,5 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-  }
-
-  .submit-button {
-    align-self: center;
-    padding: 10px 24px;
-    border: none;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-
-    box-shadow: 0px 0px 20px #00000033;
-    transition: all 0.33s ease;
-    border: 2px solid;
-    border-radius: 8px;
-
-    --color: #d36855;
-    border-color: var(--color);
-    background-color: var(--color);
-    color: #ffffff;
-
-    &:hover {
-      --color: #e2944b;
-      border-color: var(--color);
-      background-color: var(--color);
-    }
   }
 }
