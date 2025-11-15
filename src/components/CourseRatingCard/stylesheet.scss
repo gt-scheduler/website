@@ -4,8 +4,13 @@
   border-radius: 8px;
   width: 100%;
   gap: 2rem;
-  max-height: 75vh; // keeps overall card a constant size
+  max-height: 75vh;
   overflow: hidden;
+
+  .add-course-warning {
+    color: #ff4c4c;
+    font-size: 16px;
+  }
 
   .card-header {
     display: flex;

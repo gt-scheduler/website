@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStarHalfStroke } from '@fortawesome/free-solid-svg-icons';
 
 import { classes } from '../../utils/misc';
 import {
@@ -17,8 +18,6 @@ import {
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
-import { AppNavigationContext } from '../App/navigation';
-import { faStarHalfStroke } from '@fortawesome/free-solid-svg-icons';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -43,8 +42,6 @@ export default function Scheduler(): React.ReactElement {
   const { compare, pinned, pinSelf, expanded, setCompareState } =
     useCompareStateFromStorage({ pinDefault: [currentVersion] });
   const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
-
-  const { setTabIndex: setAppTabIndex } = useContext(AppNavigationContext);
 
   const handleCompareSchedules = useCallback(
     (

@@ -6,6 +6,7 @@ import CourseRatingCard from '../CourseRatingCard';
 import RateCard from '../RateCard';
 import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
 import { MetricName, SubmitMetricsRequestData } from '../../data/types';
+
 import './stylesheet.scss';
 
 export default function RatingsPage(): React.ReactElement {
@@ -47,6 +48,8 @@ export default function RatingsPage(): React.ReactElement {
     values: [],
   });
 
+  const [showEmptyWarning, setShowEmptyWarning] = useState(false);
+
   useSubmitMetrics({
     requestData: submitData as SubmitMetricsRequestData,
   });
@@ -54,6 +57,7 @@ export default function RatingsPage(): React.ReactElement {
   const handleAddCourse = (section: Section): void => {
     setSelectedSections((prev) => [...prev, section]);
     setUnselectedSections((prev) => prev.filter((s) => s.crn !== section.crn));
+    setShowEmptyWarning(false);
   };
 
   const handleDeleteCourse = (crn: string): void => {
@@ -65,6 +69,15 @@ export default function RatingsPage(): React.ReactElement {
   };
 
   const handleNext = (): void => setCurrentIndex((prev) => prev + 1);
+
+  const handleStart = (): void => {
+    if (selectedSections.length === 0) {
+      setShowEmptyWarning(true);
+      return;
+    }
+    setShowEmptyWarning(false);
+    handleNext();
+  };
 
   const handleRateChange = (data: Partial<SubmitMetricsRequestData>): void => {
     if (currentIndex <= 0) return;
@@ -92,7 +105,6 @@ export default function RatingsPage(): React.ReactElement {
       targets: nonEmpty.flatMap((d) => d.targets ?? []),
       values: nonEmpty.flatMap((d) => d.values ?? []),
     };
-
     setSubmitData(merged);
     setCurrentIndex((prev) => prev + 1);
   };
@@ -133,6 +145,8 @@ export default function RatingsPage(): React.ReactElement {
             unselectedSections={unselectedSections}
             onAddCourse={handleAddCourse}
             onDeleteCourse={handleDeleteCourse}
+            showEmptyWarning={showEmptyWarning}
+            setShowEmptyWarning={setShowEmptyWarning}
           />
         ) : activeSection && !isDone ? (
           <RateCard
@@ -156,7 +170,11 @@ export default function RatingsPage(): React.ReactElement {
 
         {!isDone &&
           (currentIndex === 0 ? (
-            <button type="button" className="start-button" onClick={handleNext}>
+            <button
+              type="button"
+              className="start-button"
+              onClick={handleStart}
+            >
               Start
             </button>
           ) : currentIndex < selectedSections.length ? (

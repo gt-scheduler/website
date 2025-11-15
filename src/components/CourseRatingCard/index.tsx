@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+
 import Section from '../../data/beans/Section';
 import CourseRatingEntry from '../CourseRatingEntry';
+
 import './stylesheet.scss';
 
 type CourseRatingCardProps = {
   selectedSections: Section[];
   unselectedSections: Section[];
   onAddCourse: (section: Section) => void;
-  onDeleteCourse: (crn: string) => void; // 🔹 new callback
+  onDeleteCourse: (crn: string) => void;
+  showEmptyWarning?: boolean;
+  setShowEmptyWarning?: (value: boolean) => void;
 };
 
 export default function CourseRatingCard({
@@ -15,10 +19,13 @@ export default function CourseRatingCard({
   unselectedSections,
   onAddCourse,
   onDeleteCourse,
+  showEmptyWarning = false,
+  setShowEmptyWarning,
 }: CourseRatingCardProps): React.ReactElement {
   const [editableEntries, setEditableEntries] = useState<number[]>([]);
 
   const handleAddEditable = (): void => {
+    if (setShowEmptyWarning) setShowEmptyWarning(false);
     setEditableEntries((prev) => [...prev, Date.now()]);
   };
 
@@ -31,7 +38,7 @@ export default function CourseRatingCard({
     setEditableEntries((prev) => prev.filter((k) => k !== key));
   };
 
-  const handleDelete = (crn: string): void => {
+  const handleDeleteSelected = (crn: string): void => {
     onDeleteCourse(crn);
   };
 
@@ -50,7 +57,7 @@ export default function CourseRatingCard({
             section={section}
             unselectedSections={unselectedSections}
             editable={false}
-            onDelete={(): void => handleDelete(section.crn)}
+            onDelete={(): void => handleDeleteSelected(section.crn)}
           />
         ))}
 
@@ -64,6 +71,12 @@ export default function CourseRatingCard({
           />
         ))}
       </div>
+
+      {showEmptyWarning && (
+        <div className="add-course-warning">
+          * You have to add a course to start
+        </div>
+      )}
 
       <button type="button" className="add-course" onClick={handleAddEditable}>
         + Add a course

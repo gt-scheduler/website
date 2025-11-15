@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+
 import Section from '../../data/beans/Section';
 import DropdownInput from '../DropdownInput';
+
 import './stylesheet.scss';
 
 type CourseRatingEntryProps = {
@@ -38,7 +40,7 @@ export default function CourseRatingEntry({
         <div>
           <div className="label-code">{s.id}</div>
           <div className="label-title">
-            {s.instructors.length ? s.instructors.join(', ') : 'N/A'}
+            {s.instructors.length ? s.instructors.join(', ') : 'TBA'}
           </div>
         </div>
       ),
@@ -98,7 +100,7 @@ export default function CourseRatingEntry({
           <div>
             <div className="label-code">{s.id}</div>
             <div className="label-title">
-              {s.instructors.length ? s.instructors.join(', ') : 'N/A'}
+              {s.instructors.length ? s.instructors.join(', ') : 'TBA'}
             </div>
           </div>
         ),

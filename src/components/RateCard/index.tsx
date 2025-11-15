@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import RateEntry, { StarsValue, TimeValue } from '../RateEntry';
@@ -30,7 +30,11 @@ export default function RateCard({
     minutes: null,
   });
 
-  useEffect(() => {
+  function buildData(
+    overall: StarsValue,
+    difficulty: StarsValue,
+    workloadValue: TimeValue
+  ): Partial<SubmitMetricsRequestData> {
     const targets = [
       { type: TargetType.COURSE, reference: course },
       { type: TargetType.SECTION, reference: section },
@@ -38,21 +42,35 @@ export default function RateCard({
     ];
 
     const values: number[] = [];
-    if (overallRating != null) values.push(overallRating);
-    if (levelOfDifficulty != null) values.push(levelOfDifficulty);
-    if (workload.hours != null || workload.minutes != null) {
-      const totalMinutes = (workload.hours ?? 0) * 60 + (workload.minutes ?? 0);
+    if (overall != null) values.push(overall);
+    if (difficulty != null) values.push(difficulty);
+    if (workloadValue.hours != null || workloadValue.minutes != null) {
+      const totalMinutes =
+        (workloadValue.hours ?? 0) * 60 + (workloadValue.minutes ?? 0);
       values.push(totalMinutes);
     }
 
-    const data: Partial<SubmitMetricsRequestData> = {
+    return {
       metricName: MetricName.DIFFICULTY,
       targets,
       values,
     };
+  }
 
-    onChange(data);
-  }, [overallRating, levelOfDifficulty, workload]);
+  const handleOverallChange = (value: StarsValue): void => {
+    setOverallRating(value);
+    onChange(buildData(value, levelOfDifficulty, workload));
+  };
+
+  const handleDifficultyChange = (value: StarsValue): void => {
+    setLevelOfDifficulty(value);
+    onChange(buildData(overallRating, value, workload));
+  };
+
+  const handleWorkloadChange = (value: TimeValue): void => {
+    setWorkload(value);
+    onChange(buildData(overallRating, levelOfDifficulty, value));
+  };
 
   return (
     <div className={classes('ratecard')}>
@@ -68,7 +86,7 @@ export default function RateCard({
           oneStarLabel="Awful"
           fiveStarLabel="Awesome"
           value={overallRating}
-          onChange={setOverallRating}
+          onChange={handleOverallChange}
         />
         <RateEntry
           heading="Level of Difficulty"
@@ -76,7 +94,7 @@ export default function RateCard({
           oneStarLabel="Very Easy"
           fiveStarLabel="Very Difficult"
           value={levelOfDifficulty}
-          onChange={setLevelOfDifficulty}
+          onChange={handleDifficultyChange}
         />
         <RateEntry
           heading="Workload per Week"
@@ -86,7 +104,7 @@ export default function RateCard({
             hours: { min: 0, max: 167 },
             minutes: { min: 0, max: 59 },
           }}
-          onChange={setWorkload}
+          onChange={handleWorkloadChange}
         />
       </div>
     </div>
