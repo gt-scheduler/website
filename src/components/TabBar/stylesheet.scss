@@ -2,7 +2,7 @@
 
 .TabBarContainer {
   position: relative;
-  width: 100%;
+  // width: 100%;
   overflow: hidden;
 }
 
@@ -29,18 +29,19 @@
     align-items: center;
     justify-content: center;
     font-family: 'Roboto', sans-serif;
-    font-size: 1em;
+    font-size: 0.875em;
     border-radius: 8px;
-    margin-right: 8px;
     cursor: pointer;
     color: $tab-bar-text-unselected;
     white-space: nowrap;
     user-select: none;
     transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+    gap: 8px;
 
     &.active {
       background-color: rgba($color-neutral, 0.3);
-      color: white;
+      @include dark(color, $theme-light-background);
+      @include light(color, $theme-dark-background);
       font-weight: 700;
     }
   }

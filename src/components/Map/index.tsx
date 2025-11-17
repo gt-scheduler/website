@@ -79,6 +79,7 @@ export default function Map(): React.ReactElement {
         section: section.id,
         type: ScheduleBlockEventType.Course,
         coords: firstMeeting.location,
+        where: firstMeeting.where ?? null,
       });
       courseDateMap[day] = scheduleBlocks;
     });

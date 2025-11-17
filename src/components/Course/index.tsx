@@ -6,6 +6,7 @@ import {
   faPalette,
   faPlus,
   faTrash,
+  faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, getContentClassName } from '../../utils/misc';
@@ -17,6 +18,7 @@ import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
+import CourseInfoModal from '../CourseInfoModal';
 
 export type CourseProps = {
   className?: string;
@@ -32,6 +34,7 @@ export default function Course({
   const [expanded, setExpanded] = useState<boolean>(false);
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
+  const [courseModalOpen, setCourseModalOpen] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
@@ -156,6 +159,14 @@ export default function Course({
     0
   );
 
+  const handleOpenCourseModal = (): void => {
+    setCourseModalOpen(true);
+  };
+
+  const handleCloseCourseModal = (): void => {
+    setCourseModalOpen(false);
+  };
+
   return (
     <div
       className={classes('Course', contentClassName, 'default', className)}
@@ -176,6 +187,12 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
+                {
+                  icon: faCircleInfo,
+                  onClick: handleOpenCourseModal,
+                  tooltip: 'View Section Details',
+                  id: `${course.id}-details`,
+                },
                 {
                   icon: faPalette,
                   onClick: (): void => {
@@ -270,6 +287,13 @@ export default function Course({
       )}
       {expanded && prereqOpen && prereqs !== null && (
         <Prerequisite course={course} prereqs={prereqs} />
+      )}
+      {courseModalOpen && (
+        <CourseInfoModal
+          courseId={course.id}
+          show={courseModalOpen}
+          onHide={handleCloseCourseModal}
+        />
       )}
     </div>
   );

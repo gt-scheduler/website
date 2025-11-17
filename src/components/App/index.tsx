@@ -16,11 +16,10 @@ import useThemeFromStorage from '../../data/hooks/useThemeFromStorage';
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import InformationModal from '../InformationModal';
-// TODO: Remove Before merging #380
-import CourseInfoSandbox from '../Sandbox/CourseInfo';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+import CourseDetailsSandbox from '../Sandbox/CourseDetails';
 
 export default function App(): React.ReactElement {
   // Grab the current theme (light/dark) from local storage.
@@ -59,23 +58,23 @@ export default function App(): React.ReactElement {
               </AppSkeleton>
             )}
           >
-            {/* TODO: Remove this conditional Before merging #380 */}
-            {window.location.pathname.startsWith('/sandbox') ? (
-              // Sandbox-only route
-              <CourseInfoSandbox />
-            ) : (
-              <AppNavigation>
-                {/* AppDataLoader is in charge of ensuring that there are valid values
+            <AppNavigation>
+              {/* AppDataLoader is in charge of ensuring that there are valid values
                   for the Terms and Term contexts before rendering its children.
                   If any data is still loading,
                   then it displays an "app skeleton" with a spinner.
                   If there was an error while loading
                   then it displays an error screen. */}
-                <AppDataLoader>
+              <AppDataLoader>
+                {window.location.pathname.startsWith('/sandbox') ? (
+                  // Sandbox-only route
+                  // TODO: remove before merge
+                  <CourseDetailsSandbox />
+                ) : (
                   <AppContent />
-                </AppDataLoader>
-              </AppNavigation>
-            )}
+                )}
+              </AppDataLoader>
+            </AppNavigation>
             <Feedback />
 
             {/* Display a popup when first visiting the site */}
