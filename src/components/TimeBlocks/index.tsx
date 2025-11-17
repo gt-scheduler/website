@@ -198,7 +198,6 @@ function MeetingDayBlock({
   const isDraft = color === undefined;
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
-
   return (
     <div ref={outerRef}>
       <BlockElement
