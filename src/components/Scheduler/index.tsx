@@ -112,10 +112,13 @@ export default function Scheduler(): React.ReactElement {
           ))}
         </div>
       )}
+
       <OverlayCrnsContext.Provider value={overlayContextValue}>
         <div className="main">
           {(!mobile || tabIndex === 0) && <CourseContainer />}
+
           {mobile && tabIndex === 1 && <CombinationContainer />}
+
           {(!mobile || tabIndex === 2) && (
             <div className="scheduler-container">
               <div className="view-mode-section">
@@ -149,27 +152,9 @@ export default function Scheduler(): React.ReactElement {
                   <SectionDetailsContainer />
                 </div>
               )}
-            <div className="calendar-container">
-              {
-                // uncomment the following to test:
-                /* <CourseInfoModal
-                courseId="CS 1332"
-                show={showModal}
-                onHide={handleCloseModal}
-              />
-              <CourseInfoCard courseId="CS 1332" />
-              <CourseInfo courseId="CS 1332" infoType="long" /> */
-              }
-              <Calendar
-                className="calendar"
-                overlayCrns={overlayCrns}
-                compare={compare}
-                pinnedFriendSchedules={pinned}
-                pinSelf={!compare || pinSelf}
-                overlayFriendSchedules={overlaySchedules}
-              />
             </div>
           )}
+
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}

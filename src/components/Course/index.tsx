@@ -18,6 +18,7 @@ import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 import './stylesheet.scss';
+import CourseInfoModal from '../CourseInfoModal';
 
 export type CourseProps = {
   className?: string;
@@ -288,7 +289,11 @@ export default function Course({
         <Prerequisite course={course} prereqs={prereqs} />
       )}
       {courseModalOpen && (
-        <CourseInfoModal course={course} onClose={handleCloseCourseModal} />
+        <CourseInfoModal
+          courseId={course.id}
+          show={courseModalOpen}
+          onHide={handleCloseCourseModal}
+        />
       )}
     </div>
   );

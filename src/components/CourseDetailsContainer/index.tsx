@@ -4,6 +4,7 @@ import { ScheduleContext } from '../../contexts';
 
 import 'react-virtualized/styles.css';
 import './stylesheet.scss';
+import CourseInfoCard from '../CourseInfoCard';
 
 export default function CourseDetailsContainer(): React.ReactElement {
   const [{ oscar, desiredCourses }] = useContext(ScheduleContext);
@@ -21,7 +22,7 @@ export default function CourseDetailsContainer(): React.ReactElement {
   return (
     <div className="cards-container">
       {desiredCourses.map((course) => {
-        return <CourseInfoCard course={oscar.findCourse(course)} />;
+        return <CourseInfoCard courseId={course} />;
       })}
     </div>
   );
