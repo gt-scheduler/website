@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
+import ToggleButton from '../ToggleButton';
 import { ScheduleContext } from '../../contexts';
 import DaySelection, {
   ScheduleBlockDateItem,
@@ -37,6 +38,20 @@ function hasValidLocationData(
 export default function Map(): React.ReactElement {
   const [{ oscar, pinnedCrns, events }] = useContext(ScheduleContext);
   const [activeDay, setActiveDay] = useState<Day | ''>('ALL');
+  const [showTravelTimes, setShowTravelTimes] = useState(false);
+  const isTravelToggleDisabled = activeDay === '' || activeDay === 'ALL';
+  let travelToggleLabel = 'Hide travel time';
+  if (isTravelToggleDisabled) {
+    travelToggleLabel = 'Travel time (select weekday)';
+  } else if (showTravelTimes) {
+    travelToggleLabel = 'Show travel time';
+  }
+
+  useEffect(() => {
+    if (isTravelToggleDisabled && showTravelTimes) {
+      setShowTravelTimes(false);
+    }
+  }, [isTravelToggleDisabled, showTravelTimes]);
   const courseDateMap: Record<Day, CombinedCourseData[]> = {
     ALL: [],
     M: [],
@@ -173,7 +188,19 @@ export default function Map(): React.ReactElement {
         activeDay={activeDay}
         setActiveDay={setActiveDay}
       />
-      <MapView locations={activeLocations} />
+      <div className="map-view-panel">
+        <ToggleButton
+          label={travelToggleLabel}
+          active={showTravelTimes}
+          disabled={isTravelToggleDisabled}
+          onClick={(): void => setShowTravelTimes((prev) => !prev)}
+          className="travel-toggle-floating"
+        />
+        <MapView
+          locations={activeLocations}
+          showTravelTimes={showTravelTimes}
+        />
+      </div>
     </div>
   );
 }

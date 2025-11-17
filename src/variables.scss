@@ -17,6 +17,15 @@ $theme-light-foreground: $theme-dark-background;
 $theme-dark-foreground: $theme-light-background;
 $color-background-light: #f8f9fa;
 $account-accent: #0C797D;
+$travel-time-blue: #589BD5;
+
+$toggle-background-dark: rgba(15, 23, 42, 0.85);
+$toggle-background-active-dark: rgba(15, 23, 42, 0.95);
+$toggle-indicator-background-dark: rgba(255, 255, 255, 0.25);
+
+$toggle-background-light: rgba(255, 255, 255, 0.9);
+$toggle-background-active-light: rgba(255, 255, 255, 0.95);
+$toggle-indicator-background-light: rgba(0, 0, 0, 0.15);
 
 $opacity-inactive: 0.6;
 $opacity-disabled: 0.38;
