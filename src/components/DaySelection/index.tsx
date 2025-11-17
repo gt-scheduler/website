@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
-import { classes, getContentClassName } from '../../utils/misc';
+import { classes, getContentClassName, daysToString } from '../../utils/misc';
 import { Period, Event } from '../../types';
 import { ThemeContext } from '../../contexts';
 
@@ -145,20 +145,19 @@ export default function DaySelection({
                           {course.type === ScheduleBlockEventType.CustomEvent
                             ? course.title
                             : course.id}
+                          {course.type === ScheduleBlockEventType.Course
+                            ? ` - ${course.title}`
+                            : ''}
                         </div>
-                        {course.type === ScheduleBlockEventType.Course && (
-                          <span className="course-row">{course.title}</span>
-                        )}
-                        {course.type === ScheduleBlockEventType.CustomEvent &&
-                          course.where && (
-                            <span className="course-row">
-                              {/* avoid showing full address
+                        {course.where && (
+                          <span className="course-row">
+                            {/* avoid showing full address
                                   is there a better way to format this? */}
-                              {course.where.split(',')[0]}
-                            </span>
-                          )}
+                            {course.where.split(',')[0]}
+                          </span>
+                        )}
                         <span className="course-row">
-                          {course.daysOfWeek} {timeLabel}
+                          {daysToString(course.daysOfWeek)} {timeLabel}
                         </span>
                       </div>
                     );
