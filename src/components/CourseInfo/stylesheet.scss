@@ -1,0 +1,112 @@
+.CourseInfo {
+  .course-info-short {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    align-self: stretch;
+
+    .course-header-container-modal {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      width: 100%;
+
+      .course-header-modal {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        flex: 1 0 0;
+
+        .course-title-container {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          align-self: stretch;
+
+          .course-id {
+            font-size: 1.25em;
+            font-weight: bold;
+          }
+
+          .course-title {
+            font-size: 1.25em;
+          }
+        }
+
+        .course-credits {
+          font-size: 1.25em;
+        }
+      }
+
+      .cancel-button {
+        padding: 0px;
+      }
+    }
+
+    .course-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      align-self: stretch;
+
+      .course-title-container {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        align-self: stretch;
+
+        .course-id {
+          font-size: 1.25em;
+          font-weight: bold;
+        }
+
+        .course-title {
+          font-size: 1.25em;
+        }
+      }
+
+      .course-credits {
+        font-size: 1.25em;
+      }
+    }
+
+    .course-eligibility {
+      align-self: stretch;
+
+      .eligibility-label {
+        font-weight: bold;
+      }
+
+      .eligibility-list {
+        display: flex;
+        padding: 0 60px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        align-self: stretch;
+      }
+    }
+
+    .terms-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+
+      .terms-label {
+        font-weight: bold;
+      }
+    }
+    
+  }
+
+  .long-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-self: stretch;
+    margin-top: 20px;
+  }
+}

@@ -9,12 +9,16 @@ import ActionRow from '../ActionRow';
 import { formatTime, getRandomColor } from '../../utils/misc';
 import { Schedule } from '../../data/types';
 import { OccupiedInfo } from '../../data/beans/Section';
+import { MetricData } from '../../types';
+import MetricsCard from '../MetricsCard';
 
 import './stylesheet.scss';
 
 export type ProfessorInfoCardProps = {
   professorName: string;
+  professorMetrics: MetricData;
   course: Course;
+  displaySectionInfo: boolean;
 };
 
 type SeatData = {
@@ -90,7 +94,9 @@ function SectionRow({
 
 export default function ProfessorInfoCard({
   professorName,
+  professorMetrics,
   course,
+  displaySectionInfo,
 }: ProfessorInfoCardProps): React.ReactElement {
   const sections: Section[] = course.sections.filter((section: Section) => {
     return section.instructors[0] === professorName;
@@ -116,34 +122,78 @@ export default function ProfessorInfoCard({
         <p className="professor-name">{professorName}</p>
       </div>
 
-      <div className="sections-container">
-        <div className="sections-header">
-          <div className="left-group">
-            <div className="row-cell" />
-            <div className="row-cell">CRN</div>
-            <div className="row-cell">Sect.</div>
-            <div className="row-cell">Day</div>
-            <div className="row-cell">Time</div>
-          </div>
-          <div className="right-group">
-            <div className="row-cell">Seats Filled</div>
-            <div className="row-cell">Waitlist</div>
-            <div className="row-cell">Location</div>
-          </div>
-        </div>
+      <MetricsCard
+        metrics={[
+          {
+            label: 'Overall Rating',
+            value:
+              professorMetrics &&
+              professorMetrics.overall !== undefined &&
+              professorMetrics.overall !== null
+                ? professorMetrics.overall.toFixed(2)
+                : 'N/A',
+          },
+          {
+            label: 'Average GPA',
+            value:
+              professorMetrics &&
+              professorMetrics.averageGpa !== undefined &&
+              professorMetrics.averageGpa !== null
+                ? professorMetrics.averageGpa.toFixed(2)
+                : 'N/A',
+          },
+          {
+            label: 'Difficulty',
+            value:
+              professorMetrics &&
+              professorMetrics.difficulty !== undefined &&
+              professorMetrics.difficulty !== null
+                ? professorMetrics.difficulty.toFixed(1)
+                : 'N/A',
+          },
+          {
+            label: 'Workload',
+            value:
+              professorMetrics &&
+              professorMetrics.workload !== undefined &&
+              professorMetrics.workload !== null
+                ? professorMetrics.workload.toFixed(2)
+                : 'N/A',
+            unit: 'hrs/week',
+          },
+        ]}
+      />
 
-        {sections.map((section) => {
-          return (
-            <SectionRow
-              key={section.crn}
-              section={section}
-              term={course.term}
-              isPinned={pinnedCrns.includes(section.crn)}
-              onAdd={(): void => handleAddSection(section)}
-            />
-          );
-        })}
-      </div>
+      {displaySectionInfo && (
+        <div className="sections-container">
+          <div className="sections-header">
+            <div className="left-group">
+              <div className="row-cell" />
+              <div className="row-cell">CRN</div>
+              <div className="row-cell">Sect.</div>
+              <div className="row-cell">Day</div>
+              <div className="row-cell">Time</div>
+            </div>
+            <div className="right-group">
+              <div className="row-cell">Seats Filled</div>
+              <div className="row-cell">Waitlist</div>
+              <div className="row-cell">Location</div>
+            </div>
+          </div>
+
+          {sections.map((section) => {
+            return (
+              <SectionRow
+                key={section.crn}
+                section={section}
+                term={course.term}
+                isPinned={pinnedCrns.includes(section.crn)}
+                onAdd={(): void => handleAddSection(section)}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

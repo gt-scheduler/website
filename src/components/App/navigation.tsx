@@ -13,8 +13,14 @@ import { AccountContextValue } from '../../contexts/account';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
+import { Course } from '../../data/beans';
 
 export const NAV_TABS = ['Scheduler', 'Map', 'Finals'];
+
+export type SchedulerPageState =
+  | { type: 'calendar' }
+  | { type: 'course-details' }
+  | { type: 'section-details'; course: Course };
 
 export type AppNavigationContextValue = {
   currentTabIndex: number;
@@ -22,6 +28,8 @@ export type AppNavigationContextValue = {
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
+  currentSchedulerPage: SchedulerPageState;
+  setCurrentSchedulerPage: (page: SchedulerPageState) => void;
 };
 
 export const AppNavigationContext =
@@ -43,6 +51,13 @@ export const AppNavigationContext =
         message: 'empty AppNavigationContext.closeDrawer value being used',
       });
     },
+    currentSchedulerPage: { type: 'calendar' },
+    setCurrentSchedulerPage: (): void => {
+      throw new ErrorWithFields({
+        message:
+          'empty AppNavigationContext.setCurrentSchedulerPage value being used',
+      });
+    },
   });
 
 export type AppNavigationProps = {
@@ -60,6 +75,9 @@ export function AppNavigation({
 
   // Allow top-level tab-based navigation
   const [currentTabIndex, setTabIndex] = useState(0);
+
+  const [currentSchedulerPage, setCurrentSchedulerPage] =
+    useState<SchedulerPageState>({ type: 'calendar' });
 
   // Handle the status of the drawer being open on mobile
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -80,8 +98,18 @@ export function AppNavigation({
       isDrawerOpen,
       openDrawer,
       closeDrawer,
+      currentSchedulerPage,
+      setCurrentSchedulerPage,
     }),
-    [currentTabIndex, setTabIndex, isDrawerOpen, openDrawer, closeDrawer]
+    [
+      currentTabIndex,
+      setTabIndex,
+      isDrawerOpen,
+      openDrawer,
+      closeDrawer,
+      currentSchedulerPage,
+      setCurrentSchedulerPage,
+    ]
   );
 
   return (

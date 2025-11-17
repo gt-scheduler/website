@@ -3,7 +3,6 @@
 .ProfessorInfo {
   padding: 20px;
   border-radius: 5px;
-  margin: 16px;
 
   @include dark(background, $theme-dark-card-background);
   @include light(background, $theme-light-card-background);

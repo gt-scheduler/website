@@ -3,13 +3,18 @@ import React, { useRef, useState, useEffect } from 'react';
 import { classes } from '../../utils/misc';
 
 import './stylesheet.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+type FontAwesomeProps = React.ComponentProps<typeof FontAwesomeIcon>;
 
 export type TabBarItem = {
   key: string;
   label: string;
+  icon?: FontAwesomeProps['icon'];
 };
 
 type TabBarProps = {
+  className?: string;
   enableSelect?: boolean;
   items: TabBarItem[];
   selected?: TabBarItem;
@@ -17,11 +22,33 @@ type TabBarProps = {
 };
 
 export default function TabBar({
+  className,
   enableSelect = false,
   items,
   selected,
   onSelect,
 }: TabBarProps): React.ReactElement {
+  // return (
+  //   <div
+  //     className={classes('TabBar', !enableSelect && 'unselectable', className)}
+  //   >
+  //     {items.map((item) => {
+  //       const isActive = selected?.key === item.key;
+  //       return (
+  //         <div
+  //           key={item.key}
+  //           className={classes('tab', enableSelect && isActive && 'active')}
+  //           onClick={(): void => {
+  //             if (enableSelect && onSelect) onSelect(item.key);
+  //           }}
+  //         >
+  //           {item.icon && (
+  //             <FontAwesomeIcon icon={item.icon} className="tab-icon" />
+  //           )}
+  //           <span className="tab-label">{item.label}</span>
+  //         </div>
+  //       );
+  //     })}
   const ref = useRef<HTMLDivElement>(null);
   const [fadeLeft, setFadeLeft] = useState(false);
   const [fadeRight, setFadeRight] = useState(false);
@@ -53,7 +80,11 @@ export default function TabBar({
       {enableSelect && fadeLeft && <div className="fade-left" />}
       <div
         ref={ref}
-        className={classes('TabBar', !enableSelect && 'unselectable')}
+        className={classes(
+          'TabBar',
+          !enableSelect && 'unselectable',
+          className
+        )}
       >
         {items.map((item) => {
           const isActive = selected?.key === item.key;
@@ -65,7 +96,10 @@ export default function TabBar({
                 if (enableSelect && onSelect) onSelect(item.key);
               }}
             >
-              {item.label}
+              {item.icon && (
+                <FontAwesomeIcon icon={item.icon} className="tab-icon" />
+              )}
+              <span className="tab-label">{item.label}</span>
             </div>
           );
         })}

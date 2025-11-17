@@ -8,7 +8,7 @@ import './stylesheet.scss';
 
 export type BreadcrumbItem = {
   label: string;
-  link?: string;
+  onClick?: () => void;
 };
 
 export type BreadcrumbProps = {
@@ -23,10 +23,10 @@ export default function Breadcrumb({
       <ul className="list">
         {items.map((item, index) => (
           <li key={index} className="item">
-            {item.link ? (
-              <a href={item.link} className="link">
+            {item.onClick ? (
+              <button onClick={item.onClick} className="button" type="button">
                 {item.label}
-              </a>
+              </button>
             ) : (
               <span className="label">{item.label}</span>
             )}
