@@ -33,6 +33,7 @@ export { default as CourseNavMenu } from './CourseNavMenu';
 export { default as ComparisonContainer } from './ComparisonContainer';
 export { default as ComparisonPanel } from './ComparisonPanel';
 export { default as InviteBackLink } from './InviteBackLink';
+export { default as ImportCoursesModal } from './ImportCoursesModal';
 export { default as RouterComponent } from './RouterComponent';
 export { default as InvitationModal } from './InvitationModal';
 export { default as ShareIcon } from './ShareIcon';

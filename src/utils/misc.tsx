@@ -553,3 +553,15 @@ export function abbreviateLocation(location: string): string {
 
   return location;
 }
+
+// Normalize Course Names
+// e.g. "cs1331" -> "CS 1331", "MATH 1551" -> "MATH 1551"
+export function normalizeCourseName(courseName: string): string {
+  let normalizedName = courseName;
+  const results = /^([A-Z]+)(\d.*)$/i.exec(courseName);
+  if (results != null) {
+    const [, subject, number] = results as unknown as [string, string, string];
+    normalizedName = `${subject} ${number}`;
+  }
+  return normalizedName;
+}
