@@ -72,7 +72,7 @@ export default function ImportCoursesModal(): React.ReactElement {
         <div className="courses-list">
           {courses
             .split(',')
-            .map((course) => normalizeCourseName(course.trim().toUpperCase()))
+            .map((course) => normalizeCourseName(course.trim()))
             .filter((course) => course.length > 0)
             .map((course, index) => (
               <div key={index}>{course}</div>
