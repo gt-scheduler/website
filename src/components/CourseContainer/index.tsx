@@ -1,7 +1,14 @@
 import React, { useContext } from 'react';
 import ago from 's-ago';
 
-import { Button, Course, CourseAdd, Event, EventAdd } from '..';
+import {
+  Button,
+  Course,
+  CourseAdd,
+  Event,
+  EventAdd,
+  ImportCoursesModal,
+} from '..';
 import { ScheduleContext } from '../../contexts';
 import CourseNavMenu from '../CourseNavMenu';
 import { COURSE_TABS, COURSES } from '../../constants';
@@ -17,6 +24,7 @@ export default function CourseContainer(): React.ReactElement {
 
   return (
     <div className="CourseContainer">
+      <ImportCoursesModal />
       <CourseNavMenu
         items={COURSE_TABS}
         currentItem={courseContainerTab}

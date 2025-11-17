@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { Course, CourseFilter } from '..';
-import { classes, getRandomColor } from '../../utils/misc';
+import { classes, getRandomColor, normalizeCourseName } from '../../utils/misc';
 import { ASYNC_DELIVERY_MODE, CAMPUSES, DELIVERY_MODES } from '../../constants';
 import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
@@ -86,17 +86,9 @@ export default function CourseAdd({
 
   const handleChangeKeyword = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      let input = e.target.value.trim();
-      const results = /^([A-Z]+)(\d.*)$/i.exec(input);
-      if (results != null) {
-        const [, subject, number] = results as unknown as [
-          string,
-          string,
-          string
-        ];
-        input = `${subject} ${number}`;
-      }
-      setKeyword(input);
+      const input = e.target.value.trim();
+      const normalizedName = normalizeCourseName(input);
+      setKeyword(normalizedName);
     },
     []
   );
