@@ -21,6 +21,10 @@ import TabBar from '../TabBar';
 import { AppNavigationContext } from '../App/navigation';
 import CourseDetailsContainer from '../CourseDetailsContainer';
 import SectionDetailsContainer from '../SectionDetailsContainer';
+// uncomment the following to test
+// import CourseInfo from '../CourseInfo';
+// import CourseInfoCard from '../CourseInfoCard';
+// import CourseInfoModal from '../CourseInfoModal';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -86,6 +90,12 @@ export default function Scheduler(): React.ReactElement {
     },
     [setCurrentSchedulerPage]
   );
+  // uncomment the following to test
+  // const [showModal, setShowModal] = useState(true);
+
+  // const handleCloseModal = () => {
+  //   setShowModal(false);
+  // };
 
   return (
     <>
@@ -139,6 +149,25 @@ export default function Scheduler(): React.ReactElement {
                   <SectionDetailsContainer />
                 </div>
               )}
+            <div className="calendar-container">
+              {
+                // uncomment the following to test:
+                /* <CourseInfoModal
+                courseId="CS 1332"
+                show={showModal}
+                onHide={handleCloseModal}
+              />
+              <CourseInfoCard courseId="CS 1332" />
+              <CourseInfo courseId="CS 1332" infoType="long" /> */
+              }
+              <Calendar
+                className="calendar"
+                overlayCrns={overlayCrns}
+                compare={compare}
+                pinnedFriendSchedules={pinned}
+                pinSelf={!compare || pinSelf}
+                overlayFriendSchedules={overlaySchedules}
+              />
             </div>
           )}
           {(!mobile || tabIndex === 3) && (
