@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 
 import MapView, { MapLocation } from '../MapView';
 import { ScheduleContext } from '../../contexts';
-import DaySelection, { CourseDateItem, Day, isDay } from '../DaySelection';
 import {
   MULTIPLE_TOPICS_COURSE_TITLE,
   getSectionCourseTitle,

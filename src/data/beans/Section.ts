@@ -66,6 +66,7 @@ export default class Section {
   term: string;
 
   sectionTitle: string;
+
   plannedCount: number | undefined;
 
   constructor(
