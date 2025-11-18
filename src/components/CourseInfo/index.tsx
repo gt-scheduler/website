@@ -220,7 +220,6 @@ export default function CourseInfo({
     }
     hash %= 10;
     const biased = Math.abs(Math.sin(hash)) ** 0.5; // sqrt → shifts values upward
-    console.log(classname, hash, biased);
     const score = 1 + biased * (denom - 1); // scale to [1, denom]
     const num = score.toFixed(round);
     return `${num}${include_denom ? `/${denom}` : ''}`;
@@ -331,7 +330,12 @@ export default function CourseInfo({
           </div>
         </div>
         <div className="terms-container">
-          <div className="terms-label">Offered Terms</div>
+          <div
+            className="terms-label"
+            style={{ visibility: infoType === 'long' ? 'hidden' : 'visible' }}
+          >
+            Offered Terms
+          </div>
           <TabBar
             enableSelect={infoType === 'long'}
             items={[
