@@ -16,8 +16,8 @@ $theme-dark-card-background: #434343;
 $theme-light-foreground: $theme-dark-background;
 $theme-dark-foreground: $theme-light-background;
 $color-background-light: #f8f9fa;
-$account-accent: #0C797D;
-$travel-time-blue: #589BD5;
+$account-accent: #0c797d;
+$travel-time-blue: #589bd5;
 
 $toggle-background-dark: rgba(15, 23, 42, 0.85);
 $toggle-background-active-dark: rgba(15, 23, 42, 0.95);
@@ -54,6 +54,7 @@ $view-mode-tab-bar-background-dark: #2a2a2a;
 $view-mode-tab-bar-background-light: #e6e6e6;
 
 $course-page-link-color: #8bd6fb;
+$table-header: #adadad;
 
 @mixin card {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
