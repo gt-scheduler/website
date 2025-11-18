@@ -21,12 +21,52 @@
     display: flex;
     align-items: stretch;
 
+    .ratings-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+
     .calendar-container {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       overflow-y: auto;
+
+      .buttons-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-inline: 24px;
+        padding-top: 16px;
+        margin-bottom: 0px;
+
+        .rate-button {
+          align-items: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--theme-fg);
+          border-radius: 10px;
+          background-color: $color-border;
+          display: flex;
+          padding: 10px 20px 10px 20px;
+          border: none;
+          gap: 5px;
+
+          &:hover {
+            @include dark {
+              background: $modal-foreground-color-light;
+            }
+
+            @include light {
+              background: $modal-foreground-color-dark;
+            }
+          }
+        }
+      }
 
       .calendar {
         min-height: $calendar-height;
@@ -127,11 +167,11 @@ body.light .App {
           line-height: 28px;
 
           span {
-            color: #C56E5B;
+            color: #c56e5b;
           }
-          
+
           a {
-            color: #C56E5B;
+            color: #c56e5b;
           }
         }
       }
@@ -144,7 +184,7 @@ body.light .App {
     .footer {
       position: absolute;
       bottom: 32px;
-      
+
       img {
         width: 200px;
       }
@@ -186,7 +226,7 @@ body.light .App {
 
     .footer {
       bottom: 18px;
-      
+
       img {
         width: 150px;
       }

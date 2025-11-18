@@ -1,4 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStarHalfStroke } from '@fortawesome/free-solid-svg-icons';
 
 import { classes } from '../../utils/misc';
 import {
@@ -78,6 +80,16 @@ export default function Scheduler(): React.ReactElement {
           {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
             <div className="calendar-container">
+              <div className="buttons-container">
+                <div>View Mode</div>
+                <Button
+                  className="rate-button"
+                  href={`${window.location.origin}${window.location.pathname}#/ratings`}
+                >
+                  <FontAwesomeIcon fixedWidth icon={faStarHalfStroke} />
+                  <div>Rate my courses</div>
+                </Button>
+              </div>
               <Calendar
                 className="calendar"
                 overlayCrns={overlayCrns}

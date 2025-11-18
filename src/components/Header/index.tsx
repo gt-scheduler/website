@@ -13,6 +13,7 @@ export type HeaderProps = {
   onToggleMenu: () => void;
   tabs: string[];
   captureRef: React.RefObject<HTMLDivElement>;
+  minimal?: boolean;
 };
 
 type VersionState = {
@@ -44,6 +45,7 @@ export default function Header({
   onToggleMenu,
   tabs,
   captureRef,
+  minimal = false,
 }: HeaderProps): React.ReactElement {
   const [
     { term, oscar, pinnedCrns, allVersionNames, currentVersion },
@@ -100,6 +102,7 @@ export default function Header({
 
   return (
     <HeaderDisplay
+      minimal={minimal}
       totalCredits={totalCredits}
       currentTab={currentTab}
       onChangeTab={onChangeTab}

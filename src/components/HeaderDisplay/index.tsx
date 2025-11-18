@@ -21,6 +21,7 @@ import { Term } from '../../types';
 import Toast, { notifyToast } from '../Toast';
 
 import './stylesheet.scss';
+import { useNavigate } from 'react-router-dom';
 
 type VersionState =
   | { type: 'loading' }
@@ -60,6 +61,7 @@ export type HeaderDisplayProps = {
   versionsState: VersionState;
   accountState: AccountContextValue | { type: 'loading' };
   skeleton: boolean;
+  minimal?: boolean;
 };
 
 /**
@@ -85,6 +87,7 @@ export default function HeaderDisplay({
   versionsState,
   accountState,
   skeleton = true,
+  minimal = false,
 }: HeaderDisplayProps): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
@@ -93,6 +96,8 @@ export default function HeaderDisplay({
   // Re-render when the page is re-sized to be small mobile vs. greater
   // (small mobile is < 600 px wide)
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (termsState.type === 'loaded' && !skeleton) {
@@ -105,6 +110,17 @@ export default function HeaderDisplay({
       }
     }
   }, [termsState, skeleton]);
+
+  if (minimal) {
+    return (
+      <div className="Header">
+        <div className="logo" onClick={(): void => navigate('/')}>
+          <span className="gt">GT </span>
+          <span className="scheduler">Scheduler</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="Header">

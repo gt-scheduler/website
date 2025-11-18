@@ -1,0 +1,32 @@
+@import '../../variables';
+
+.ratecard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2rem;
+  max-height: 75vh;
+
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+    flex-shrink: 0;
+    gap: 8px;
+
+    .course-header {
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    .instructor-header {
+      font-size: 16px;
+    }
+  }
+
+  .entry-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
