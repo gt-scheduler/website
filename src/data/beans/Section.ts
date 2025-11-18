@@ -30,7 +30,8 @@ type SectionConstructionData = [
   scheduleTypeIndex: number,
   campusIndex: number,
   attributeIndices: number[],
-  gradeBasisIndex: number
+  gradeBasisIndex: number,
+  sectionTitle: string
 ];
 
 export default class Section {
@@ -64,6 +65,8 @@ export default class Section {
 
   term: string;
 
+  sectionTitle: string;
+
   plannedCount: number | undefined;
 
   constructor(
@@ -81,6 +84,7 @@ export default class Section {
       campusIndex,
       attributeIndices,
       gradeBasisIndex,
+      sectionTitle,
     ] = data;
 
     this.plannedCount = oscar.plannedCounts?.sectionCounts[crn];
@@ -92,6 +96,7 @@ export default class Section {
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
     this.campus = oscar.campuses[campusIndex] ?? 'unknown';
+    this.sectionTitle = sectionTitle;
     const attributes = attributeIndices
       .map((attributeIndex) => oscar.attributes[attributeIndex])
       .flatMap((attribute) => (attribute == null ? [] : [attribute]));
