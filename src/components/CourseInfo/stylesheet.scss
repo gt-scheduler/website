@@ -5,11 +5,13 @@
     align-items: flex-start;
     gap: 29px;
     align-self: stretch;
+    width: 100%;
 
     .main-course-info {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      width: 100%;
 
       .course-header-container-modal {
         display: flex;
