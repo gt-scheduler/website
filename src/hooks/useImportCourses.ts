@@ -2,7 +2,7 @@ import { useCallback, useContext } from 'react';
 
 import { ScheduleContext } from '../contexts';
 import { ASYNC_DELIVERY_MODE } from '../constants';
-import { getRandomColor } from '../utils/misc';
+import { getRandomColor, normalizeCourseName } from '../utils/misc';
 
 /**
  * Hook to import courses from a comma-delimited string of course names.
@@ -35,8 +35,12 @@ export default function useImportCourses(): (courseString: string) => void {
 
       // Process each course name
       courseNames.forEach((courseName) => {
+        // Normalize the course name format (e.g., "CS1331" -> "CS 1331")
+        // Mitigate for different formatting of course string
+
+        const normalizedName = normalizeCourseName(courseName);
         // Search for the course in oscar.courses
-        const course = oscar.courses.find((c) => c.id === courseName);
+        const course = oscar.courses.find((c) => c.id === normalizedName);
 
         // If the course is found and not already in desiredCourses, add it
         if (course && !desiredCourses.includes(course.id)) {

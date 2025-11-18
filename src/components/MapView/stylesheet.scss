@@ -3,6 +3,8 @@
 .mapbox {
   height: 100%;
   width: 100%;
+  position: relative;
+  flex: 1;
 
   .pin-text {
     // right: svg width
@@ -66,6 +68,26 @@
   .error-message {
     padding: 20px;
     text-align: center;
+  }
+
+  .travel-label {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    transform: translate(-50%, -12px);
+    white-space: nowrap;
+    pointer-events: none;
+    border-radius: 6px;
+    background: $travel-time-blue;
+    color: #ffffff;
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &__icon {
+      font-size: 14px;
+    }
   }
 }
 

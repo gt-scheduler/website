@@ -200,6 +200,18 @@ export function humanizeArrayReact<T>(
   );
 }
 
+export const MULTIPLE_TOPICS_COURSE_TITLE = 'Multiple Topics';
+
+export const getSectionCourseTitle = (section: Section): string => {
+  if (
+    section.course.title === MULTIPLE_TOPICS_COURSE_TITLE &&
+    section.sectionTitle
+  ) {
+    return section.sectionTitle;
+  }
+  return section.course.title;
+};
+
 export const serializePrereqs = (
   reqs: PrerequisiteClause,
   openPar = false,
@@ -372,7 +384,7 @@ export function exportCoursesToCalendar(
     section.meetings.forEach((meeting) => {
       if (!meeting.period || !meeting.days.length) return;
       const subject = section.course.id;
-      const description = section.course.title;
+      const description = getSectionCourseTitle(section);
       const location = meeting.where;
       addEventsToCalendar(
         meeting.period,
@@ -560,4 +572,16 @@ export function abbreviateLocation(location: string): string {
   }
 
   return location;
+}
+
+// Normalize Course Names
+// e.g. "cs1331" -> "CS 1331", "MATH 1551" -> "MATH 1551"
+export function normalizeCourseName(courseName: string): string {
+  let normalizedName = courseName;
+  const results = /^([A-Z]+)(\d.*)$/i.exec(courseName);
+  if (results != null) {
+    const [, subject, number] = results as unknown as [string, string, string];
+    normalizedName = `${subject} ${number}`;
+  }
+  return normalizedName;
 }
