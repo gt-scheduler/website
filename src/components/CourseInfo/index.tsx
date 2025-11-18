@@ -319,14 +319,13 @@ export default function CourseInfo({
               </li>
               <li>
                 <span className="eligibility-label">Major Restrictions:</span>{' '}
-                {!course || !course.restrictions
-                  ? 'N/A'
-                  : course.restrictions
-                      .map((r) => {
-                        const vals = r.values.map((v) => v.name).join(', ');
-                        return `${vals}${r.allowed ? '' : ' (Not allowed)'}`;
-                      })
-                      .join(' | ')}
+                {course.restrictions?.[0]
+                  ? `${course.restrictions[0].values
+                      .map((v) => v.name)
+                      .join(', ')}${
+                      course.restrictions[0].allowed ? '' : ' (Not allowed)'
+                    }`
+                  : 'N/A'}
               </li>
             </ul>
           </div>

@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import { AppNavigationContext } from '../App/navigation';
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb';
+import CourseInfo from '../CourseInfo';
+import './stylesheet.scss';
 
 export default function SectionDetailsContainer(): React.ReactElement {
   const { currentSchedulerPage, setCurrentSchedulerPage } =
@@ -26,8 +28,10 @@ export default function SectionDetailsContainer(): React.ReactElement {
   ];
 
   return (
-    <div>
+    <div className="section-details-container">
       <Breadcrumb items={breadcrumbItems} />
+
+      <CourseInfo courseId={course.id} infoType="long" />
     </div>
   );
 }

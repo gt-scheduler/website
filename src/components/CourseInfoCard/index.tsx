@@ -6,6 +6,8 @@ import { ScheduleContext } from '../../contexts';
 import { getRandomColor } from '../../utils/misc';
 
 import './stylesheet.scss';
+import { AppNavigationContext } from '../App/navigation';
+import { set } from 'lodash';
 
 export type CourseInfoCardProps = {
   courseId: string;
@@ -16,6 +18,10 @@ export default function CourseInfoCard({
 }: CourseInfoCardProps): React.ReactElement | null {
   const [{ colorMap, palette }] = useContext(ScheduleContext);
   const [color, setColor] = useState<string>(getRandomColor(palette));
+  const [{ oscar }] = useContext(ScheduleContext);
+  const fullCourse = oscar.findCourse(courseId);
+  const { currentSchedulerPage, setCurrentSchedulerPage } =
+    useContext(AppNavigationContext);
 
   useEffect(() => {
     const courseColor = colorMap?.[courseId];
@@ -24,10 +30,16 @@ export default function CourseInfoCard({
     }
   }, [courseId, colorMap]);
 
+  const handleClick = (): void => {
+    if (fullCourse) {
+      setCurrentSchedulerPage({ type: 'section-details', course: fullCourse });
+    }
+  };
+
   return (
     <CardContainer color={color}>
       <CourseInfo courseId={courseId} infoType="short" />
-      <div className="view-section">
+      <div className="view-section" onClick={handleClick}>
         <img
           alt="view section info"
           src="/section_info.svg"
