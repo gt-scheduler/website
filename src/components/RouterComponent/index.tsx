@@ -8,7 +8,9 @@ export default function RouterComponent(): React.ReactElement {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<App />}>
+          <Route path="ratings" element={<App />} />
+        </Route>
         <Route path="/invite/:id" element={<InviteBackLink />} />
         <Route path="/pr-preview/:id">
           <Route path="" element={<App />} />

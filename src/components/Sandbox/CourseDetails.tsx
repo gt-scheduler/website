@@ -1,6 +1,7 @@
 // TODO: Delete entire file and folder before merging
 
 import React, { useContext, useEffect } from 'react';
+
 import SectionDetailsContainer from '../SectionDetailsContainer';
 import { ScheduleContext } from '../../contexts';
 import { AppNavigationContext } from '../App/navigation';
@@ -16,7 +17,7 @@ export default function CourseDetailsSandbox(): React.ReactElement {
     if (course) {
       setCurrentSchedulerPage({ type: 'section-details', course });
     }
-  }, []);
+  }, [course, setCurrentSchedulerPage]);
 
   if (!course) {
     return <div>no course found</div>;
