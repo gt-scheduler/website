@@ -1,0 +1,39 @@
+@import '../../variables.scss';
+
+.Breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+  padding: 8px 12px;
+
+  .list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .item {
+      display: flex;
+      align-items: center;
+
+      .button {
+        color: $course-page-link-color;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .label {
+        font-weight: 500;
+      }
+
+      .separator {
+        margin: 0 6px;
+        font-size: 0.75em;
+      }
+    }
+  }
+}

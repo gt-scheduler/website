@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 
+import { faCalendar, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { classes } from '../../utils/misc';
 import {
   Button,
@@ -16,6 +17,14 @@ import {
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import TabBar from '../TabBar';
+import { AppNavigationContext } from '../App/navigation';
+import CourseDetailsContainer from '../CourseDetailsContainer';
+import SectionDetailsContainer from '../SectionDetailsContainer';
+// uncomment the following to test
+// import CourseInfo from '../CourseInfo';
+// import CourseInfoCard from '../CourseInfoCard';
+// import CourseInfoModal from '../CourseInfoModal';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -37,9 +46,20 @@ export default function Scheduler(): React.ReactElement {
 
   const [{ currentVersion }] = useContext(ScheduleContext);
 
+  const { currentSchedulerPage, setCurrentSchedulerPage } =
+    useContext(AppNavigationContext);
+
   const { compare, pinned, pinSelf, expanded, setCompareState } =
     useCompareStateFromStorage({ pinDefault: [currentVersion] });
   const [overlaySchedules, setOverlaySchedules] = useState<string[]>([]);
+
+  const tabs = [
+    { key: 'calendar', label: 'Calendar', icon: faCalendar },
+    { key: 'course-details', label: 'Course Details', icon: faInfoCircle },
+  ];
+
+  const selectedTab =
+    tabs.find((tab) => tab.key === currentSchedulerPage.type) || tabs[0];
 
   const handleCompareSchedules = useCallback(
     (
@@ -57,6 +77,26 @@ export default function Scheduler(): React.ReactElement {
     [setCompareState, setOverlaySchedules]
   );
 
+  const handleTabSelect = useCallback(
+    (key: string): void => {
+      const tab = tabs.find((t) => t.key === key);
+      if (!tab) return;
+
+      if (tab.key === 'calendar') {
+        setCurrentSchedulerPage({ type: 'calendar' });
+      } else if (tab.key === 'course-details') {
+        setCurrentSchedulerPage({ type: 'course-details' });
+      }
+    },
+    [setCurrentSchedulerPage]
+  );
+  // uncomment the following to test
+  // const [showModal, setShowModal] = useState(true);
+
+  // const handleCloseModal = () => {
+  //   setShowModal(false);
+  // };
+
   return (
     <>
       {mobile && (
@@ -72,22 +112,49 @@ export default function Scheduler(): React.ReactElement {
           ))}
         </div>
       )}
+
       <OverlayCrnsContext.Provider value={overlayContextValue}>
         <div className="main">
           {(!mobile || tabIndex === 0) && <CourseContainer />}
+
           {mobile && tabIndex === 1 && <CombinationContainer />}
+
           {(!mobile || tabIndex === 2) && (
-            <div className="calendar-container">
-              <Calendar
-                className="calendar"
-                overlayCrns={overlayCrns}
-                compare={compare}
-                pinnedFriendSchedules={pinned}
-                pinSelf={!compare || pinSelf}
-                overlayFriendSchedules={overlaySchedules}
-              />
+            <div className="scheduler-container">
+              <div className="view-mode-section">
+                <span>View Mode:</span>
+                <TabBar
+                  className="view-mode-tab-bar"
+                  enableSelect
+                  items={tabs}
+                  selected={selectedTab}
+                  onSelect={handleTabSelect}
+                />
+              </div>
+
+              {currentSchedulerPage.type === 'calendar' && (
+                <Calendar
+                  className="calendar"
+                  overlayCrns={overlayCrns}
+                  compare={compare}
+                  pinnedFriendSchedules={pinned}
+                  pinSelf={!compare || pinSelf}
+                  overlayFriendSchedules={overlaySchedules}
+                />
+              )}
+
+              {currentSchedulerPage.type === 'course-details' && (
+                <CourseDetailsContainer />
+              )}
+
+              {currentSchedulerPage.type === 'section-details' && (
+                <div className="section-details-view">
+                  <SectionDetailsContainer />
+                </div>
+              )}
             </div>
           )}
+
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel
               handleCompareSchedules={handleCompareSchedules}

@@ -75,14 +75,7 @@ export default function useImportCourses(): (courseString: string) => void {
         });
       }
     },
-    [
-      oscar.courses,
-      desiredCourses,
-      palette,
-      patchSchedule,
-      excludedCrns,
-      colorMap,
-    ]
+    [oscar, desiredCourses, excludedCrns, colorMap, patchSchedule, palette]
   );
 
   return importCourses;

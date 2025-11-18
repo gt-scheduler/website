@@ -1,0 +1,128 @@
+.CourseInfo {
+  .course-info-short {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 29px;
+    align-self: stretch;
+
+    .main-course-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .course-header-container-modal {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        width: 100%;
+
+        .course-header-modal {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          flex: 1 0 0;
+
+          .course-title-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            align-self: stretch;
+
+            .course-id {
+              font-size: 1em;
+              font-weight: bold;
+            }
+
+            .course-title {
+              font-size: 1.25em;
+            }
+          }
+
+          .course-credits {
+            font-size: 1.25em;
+          }
+        }
+
+        .cancel-button {
+          padding: 0px;
+        }
+      }
+
+      .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        align-self: stretch;
+
+        .course-title-container {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          align-self: stretch;
+
+          .course-id {
+            font-size: 1.125em;
+            font-weight: bold;
+          }
+
+          .course-title {
+            font-size: 1.125em;
+          }
+        }
+
+        .course-credits {
+          font-size: 1.125em;
+        }
+      }
+
+      .course-description {
+        font-size: 0.875em;
+        font-weight: 400px;
+      }
+
+      .course-eligibility {
+        align-self: stretch;
+        font-size: 0.875em;
+        gap: 20px;
+        display: flex;
+        flex-direction: column;
+
+        .eligibility-label {
+          font-weight: bold;
+        }
+
+        .eligibility-list {
+          display: flex;
+          padding: 0 40px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          align-self: stretch;
+          margin: 0px;
+        }
+      }
+    }
+
+    .terms-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+
+      .terms-label {
+        font-weight: bold;
+        font-size: 0.875em;
+      }
+    }
+  }
+
+  .long-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-self: stretch;
+    margin-top: 20px;
+  }
+}

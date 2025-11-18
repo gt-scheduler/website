@@ -38,3 +38,6 @@ export { default as ImportCoursesModal } from './ImportCoursesModal';
 export { default as RouterComponent } from './RouterComponent';
 export { default as InvitationModal } from './InvitationModal';
 export { default as ShareIcon } from './ShareIcon';
+export { default as Breadcrumb } from './Breadcrumb';
+export { default as MetricsCard } from './MetricsCard';
+export { default as ProfessorInfoCard } from './ProfessorInfoCard';

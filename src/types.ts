@@ -2,6 +2,8 @@ import React from 'react';
 
 export type Theme = 'light' | 'dark';
 
+export type CourseInfoType = 'short' | 'long';
+
 export function isTheme(theme: string): theme is Theme {
   switch (theme) {
     case 'light':
@@ -102,6 +104,31 @@ export interface Term {
 export interface CourseGpa {
   averageGpa?: number;
   [instructor: string]: number | undefined;
+}
+
+export interface MetricData {
+  overall?: number;
+  averageGpa?: number;
+  difficulty?: number;
+  workload?: number;
+}
+
+export type GetAggregatedMetricsParams = {
+  courses?: string[];
+  professors?: string[];
+  metricNames?: string[];
+  semester?: number;
+};
+
+export interface AggregateMetricData {
+  type: 'course' | 'professor' | 'course_professor';
+  courseId: string | null;
+  professorId: string | null;
+  metricName: string;
+  semester: number | null;
+  total: number;
+  count: number;
+  average: number;
 }
 
 // Meeting type (imported as `CrawlerMeeting`):
