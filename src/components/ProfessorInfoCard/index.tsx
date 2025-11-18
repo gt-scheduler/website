@@ -116,6 +116,23 @@ export default function ProfessorInfoCard({
     patchSchedule(updates);
   };
 
+  function mockStats(
+    denom: number,
+    classname: string,
+    round = 2,
+    include_denom = true
+  ): string {
+    let hash = 0;
+    for (let i = 0; i < classname.length; i++) {
+      hash = (hash * 31 + classname.charCodeAt(i)) >>> 0;
+    }
+    hash %= 10;
+    const biased = Math.abs(Math.sin(hash)) ** 0.5; // sqrt → shifts values upward
+    const score = 1 + biased * (denom - 1); // scale to [1, denom]
+    const num = score.toFixed(round);
+    return `${num}${include_denom ? `/${denom}` : ''}`;
+  }
+
   return (
     <div className="ProfessorInfo">
       <div className="professor-header">
@@ -126,39 +143,43 @@ export default function ProfessorInfoCard({
         metrics={[
           {
             label: 'Overall Rating',
-            value:
-              professorMetrics &&
-              professorMetrics.overall !== undefined &&
-              professorMetrics.overall !== null
-                ? professorMetrics.overall.toFixed(2)
-                : 'N/A',
+            /* eslint-disable-next-line */
+            value: mockStats(5, professorName + '1'),
+            // professorMetrics &&
+            // professorMetrics.overall !== undefined &&
+            // professorMetrics.overall !== null
+            //   ? professorMetrics.overall.toFixed(2)
+            //   : 'N/A',
           },
           {
             label: 'Average GPA',
-            value:
-              professorMetrics &&
-              professorMetrics.averageGpa !== undefined &&
-              professorMetrics.averageGpa !== null
-                ? professorMetrics.averageGpa.toFixed(2)
-                : 'N/A',
+            /* eslint-disable-next-line */
+            value: mockStats(4, professorName + '5', 2, false),
+            // professorMetrics &&
+            // professorMetrics.averageGpa !== undefined &&
+            // professorMetrics.averageGpa !== null
+            //   ? professorMetrics.averageGpa.toFixed(2)
+            //   : 'N/A',
           },
           {
             label: 'Difficulty',
-            value:
-              professorMetrics &&
-              professorMetrics.difficulty !== undefined &&
-              professorMetrics.difficulty !== null
-                ? professorMetrics.difficulty.toFixed(1)
-                : 'N/A',
+            /* eslint-disable-next-line */
+            value: mockStats(5, professorName + '2'),
+            // professorMetrics &&
+            // professorMetrics.difficulty !== undefined &&
+            // professorMetrics.difficulty !== null
+            //   ? professorMetrics.difficulty.toFixed(1)
+            //   : 'N/A',
           },
           {
             label: 'Workload',
-            value:
-              professorMetrics &&
-              professorMetrics.workload !== undefined &&
-              professorMetrics.workload !== null
-                ? professorMetrics.workload.toFixed(2)
-                : 'N/A',
+            /* eslint-disable-next-line */
+            value: mockStats(14, professorName + '3', 1, false),
+            // professorMetrics &&
+            // professorMetrics.workload !== undefined &&
+            // professorMetrics.workload !== null
+            //   ? professorMetrics.workload.toFixed(2)
+            //   : 'N/A',
             unit: 'hrs/week',
           },
         ]}

@@ -7,6 +7,7 @@ import {
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
+  Restriction,
 } from '../../types';
 import {
   hasConflictBetween,
@@ -73,6 +74,8 @@ export default class Course {
 
   additionalTermInfo: Record<string, string[]>;
 
+  restrictions: Restriction[];
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
     this.plannedCount = oscar.plannedCounts?.courseCounts[courseId];
@@ -119,6 +122,10 @@ export default class Course {
       }
     );
     this.prereqs = prereqs;
+    this.restrictions = this.sections.flatMap(
+      (section) =>
+        section.restrictions?.filter((r) => r.category === 'Major') || []
+    );
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)

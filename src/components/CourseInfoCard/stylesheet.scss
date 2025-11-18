@@ -7,4 +7,9 @@
   align-items: center;
   height: 0.875em;
   font-weight: 400;
+  cursor: pointer;
+}
+
+.view-section:hover {
+  text-decoration: underline;
 }

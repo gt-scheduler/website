@@ -5,11 +5,13 @@
     align-items: flex-start;
     gap: 29px;
     align-self: stretch;
+    width: 100%;
 
     .main-course-info {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      width: 100%;
 
       .course-header-container-modal {
         display: flex;
@@ -23,6 +25,7 @@
           align-items: flex-start;
           gap: 10px;
           flex: 1 0 0;
+          padding-top: 5px;
 
           .course-title-container {
             display: flex;
@@ -31,7 +34,7 @@
             align-self: stretch;
 
             .course-id {
-              font-size: 1em;
+              font-size: 1.25em;
               font-weight: bold;
             }
 
@@ -41,7 +44,7 @@
           }
 
           .course-credits {
-            font-size: 1.25em;
+            font-size: 1.125em;
           }
         }
 

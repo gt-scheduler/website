@@ -26,6 +26,7 @@ import TabBar from '../TabBar';
 import { AppNavigationContext } from '../App/navigation';
 import CourseDetailsContainer from '../CourseDetailsContainer';
 import SectionDetailsContainer from '../SectionDetailsContainer';
+import { current } from 'immer';
 // uncomment the following to test
 // import CourseInfo from '../CourseInfo';
 // import CourseInfoCard from '../CourseInfoCard';
@@ -63,8 +64,13 @@ export default function Scheduler(): React.ReactElement {
     { key: 'course-details', label: 'Course Details', icon: faInfoCircle },
   ];
 
-  const selectedTab =
+  let selectedTab =
     tabs.find((tab) => tab.key === currentSchedulerPage.type) || tabs[0];
+
+  if (currentSchedulerPage.type === 'section-details') {
+    /* eslint-disable-next-line */
+    selectedTab = tabs[1];
+  }
 
   const handleCompareSchedules = useCallback(
     (

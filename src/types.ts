@@ -182,6 +182,17 @@ export type CrawlerMeeting = [
   finalTimeIdx: number
 ];
 
+export type RestrictionValue = {
+  name: string;
+  code: string;
+};
+
+export type Restriction = {
+  allowed: boolean;
+  category: string;
+  values: RestrictionValue[];
+};
+
 // Section type (imported as `CrawlerSection`):
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts
 
@@ -227,8 +238,15 @@ export type CrawlerSection = [
    * the section-specific title of the course (e.g. "Animal Interaction"),
    * used for 8803 Special Topics courses
    */
-  sectionTitle: string
+  sectionTitle: string,
+
+  restrictions: RestrictionCrawler
 ];
+
+export type RestrictionCrawler = {
+  restrictions: Restriction[];
+  status: string;
+};
 
 // Prerequisite types:
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts
