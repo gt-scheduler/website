@@ -153,12 +153,13 @@ export default function ProfessorInfoCard({
           },
           {
             label: 'Average GPA',
-            value:
-              professorMetrics &&
-              professorMetrics.averageGpa !== undefined &&
-              professorMetrics.averageGpa !== null
-                ? professorMetrics.averageGpa.toFixed(2)
-                : 'N/A',
+            /* eslint-disable-next-line */
+            value: mockStats(4, professorName + '5', 2, false),
+            // professorMetrics &&
+            // professorMetrics.averageGpa !== undefined &&
+            // professorMetrics.averageGpa !== null
+            //   ? professorMetrics.averageGpa.toFixed(2)
+            //   : 'N/A',
           },
           {
             label: 'Difficulty',
