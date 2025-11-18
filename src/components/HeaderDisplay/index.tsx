@@ -21,6 +21,7 @@ import { Term } from '../../types';
 import Toast, { notifyToast } from '../Toast';
 
 import './stylesheet.scss';
+import { useNavigate } from 'react-router-dom';
 
 type VersionState =
   | { type: 'loading' }
@@ -96,6 +97,8 @@ export default function HeaderDisplay({
   // (small mobile is < 600 px wide)
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (termsState.type === 'loaded' && !skeleton) {
       const termObject = termsState.terms.filter(
@@ -111,7 +114,7 @@ export default function HeaderDisplay({
   if (minimal) {
     return (
       <div className="Header">
-        <div className="logo">
+        <div className="logo" onClick={(): void => navigate('/')}>
           <span className="gt">GT </span>
           <span className="scheduler">Scheduler</span>
         </div>

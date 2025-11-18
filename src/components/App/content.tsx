@@ -28,17 +28,10 @@ import RatingsPage from '../RatingsPage';
  * This component is memoized, so it only re-renders when its context changes.
  */
 function AppContentBase(): React.ReactElement {
+  const captureRef = useRef<HTMLDivElement>(null);
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
-  const captureRef = useRef<HTMLDivElement>(null);
 
-  const location = useLocation();
-
-  useEffect(() => {
-    if (window.location.hash.includes('#/ratings')) {
-      setTabIndex(3);
-    }
-  }, [location.key, setTabIndex]);
   return (
     <>
       <AppMobileNav captureRef={captureRef} />
@@ -82,7 +75,7 @@ function AppContentBase(): React.ReactElement {
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
         </div>
       </ErrorBoundary>
-      <Attribution />
+      {currentTabIndex !== 3 && <Attribution />}
     </>
   );
 }
@@ -119,6 +112,13 @@ export function AppSkeleton({
   const { currentTabIndex, setTabIndex, openDrawer } =
     useContext(AppNavigationContext);
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (window.location.hash.includes('#/ratings')) {
+      setTabIndex(3);
+    }
+  }, [location.key, setTabIndex]);
   return (
     <>
       <AppMobileNavDisplay />

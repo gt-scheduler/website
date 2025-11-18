@@ -1,23 +1,30 @@
 @import '../../variables';
 
 .course-rating-entry {
-  position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   padding: 2rem;
   background: $theme-dark-card-background;
   border-radius: 10px;
   gap: 1rem;
   font-size: 16px;
+  width: 800px;
 
   .delete-button {
-    position: absolute;
-    top: 24px;
-    right: 24px;
     background: none;
     border: none;
     color: #fff;
     cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .course-info {
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    gap: 1rem;
   }
 
   .info-row {
@@ -27,8 +34,8 @@
 
     .label {
       font-weight: bold;
-      width: 70px;
       flex-shrink: 0;
+      margin-right: 10px;
     }
 
     .value {

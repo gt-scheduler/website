@@ -133,63 +133,82 @@ export default function RatingsPage(): React.ReactElement {
   const isDone = currentIndex > selectedSections.length;
 
   return (
-    <div className="ratings-container">
-      <div className="sub-container">
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${progress}%` }} />
-        </div>
+    <div className="scroller">
+      <div className="ratings-container">
+        <div className="sub-container">
+          <div className="progress-bar">
+            <div className="progress" style={{ width: `${progress}%` }} />
+          </div>
 
-        {currentIndex === 0 && !isDone ? (
-          <CourseRatingCard
-            selectedSections={selectedSections}
-            unselectedSections={unselectedSections}
-            onAddCourse={handleAddCourse}
-            onDeleteCourse={handleDeleteCourse}
-            showEmptyWarning={showEmptyWarning}
-            setShowEmptyWarning={setShowEmptyWarning}
-          />
-        ) : activeSection && !isDone ? (
-          <RateCard
-            key={activeSection.crn}
-            course={activeCourseLabel}
-            section={activeSectionLabel}
-            instructor={activeInstructorLabel}
-            onChange={handleRateChange}
-          />
-        ) : (
-          <div className="done-container">
-            <img src="/buzz_happy.png" alt="All done" className="done-image" />
-            <div className="done-message">
-              <div className="done">You&apos;re all done!</div>
-              <div className="thank-you">
-                Thank you for your time and feedback
+          {currentIndex === 0 && !isDone ? (
+            <CourseRatingCard
+              selectedSections={selectedSections}
+              unselectedSections={unselectedSections}
+              onAddCourse={handleAddCourse}
+              onDeleteCourse={handleDeleteCourse}
+              showEmptyWarning={showEmptyWarning}
+              setShowEmptyWarning={setShowEmptyWarning}
+            />
+          ) : activeSection && !isDone ? (
+            <RateCard
+              key={activeSection.crn}
+              course={activeCourseLabel}
+              section={activeSectionLabel}
+              instructor={activeInstructorLabel}
+              onChange={handleRateChange}
+            />
+          ) : (
+            <div className="done-container">
+              <img
+                src="/buzz_happy.png"
+                alt="All done"
+                className="done-image"
+              />
+              <div className="done-message">
+                <div className="done">You&apos;re all done!</div>
+                <div className="thank-you">
+                  Thank you for your time and feedback
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!isDone &&
-          (currentIndex === 0 ? (
-            <button
-              type="button"
-              className="start-button"
-              onClick={handleStart}
-            >
-              Start
-            </button>
-          ) : currentIndex < selectedSections.length ? (
-            <button type="button" className="next-button" onClick={handleNext}>
-              Next
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="next-button"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
-          ))}
+          {!isDone &&
+            (currentIndex === 0 ? (
+              <button
+                type="button"
+                className="start-button"
+                onClick={handleStart}
+              >
+                Start
+              </button>
+            ) : currentIndex < selectedSections.length ? (
+              <div className="button-group">
+                <button
+                  type="button"
+                  className="next-button"
+                  onClick={handleNext}
+                >
+                  Next
+                </button>
+                <button
+                  type="button"
+                  className="skip-button"
+                  onClick={handleNext}
+                >
+                  Skip this Course
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="next-button"
+                onClick={handleSubmit}
+              >
+                Submit
+              </button>
+            ))}
+        </div>
       </div>
     </div>
   );

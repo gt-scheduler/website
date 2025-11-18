@@ -21,6 +21,14 @@
     display: flex;
     align-items: stretch;
 
+    .ratings-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+
     .calendar-container {
       flex: 1;
       display: flex;

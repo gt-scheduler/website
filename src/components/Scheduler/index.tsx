@@ -82,17 +82,13 @@ export default function Scheduler(): React.ReactElement {
             <div className="calendar-container">
               <div className="buttons-container">
                 <div>View Mode</div>
-                <button
-                  type="button"
-                  onClick={(): void => {
-                    const newUrl = `${window.location.origin}${window.location.pathname}#/ratings`;
-                    window.open(newUrl, '_blank');
-                  }}
+                <Button
                   className="rate-button"
+                  href={`${window.location.origin}${window.location.pathname}#/ratings`}
                 >
                   <FontAwesomeIcon fixedWidth icon={faStarHalfStroke} />
                   <div>Rate my courses</div>
-                </button>
+                </Button>
               </div>
               <Calendar
                 className="calendar"

@@ -120,6 +120,66 @@ export default function CourseRatingEntry({
 
   return (
     <div className="course-rating-entry">
+      <div className="course-info">
+        {editable ? (
+          <>
+            {!courseSelected ? (
+              <div className="info-row">
+                <div className="label">Course:</div>
+                <div className="course-dropdown">
+                  <DropdownInput
+                    searchable
+                    options={courseOptions}
+                    value={selectedCourse}
+                    onChange={handleCourseSelect}
+                    placeholder="Choose"
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="info-row">
+                  <div className="label">Course:</div>
+                  <div className="value">
+                    {selectedCourse ||
+                      (subject && number
+                        ? `${subject} ${number} ${title}`
+                        : '—')}
+                  </div>
+                </div>
+                <div className="info-row">
+                  <div className="label">Section:</div>
+                  <div className="section-dropdown">
+                    <DropdownInput
+                      options={sectionOptions}
+                      value={selectedSection}
+                      onChange={handleSectionSelect}
+                      placeholder="Choose"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="info-row">
+              <div className="label">Course:</div>
+              <div className="value">
+                {subject && number ? `${subject} ${number} ${title}` : '—'}
+              </div>
+            </div>
+            <div className="info-row">
+              <div className="label">Section:</div>
+              <div className="value section">{section?.id}</div>
+              <div className="label instructor">Instructor:</div>
+              <div className="value">
+                {instructors.length ? instructors.join(', ') : 'TBA'}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
       <button
         type="button"
         className="delete-button"
@@ -128,64 +188,6 @@ export default function CourseRatingEntry({
       >
         <FontAwesomeIcon icon={faTrash} />
       </button>
-
-      {editable ? (
-        <>
-          {!courseSelected ? (
-            <div className="info-row">
-              <div className="label">Course:</div>
-              <div className="course-dropdown">
-                <DropdownInput
-                  searchable
-                  options={courseOptions}
-                  value={selectedCourse}
-                  onChange={handleCourseSelect}
-                  placeholder="Choose"
-                />
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="info-row">
-                <div className="label">Course:</div>
-                <div className="value">
-                  {selectedCourse ||
-                    (subject && number ? `${subject} ${number} ${title}` : '—')}
-                </div>
-              </div>
-              <div className="info-row">
-                <div className="label">Section:</div>
-                <div className="section-dropdown">
-                  <DropdownInput
-                    options={sectionOptions}
-                    value={selectedSection}
-                    onChange={handleSectionSelect}
-                    placeholder="Choose"
-                  />
-                </div>
-              </div>
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          <div className="info-row">
-            <div className="label">Course:</div>
-            <div className="value">
-              {subject && number ? `${subject} ${number} ${title}` : '—'}
-            </div>
-          </div>
-
-          <div className="info-row">
-            <div className="label">Section:</div>
-            <div className="value section">{section?.id}</div>
-            <div className="label instructor">Instructor:</div>
-            <div className="value">
-              {instructors.length ? instructors.join(', ') : 'TBA'}
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }

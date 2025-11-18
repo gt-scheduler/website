@@ -43,7 +43,10 @@
     position: absolute;
     bottom: calc(100% + 4px);
     left: 0;
-    width: 100%;
+    width: auto;
+    min-width: 100%;
+    /* prevent wrapping so width reflects longest option */
+    white-space: nowrap;
     max-height: 240px;
     overflow-y: auto;
     z-index: 1;
