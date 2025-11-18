@@ -12,6 +12,8 @@ export function isTheme(theme: string): theme is Theme {
   }
 }
 
+export type Palette = 'default' | 'soft' | 'deep';
+
 export type LoadingState<T> =
   | LoadingStateLoaded<T>
   | LoadingStateLoading
@@ -82,7 +84,10 @@ export interface Event {
   name: string;
   period: Period;
   days: string[];
+  where?: string;
+  location?: Location | null;
   showEditForm?: boolean;
+  isSaved?: boolean; // Tracks if event has been saved at least once
 }
 
 export interface Term {

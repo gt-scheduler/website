@@ -30,7 +30,8 @@ export default function Event({
   event,
 }: EventProps): React.ReactElement | null {
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
-  const [{ events, colorMap }, { patchSchedule }] = useContext(ScheduleContext);
+  const [{ events, colorMap, palette }, { patchSchedule }] =
+    useContext(ScheduleContext);
   const [formShown, setFormShown] = useState<boolean>(
     Boolean(event.showEditForm)
   );
@@ -45,25 +46,22 @@ export default function Event({
         end: event.period.end,
       },
       days: event.days,
+      isSaved: true, // Duplicated events are considered saved
+      where:
+        'where' in event && typeof event.where === 'string' ? event.where : '',
+      location: 'location' in event && event.location ? event.location : null,
     };
 
     patchSchedule({
       events: [...castDraft(events), castDraft(newEvent)],
-      colorMap: { ...colorMap, [eventId]: getRandomColor() },
+      colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
     });
-  }, [
-    colorMap,
-    event.days,
-    event.name,
-    event.period.end,
-    event.period.start,
-    events,
-    patchSchedule,
-  ]);
+  }, [colorMap, event, events, palette, patchSchedule]);
 
   // this basically forces the edit form to only auto-focus once per render
   useEffect(() => {
     if (!event.showEditForm) return; // skip if this event wasn't flagged (normal render)
+    if (!event.isSaved) return; // skip for draft events to avoid race condition with discard
 
     const targetEventId = event.id;
 
@@ -76,7 +74,7 @@ export default function Event({
 
     // push updated events list back into global state with schedulecontext
     patchSchedule({ events: nextEvents });
-  }, [event.showEditForm, event.id, events, patchSchedule]);
+  }, [event.showEditForm, event.isSaved, event.id, events, patchSchedule]);
 
   const handleRemoveEvent = useCallback(
     (id: string) => {
@@ -96,6 +94,12 @@ export default function Event({
   const color = colorMap[event.id];
   const contentClassName = color != null && getContentClassName(color);
 
+  // Safety check: if the event has been removed from the schedule, don't render
+  const eventExists = events.some((e) => e.id === event.id);
+  if (!eventExists) {
+    return null;
+  }
+
   return (
     <div>
       {!formShown && (
@@ -109,7 +113,10 @@ export default function Event({
             actions={[
               {
                 icon: faPencil,
-                onClick: (): void => setFormShown(true),
+                onClick: (): void => {
+                  setFormShown(true);
+                  setPaletteShown(false);
+                },
               },
               {
                 icon: faPalette,
@@ -121,7 +128,10 @@ export default function Event({
                 icon: faClone,
                 tooltip: 'Duplicate Event',
                 id: `${event.id}-duplicate`,
-                onClick: (): void => handleDuplicateEvent(),
+                onClick: (): void => {
+                  handleDuplicateEvent();
+                  setPaletteShown(false);
+                },
               },
               {
                 icon: faTrash,
@@ -141,6 +151,7 @@ export default function Event({
             {paletteShown && (
               <Palette
                 className="palette"
+                palette={palette}
                 onSelectColor={(col): void =>
                   patchSchedule({ colorMap: { ...colorMap, [event.id]: col } })
                 }

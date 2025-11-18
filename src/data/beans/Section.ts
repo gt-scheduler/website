@@ -66,6 +66,7 @@ export default class Section {
   term: string;
 
   sectionTitle: string;
+  plannedCount: number | undefined;
 
   constructor(
     oscar: Oscar,
@@ -84,6 +85,8 @@ export default class Section {
       gradeBasisIndex,
       sectionTitle,
     ] = data;
+
+    this.plannedCount = oscar.plannedCounts?.sectionCounts[crn];
 
     this.course = course;
     this.id = sectionId;

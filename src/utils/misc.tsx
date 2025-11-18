@@ -7,13 +7,20 @@ import { saveAs } from 'file-saver';
 import { Immutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
-import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
+import {
+  DAYS,
+  DEFAULT_PALETTE,
+  DEEP_PALETTE,
+  SOFT_PALETTE,
+  PNG_SCALE_FACTOR,
+} from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
   DateRange,
   Event,
   ICS,
   Meeting,
+  Palette,
   Period,
   PrerequisiteClause,
   Theme,
@@ -69,21 +76,40 @@ export const daysToString = (days: readonly string[] | string[]): string => {
   return DAYS.filter((day) => set.has(day)).join('');
 };
 
-export const getRandomColor = (): string => {
-  const colors = PALETTE.flat();
-  const index = (Math.random() * colors.length) | 0;
-  return colors[index] ?? '#333333';
+export const getRandomColor = (palette: Palette): string => {
+  const paletteColors =
+    palette === 'default'
+      ? DEFAULT_PALETTE
+      : palette === 'soft'
+      ? SOFT_PALETTE
+      : DEEP_PALETTE;
+  const colors = paletteColors.flat();
+  const uniqueColors = Array.from(new Set(colors));
+  const index = Math.floor(Math.random() * uniqueColors.length);
+  return uniqueColors[index] ?? '#333333';
 };
 
-export const getContentClassName = (color: string | undefined): string => {
-  if (color == null) return 'light-content';
-  const r = parseInt(color.substring(1, 3), 16);
-  const g = parseInt(color.substring(3, 5), 16);
-  const b = parseInt(color.substring(5, 7), 16);
-  return r * 0.299 + g * 0.587 + b * 0.114 > 128
-    ? 'light-content'
-    : 'dark-content';
+const getLuminance = (color: string): number => {
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  return r * 0.299 + g * 0.587 + b * 0.114;
 };
+
+const getContrastClass = (
+  color: string | undefined,
+  lightClass: string,
+  darkClass: string
+): string => {
+  if (!color) return lightClass;
+  return getLuminance(color) > 128 ? lightClass : darkClass;
+};
+
+export const getContentClassName = (color?: string): string =>
+  getContrastClass(color, 'light-content', 'dark-content');
+
+export const getLabelClassName = (color?: string): string =>
+  getContrastClass(color, 'light-label', 'dark-label');
 
 export const hasConflictBetweenMeetings = (
   meeting1: Meeting | Immutable<Event>,
