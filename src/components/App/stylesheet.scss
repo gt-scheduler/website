@@ -28,22 +28,51 @@
       align-items: stretch;
       overflow-y: auto;
 
-      .view-mode-section {
+      .buttons-container {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        font-size: 1em;
-        gap: 16px;
-        margin-left: 16px;
-        margin-top: 16px;
-        font-weight: bold;
+        padding-inline: 24px;
+        padding-top: 16px;
+        margin-bottom: 0px;
 
-        .view-mode-tab-bar {
-          @include dark(background, $view-mode-tab-bar-background-dark);
-          @include light(background, $view-mode-tab-bar-background-light);
-          padding: 0.25em;
+        .view-mode-section {
+          display: flex;
+          align-items: center;
+          font-size: 1em;
+          gap: 16px;
+          font-weight: bold;
 
-          .tab {
-            width: 128px;
+          .view-mode-tab-bar {
+            @include dark(background, $view-mode-tab-bar-background-dark);
+            @include light(background, $view-mode-tab-bar-background-light);
+            padding: 0.25em;
+
+            .tab {
+              width: 128px;
+            }
+          }
+        }
+        .rate-button {
+          align-items: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--theme-fg);
+          border-radius: 10px;
+          background-color: $color-border;
+          display: flex;
+          padding: 10px 20px 10px 20px;
+          border: none;
+          gap: 5px;
+
+          &:hover {
+            @include dark {
+              background: $modal-foreground-color-light;
+            }
+
+            @include light {
+              background: $modal-foreground-color-dark;
+            }
           }
         }
       }

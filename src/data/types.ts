@@ -71,7 +71,7 @@ export const defaultSchedule: Immutable<Schedule> = {
   events: [],
   colorMap: {},
   sortingOptionIndex: 0,
-  palette: 'default' as Palette,
+  palette: 'default',
 };
 
 export const generateScheduleVersionId = (): string =>
@@ -227,4 +227,31 @@ export type PlannedCountsData = {
   term: string;
   courseCounts: Record<string, number>;
   sectionCounts: Record<string, number>;
+};
+// Metrics system types
+// ====================
+
+// MetricNames are temporary
+export enum MetricName {
+  DIFFICULTY = 'difficulty',
+  RECOMMENDED = 'recommended',
+}
+
+export enum TargetType {
+  PROFESSOR = 'professor',
+  COURSE = 'course',
+  SECTION = 'section',
+}
+
+export interface MetricTarget {
+  type: TargetType;
+  reference: string;
+}
+
+export type SubmitMetricsRequestData = {
+  IDToken: string;
+  metricName: MetricName;
+  targets: MetricTarget[];
+  values: number[];
+  semester?: number;
 };

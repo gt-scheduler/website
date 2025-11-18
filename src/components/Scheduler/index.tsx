@@ -1,6 +1,11 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCalendar,
+  faInfoCircle,
+  faStarHalfStroke,
+} from '@fortawesome/free-solid-svg-icons';
 
-import { faCalendar, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { classes } from '../../utils/misc';
 import {
   Button,
@@ -88,7 +93,7 @@ export default function Scheduler(): React.ReactElement {
         setCurrentSchedulerPage({ type: 'course-details' });
       }
     },
-    [setCurrentSchedulerPage]
+    [setCurrentSchedulerPage, tabs]
   );
   // uncomment the following to test
   // const [showModal, setShowModal] = useState(true);
@@ -121,17 +126,25 @@ export default function Scheduler(): React.ReactElement {
 
           {(!mobile || tabIndex === 2) && (
             <div className="scheduler-container">
-              <div className="view-mode-section">
-                <span>View Mode:</span>
-                <TabBar
-                  className="view-mode-tab-bar"
-                  enableSelect
-                  items={tabs}
-                  selected={selectedTab}
-                  onSelect={handleTabSelect}
-                />
+              <div className="buttons-container">
+                <div className="view-mode-section">
+                  <span>View Mode:</span>
+                  <TabBar
+                    className="view-mode-tab-bar"
+                    enableSelect
+                    items={tabs}
+                    selected={selectedTab}
+                    onSelect={handleTabSelect}
+                  />
+                </div>
+                <Button
+                  className="rate-button"
+                  href={`${window.location.origin}${window.location.pathname}#/ratings`}
+                >
+                  <FontAwesomeIcon fixedWidth icon={faStarHalfStroke} />
+                  <div>Rate my courses</div>
+                </Button>
               </div>
-
               {currentSchedulerPage.type === 'calendar' && (
                 <Calendar
                   className="calendar"

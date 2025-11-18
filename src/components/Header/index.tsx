@@ -14,6 +14,7 @@ export type HeaderProps = {
   onToggleMenu: () => void;
   tabs: string[];
   captureRef: React.RefObject<HTMLDivElement>;
+  minimal?: boolean;
 };
 
 type VersionState = {
@@ -51,6 +52,7 @@ export default function Header({
   onToggleMenu,
   tabs,
   captureRef,
+  minimal = false,
 }: HeaderProps): React.ReactElement {
   const [
     {
@@ -115,16 +117,16 @@ export default function Header({
     [colorMap, patchSchedule, palette]
   );
 
-  const paletteState = useMemo(
+  const paletteState = useMemo<PaletteState>(
     () => ({
       type: 'loaded',
       palette,
       setPalette,
     }),
     [palette, setPalette]
-  ) as PaletteState;
+  );
 
-  const termsState = useMemo(
+  const termsState = useMemo<TermsState>(
     () => ({
       type: 'loaded',
       terms,
@@ -132,9 +134,9 @@ export default function Header({
       onChangeTerm: setTerm,
     }),
     [setTerm, term, terms]
-  ) as TermsState;
+  );
 
-  const versionsState = useMemo(
+  const versionsState = useMemo<VersionState>(
     () => ({
       type: 'loaded',
       allVersionNames,
@@ -154,10 +156,11 @@ export default function Header({
       renameVersion,
       setCurrentVersion,
     ]
-  ) as VersionState;
+  );
 
   return (
     <HeaderDisplay
+      minimal={minimal}
       totalCredits={totalCredits}
       currentTab={currentTab}
       onChangeTab={onChangeTab}
