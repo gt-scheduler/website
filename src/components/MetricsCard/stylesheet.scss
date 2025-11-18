@@ -33,8 +33,15 @@
         border-right: none;
       }
 
+      .metric-value-unit-container {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+
       .metric-value {
         font-size: 1.25em;
+        font-weight: bold;
       }
 
       .metric-unit {
@@ -43,9 +50,10 @@
 
       .metric-label {
         font-size: 0.875em;
-        margin-top: 4px;
-        @include dark(color, $seat-info-dark-label);
-        @include light(color, $seat-info-light-label);
+        margin-top: 8px;
+        font-weight: 400;
+        @include dark(color, $modal-foreground-color-dark);
+        @include light(color, $modal-foreground-color-light);
       }
     }
   }

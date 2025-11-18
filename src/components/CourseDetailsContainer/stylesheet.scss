@@ -22,5 +22,8 @@
 }
 
 .cards-container {
-  margin: 20px 16px 16px 16px;
+  margin: 20px;
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
 }

@@ -30,8 +30,6 @@ export default function CourseInfoCard({
       <div className="view-section">
         <img
           alt="view section info"
-          height={13}
-          width={13}
           src="/section_info.svg"
           className="section-info-svg"
         />

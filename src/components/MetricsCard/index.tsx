@@ -22,7 +22,7 @@ export default function MetricsCard({
       <ul className="metrics-list">
         {metrics.map((metric, index) => (
           <li key={index} className="metric-item">
-            <div>
+            <div className="metric-value-unit-container">
               <span className="metric-value">{metric.value}</span>
               {metric.unit && (
                 <span className="metric-unit"> {metric.unit}</span>

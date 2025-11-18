@@ -22,6 +22,7 @@ import './stylesheet.scss';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { get } from 'lodash';
 
 export type CourseInfoProps = {
   courseId: string;
@@ -208,12 +209,37 @@ export default function CourseInfo({
 
   if (course == null) return null;
 
+  function mockStats(denom: number, round = 2, include_denom = true): string {
+    const biased = Math.random() ** 0.5; // sqrt → shifts values upward
+    const score = 1 + biased * (denom - 1); // scale to [1, denom]
+    const num = score.toFixed(round);
+    return `${num}${include_denom ? `/${denom}` : ''}`;
+  }
+
   return (
     <div className="CourseInfo">
       <div className="course-info-short">
-        {isModal && onHide && (
-          <div className="course-header-container-modal">
-            <div className="course-header-modal">
+        <div className="main-course-info">
+          {isModal && onHide && (
+            <div className="course-header-container-modal">
+              <div className="course-header-modal">
+                <div className="course-title-container">
+                  <div className="course-id">{courseId}</div>
+                  <div className="course-title">{course.title}</div>
+                </div>
+                <div className="course-credits">
+                  {credits !== undefined
+                    ? `${credits} Credit${credits !== 1 ? 's' : ''}`
+                    : 'N/A'}
+                </div>
+              </div>
+              <Button className="cancel-button" onClick={(): void => onHide()}>
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </Button>
+            </div>
+          )}
+          {!isModal && (
+            <div className="course-header">
               <div className="course-title-container">
                 <div className="course-id">{courseId}</div>
                 <div className="course-title">{course.title}</div>
@@ -224,84 +250,67 @@ export default function CourseInfo({
                   : 'N/A'}
               </div>
             </div>
-            <Button className="cancel-button" onClick={(): void => onHide()}>
-              <FontAwesomeIcon icon={faXmark} size="lg" />
-            </Button>
+          )}
+
+          <MetricsCard
+            metrics={[
+              {
+                label: 'Overall Rating',
+                value: mockStats(5),
+                // metricsState.overall !== null &&
+                // metricsState.overall !== undefined
+                //   ? metricsState.overall.toFixed(2)
+                //   : 'N/A',
+              },
+              {
+                label: 'Average GPA',
+                value:
+                  gpaMap === null
+                    ? 'Loading...'
+                    : gpaMap.averageGpa
+                    ? gpaMap.averageGpa.toFixed(2)
+                    : 'N/A',
+              },
+              {
+                label: 'Difficulty',
+                value: mockStats(5),
+                // metricsState.difficulty !== null &&
+                // metricsState.difficulty !== undefined
+                //   ? metricsState.difficulty.toFixed(2)
+                //   : 'N/A',
+              },
+              {
+                label: 'Workload',
+                value: mockStats(14, 1, false),
+                // metricsState.workload !== null &&
+                // metricsState.workload !== undefined
+                //   ? metricsState.workload.toFixed(2)
+                //   : 'N/A',
+                unit: 'hrs/week',
+              },
+            ]}
+          />
+
+          <div className="course-description">
+            {course.description || 'No description available.'}
           </div>
-        )}
-        {!isModal && (
-          <div className="course-header">
-            <div className="course-title-container">
-              <div className="course-id">{courseId}</div>
-              <div className="course-title">{course.title}</div>
-            </div>
-            <div className="course-credits">
-              {credits !== undefined
-                ? `${credits} Credit${credits !== 1 ? 's' : ''}`
-                : 'N/A'}
-            </div>
+
+          <div className="course-eligibility">
+            <div className="eligibility-label">Eligibility</div>
+            <ul className="eligibility-list">
+              <li>
+                <span className="eligibility-label">Prerequisites:</span>{' '}
+                <PrerequisiteRenderer
+                  prereq={course.prereqs as CrawlerPrerequisites}
+                />
+              </li>
+              <li>
+                <span className="eligibility-label">Major Lock:</span>{' '}
+                Computational Media (CM) or Lit.Media & Communication (LMC)
+              </li>
+            </ul>
           </div>
-        )}
-
-        <MetricsCard
-          metrics={[
-            {
-              label: 'Overall Rating',
-              value:
-                metricsState.overall !== null &&
-                metricsState.overall !== undefined
-                  ? metricsState.overall.toFixed(2)
-                  : 'N/A',
-            },
-            {
-              label: 'Average GPA',
-              value:
-                gpaMap === null
-                  ? 'Loading...'
-                  : gpaMap.averageGpa
-                  ? gpaMap.averageGpa.toFixed(2)
-                  : 'N/A',
-            },
-            {
-              label: 'Difficulty',
-              value:
-                metricsState.difficulty !== null &&
-                metricsState.difficulty !== undefined
-                  ? metricsState.difficulty.toFixed(2)
-                  : 'N/A',
-            },
-            {
-              label: 'Workload',
-              value:
-                metricsState.workload !== null &&
-                metricsState.workload !== undefined
-                  ? metricsState.workload.toFixed(2)
-                  : 'N/A',
-              unit: 'hrs/week',
-            },
-          ]}
-        />
-
-        <div>{course.description || 'No description available.'}</div>
-
-        <div className="course-eligibility">
-          <div className="eligibility-label">Eligibility</div>
-          <ul className="eligibility-list">
-            <li>
-              <span className="eligibility-label">Prerequisites:</span>{' '}
-              <PrerequisiteRenderer
-                prereq={course.prereqs as CrawlerPrerequisites}
-              />
-            </li>
-            <li>
-              <span className="eligibility-label">Corequisites:</span> TODO
-            </li>
-            <li>
-              <span className="eligibility-label">Major Lock:</span> TODO
-            </li>
-          </ul>
         </div>
-
         <div className="terms-container">
           <div className="terms-label">Offered Terms</div>
           <TabBar
