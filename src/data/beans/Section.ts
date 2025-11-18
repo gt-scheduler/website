@@ -6,7 +6,12 @@ import { unique } from '../../utils/misc';
 import { DELIVERY_MODES, BACKEND_BASE_URL } from '../../constants';
 import Course from './Course';
 import Oscar from './Oscar';
-import { CrawlerMeeting, Meeting } from '../../types';
+import {
+  CrawlerMeeting,
+  Meeting,
+  Restriction,
+  RestrictionCrawler,
+} from '../../types';
 import { ErrorWithFields, softError } from '../../log';
 
 // Seating information
@@ -43,7 +48,8 @@ type SectionConstructionData = [
   campusIndex: number,
   attributeIndices: number[],
   gradeBasisIndex: number,
-  sectionTitle: string
+  sectionTitle: string,
+  restrictions: RestrictionCrawler
 ];
 
 export default class Section {
@@ -81,6 +87,8 @@ export default class Section {
 
   plannedCount: number | undefined;
 
+  restrictions: Restriction[] = [];
+
   constructor(
     oscar: Oscar,
     course: Course,
@@ -97,6 +105,7 @@ export default class Section {
       attributeIndices,
       gradeBasisIndex,
       sectionTitle,
+      restrictions,
     ] = data;
 
     this.plannedCount = oscar.plannedCounts?.sectionCounts[crn];
@@ -109,6 +118,7 @@ export default class Section {
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
     this.campus = oscar.campuses[campusIndex] ?? 'unknown';
     this.sectionTitle = sectionTitle;
+    this.restrictions = restrictions.restrictions;
     const attributes = attributeIndices
       .map((attributeIndex) => oscar.attributes[attributeIndex])
       .flatMap((attribute) => (attribute == null ? [] : [attribute]));

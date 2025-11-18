@@ -22,7 +22,6 @@ import './stylesheet.scss';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { get } from 'lodash';
 
 export type CourseInfoProps = {
   courseId: string;
@@ -209,8 +208,19 @@ export default function CourseInfo({
 
   if (course == null) return null;
 
-  function mockStats(denom: number, round = 2, include_denom = true): string {
-    const biased = Math.random() ** 0.5; // sqrt → shifts values upward
+  function mockStats(
+    denom: number,
+    classname: string,
+    round = 2,
+    include_denom = true
+  ): string {
+    let hash = 0;
+    for (let i = 0; i < classname.length; i++) {
+      hash = (hash * 31 + classname.charCodeAt(i)) >>> 0;
+    }
+    hash %= 10;
+    const biased = Math.abs(Math.sin(hash)) ** 0.5; // sqrt → shifts values upward
+    console.log(classname, hash, biased);
     const score = 1 + biased * (denom - 1); // scale to [1, denom]
     const num = score.toFixed(round);
     return `${num}${include_denom ? `/${denom}` : ''}`;
@@ -256,7 +266,8 @@ export default function CourseInfo({
             metrics={[
               {
                 label: 'Overall Rating',
-                value: mockStats(5),
+                /* eslint-disable-next-line */
+                value: mockStats(5, courseId + '1'),
                 // metricsState.overall !== null &&
                 // metricsState.overall !== undefined
                 //   ? metricsState.overall.toFixed(2)
@@ -273,7 +284,8 @@ export default function CourseInfo({
               },
               {
                 label: 'Difficulty',
-                value: mockStats(5),
+                /* eslint-disable-next-line */
+                value: mockStats(5, courseId + '2'),
                 // metricsState.difficulty !== null &&
                 // metricsState.difficulty !== undefined
                 //   ? metricsState.difficulty.toFixed(2)
@@ -281,7 +293,8 @@ export default function CourseInfo({
               },
               {
                 label: 'Workload',
-                value: mockStats(14, 1, false),
+                /* eslint-disable-next-line */
+                value: mockStats(14, courseId + '3', 1, false),
                 // metricsState.workload !== null &&
                 // metricsState.workload !== undefined
                 //   ? metricsState.workload.toFixed(2)
@@ -305,8 +318,15 @@ export default function CourseInfo({
                 />
               </li>
               <li>
-                <span className="eligibility-label">Major Lock:</span>{' '}
-                Computational Media (CM) or Lit.Media & Communication (LMC)
+                <span className="eligibility-label">Major Restrictions:</span>{' '}
+                {!course || !course.restrictions
+                  ? 'N/A'
+                  : course.restrictions
+                      .map((r) => {
+                        const vals = r.values.map((v) => v.name).join(', ');
+                        return `${vals}${r.allowed ? '' : ' (Not allowed)'}`;
+                      })
+                      .join(' | ')}
               </li>
             </ul>
           </div>
