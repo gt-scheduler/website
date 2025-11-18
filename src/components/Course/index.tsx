@@ -155,7 +155,6 @@ export default function Course({
     (credits, section) => credits + section.credits,
     0
   );
-
   return (
     <div
       className={classes('Course', contentClassName, 'default', className)}
