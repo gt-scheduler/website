@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
+import useScrollFade from '../../hooks/useScrollFade';
 import { classes } from '../../utils/misc';
 
 import './stylesheet.scss';
@@ -28,30 +29,12 @@ export default function TabBar<K extends string>({
   onSelect,
 }: TabBarProps<K>): React.ReactElement {
   const ref = useRef<HTMLDivElement>(null);
-  const [fadeLeft, setFadeLeft] = useState(false);
-  const [fadeRight, setFadeRight] = useState(false);
+  const { fadeLeft, fadeRight } = useScrollFade(ref, enableSelect);
 
-  useEffect(() => {
+  const handleSelect = (key: K): void => {
     if (!enableSelect) return;
-    const el = ref.current;
-    if (!el) return;
-
-    const checkScroll = (): void => {
-      const isOverflowing = el.scrollWidth > el.clientWidth;
-      const atStart = el.scrollLeft <= 0;
-      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
-      setFadeLeft(isOverflowing && !atStart);
-      setFadeRight(isOverflowing && !atEnd);
-    };
-
-    checkScroll();
-    el.addEventListener('scroll', checkScroll);
-    window.addEventListener('resize', checkScroll);
-    return () => {
-      el.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
-    };
-  }, [items, enableSelect]);
+    onSelect?.(key);
+  };
 
   return (
     <div className="TabBarContainer">
@@ -70,11 +53,7 @@ export default function TabBar<K extends string>({
             <div
               key={item.key}
               className={classes('tab', enableSelect && isActive && 'active')}
-              onClick={(): void => {
-                if (enableSelect && onSelect) {
-                  onSelect(item.key);
-                }
-              }}
+              onClick={(): void => handleSelect(item.key)}
             >
               {item.icon && (
                 <FontAwesomeIcon icon={item.icon} className="tab-icon" />

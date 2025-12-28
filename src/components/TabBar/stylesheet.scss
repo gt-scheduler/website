@@ -11,7 +11,6 @@
   background-color: $buttons-secondary-action-dark;
   border-radius: 10px;
   padding: 4px;
-  overflow-x: auto;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -31,7 +30,6 @@
     border-radius: 6px;
     cursor: pointer;
     color: $buttons-secondary-action;
-    white-space: nowrap;
     transition: background-color 0.2s, color 0.2s, opacity 0.2s;
     gap: 8px;
 
@@ -48,7 +46,7 @@
     overflow-x: visible;
     justify-content: flex-start;
     .tab {
-      color: white;
+      color: $theme-light-background;
       cursor: default;
       opacity: 1;
     }
@@ -83,12 +81,4 @@
     rgba($buttons-secondary-action-dark, 1)
   );
   border-radius: 10px 0 0 10px;
-}
-
-@media (max-width: 600px) {
-  .TabBar {
-    .tab {
-      margin-right: 0;
-    }
-  }
 }
