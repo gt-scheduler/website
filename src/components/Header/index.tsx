@@ -9,8 +9,8 @@ import { DEFAULT_PALETTE, SOFT_PALETTE, DEEP_PALETTE } from '../../constants';
 import './stylesheet.scss';
 
 export type HeaderProps = {
-  currentTab: number;
-  onChangeTab: (newTab: number) => void;
+  currentTab: string;
+  onChangeTab: (newTab: string) => void;
   onToggleMenu: () => void;
   tabs: string[];
   captureRef: React.RefObject<HTMLDivElement>;

@@ -73,7 +73,7 @@ export default function ScheduleContainer({
         );
 
       case SchedulerPageType.COURSE_DETAILS:
-        return <span>Course details page placeholder</span>;
+        return <span>Course details page web placeholder</span>;
 
       default:
         return null;

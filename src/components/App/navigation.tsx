@@ -15,7 +15,7 @@ import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
 import { Course } from '../../data/beans';
 
-export const NAV_TABS = ['Scheduler', 'Map', 'Finals'];
+export const MOBILE_NAV_TABS = ['Scheduler', 'Course details', 'Map', 'Finals'];
 
 export enum SchedulerPageType {
   CALENDAR = 'calendar',
@@ -29,8 +29,8 @@ export type SchedulerPageState =
   | { type: SchedulerPageType.SECTION_DETAILS; course: Course };
 
 export type AppNavigationContextValue = {
-  currentTabIndex: number;
-  setTabIndex: (next: number) => void;
+  currentTab: string;
+  setTab: (next: string) => void;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -40,10 +40,10 @@ export type AppNavigationContextValue = {
 
 export const AppNavigationContext =
   React.createContext<AppNavigationContextValue>({
-    currentTabIndex: 0,
-    setTabIndex: (): void => {
+    currentTab: 'Scheduler',
+    setTab: (): void => {
       throw new ErrorWithFields({
-        message: 'empty AppNavigationContext.setTabIndex value being used',
+        message: 'empty AppNavigationContext.setTab value being used',
       });
     },
     isDrawerOpen: false,
@@ -80,7 +80,7 @@ export function AppNavigation({
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   // Allow top-level tab-based navigation
-  const [currentTabIndex, setTabIndex] = useState(0);
+  const [currentTab, setTab] = useState<string>('Scheduler');
 
   const [currentSchedulerPage, setCurrentSchedulerPage] =
     useState<SchedulerPageState>({ type: SchedulerPageType.CALENDAR });
@@ -99,8 +99,8 @@ export function AppNavigation({
   // Memoize the context value
   const contextValue = useMemo<AppNavigationContextValue>(
     () => ({
-      currentTabIndex,
-      setTabIndex,
+      currentTab,
+      setTab,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -108,8 +108,8 @@ export function AppNavigation({
       setCurrentSchedulerPage,
     }),
     [
-      currentTabIndex,
-      setTabIndex,
+      currentTab,
+      setTab,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -169,7 +169,7 @@ export function AppMobileNavDisplay({
 }: AppMobileNavDisplayProps): React.ReactElement | null {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
-  const { currentTabIndex, setTabIndex, isDrawerOpen, closeDrawer } =
+  const { currentTab, setTab, isDrawerOpen, closeDrawer } =
     useContext(AppNavigationContext);
 
   if (!mobile) return null;
@@ -190,10 +190,10 @@ export function AppMobileNavDisplay({
       )}
 
       <NavMenu
-        items={NAV_TABS}
-        currentItem={currentTabIndex}
+        items={MOBILE_NAV_TABS}
+        currentItem={currentTab}
         onChangeItem={(next): void => {
-          setTabIndex(next);
+          setTab(next);
           closeDrawer();
         }}
       />

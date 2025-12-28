@@ -60,8 +60,8 @@ type PaletteState =
 
 export type HeaderDisplayProps = {
   totalCredits?: number | null;
-  currentTab: number;
-  onChangeTab: (newTab: number) => void;
+  currentTab: string;
+  onChangeTab: (newTab: string) => void;
   onToggleMenu: () => void;
   tabs: string[];
   onCopyCrns?: () => void;
@@ -198,8 +198,8 @@ export default function HeaderDisplay({
           {tabs.map((tabLabel, tabIdx) => (
             <Tab
               key={tabIdx}
-              active={tabIdx === currentTab}
-              onClick={(): void => onChangeTab(tabIdx)}
+              active={tabLabel === currentTab}
+              onClick={(): void => onChangeTab(tabLabel)}
               label={tabLabel}
             />
           ))}
