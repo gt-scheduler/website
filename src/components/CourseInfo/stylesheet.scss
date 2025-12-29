@@ -1,0 +1,75 @@
+.course-info-subtitle {
+  font-weight: bold;
+}
+
+.course-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+  flex: 1 0 0;
+  font-size: 0.875em;
+
+  .course-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+
+    .course-header {
+      display: flex;
+      justify-content: space-between;
+      align-self: stretch;
+      font-size: 1.285em;
+
+      .course-id {
+        font-weight: bold;
+      }
+    }
+
+    .course-metrics {
+      align-self: stretch;
+    }
+
+    .course-eligibility {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      align-self: stretch;
+
+      .course-eligibility-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0px;
+
+        .course-eligibility-list-item {
+          display: flex;
+          gap: 8px;
+
+          .course-eligibility-content-title {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+
+  .course-terms {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.course-title-container {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.mobile .course-title-container {
+  flex-direction: column;
+  gap: 4px;
+}

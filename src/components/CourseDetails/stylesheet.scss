@@ -32,8 +32,34 @@
 }
 
 .cards-container {
-  margin: 20px;
   display: flex;
+  padding: 20px;
+  padding-top: 0px;
   gap: 20px;
   flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 29px;
+  }
+
+  .view-section {
+    color: $information-blue;
+    font-size: 0.875em;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .view-section:hover {
+    text-decoration: underline;
+  }
+}
+
+.mobile .cards-container {
+  padding: 16px;
 }

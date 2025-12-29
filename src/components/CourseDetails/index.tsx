@@ -1,11 +1,14 @@
 import React, { useContext } from 'react';
 
 import { ScheduleContext } from '../../contexts';
+import CardContainer from '../Card';
+import CourseInfo from '../CourseInfo';
+import { getRandomColor } from '../../utils/misc';
 
 import './stylesheet.scss';
 
 export default function CourseDetails(): React.ReactElement {
-  const [{ desiredCourses }] = useContext(ScheduleContext);
+  const [{ desiredCourses, colorMap, palette }] = useContext(ScheduleContext);
 
   if (desiredCourses.length === 0) {
     return (
@@ -21,8 +24,25 @@ export default function CourseDetails(): React.ReactElement {
 
   return (
     <div className="cards-container">
-      {desiredCourses.map((course) => {
-        return <span>course: {course}</span>;
+      {desiredCourses.map((courseId) => {
+        return (
+          <CardContainer
+            color={colorMap[courseId] || getRandomColor(palette)}
+            key={courseId}
+          >
+            <div className="card-content">
+              <CourseInfo courseId={courseId} />
+              <div className="view-section">
+                <img
+                  alt="view section info"
+                  src="info.svg"
+                  className="section-info-svg"
+                />
+                View section details
+              </div>
+            </div>
+          </CardContainer>
+        );
       })}
     </div>
   );

@@ -1,0 +1,10 @@
+@import '../../variables';
+
+.CardContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: $theme-dark-card-background;
+  border-left: 8px solid $theme-dark-card-background;
+  border-radius: 5px;
+  padding: 20px;
+}
