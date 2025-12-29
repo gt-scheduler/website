@@ -1,0 +1,39 @@
+@import '../../variables';
+
+.empty-container {
+  padding-bottom: 9%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: $color-neutral;
+  flex: 1;
+
+  .empty-course-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 12px;
+    gap: 3px;
+
+    img {
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-size: 1.125em;
+      font-weight: bold;
+    }
+
+    .empty-description {
+      font-size: 0.875em;
+      text-align: center;
+    }
+  }
+}
+
+.cards-container {
+  margin: 20px;
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+}

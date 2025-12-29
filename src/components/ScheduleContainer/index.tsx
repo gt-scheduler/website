@@ -1,4 +1,10 @@
-import React, { ReactElement, useCallback, useContext, useMemo } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 import { faCalendar, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 import { Calendar } from '..';
@@ -8,6 +14,7 @@ import {
   SchedulerPageState,
   SchedulerPageType,
 } from '../App/navigation';
+import CourseDetails from '../CourseDetails';
 
 type ScheduleContainerProps = {
   overlayCrns: string[];
@@ -42,6 +49,14 @@ export default function ScheduleContainer({
   const { currentSchedulerPage, setCurrentSchedulerPage } =
     useContext(AppNavigationContext);
 
+  // We don't use the view-mode tab bar on mobile, we display in the nav menu.
+  // Weird when user goes from a mobile to web view while on the scheduler page
+  useEffect(() => {
+    if (mobile && currentSchedulerPage.type !== SchedulerPageType.CALENDAR) {
+      setCurrentSchedulerPage({ type: SchedulerPageType.CALENDAR });
+    }
+  }, [mobile, currentSchedulerPage.type, setCurrentSchedulerPage]);
+
   const selectedTab = useMemo(
     () => TABS.find((tab) => tab.key === currentSchedulerPage.type) ?? TABS[0],
     [currentSchedulerPage.type]
@@ -73,7 +88,7 @@ export default function ScheduleContainer({
         );
 
       case SchedulerPageType.COURSE_DETAILS:
-        return <span>Course details page web placeholder</span>;
+        return <CourseDetails />;
 
       default:
         return null;

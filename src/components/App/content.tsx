@@ -17,6 +17,7 @@ import {
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
+import CourseDetails from '../CourseDetails';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
@@ -62,9 +63,7 @@ function AppContentBase(): React.ReactElement {
         )}
       >
         {currentTab === 'Scheduler' && <Scheduler />}
-        {currentTab === 'Course details' && (
-          <span>Course Details Page Mobile placeholder</span>
-        )}
+        {currentTab === 'Course details' && <CourseDetails />}
         {currentTab === 'Map' && <Map />}
         {currentTab === 'Finals' && <Finals />}
         {/* Fake calendar used to capture screenshots */}
