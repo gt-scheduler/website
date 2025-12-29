@@ -21,8 +21,6 @@ import CourseDetails from '../CourseDetails';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
-export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
-
 /**
  * Renders the actual content at the root of the app
  * once it has completely loaded state,
