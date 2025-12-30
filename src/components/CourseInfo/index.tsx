@@ -4,11 +4,11 @@ import { ScheduleContext } from '../../contexts';
 import { serializePrereqs } from '../../utils/misc';
 import { CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
+import TabBar from '../TabBar';
+import { ErrorWithFields, softError } from '../../log';
 import { getTermFromSemesterName } from '../../utils/semesters';
 
 import './stylesheet.scss';
-import TabBar from '../TabBar';
-import { ErrorWithFields, softError } from '../../log';
 
 export type CourseInfoProps = {
   courseId: string;
@@ -42,7 +42,7 @@ export default function CourseInfo({
           );
         });
     }
-  }, [course]);
+  }, [course, courseId]);
 
   const prerequisite = useMemo(() => {
     return course?.prereqs
@@ -54,7 +54,7 @@ export default function CourseInfo({
   const credits = useMemo(() => course?.sections?.[0]?.credits, [course]);
 
   /**
-   * Get the currterm + 5 terms prior to the current term in course crit response
+   * Get the currterm + 5 terms prior to current term in course crit response
    *
    * Note that course critique as of Spr2025 only has data up to Spr2024
    * This can make it incomplete (ie. From Spring 2025 to Spring 2024)
