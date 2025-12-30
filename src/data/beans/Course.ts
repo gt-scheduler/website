@@ -17,6 +17,7 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { getSemesterName } from '../../utils/semesters';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -25,7 +26,7 @@ import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
 const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
-const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-3';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 interface SectionGroupMeeting {
@@ -70,6 +71,8 @@ export default class Course {
   sectionGroups: Record<string, SectionGroup> | undefined;
 
   term: string;
+
+  termInfo: Record<string, string[]>;
 
   plannedCount: number | undefined;
 
@@ -116,6 +119,9 @@ export default class Course {
         }
       }
     );
+    this.termInfo = {
+      [getSemesterName(this.term)]: this.sections.flatMap((s) => s.instructors),
+    };
     this.prereqs = prereqs;
     this.coreqs = coreqs;
 
@@ -226,6 +232,7 @@ export default class Course {
     interface GpaCacheItem {
       d: CourseGpa;
       exp: string;
+      termInfo: Record<string, string[]>;
     }
 
     // Try to look in the cache for a cached course gpa item
@@ -243,6 +250,9 @@ export default class Course {
           // Use lexicographic comparison on date strings
           // (since they are ISO 8601)
           if (now < cacheItem.exp) {
+            if (cacheItem.termInfo) {
+              this.termInfo = cacheItem.termInfo;
+            }
             return cacheItem.d;
           }
         }
@@ -268,7 +278,11 @@ export default class Course {
         cache = JSON.parse(rawCache) as unknown as GpaCache;
       }
 
-      cache[this.id] = { d: courseGpa, exp: exp.toISOString() };
+      cache[this.id] = {
+        d: courseGpa,
+        exp: exp.toISOString(),
+        termInfo: this.termInfo,
+      };
       const rawUpdatedCache = JSON.stringify(cache);
       window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
     } catch (err) {
@@ -346,11 +360,13 @@ export default class Course {
           class_size_group: classSizeGroup,
           instructor_name: rawInstructorName,
           GPA: gpa,
+          Term: historicalTerm,
         } = historicalSectionData;
 
         if (typeof classSizeGroup !== 'string') return;
         if (typeof rawInstructorName !== 'string') return;
         if (typeof gpa !== 'number') return;
+        if (typeof historicalTerm !== 'string') return;
 
         // Map the class size group to an estimate
         // of the number of actual students.
@@ -402,6 +418,13 @@ export default class Course {
         instructorGpa.count += classSizeEstimate;
         instructorGpa.sum += gpa * classSizeEstimate;
         instructors.set(instructorName, instructorGpa);
+
+        const termKey = String(historicalTerm);
+        this.termInfo[termKey] ??= [];
+        const termInstructors = this.termInfo[termKey];
+        if (termInstructors && !termInstructors.includes(instructorName)) {
+          termInstructors.push(instructorName);
+        }
       });
 
       // Now, finally compute the actual weighted averages
@@ -451,6 +474,7 @@ interface CourseDetailsAPIResponse {
     link: string | unknown;
     class_size_group: string | unknown;
     GPA: number | unknown;
+    Term: string | unknown;
     A: number | unknown;
     B: number | unknown;
     C: number | unknown;

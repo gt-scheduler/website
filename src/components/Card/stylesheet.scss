@@ -3,8 +3,8 @@
 .CardContainer {
   display: flex;
   flex-direction: column;
-  background-color: $theme-dark-card-background;
-  border-left: 8px solid $theme-dark-card-background;
+  background-color: $theme-dark-background-foreground;
+  border-left: 8px solid $theme-dark-background-foreground;
   border-radius: 5px;
   padding: 20px;
 }
