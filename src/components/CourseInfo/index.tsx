@@ -65,7 +65,7 @@ export default function CourseInfo({
         <div className="course-metrics">
           <MetricsCard metrics={metrics} />
         </div>
-        <div>course description placeholder</div>
+        <div>{course?.description || 'No description available'}</div>
         <div className="course-eligibility">
           <div className="course-info-subtitle">Eligibility</div>
           <ul className="course-eligibility-content">
@@ -82,7 +82,9 @@ export default function CourseInfo({
                 <div className="course-eligibility-content-title">
                   Corequisites
                 </div>
-                corequisite placeholder
+                {course.coreqs && course.coreqs.length > 0
+                  ? course.coreqs.map((coreq) => coreq.id).join(', ')
+                  : 'None'}
               </div>
             </li>
           </ul>

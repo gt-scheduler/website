@@ -4,6 +4,7 @@ import { decode } from 'html-entities';
 import { Oscar, Section } from '.';
 import {
   CourseGpa,
+  CrawlerCorequisites,
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
@@ -50,9 +51,13 @@ export default class Course {
 
   title: string;
 
+  description?: string;
+
   sections: Section[];
 
   prereqs: CrawlerPrerequisites | undefined;
+
+  coreqs: CrawlerCorequisites | undefined;
 
   hasLab: boolean;
 
@@ -71,7 +76,7 @@ export default class Course {
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
     this.plannedCount = oscar.plannedCounts?.courseCounts[courseId];
-    const [title, sections, prereqs] = data;
+    const [title, sections, prereqs, description, coreqs] = data;
 
     this.id = courseId;
     const [subject, number] = this.id.split(' ');
@@ -90,6 +95,7 @@ export default class Course {
     this.number = number;
 
     this.title = decode(title);
+    this.description = description ? decode(description) : undefined;
     this.sections = Object.entries(sections).flatMap<Section>(
       ([sectionId, sectionData]) => {
         if (sectionData == null) return [];
@@ -111,6 +117,7 @@ export default class Course {
       }
     );
     this.prereqs = prereqs;
+    this.coreqs = coreqs;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)

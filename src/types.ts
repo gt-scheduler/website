@@ -234,6 +234,8 @@ export type PrerequisiteSet = [
  */
 export type CrawlerPrerequisites = PrerequisiteSet | [];
 
+export type CrawlerCorequisites = { id: string }[];
+
 // Caches type (imported as `CrawlerCaches`):
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts
 
@@ -333,7 +335,9 @@ export type CrawlerCourse = [
   /**
    * Description pulled from Oscar
    */
-  description: string | null
+  description: string | null,
+  // ! Type had `undefined` explicitly added to ensure we check when accessing
+  corequisites: CrawlerCorequisites | undefined
 ];
 
 // TermData type (imported as `CrawlerTermData`):
