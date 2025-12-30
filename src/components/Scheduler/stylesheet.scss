@@ -5,11 +5,10 @@
   align-items: center;
   gap: 16px;
   margin-left: $calendar-web-margin;
-  margin-top: $calendar-web-margin;
+  margin-top: 16px;
 
   .view-mode-label {
     font-size: 1em;
     font-weight: bold;
-    font-family: 'Roboto';
   }
 }
