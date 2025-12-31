@@ -1,9 +1,12 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ScheduleContext } from '../../contexts';
 import { serializePrereqs } from '../../utils/misc';
 import { CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
+import TabBar from '../TabBar';
+import { ErrorWithFields, softError } from '../../log';
+import { getSemesterName } from '../../utils/semesters';
 
 import './stylesheet.scss';
 
@@ -16,12 +19,61 @@ export default function CourseInfo({
 }: CourseInfoProps): React.ReactElement {
   const [{ oscar }] = useContext(ScheduleContext);
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
+
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (course) {
+      course
+        .fetchGpa()
+        .then(() => {
+          setIsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching course GPA',
+              source: err,
+              fields: {
+                courseId,
+                term: course.term,
+              },
+            })
+          );
+        });
+    }
+  }, [course, courseId]);
+
   const prerequisite = useMemo(() => {
     return course?.prereqs
-      ? serializePrereqs(course.prereqs as Exclude<CrawlerPrerequisites, []>)
+      ? serializePrereqs(
+          course.prereqs as Exclude<CrawlerPrerequisites, []>
+        ).replace(/^\(|\)$/g, '')
       : 'None';
   }, [course?.prereqs]);
   const credits = useMemo(() => course?.sections?.[0]?.credits, [course]);
+
+  /**
+   * Get the currterm + 5 terms prior to current term in course crit response
+   *
+   * Note that course critique as of Spr2025 only has data up to Spr2024
+   * This can make it incomplete (ie. From Spring 2025 to Spring 2024)
+   */
+  const offeredTerms = useMemo(() => {
+    const termInfo = course?.termInfo;
+    const currentTerm = course?.term;
+
+    if (!termInfo || !currentTerm || !isLoaded) return [];
+
+    return Object.keys(termInfo)
+      .filter((termKey) => {
+        return termKey.localeCompare(currentTerm) <= 0;
+      })
+      .sort((a, b) => {
+        return b.localeCompare(a);
+      })
+      .slice(0, 6);
+  }, [course, isLoaded]);
 
   if (!course) {
     return <div />;
@@ -65,7 +117,7 @@ export default function CourseInfo({
         <div className="course-metrics">
           <MetricsCard metrics={metrics} />
         </div>
-        <div>course description placeholder</div>
+        <div>{course?.description || 'No description available'}</div>
         <div className="course-eligibility">
           <div className="course-info-subtitle">Eligibility</div>
           <ul className="course-eligibility-content">
@@ -82,16 +134,28 @@ export default function CourseInfo({
                 <div className="course-eligibility-content-title">
                   Corequisites
                 </div>
-                corequisite placeholder
+                {course.coreqs && course.coreqs.length > 0
+                  ? course.coreqs.map((coreq) => coreq.id).join(', ')
+                  : 'None'}
               </div>
             </li>
           </ul>
         </div>
       </div>
-      <div className="course-terms">
-        <div className="course-info-subtitle">Offered Terms</div>
-        <div>course terms placeholder</div>
-      </div>
+      {offeredTerms.length > 0 && (
+        <div className="course-terms">
+          <div className="course-info-subtitle">Offered Terms</div>
+          <div>
+            <TabBar
+              className="course-terms-tab-bar"
+              items={offeredTerms.map((term) => ({
+                key: term,
+                label: getSemesterName(term, true),
+              }))}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

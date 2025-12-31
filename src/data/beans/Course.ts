@@ -4,6 +4,7 @@ import { decode } from 'html-entities';
 import { Oscar, Section } from '.';
 import {
   CourseGpa,
+  CrawlerCorequisites,
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
@@ -16,6 +17,7 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { getTermFromSemesterName } from '../../utils/semesters';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -24,7 +26,7 @@ import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
 const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
-const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-3';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 interface SectionGroupMeeting {
@@ -50,9 +52,13 @@ export default class Course {
 
   title: string;
 
+  description?: string;
+
   sections: Section[];
 
   prereqs: CrawlerPrerequisites | undefined;
+
+  coreqs: CrawlerCorequisites | undefined;
 
   hasLab: boolean;
 
@@ -66,12 +72,14 @@ export default class Course {
 
   term: string;
 
+  termInfo: Record<string, string[]>;
+
   plannedCount: number | undefined;
 
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
     this.plannedCount = oscar.plannedCounts?.courseCounts[courseId];
-    const [title, sections, prereqs] = data;
+    const [title, sections, prereqs, description, coreqs] = data;
 
     this.id = courseId;
     const [subject, number] = this.id.split(' ');
@@ -90,6 +98,7 @@ export default class Course {
     this.number = number;
 
     this.title = decode(title);
+    this.description = description ? decode(description) : undefined;
     this.sections = Object.entries(sections).flatMap<Section>(
       ([sectionId, sectionData]) => {
         if (sectionData == null) return [];
@@ -110,7 +119,11 @@ export default class Course {
         }
       }
     );
+    this.termInfo = {
+      [this.term]: this.sections.flatMap((s) => s.instructors),
+    };
     this.prereqs = prereqs;
+    this.coreqs = coreqs;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)
@@ -219,6 +232,7 @@ export default class Course {
     interface GpaCacheItem {
       d: CourseGpa;
       exp: string;
+      termInfo: Record<string, string[]>;
     }
 
     // Try to look in the cache for a cached course gpa item
@@ -236,6 +250,9 @@ export default class Course {
           // Use lexicographic comparison on date strings
           // (since they are ISO 8601)
           if (now < cacheItem.exp) {
+            if (cacheItem.termInfo) {
+              this.termInfo = cacheItem.termInfo;
+            }
             return cacheItem.d;
           }
         }
@@ -261,7 +278,11 @@ export default class Course {
         cache = JSON.parse(rawCache) as unknown as GpaCache;
       }
 
-      cache[this.id] = { d: courseGpa, exp: exp.toISOString() };
+      cache[this.id] = {
+        d: courseGpa,
+        exp: exp.toISOString(),
+        termInfo: this.termInfo,
+      };
       const rawUpdatedCache = JSON.stringify(cache);
       window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
     } catch (err) {
@@ -339,11 +360,13 @@ export default class Course {
           class_size_group: classSizeGroup,
           instructor_name: rawInstructorName,
           GPA: gpa,
+          Term: historicalTerm,
         } = historicalSectionData;
 
         if (typeof classSizeGroup !== 'string') return;
         if (typeof rawInstructorName !== 'string') return;
         if (typeof gpa !== 'number') return;
+        if (typeof historicalTerm !== 'string') return;
 
         // Map the class size group to an estimate
         // of the number of actual students.
@@ -395,6 +418,15 @@ export default class Course {
         instructorGpa.count += classSizeEstimate;
         instructorGpa.sum += gpa * classSizeEstimate;
         instructors.set(instructorName, instructorGpa);
+
+        const termKey = getTermFromSemesterName(String(historicalTerm));
+        if (termKey) {
+          this.termInfo[termKey] ??= [];
+          const termInstructors = this.termInfo[termKey];
+          if (termInstructors && !termInstructors.includes(instructorName)) {
+            termInstructors.push(instructorName);
+          }
+        }
       });
 
       // Now, finally compute the actual weighted averages
@@ -444,6 +476,7 @@ interface CourseDetailsAPIResponse {
     link: string | unknown;
     class_size_group: string | unknown;
     GPA: number | unknown;
+    Term: string | unknown;
     A: number | unknown;
     B: number | unknown;
     C: number | unknown;
