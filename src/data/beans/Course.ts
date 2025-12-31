@@ -17,7 +17,7 @@ import {
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
-import { getSemesterName } from '../../utils/semesters';
+import { getTermFromSemesterName } from '../../utils/semesters';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -120,7 +120,7 @@ export default class Course {
       }
     );
     this.termInfo = {
-      [getSemesterName(this.term)]: this.sections.flatMap((s) => s.instructors),
+      [this.term]: this.sections.flatMap((s) => s.instructors),
     };
     this.prereqs = prereqs;
     this.coreqs = coreqs;
@@ -419,11 +419,13 @@ export default class Course {
         instructorGpa.sum += gpa * classSizeEstimate;
         instructors.set(instructorName, instructorGpa);
 
-        const termKey = String(historicalTerm);
-        this.termInfo[termKey] ??= [];
-        const termInstructors = this.termInfo[termKey];
-        if (termInstructors && !termInstructors.includes(instructorName)) {
-          termInstructors.push(instructorName);
+        const termKey = getTermFromSemesterName(String(historicalTerm));
+        if (termKey) {
+          this.termInfo[termKey] ??= [];
+          const termInstructors = this.termInfo[termKey];
+          if (termInstructors && !termInstructors.includes(instructorName)) {
+            termInstructors.push(instructorName);
+          }
         }
       });
 

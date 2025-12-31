@@ -6,7 +6,7 @@ import { CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
-import { getTermFromSemesterName } from '../../utils/semesters';
+import { getSemesterName } from '../../utils/semesters';
 
 import './stylesheet.scss';
 
@@ -59,7 +59,7 @@ export default function CourseInfo({
    * Note that course critique as of Spr2025 only has data up to Spr2024
    * This can make it incomplete (ie. From Spring 2025 to Spring 2024)
    */
-  const offered_terms = useMemo(() => {
+  const offeredTerms = useMemo(() => {
     const termInfo = course?.termInfo;
     const currentTerm = course?.term;
 
@@ -67,13 +67,10 @@ export default function CourseInfo({
 
     return Object.keys(termInfo)
       .filter((termKey) => {
-        const termValue = getTermFromSemesterName(termKey) ?? '';
-        return termValue.localeCompare(currentTerm) <= 0;
+        return termKey.localeCompare(currentTerm) <= 0;
       })
       .sort((a, b) => {
-        return (getTermFromSemesterName(b) ?? '').localeCompare(
-          getTermFromSemesterName(a) ?? ''
-        );
+        return b.localeCompare(a);
       })
       .slice(0, 6);
   }, [course, isLoaded]);
@@ -145,15 +142,15 @@ export default function CourseInfo({
           </ul>
         </div>
       </div>
-      {offered_terms.length > 0 && (
+      {offeredTerms.length > 0 && (
         <div className="course-terms">
           <div className="course-info-subtitle">Offered Terms</div>
           <div>
             <TabBar
               className="course-terms-tab-bar"
-              items={offered_terms.map((term) => ({
+              items={offeredTerms.map((term) => ({
                 key: term,
-                label: term,
+                label: getSemesterName(term, true),
               }))}
             />
           </div>

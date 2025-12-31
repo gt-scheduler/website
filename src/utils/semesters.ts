@@ -18,7 +18,7 @@ export function isTerm(maybeTerm: string): boolean {
 /**
  * Gets the human-facing display name of a term/semester
  */
-export function getSemesterName(term: string): string {
+export function getSemesterName(term: string, yearFirst = false): string {
   if (!isTerm(term)) return 'Unknown';
 
   const year = term.substring(0, 4);
@@ -39,7 +39,7 @@ export function getSemesterName(term: string): string {
         return 'Unknown';
     }
   })();
-  return `${semester} ${year}`;
+  return yearFirst ? `${year} ${semester}` : `${semester} ${year}`;
 }
 
 /**
