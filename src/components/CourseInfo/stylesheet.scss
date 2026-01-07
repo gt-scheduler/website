@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: 29px;
   flex: 1 0 0;
-  font-size: 0.875em;
+  font-size: 0.875rem;
 
   .course-info-content {
     display: flex;
@@ -22,7 +22,7 @@
       display: flex;
       justify-content: space-between;
       align-self: stretch;
-      font-size: 1.285em;
+      font-size: 1.25rem;
 
       .course-id {
         font-weight: bold;
@@ -65,6 +65,14 @@
 
     .course-terms-tab-bar {
       background-color: $buttons-navigation-hover;
+    }
+
+    .course-terms-tab-bar.enable-select {
+      background-color: $theme-dark-background-foreground;
+      padding: 2px;
+      .tab {
+        border-radius: 8px;
+      }
     }
   }
 }

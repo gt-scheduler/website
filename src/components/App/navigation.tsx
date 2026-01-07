@@ -13,7 +13,6 @@ import { AccountContextValue } from '../../contexts/account';
 import useScreenWidth from '../../hooks/useScreenWidth';
 import { ErrorWithFields } from '../../log';
 import HeaderActionBar from '../HeaderActionBar';
-import { Course } from '../../data/beans';
 
 export const MOBILE_NAV_TABS = ['Scheduler', 'Course details', 'Map', 'Finals'];
 
@@ -26,7 +25,7 @@ export enum SchedulerPageType {
 export type SchedulerPageState =
   | { type: SchedulerPageType.CALENDAR }
   | { type: SchedulerPageType.COURSE_DETAILS }
-  | { type: SchedulerPageType.SECTION_DETAILS; course: Course };
+  | { type: SchedulerPageType.SECTION_DETAILS; courseId: string };
 
 export type AppNavigationContextValue = {
   currentTab: string;

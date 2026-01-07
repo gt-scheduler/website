@@ -26,7 +26,7 @@ import { getTermFromSemesterName } from '../../utils/semesters';
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
 const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
-const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-3';
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 interface SectionGroupMeeting {
