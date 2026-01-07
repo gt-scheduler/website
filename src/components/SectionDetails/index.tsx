@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 
 import CourseInfo from '../CourseInfo';
-
-import './stylesheet.scss';
 import Breadcrumb, { BreadcrumbItem } from '../Breadcrumb';
 import { AppNavigationContext, SchedulerPageType } from '../App/navigation';
+import { ErrorWithFields, softError } from '../../log';
+
+import './stylesheet.scss';
 
 export type SectionDetailsProps = {
   courseId: string;
@@ -22,7 +23,15 @@ export default function SectionDetails({
         try {
           setCurrentSchedulerPage({ type: SchedulerPageType.COURSE_DETAILS });
         } catch (e) {
-          console.error(e);
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching section details',
+              source: e,
+              fields: {
+                courseId,
+              },
+            })
+          );
         }
       },
     },

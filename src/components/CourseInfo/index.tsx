@@ -4,9 +4,10 @@ import { ScheduleContext } from '../../contexts';
 import { serializePrereqs } from '../../utils/misc';
 import { CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
-import TabBar, { TabBarItem } from '../TabBar';
+import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
 import { getSemesterName } from '../../utils/semesters';
+import ProfessorInfoCard from '../ProfessorInfoCard';
 
 import './stylesheet.scss';
 
@@ -102,7 +103,14 @@ export default function CourseInfo({
         );
       }
     }
-  }, [offeredTerms, selectedTermKey]);
+  }, [enableTermSelect, offeredTerms, selectedTermKey]);
+
+  const instructorsForSelectedTerm = useMemo(() => {
+    if (!course || !selectedTermKey) return [];
+
+    const rawInstructors = course.termInfo?.[selectedTermKey] ?? [];
+    return Array.from(new Set(rawInstructors));
+  }, [course, selectedTermKey]);
 
   if (!course) {
     return <div />;
@@ -179,7 +187,7 @@ export default function CourseInfo({
           >
             Offered Terms
           </div>
-          <div>
+          <div className="term-info">
             <TabBar
               className={`course-terms-tab-bar${
                 enableTermSelect ? ' enable-select' : ''
@@ -189,6 +197,18 @@ export default function CourseInfo({
               onSelect={setSelectedTermKey}
               enableSelect={enableTermSelect}
             />
+            {enableTermSelect && (
+              <div className="professor-cards">
+                {instructorsForSelectedTerm.map((instructorName) => (
+                  <ProfessorInfoCard
+                    professorName={instructorName}
+                    professorMetrics={metrics}
+                    course={course}
+                    displaySectionInfo={selectedTermKey === course?.term}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

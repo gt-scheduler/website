@@ -104,6 +104,18 @@ export interface CourseGpa {
   [instructor: string]: number | undefined;
 }
 
+// Normalized Seating Info Type
+// To prevent continuous type checking with Section Seating type
+export type OccupiedInfo = {
+  occupied: number;
+  total: number;
+};
+
+export type SeatData = {
+  inClass: OccupiedInfo | null;
+  waitlist: OccupiedInfo | null;
+};
+
 // Meeting type (imported as `CrawlerMeeting`):
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts
 
