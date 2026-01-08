@@ -20,19 +20,32 @@
     }
   }
 
+  .sections-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
   .sections-container {
+    scroll-behavior: smooth;
+    overflow-x: auto; // Better than 'scroll' as it hides bars when not needed
+    overflow-y: hidden;
+    width: 100%;
+    display: block;
+
     .sections-header,
     .section-row .section-content {
       display: grid;
+      width: min-content;
       grid-template-columns:
         45px /* action */
-        0.91fr /* CRN */
-        0.87fr /* Sect */
-        0.96fr /* Day */
-        1.98fr /* Time */
-        1.52fr /* Seats Filled */
-        1.36fr /* Waitlist */
-        2.5fr; /* Location */
+        69px /* CRN */
+        66px /* Sect */
+        73px /* Day */
+        150px /* Time */
+        115px /* Seats Filled */
+        103px /* Waitlist */
+        210px; /* Location */
       align-items: center;
     }
 
@@ -93,4 +106,32 @@
       }
     }
   }
+}
+
+.fade-right,
+.fade-left {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fade-right {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    $theme-dark-background-foreground 0%,
+    rgba(59, 59, 59, 0) 100%
+  );
+}
+
+.fade-left {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    $theme-dark-background-foreground 0%,
+    rgba(59, 59, 59, 0) 100%
+  );
 }

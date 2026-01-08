@@ -581,7 +581,7 @@ export function normalizeCourseName(courseName: string): string {
   return normalizedName;
 }
 
-export function normalizeSeatingDate(raw: Seating): SeatData {
+export function normalizeSeatingData(raw: Seating): SeatData {
   if (!raw[0] || raw[0].length < 4) {
     return { inClass: null, waitlist: null };
   }
