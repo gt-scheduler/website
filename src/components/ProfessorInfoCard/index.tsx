@@ -82,34 +82,31 @@ function SectionRow({
   return (
     <ActionRow key={section.crn} className="section-row" label="" actions={[]}>
       <div className="section-content">
-        <div className="left-group">
-          <div className="row-cell action-cell">
-            <button
-              type="button"
-              className="action-button"
-              onClick={(): void => (isPinned ? onRemove() : onAdd())}
-            >
-              <FontAwesomeIcon
-                icon={isPinned ? faCheck : faPlus}
-                className="action-icon"
-              />
-            </button>
-          </div>
+        <div className="row-cell action-cell">
+          <button
+            type="button"
+            className="action-button"
+            onClick={(): void => (isPinned ? onRemove() : onAdd())}
+          >
+            <FontAwesomeIcon
+              icon={isPinned ? faCheck : faPlus}
+              className="action-icon"
+            />
+          </button>
+        </div>
 
-          <div className="row-cell">{section.crn}</div>
-          <div className="row-cell">{section.id}</div>
-          <div className="row-cell">{meeting?.days.join('') || 'TBA'}</div>
-          <div className="row-cell">{periodToString(meeting?.period)}</div>
+        <div className="row-cell">{section.crn}</div>
+        <div className="row-cell">{section.id}</div>
+        <div className="row-cell">{meeting?.days.join('') || 'TBA'}</div>
+        <div className="row-cell">{periodToString(meeting?.period)}</div>
+
+        <div className="row-cell">
+          {formatSeatData(seating?.inClass ?? null)}
         </div>
-        <div className="right-group">
-          <div className="row-cell">
-            {formatSeatData(seating?.inClass ?? null)}
-          </div>
-          <div className="row-cell">
-            {formatSeatData(seating?.waitlist ?? null)}
-          </div>
-          <div className="row-cell">{meeting?.where || 'TBA'}</div>
+        <div className="row-cell">
+          {formatSeatData(seating?.waitlist ?? null)}
         </div>
+        <div className="row-cell">{meeting?.where || 'TBA'}</div>
       </div>
     </ActionRow>
   );

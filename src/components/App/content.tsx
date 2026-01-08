@@ -13,11 +13,13 @@ import {
   AppNavigationContext,
   AppMobileNav,
   AppMobileNavDisplay,
+  SchedulerPageType,
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
 import CourseDetails from '../CourseDetails';
+import SectionDetails from '../SectionDetails';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
@@ -28,7 +30,8 @@ export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
  * This component is memoized, so it only re-renders when its context changes.
  */
 function AppContentBase(): React.ReactElement {
-  const { currentTab, setTab, openDrawer } = useContext(AppNavigationContext);
+  const { currentTab, setTab, openDrawer, currentSchedulerPage } =
+    useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -63,7 +66,12 @@ function AppContentBase(): React.ReactElement {
         )}
       >
         {currentTab === 'Scheduler' && <Scheduler />}
-        {currentTab === 'Course details' && <CourseDetails />}
+        {currentTab === 'Course details' &&
+          (currentSchedulerPage.type === SchedulerPageType.SECTION_DETAILS ? (
+            <SectionDetails courseId={currentSchedulerPage.courseId} />
+          ) : (
+            <CourseDetails />
+          ))}
         {currentTab === 'Map' && <Map />}
         {currentTab === 'Finals' && <Finals />}
         {/* Fake calendar used to capture screenshots */}
