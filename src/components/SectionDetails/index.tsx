@@ -25,7 +25,7 @@ export default function SectionDetails({
         } catch (e) {
           softError(
             new ErrorWithFields({
-              message: 'error fetching section details',
+              message: 'error navigating to section details',
               source: e,
               fields: {
                 courseId,

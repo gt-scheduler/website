@@ -200,6 +200,7 @@ export default function CourseInfo({
               <div className="professor-cards">
                 {instructorsForSelectedTerm.map((instructorName) => (
                   <ProfessorInfoCard
+                    key={instructorName}
                     professorName={instructorName}
                     professorMetrics={metrics}
                     course={course}

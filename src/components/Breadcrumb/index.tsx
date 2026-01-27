@@ -30,7 +30,7 @@ export default function Breadcrumb({
                 {item.label}
               </button>
             ) : (
-              <span className="breadcumb-unclickable">{item.label}</span>
+              <span className="breadcrumb-unclickable">{item.label}</span>
             )}
             {index < items.length - 1 && (
               <FontAwesomeIcon
