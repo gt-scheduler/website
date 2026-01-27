@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 
+import { AppNavigationContext, SchedulerPageType } from '../App/navigation';
 import { ScheduleContext } from '../../contexts';
 import CardContainer from '../Card';
 import CourseInfo from '../CourseInfo';
@@ -9,6 +10,7 @@ import './stylesheet.scss';
 
 export default function CourseDetails(): React.ReactElement {
   const [{ desiredCourses, colorMap, palette }] = useContext(ScheduleContext);
+  const { setCurrentSchedulerPage } = useContext(AppNavigationContext);
 
   if (desiredCourses.length === 0) {
     return (
@@ -32,7 +34,15 @@ export default function CourseDetails(): React.ReactElement {
           >
             <div className="card-content">
               <CourseInfo courseId={courseId} />
-              <div className="view-section">
+              <div
+                className="view-section"
+                onClick={(): void =>
+                  setCurrentSchedulerPage({
+                    type: SchedulerPageType.SECTION_DETAILS,
+                    courseId,
+                  })
+                }
+              >
                 <img
                   alt="view section info"
                   src="info.svg"

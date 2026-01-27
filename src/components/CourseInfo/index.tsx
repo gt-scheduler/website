@@ -7,20 +7,26 @@ import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
 import { getSemesterName } from '../../utils/semesters';
+import ProfessorInfoCard from '../ProfessorInfoCard';
 
 import './stylesheet.scss';
 
 export type CourseInfoProps = {
   courseId: string;
+  enableTermSelect?: boolean;
 };
+
+// Need to create course info short and course info long
 
 export default function CourseInfo({
   courseId,
+  enableTermSelect = false,
 }: CourseInfoProps): React.ReactElement {
-  const [{ oscar }] = useContext(ScheduleContext);
+  const [{ oscar, term }] = useContext(ScheduleContext);
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedTermKey, setSelectedTermKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (course) {
@@ -61,19 +67,49 @@ export default function CourseInfo({
    */
   const offeredTerms = useMemo(() => {
     const termInfo = course?.termInfo;
-    const currentTerm = course?.term;
 
-    if (!termInfo || !currentTerm || !isLoaded) return [];
+    if (!termInfo || !term || !isLoaded) return [];
 
     return Object.keys(termInfo)
       .filter((termKey) => {
-        return termKey.localeCompare(currentTerm) <= 0;
+        return termKey.localeCompare(term) <= 0;
       })
       .sort((a, b) => {
         return b.localeCompare(a);
       })
       .slice(0, 6);
-  }, [course, isLoaded]);
+  }, [course, isLoaded, term]);
+
+  const tabItems = useMemo(
+    () =>
+      offeredTerms.map((termItem) => ({
+        key: termItem,
+        label: getSemesterName(termItem, true),
+      })),
+    [offeredTerms]
+  );
+
+  const selectedTabItem = useMemo(
+    () => tabItems.find((t) => t.key === selectedTermKey),
+    [tabItems, selectedTermKey]
+  );
+
+  useEffect(() => {
+    if (enableTermSelect) {
+      if (offeredTerms.length > 0 && !selectedTermKey) {
+        setSelectedTermKey(
+          offeredTerms && offeredTerms[0] ? offeredTerms[0] : null
+        );
+      }
+    }
+  }, [enableTermSelect, offeredTerms, selectedTermKey]);
+
+  const instructorsForSelectedTerm = useMemo(() => {
+    if (!course || !selectedTermKey) return [];
+
+    const rawInstructors = course.termInfo?.[selectedTermKey] ?? [];
+    return Array.from(new Set(rawInstructors));
+  }, [course, selectedTermKey]);
 
   if (!course) {
     return <div />;
@@ -144,15 +180,35 @@ export default function CourseInfo({
       </div>
       {offeredTerms.length > 0 && (
         <div className="course-terms">
-          <div className="course-info-subtitle">Offered Terms</div>
-          <div>
+          <div
+            className="course-info-subtitle"
+            style={{ visibility: enableTermSelect ? 'hidden' : 'visible' }}
+          >
+            Offered Terms
+          </div>
+          <div className="term-info">
             <TabBar
-              className="course-terms-tab-bar"
-              items={offeredTerms.map((term) => ({
-                key: term,
-                label: getSemesterName(term, true),
-              }))}
+              className={`course-terms-tab-bar${
+                enableTermSelect ? ' enable-select' : ''
+              }`}
+              items={tabItems}
+              selected={selectedTabItem}
+              onSelect={setSelectedTermKey}
+              enableSelect={enableTermSelect}
             />
+            {enableTermSelect && (
+              <div className="professor-cards">
+                {instructorsForSelectedTerm.map((instructorName) => (
+                  <ProfessorInfoCard
+                    key={instructorName}
+                    professorName={instructorName}
+                    professorMetrics={metrics}
+                    course={course}
+                    displaySectionInfo={selectedTermKey === term}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,61 +1,20 @@
-import React from 'react';
-import useSWR from 'swr';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { getContentClassName, getLabelClassName } from '../../utils/misc';
+import {
+  getContentClassName,
+  getLabelClassName,
+  normalizeSeatingData,
+} from '../../utils/misc';
 import { Section as SectionBean } from '../../data/beans';
+import { ErrorWithFields, softError } from '../../log';
+import { OccupiedInfo } from '../../types';
 
 import './stylesheet.scss';
-
-// Seating information
-export type OccupiedInfo = {
-  occupied: number;
-  total: number;
-};
 
 export type SeatInfoProps = {
   section: SectionBean;
   term: string;
   color: string | undefined;
-};
-
-// Response from fetchSeating
-type SeatData = {
-  inClass: OccupiedInfo | null;
-  waitlist: OccupiedInfo | null;
-};
-
-// Fetch and normalize seating data for a section/term
-const fetchSeating = async (
-  section: SectionBean,
-  term: string
-): Promise<SeatData> => {
-  try {
-    const raw = await section.fetchSeating(term);
-
-    // Handle missing or bad data, assuming less than 4 return values is invalid
-    if (!raw[0] || raw[0].length < 4) {
-      return { inClass: null, waitlist: null };
-    }
-
-    const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
-      raw[0];
-
-    // normalize raw values into an OccupiedInfo object
-    const toOccupiedInfo = (
-      total: unknown,
-      occupied: unknown
-    ): OccupiedInfo => ({
-      occupied: Number(occupied ?? 0),
-      total: Number(total ?? 0),
-    });
-
-    return {
-      inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
-      waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
-    };
-  } catch (err) {
-    return { inClass: null, waitlist: null };
-  }
 };
 
 // subcomponent for a single stat line (label + numbers)
@@ -91,10 +50,36 @@ export default function SeatInfo({
   term,
   color,
 }: SeatInfoProps): React.ReactElement {
-  const { data: seatData, isLoading } = useSWR<SeatData>(
-    ['seating', section.crn, term],
-    () => fetchSeating(section, term)
-  );
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (section) {
+      section
+        .fetchSeating(term)
+        .then(() => {
+          setIsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching section seating',
+              source: err,
+              fields: {
+                crn: section.crn,
+                term,
+              },
+            })
+          );
+        });
+    }
+  }, [section, term]);
+
+  const seating = useMemo(() => {
+    if (!isLoaded) {
+      return { inClass: null, waitlist: null };
+    }
+    return normalizeSeatingData(section.seating);
+  }, [isLoaded, section?.seating]);
 
   // Derive styling classes based on Section's color (passed down from Section)
   const textClass = getContentClassName(color);
@@ -106,15 +91,15 @@ export default function SeatInfo({
         <div className="seating">
           <SeatingStat
             label="Seats Filled"
-            info={seatData?.inClass ?? null}
-            isLoading={isLoading}
+            info={seating?.inClass ?? null}
+            isLoading={!isLoaded}
             textClass={textClass}
             labelClass={labelClass}
           />
           <SeatingStat
             label="Waitlist Filled"
-            info={seatData?.waitlist ?? null}
-            isLoading={isLoading}
+            info={seating?.waitlist ?? null}
+            isLoading={!isLoaded}
             textClass={textClass}
             labelClass={labelClass}
           />

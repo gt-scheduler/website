@@ -15,6 +15,7 @@ import {
   SchedulerPageType,
 } from '../App/navigation';
 import CourseDetails from '../CourseDetails';
+import SectionDetails from '../SectionDetails';
 
 type ScheduleContainerProps = {
   overlayCrns: string[];
@@ -58,7 +59,13 @@ export default function ScheduleContainer({
   }, [mobile, currentSchedulerPage.type, setCurrentSchedulerPage]);
 
   const selectedTab = useMemo(
-    () => TABS.find((tab) => tab.key === currentSchedulerPage.type) ?? TABS[0],
+    () =>
+      TABS.find(
+        (tab) =>
+          tab.key === currentSchedulerPage.type ||
+          (currentSchedulerPage.type === SchedulerPageType.SECTION_DETAILS &&
+            tab.key === SchedulerPageType.COURSE_DETAILS)
+      ) ?? TABS[0],
     [currentSchedulerPage.type]
   );
 
@@ -89,6 +96,9 @@ export default function ScheduleContainer({
 
       case SchedulerPageType.COURSE_DETAILS:
         return <CourseDetails />;
+
+      case SchedulerPageType.SECTION_DETAILS:
+        return <SectionDetails courseId={schedulerPage.courseId} />;
 
       default:
         return null;

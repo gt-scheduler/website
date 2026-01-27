@@ -1,0 +1,137 @@
+@import '../../variables';
+
+.ProfessorInfo {
+  padding: 20px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @include dark(background, $theme-dark-background-foreground);
+  @include light(background, $theme-light-card-background);
+
+  .professor-header {
+    padding: 0px;
+
+    .professor-name {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin: 0px;
+    }
+  }
+
+  .sections-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .sections-container {
+    scroll-behavior: smooth;
+    overflow-x: auto; // Better than 'scroll' as it hides bars when not needed
+    overflow-y: hidden;
+    width: 100%;
+    display: block;
+
+    .sections-header,
+    .section-row .section-content {
+      display: grid;
+      width: min-content;
+      grid-template-columns:
+        45px /* action */
+        69px /* CRN */
+        66px /* Sect */
+        73px /* Day */
+        150px /* Time */
+        115px /* Seats Filled */
+        103px /* Waitlist */
+        210px; /* Location */
+      align-items: center;
+    }
+
+    .section-row .left-group,
+    .section-row .right-group {
+      display: contents;
+    }
+
+    .section-row {
+      padding: 0px;
+    }
+
+    .sections-header {
+      padding: 0px;
+      padding-left: 0px;
+      color: $table-header;
+      > .left-group,
+      > .right-group {
+        display: contents;
+      }
+
+      .row-cell {
+        font-size: 0.7rem;
+      }
+    }
+
+    .section-row {
+      .section-content {
+        padding: 0px;
+        padding-left: 0px;
+        border-top: 1px solid $table-border;
+      }
+
+      .action-row-header {
+        display: none;
+      }
+    }
+
+    .row-cell {
+      font-size: 0.875em;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      min-height: 46px;
+
+      .action-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding-left: 0px;
+        border-radius: 4px;
+        display: flex;
+        font-size: 1em;
+
+        .action-icon {
+          color: $information-blue;
+        }
+      }
+    }
+  }
+}
+
+.fade-right,
+.fade-left {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fade-right {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    $theme-dark-background-foreground 0%,
+    rgba(59, 59, 59, 0) 100%
+  );
+}
+
+.fade-left {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    $theme-dark-background-foreground 0%,
+    rgba(59, 59, 59, 0) 100%
+  );
+}

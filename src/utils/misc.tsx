@@ -20,13 +20,16 @@ import {
   Event,
   ICS,
   Meeting,
+  OccupiedInfo,
   Palette,
   Period,
   PrerequisiteClause,
+  SeatData,
   Theme,
 } from '../types';
 import ics from '../vendor/ics';
 import { getSemesterName } from './semesters';
+import { Seating } from '../data/beans/Section';
 
 /* Converts a string of the form "930" to 750. strings of the
   mentioned format are returned by crawler v2 */
@@ -576,4 +579,23 @@ export function normalizeCourseName(courseName: string): string {
     normalizedName = `${subject} ${number}`;
   }
   return normalizedName;
+}
+
+export function normalizeSeatingData(raw: Seating): SeatData {
+  if (!raw[0] || raw[0].length < 4) {
+    return { inClass: null, waitlist: null };
+  }
+
+  const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
+    raw[0];
+
+  const toOccupiedInfo = (total: unknown, occupied: unknown): OccupiedInfo => ({
+    occupied: Number(occupied ?? 0),
+    total: Number(total ?? 0),
+  });
+
+  return {
+    inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
+    waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
+  };
 }
