@@ -22,7 +22,7 @@ export default function CourseInfo({
   courseId,
   enableTermSelect = false,
 }: CourseInfoProps): React.ReactElement {
-  const [{ oscar }] = useContext(ScheduleContext);
+  const [{ oscar, term }] = useContext(ScheduleContext);
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -67,25 +67,24 @@ export default function CourseInfo({
    */
   const offeredTerms = useMemo(() => {
     const termInfo = course?.termInfo;
-    const currentTerm = course?.term;
 
-    if (!termInfo || !currentTerm || !isLoaded) return [];
+    if (!termInfo || !term || !isLoaded) return [];
 
     return Object.keys(termInfo)
       .filter((termKey) => {
-        return termKey.localeCompare(currentTerm) <= 0;
+        return termKey.localeCompare(term) <= 0;
       })
       .sort((a, b) => {
         return b.localeCompare(a);
       })
       .slice(0, 6);
-  }, [course, isLoaded]);
+  }, [course, isLoaded, term]);
 
   const tabItems = useMemo(
     () =>
-      offeredTerms.map((term) => ({
-        key: term,
-        label: getSemesterName(term, true),
+      offeredTerms.map((termItem) => ({
+        key: termItem,
+        label: getSemesterName(termItem, true),
       })),
     [offeredTerms]
   );
@@ -204,7 +203,7 @@ export default function CourseInfo({
                     professorName={instructorName}
                     professorMetrics={metrics}
                     course={course}
-                    displaySectionInfo={selectedTermKey === course?.term}
+                    displaySectionInfo={selectedTermKey === term}
                   />
                 ))}
               </div>
