@@ -46,11 +46,16 @@ $seat-info-light-label: #848173;
 
 $buttons-secondary-action: #676767;
 $buttons-secondary-action-dark: #2a2a2a;
+$buttons-secondary-action-light: rgba($theme-dark-background, 0.10);
 $buttons-secondary-gradient-dark: #323232;
 $buttons-navigation-hover: #424242;
 
+$card-light-background: rgba(51, 51, 51, 0.05);
+$card-dark-background: $theme-dark-background-foreground;
+
 $information-blue: #57a0d5;
-$table-header: #adadad;
+$table-header-dark: #adadad;
+$table-header-light: rgba(51, 51, 51, 0.60);
 $table-border: #505050;
 
 @mixin card {

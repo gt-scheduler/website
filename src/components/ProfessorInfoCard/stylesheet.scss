@@ -7,8 +7,8 @@
   flex-direction: column;
   gap: 20px;
 
-  @include dark(background, $theme-dark-background-foreground);
-  @include light(background, $theme-light-card-background);
+  @include dark(background-color, $card-dark-background);
+  @include light(background-color, $card-light-background);
 
   .professor-header {
     padding: 0px;
@@ -61,7 +61,8 @@
     .sections-header {
       padding: 0px;
       padding-left: 0px;
-      color: $table-header;
+      @include dark(color, $table-header-dark);
+      @include light(color, $table-header-light);
       > .left-group,
       > .right-group {
         display: contents;

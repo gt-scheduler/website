@@ -43,7 +43,8 @@
       }
 
       .metric-label {
-        color: $modal-foreground-color-dark;
+        @include dark(color, $table-header-dark);
+        @include light(color, $table-header-light);
       }
     }
   }

@@ -8,7 +8,8 @@
 .TabBar {
   display: flex;
   align-items: center;
-  background-color: $buttons-secondary-action-dark;
+  @include dark(background-color, $buttons-secondary-action-dark);
+  @include light(background-color, $buttons-secondary-action-light);
   border-radius: 10px;
   padding: 4px;
   scroll-behavior: smooth;
@@ -32,9 +33,9 @@
     gap: 8px;
 
     &.active {
-      background-color: rgba($color-neutral, 0.3);
+      @include dark(background-color, rgba($color-neutral, 0.3));
+      @include light(background-color, $theme-light-background);
       @include dark(color, $theme-light-background);
-      @include light(color, $theme-dark-background);
       font-weight: bold;
     }
   }
@@ -44,7 +45,7 @@
     overflow-x: visible;
     justify-content: flex-start;
     .tab {
-      color: $theme-light-background;
+      @include dark(color, $theme-light-background);
       cursor: default;
       opacity: 1;
     }
