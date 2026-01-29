@@ -177,14 +177,6 @@ export default function Course({
                 },
                 prereqAction,
                 {
-                  icon: faCircleInfo,
-                  onClick: (): void => {
-                    console.log('view course info');
-                  },
-                  tooltip: 'View Course Info',
-                  id: `${course.id}-info`,
-                },
-                {
                   icon: faPalette,
                   onClick: (): void => {
                     setPaletteShown(!paletteShown);
