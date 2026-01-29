@@ -3,7 +3,6 @@ import {
   faAngleDown,
   faAngleUp,
   faShareAlt,
-  faCircleInfo,
   faPalette,
   faPlus,
   faTrash,
