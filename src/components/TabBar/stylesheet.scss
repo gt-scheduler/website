@@ -18,6 +18,8 @@
   &::-webkit-scrollbar {
     display: none;
   }
+  overflow-x: auto; // Better than 'scroll' as it hides bars when not needed
+  overflow-y: hidden;
 
   .tab {
     min-width: 128px;

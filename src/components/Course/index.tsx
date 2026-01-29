@@ -3,6 +3,7 @@ import {
   faAngleDown,
   faAngleUp,
   faShareAlt,
+  faCircleInfo,
   faPalette,
   faPlus,
   faTrash,
@@ -175,6 +176,14 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
+                {
+                  icon: faCircleInfo,
+                  onClick: (): void => {
+                    console.log('view course info');
+                  },
+                  tooltip: 'View Course Info',
+                  id: `${course.id}-info`,
+                },
                 {
                   icon: faPalette,
                   onClick: (): void => {

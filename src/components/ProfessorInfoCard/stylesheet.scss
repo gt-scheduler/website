@@ -121,18 +121,28 @@
 
 .fade-right {
   right: 0;
-  background: linear-gradient(
+  @include dark (background, linear-gradient(
     270deg,
-    $theme-dark-background-foreground 0%,
+    $card-dark-background 0%,
     rgba(59, 59, 59, 0) 100%
-  );
+  ));
+  @include light (background, linear-gradient(
+    270deg,
+    $card-light-background 0%,
+    rgba(255, 255, 255, 0) 100%
+  ));
 }
 
 .fade-left {
   left: 0;
-  background: linear-gradient(
+  @include dark (background, linear-gradient(
     90deg,
-    $theme-dark-background-foreground 0%,
+    $card-dark-background 0%,
     rgba(59, 59, 59, 0) 100%
-  );
+  ));
+  @include light (background, linear-gradient(
+    90deg,
+    $card-light-background 0%,
+    rgba(255, 255, 255, 0) 100%
+  ));
 }
