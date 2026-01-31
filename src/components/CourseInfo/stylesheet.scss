@@ -69,11 +69,10 @@
       gap: 20px;
 
       .course-terms-tab-bar {
-        background-color: $buttons-navigation-hover;
+        @include dark(background-color, $buttons-navigation-hover);
       }
 
       .course-terms-tab-bar.enable-select {
-        background-color: $theme-dark-background-foreground;
         padding: 2px;
         .tab {
           border-radius: 8px;
