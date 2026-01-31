@@ -66,20 +66,20 @@
 
 .fade-right {
   right: 0;
-  background: linear-gradient(
+  @include dark(background, linear-gradient(
     to right,
     rgba($buttons-secondary-action-dark, 0),
     rgba($buttons-secondary-action-dark, 1)
-  );
+  ));
   border-radius: 0 10px 10px 0;
 }
 
 .fade-left {
   left: 0;
-  background: linear-gradient(
+  @include dark(background, linear-gradient(
     to left,
     rgba($buttons-secondary-action-dark, 0),
     rgba($buttons-secondary-action-dark, 1)
-  );
+  )); 
   border-radius: 10px 0 0 10px;
 }

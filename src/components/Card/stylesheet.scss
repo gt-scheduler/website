@@ -3,7 +3,7 @@
 .CardContainer {
   display: flex;
   flex-direction: column;
-  @include dark(background-color, $theme-dark-background-foreground);
+  @include dark(background-color, $card-dark-background);
   @include light(background-color, $card-light-background);
   border-left: 8px solid $theme-dark-background-foreground;
   border-radius: 5px;

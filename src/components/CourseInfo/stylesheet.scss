@@ -70,7 +70,6 @@
 
       .course-terms-tab-bar {
         @include dark(background-color, $buttons-navigation-hover);
-        @include light(background-color, $card-light-background);
       }
 
       .course-terms-tab-bar.enable-select {

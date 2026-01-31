@@ -126,11 +126,6 @@
     $card-dark-background 0%,
     rgba(59, 59, 59, 0) 100%
   ));
-  @include light (background, linear-gradient(
-    270deg,
-    $card-light-background 0%,
-    rgba(255, 255, 255, 0) 100%
-  ));
 }
 
 .fade-left {
@@ -139,10 +134,5 @@
     90deg,
     $card-dark-background 0%,
     rgba(59, 59, 59, 0) 100%
-  ));
-  @include light (background, linear-gradient(
-    90deg,
-    $card-light-background 0%,
-    rgba(255, 255, 255, 0) 100%
   ));
 }
