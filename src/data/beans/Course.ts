@@ -579,8 +579,11 @@ export default class Course {
             this.professorRatings = {};
           }
           cacheItems.forEach(({ name, item }) => {
-            this.professorRatings![slugifyProfessor(name)] = item?.d ?? null;
-            result[slugifyProfessor(name)] = item?.d ?? null;
+            const slugifiedName = slugifyProfessor(name);
+            if (this.professorRatings) {
+              this.professorRatings[slugifiedName] = item?.d ?? null;
+            }
+            result[slugifiedName] = item?.d ?? null;
           });
           return result;
         }
@@ -634,8 +637,8 @@ export default class Course {
 
     professorsInTerm.forEach((professor) => {
       const slugifiedName = slugifyProfessor(professor);
-      if (slugifiedName in this.professorRatings!) {
-        result[slugifiedName] = this.professorRatings![slugifiedName] ?? null;
+      if (this.professorRatings && slugifiedName in this.professorRatings) {
+        result[slugifiedName] = this.professorRatings[slugifiedName] ?? null;
       }
     });
 

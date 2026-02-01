@@ -35,8 +35,9 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (course) {
-      Promise.all([course.fetchGpa()])
-        .then(([gpaData]) => {
+      course
+        .fetchGpa()
+        .then((gpaData) => {
           setGpaMap(gpaData);
           setIsLoaded(true);
         })
@@ -52,7 +53,8 @@ export default function CourseInfo({
             })
           );
         });
-      Promise.all([course.fetchRatings()])
+      course
+        .fetchRatings()
         .then(() => {
           setIsRatingsLoaded(true);
         })
@@ -127,7 +129,8 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (selectedTermKey && course) {
-      Promise.all([course.fetchProfessorRatings(course.term)])
+      course
+        .fetchProfessorRatings(selectedTermKey)
         .then(() => {
           setIsProfessorRatingsLoaded(true);
         })
