@@ -403,7 +403,6 @@ export default class Course {
         if (cacheItem != null) {
           const now = new Date().toISOString();
           if (now < cacheItem.exp) {
-            console.log('using cached ratings for', this.id, cacheItem);
             this.ratings = cacheItem.d;
             return cacheItem.d;
           }
@@ -418,7 +417,6 @@ export default class Course {
     if (ratingsResponse === null) {
       return null;
     }
-    console.log('fetched ratings for', this.id, ratingsResponse);
 
     const exp = new Date();
     exp.setMinutes(
@@ -482,7 +480,6 @@ export default class Course {
     } catch (err) {
       // Ignore network errors
       if (!isAxiosNetworkError(err)) {
-        console.log(err);
         softError(
           new ErrorWithFields({
             message: 'error fetching ratings from ratings API',
@@ -582,9 +579,8 @@ export default class Course {
             this.professorRatings = {};
           }
           cacheItems.forEach(({ name, item }) => {
-            console.log('cached item', name, item);
-            this.professorRatings![name] = item?.d ?? null;
-            result[name] = item?.d ?? null;
+            this.professorRatings![slugifyProfessor(name)] = item?.d ?? null;
+            result[slugifyProfessor(name)] = item?.d ?? null;
           });
           return result;
         }
@@ -639,7 +635,7 @@ export default class Course {
     professorsInTerm.forEach((professor) => {
       const slugifiedName = slugifyProfessor(professor);
       if (slugifiedName in this.professorRatings!) {
-        result[professor] = this.professorRatings![slugifiedName] ?? null;
+        result[slugifiedName] = this.professorRatings![slugifiedName] ?? null;
       }
     });
 

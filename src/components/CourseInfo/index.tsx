@@ -144,7 +144,7 @@ export default function CourseInfo({
           );
         });
     }
-  }, [selectedTermKey, course]);
+  }, [selectedTermKey, course, courseId]);
 
   const formatValue = (val: number, decimals: number): string =>
     Number.isInteger(val) ? val.toString() : val.toFixed(decimals);
@@ -186,7 +186,7 @@ export default function CourseInfo({
         unit: 'hrs/week',
       },
     ];
-  }, [isLoaded, isRatingsLoaded, course?.ratings, gpaMap]);
+  }, [isRatingsLoaded, course?.ratings, gpaMap]);
 
   const instructorsForSelectedTerm = useMemo(() => {
     if (!course || !selectedTermKey) return [];
@@ -195,7 +195,6 @@ export default function CourseInfo({
     return Array.from(new Set(rawInstructors));
   }, [course, selectedTermKey]);
 
-  // Memoize professor metrics so they update when ratings load
   const professorMetricsMap = useMemo(() => {
     const metricsMap: Record<
       string,
@@ -205,7 +204,6 @@ export default function CourseInfo({
     instructorsForSelectedTerm.forEach((professorName) => {
       const profGpa = gpaMap?.[professorName];
       const slugifiedName = slugifyProfessor(professorName);
-      console.log(isProfessorRatingsLoaded, course?.professorRatings);
 
       if (!isProfessorRatingsLoaded || !course?.professorRatings) {
         metricsMap[slugifiedName] = [
