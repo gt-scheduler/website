@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ScheduleContext } from '../../contexts';
 import { serializePrereqs } from '../../utils/misc';
-import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { slugifyProfessor } from '../../data/beans/Course';
+import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
@@ -27,6 +27,7 @@ export default function CourseInfo({
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isRatingsLoaded, setIsRatingsLoaded] = useState(false);
   const [isProfessorRatingsLoaded, setIsProfessorRatingsLoaded] =
     useState(false);
   const [selectedTermKey, setSelectedTermKey] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (course) {
-      Promise.all([course.fetchGpa(), course.fetchRatings()])
+      Promise.all([course.fetchGpa()])
         .then(([gpaData]) => {
           setGpaMap(gpaData);
           setIsLoaded(true);
@@ -42,7 +43,23 @@ export default function CourseInfo({
         .catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'error fetching course data',
+              message: 'error fetching course gpa',
+              source: err,
+              fields: {
+                courseId,
+                term: course.term,
+              },
+            })
+          );
+        });
+      Promise.all([course.fetchRatings()])
+        .then(() => {
+          setIsRatingsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching course ratings',
               source: err,
               fields: {
                 courseId,
@@ -100,24 +117,6 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (enableTermSelect) {
-      if (course) {
-        Promise.all([course.fetchProfessorRatings(course.term)])
-          .then(() => {
-            setIsProfessorRatingsLoaded(true);
-          })
-          .catch((err) => {
-            softError(
-              new ErrorWithFields({
-                message: 'error fetching professor ratings',
-                source: err,
-                fields: {
-                  courseId,
-                  term: course.term,
-                },
-              })
-            );
-          });
-      }
       if (offeredTerms.length > 0 && !selectedTermKey) {
         setSelectedTermKey(
           offeredTerms && offeredTerms[0] ? offeredTerms[0] : null
@@ -126,38 +125,39 @@ export default function CourseInfo({
     }
   }, [enableTermSelect, course, offeredTerms, selectedTermKey]);
 
-  const instructorsForSelectedTerm = useMemo(() => {
-    if (!course || !selectedTermKey) return [];
-
-    const rawInstructors = course.termInfo?.[selectedTermKey] ?? [];
-    return Array.from(new Set(rawInstructors));
-  }, [course, selectedTermKey]);
+  useEffect(() => {
+    if (selectedTermKey && course) {
+      Promise.all([course.fetchProfessorRatings(course.term)])
+        .then(() => {
+          setIsProfessorRatingsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching professor ratings',
+              source: err,
+              fields: {
+                courseId,
+                term: course.term,
+              },
+            })
+          );
+        });
+    }
+  }, [selectedTermKey, course]);
 
   const formatValue = (val: number, decimals: number): string =>
     Number.isInteger(val) ? val.toString() : val.toFixed(decimals);
 
   const metrics = useMemo(() => {
-    if (!isLoaded || !course?.ratings) {
-      return [
-        { label: 'Overall Rating', value: '—' },
-        {
-          label: 'Course GPA',
-          value:
-            gpaMap === null
-              ? 'Loading...'
-              : gpaMap.averageGpa
-              ? formatValue(gpaMap.averageGpa, 2)
-              : '-',
-        },
-        { label: 'Level of Difficulty', value: '—' },
-        { label: 'Workload', value: '—', unit: 'hrs/week' },
-      ];
-    }
-
     return [
       {
         label: 'Overall Rating',
-        value: `${formatValue(course.ratings.averageRating, 2)}/5`,
+        value: !isRatingsLoaded
+          ? 'Loading'
+          : course?.ratings
+          ? `${formatValue(course.ratings.averageRating, 2)}/5`
+          : '—',
       },
       {
         label: 'Course GPA',
@@ -170,67 +170,91 @@ export default function CourseInfo({
       },
       {
         label: 'Level of Difficulty',
-        value: `${formatValue(course.ratings.averageDifficulty, 1)}/5`,
+        value: !isRatingsLoaded
+          ? 'Loading'
+          : course?.ratings
+          ? `${formatValue(course.ratings.averageDifficulty, 1)}/5`
+          : '—',
       },
       {
         label: 'Workload',
-        value: formatValue(course.ratings.averageWorkload, 1),
+        value: !isRatingsLoaded
+          ? 'Loading'
+          : course?.ratings
+          ? formatValue(course.ratings.averageWorkload, 1)
+          : '—',
         unit: 'hrs/week',
       },
     ];
-  }, [isLoaded, course?.ratings, gpaMap]);
+  }, [isLoaded, isRatingsLoaded, course?.ratings, gpaMap]);
 
-  // This function generates metrics for a specific professor
-  const getProfessorMetrics = (
-    professorName: string
-  ): { label: string; value: string; unit?: string }[] => {
-    const profGpa = gpaMap?.[professorName];
-    const slugifiedName = slugifyProfessor(professorName);
-    if (
-      !isProfessorRatingsLoaded ||
-      !course?.professorRatings ||
-      !course.professorRatings[slugifiedName]
-    ) {
-      return [
-        { label: 'Overall Rating', value: '—' },
-        {
-          label: 'Course GPA',
-          value: profGpa ? formatValue(profGpa, 2) : '—',
-        },
-        { label: 'Level of Difficulty', value: '—' },
-        { label: 'Workload', value: '—', unit: 'hrs/week' },
-      ];
-    }
+  const instructorsForSelectedTerm = useMemo(() => {
+    if (!course || !selectedTermKey) return [];
 
-    return [
-      {
-        label: 'Overall Rating',
-        value: `${formatValue(
-          course?.professorRatings[slugifiedName]!.averageRating,
-          2
-        )}/5`,
-      },
-      {
-        label: 'Course GPA',
-        value: profGpa ? formatValue(profGpa, 2) : '-',
-      },
-      {
-        label: 'Level of Difficulty',
-        value: `${formatValue(
-          course?.professorRatings[slugifiedName]!.averageDifficulty,
-          1
-        )}/5`,
-      },
-      {
-        label: 'Workload',
-        value: formatValue(
-          course?.professorRatings[slugifiedName]!.averageWorkload,
-          1
-        ),
-        unit: 'hrs/week',
-      },
-    ];
-  };
+    const rawInstructors = course.termInfo?.[selectedTermKey] ?? [];
+    return Array.from(new Set(rawInstructors));
+  }, [course, selectedTermKey]);
+
+  // Memoize professor metrics so they update when ratings load
+  const professorMetricsMap = useMemo(() => {
+    const metricsMap: Record<
+      string,
+      { label: string; value: string; unit?: string }[]
+    > = {};
+
+    instructorsForSelectedTerm.forEach((professorName) => {
+      const profGpa = gpaMap?.[professorName];
+      const slugifiedName = slugifyProfessor(professorName);
+      console.log(isProfessorRatingsLoaded, course?.professorRatings);
+
+      if (!isProfessorRatingsLoaded || !course?.professorRatings) {
+        metricsMap[slugifiedName] = [
+          { label: 'Overall Rating', value: '—' },
+          {
+            label: 'Course GPA',
+            value: profGpa ? formatValue(profGpa, 2) : '—',
+          },
+          { label: 'Level of Difficulty', value: '—' },
+          { label: 'Workload', value: '—', unit: 'hrs/week' },
+        ];
+      } else {
+        const profRating = course.professorRatings[slugifiedName];
+
+        metricsMap[slugifiedName] = [
+          {
+            label: 'Overall Rating',
+            value: profRating
+              ? `${formatValue(profRating.averageRating, 2)}/5`
+              : '—',
+          },
+          {
+            label: 'Course GPA',
+            value: profGpa ? formatValue(profGpa, 2) : '—',
+          },
+          {
+            label: 'Level of Difficulty',
+            value: profRating
+              ? `${formatValue(profRating.averageDifficulty, 1)}/5`
+              : '—',
+          },
+          {
+            label: 'Workload',
+            value: profRating
+              ? formatValue(profRating.averageWorkload, 1)
+              : '—',
+            unit: 'hrs/week',
+          },
+        ];
+      }
+    });
+
+    return metricsMap;
+  }, [
+    instructorsForSelectedTerm,
+    isProfessorRatingsLoaded,
+    course?.professorRatings,
+    gpaMap,
+  ]);
 
   if (!course) {
     return <div />;
@@ -303,7 +327,14 @@ export default function CourseInfo({
                   <ProfessorInfoCard
                     key={instructorName}
                     professorName={instructorName}
-                    professorMetrics={getProfessorMetrics(instructorName)}
+                    professorMetrics={
+                      professorMetricsMap[slugifyProfessor(instructorName)] ?? [
+                        { label: 'Overall Rating', value: '—' },
+                        { label: 'Course GPA', value: '—' },
+                        { label: 'Level of Difficulty', value: '—' },
+                        { label: 'Workload', value: '—', unit: 'hrs/week' },
+                      ]
+                    }
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
                   />

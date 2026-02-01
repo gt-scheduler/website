@@ -31,10 +31,10 @@ const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
-const RATINGS_CACHE_EXPIRATION_DURATION_DAYS = 7;
+const RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
 
 const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY = 'professor-ratings-cache-1';
-const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_DAYS = 7;
+const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
 
 interface SectionGroupMeeting {
   days: string[];
@@ -402,7 +402,6 @@ export default class Course {
         const cacheItem = cache[this.id];
         if (cacheItem != null) {
           const now = new Date().toISOString();
-          // Use lexicographic comparison on date strings
           if (now < cacheItem.exp) {
             console.log('using cached ratings for', this.id, cacheItem);
             this.ratings = cacheItem.d;
@@ -419,9 +418,12 @@ export default class Course {
     if (ratingsResponse === null) {
       return null;
     }
+    console.log('fetched ratings for', this.id, ratingsResponse);
 
     const exp = new Date();
-    exp.setDate(exp.getDate() + RATINGS_CACHE_EXPIRATION_DURATION_DAYS);
+    exp.setMinutes(
+      exp.getMinutes() + RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
+    );
     try {
       let cache: ratingsCache = {};
       const rawCache = window.localStorage.getItem(
@@ -460,14 +462,12 @@ export default class Course {
 
     let responseData: RatingStatsResponse;
     try {
-      // Create the payload
       const payload = {
         courses: normalizedCourses.length > 0 ? normalizedCourses : undefined,
         professors:
           normalizedProfessors.length > 0 ? normalizedProfessors : undefined,
       };
 
-      // Send as application/x-www-form-urlencoded with data nested inside
       responseData = (
         await axios.post<RatingStatsResponse>(
           url,
@@ -593,7 +593,6 @@ export default class Course {
       // Ignore
     }
 
-    // Fetch professor ratings normally
     if (this.professorRatings === undefined) {
       const allProfessors = Array.from(
         new Set(Object.values(this.termInfo).flat())
@@ -606,8 +605,8 @@ export default class Course {
       }
 
       const exp = new Date();
-      exp.setDate(
-        exp.getDate() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_DAYS
+      exp.setMinutes(
+        exp.getMinutes() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
       );
       try {
         let cache: ProfessorRatingsCache = {};
