@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ScheduleContext } from '../../contexts';
 import { serializePrereqs } from '../../utils/misc';
-import { CrawlerPrerequisites } from '../../types';
+import { CourseGpa, CrawlerPrerequisites } from '../../types';
+import { slugifyProfessor } from '../../data/beans/Course';
 import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
@@ -26,19 +27,22 @@ export default function CourseInfo({
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isProfessorRatingsLoaded, setIsProfessorRatingsLoaded] =
+    useState(false);
   const [selectedTermKey, setSelectedTermKey] = useState<string | null>(null);
+  const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
 
   useEffect(() => {
     if (course) {
-      course
-        .fetchGpa()
-        .then(() => {
+      Promise.all([course.fetchGpa(), course.fetchRatings()])
+        .then(([gpaData]) => {
+          setGpaMap(gpaData);
           setIsLoaded(true);
         })
         .catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'error fetching course GPA',
+              message: 'error fetching course data',
               source: err,
               fields: {
                 courseId,
@@ -96,13 +100,31 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (enableTermSelect) {
+      if (course) {
+        Promise.all([course.fetchProfessorRatings(course.term)])
+          .then(() => {
+            setIsProfessorRatingsLoaded(true);
+          })
+          .catch((err) => {
+            softError(
+              new ErrorWithFields({
+                message: 'error fetching professor ratings',
+                source: err,
+                fields: {
+                  courseId,
+                  term: course.term,
+                },
+              })
+            );
+          });
+      }
       if (offeredTerms.length > 0 && !selectedTermKey) {
         setSelectedTermKey(
           offeredTerms && offeredTerms[0] ? offeredTerms[0] : null
         );
       }
     }
-  }, [enableTermSelect, offeredTerms, selectedTermKey]);
+  }, [enableTermSelect, course, offeredTerms, selectedTermKey]);
 
   const instructorsForSelectedTerm = useMemo(() => {
     if (!course || !selectedTermKey) return [];
@@ -111,29 +133,108 @@ export default function CourseInfo({
     return Array.from(new Set(rawInstructors));
   }, [course, selectedTermKey]);
 
+  const formatValue = (val: number, decimals: number): string =>
+    Number.isInteger(val) ? val.toString() : val.toFixed(decimals);
+
+  const metrics = useMemo(() => {
+    if (!isLoaded || !course?.ratings) {
+      return [
+        { label: 'Overall Rating', value: '—' },
+        {
+          label: 'Course GPA',
+          value:
+            gpaMap === null
+              ? 'Loading...'
+              : gpaMap.averageGpa
+              ? formatValue(gpaMap.averageGpa, 2)
+              : '-',
+        },
+        { label: 'Level of Difficulty', value: '—' },
+        { label: 'Workload', value: '—', unit: 'hrs/week' },
+      ];
+    }
+
+    return [
+      {
+        label: 'Overall Rating',
+        value: `${formatValue(course.ratings.averageRating, 2)}/5`,
+      },
+      {
+        label: 'Course GPA',
+        value:
+          gpaMap === null
+            ? 'Loading...'
+            : gpaMap.averageGpa
+            ? formatValue(gpaMap.averageGpa, 2)
+            : '-',
+      },
+      {
+        label: 'Level of Difficulty',
+        value: `${formatValue(course.ratings.averageDifficulty, 1)}/5`,
+      },
+      {
+        label: 'Workload',
+        value: formatValue(course.ratings.averageWorkload, 1),
+        unit: 'hrs/week',
+      },
+    ];
+  }, [isLoaded, course?.ratings, gpaMap]);
+
+  // This function generates metrics for a specific professor
+  const getProfessorMetrics = (
+    professorName: string
+  ): { label: string; value: string; unit?: string }[] => {
+    const profGpa = gpaMap?.[professorName];
+    const slugifiedName = slugifyProfessor(professorName);
+    if (
+      !isProfessorRatingsLoaded ||
+      !course?.professorRatings ||
+      !course.professorRatings[slugifiedName]
+    ) {
+      return [
+        { label: 'Overall Rating', value: '—' },
+        {
+          label: 'Course GPA',
+          value: profGpa ? formatValue(profGpa, 2) : '—',
+        },
+        { label: 'Level of Difficulty', value: '—' },
+        { label: 'Workload', value: '—', unit: 'hrs/week' },
+      ];
+    }
+
+    return [
+      {
+        label: 'Overall Rating',
+        value: `${formatValue(
+          course?.professorRatings[slugifiedName]!.averageRating,
+          2
+        )}/5`,
+      },
+      {
+        label: 'Course GPA',
+        value: profGpa ? formatValue(profGpa, 2) : '-',
+      },
+      {
+        label: 'Level of Difficulty',
+        value: `${formatValue(
+          course?.professorRatings[slugifiedName]!.averageDifficulty,
+          1
+        )}/5`,
+      },
+      {
+        label: 'Workload',
+        value: formatValue(
+          course?.professorRatings[slugifiedName]!.averageWorkload,
+          1
+        ),
+        unit: 'hrs/week',
+      },
+    ];
+  };
+
   if (!course) {
     return <div />;
   }
-
-  const metrics = [
-    {
-      label: 'Overall Rating',
-      value: '3.91/5',
-    },
-    {
-      label: 'Course GPA',
-      value: '3.91',
-    },
-    {
-      label: 'Level of Difficulty',
-      value: '3.4/5',
-    },
-    {
-      label: 'Workload',
-      value: '14.5',
-      unit: 'hrs/week',
-    },
-  ];
 
   return (
     <div className="course-info-container">
@@ -202,7 +303,7 @@ export default function CourseInfo({
                   <ProfessorInfoCard
                     key={instructorName}
                     professorName={instructorName}
-                    professorMetrics={metrics}
+                    professorMetrics={getProfessorMetrics(instructorName)}
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
                   />

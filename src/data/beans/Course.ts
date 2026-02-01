@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { decode } from 'html-entities';
+import { z } from 'zod';
 
 import { Oscar, Section } from '.';
 import {
@@ -29,6 +30,12 @@ const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCou
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
+const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
+const RATINGS_CACHE_EXPIRATION_DURATION_DAYS = 7;
+
+const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY = 'professor-ratings-cache-1';
+const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_DAYS = 7;
+
 interface SectionGroupMeeting {
   days: string[];
   period: Period | undefined;
@@ -42,6 +49,42 @@ interface SectionGroup {
   meetings: SectionGroupMeeting[];
   sections: Section[];
 }
+
+const NormalizedStatSchema = z.object({
+  averageRating: z.number().nonnegative(),
+  averageDifficulty: z.number().nonnegative(),
+  averageWorkload: z.number().nonnegative(),
+  reviewCount: z.number().int().nonnegative(),
+});
+
+export interface NormalizedStat {
+  averageRating: number;
+  averageDifficulty: number;
+  averageWorkload: number;
+  reviewCount: number;
+}
+
+const RatingStatsResponseSchema = z.object({
+  courses: z.record(z.string(), NormalizedStatSchema.nullable()),
+  professors: z.record(z.string(), NormalizedStatSchema.nullable()),
+});
+
+export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;
+
+export const slugifyCourse = (courseId: string): string => {
+  const [subject, number] = courseId.split(' ');
+  if (!subject || !number) return courseId;
+  const cleanNumber = number.replace(/\D/g, '');
+  return `${subject} ${cleanNumber}`;
+};
+
+export const slugifyProfessor = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+};
 
 export default class Course {
   id: string;
@@ -75,6 +118,10 @@ export default class Course {
   termInfo: Record<string, string[]>;
 
   plannedCount: number | undefined;
+
+  ratings: NormalizedStat | null | undefined;
+
+  professorRatings: Record<string, NormalizedStat | null> | undefined;
 
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
@@ -124,6 +171,9 @@ export default class Course {
     };
     this.prereqs = prereqs;
     this.coreqs = coreqs;
+
+    this.ratings = undefined;
+    this.professorRatings = undefined;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)
@@ -331,6 +381,270 @@ export default class Course {
     }
 
     return this.decodeCourseCritiqueResponse(responseData);
+  }
+
+  async fetchRatings(): Promise<NormalizedStat | null> {
+    type ratingsCache = Record<string, ratingsCacheItem>;
+    interface ratingsCacheItem {
+      d: NormalizedStat | null;
+      exp: string;
+    }
+
+    // Try to look in the cache for a cached ratings item
+    try {
+      const rawCache = window.localStorage.getItem(
+        RATINGS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        const cache: ratingsCache = JSON.parse(
+          rawCache
+        ) as unknown as ratingsCache;
+        const cacheItem = cache[this.id];
+        if (cacheItem != null) {
+          const now = new Date().toISOString();
+          // Use lexicographic comparison on date strings
+          if (now < cacheItem.exp) {
+            console.log('using cached ratings for', this.id, cacheItem);
+            this.ratings = cacheItem.d;
+            return cacheItem.d;
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
+    // Fetch the ratings normally
+    const ratingsResponse = await this.fetchRatingsInner([this.id], []);
+    if (ratingsResponse === null) {
+      return null;
+    }
+
+    const exp = new Date();
+    exp.setDate(exp.getDate() + RATINGS_CACHE_EXPIRATION_DURATION_DAYS);
+    try {
+      let cache: ratingsCache = {};
+      const rawCache = window.localStorage.getItem(
+        RATINGS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        cache = JSON.parse(rawCache) as unknown as ratingsCache;
+      }
+      cache[this.id] = {
+        d: ratingsResponse.courses[this.id] ?? null,
+        exp: exp.toISOString(),
+      };
+      const rawUpdatedCache = JSON.stringify(cache);
+      window.localStorage.setItem(
+        RATINGS_CACHE_LOCAL_STORAGE_KEY,
+        rawUpdatedCache
+      );
+    } catch (err) {
+      // Ignore
+    }
+    const courseRating = ratingsResponse.courses[this.id] ?? null;
+    this.ratings = courseRating;
+
+    return courseRating;
+  }
+
+  private async fetchRatingsInner(
+    courses: string[],
+    professors: string[]
+  ): Promise<RatingStatsResponse | null> {
+    const normalizedCourses = courses.map((c) => slugifyCourse(c));
+    const normalizedProfessors = professors.map((p) => slugifyProfessor(p));
+
+    // TODO: update URL when deployed
+    const url = `http://localhost:5001/gt-scheduler-web-dev/us-east1/getRatingStats`;
+
+    let responseData: RatingStatsResponse;
+    try {
+      // Create the payload
+      const payload = {
+        courses: normalizedCourses.length > 0 ? normalizedCourses : undefined,
+        professors:
+          normalizedProfessors.length > 0 ? normalizedProfessors : undefined,
+      };
+
+      // Send as application/x-www-form-urlencoded with data nested inside
+      responseData = (
+        await axios.post<RatingStatsResponse>(
+          url,
+          `data=${encodeURIComponent(JSON.stringify(payload))}`,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        )
+      ).data;
+    } catch (err) {
+      // Ignore network errors
+      if (!isAxiosNetworkError(err)) {
+        console.log(err);
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching ratings from ratings API',
+            source: err,
+            fields: {
+              courses: normalizedCourses,
+              professors: normalizedProfessors,
+              url,
+            },
+          })
+        );
+      }
+
+      return null;
+    }
+
+    // Validate the response data
+    try {
+      const validatedResponse = RatingStatsResponseSchema.parse(responseData);
+
+      const validateStat = (stat: NormalizedStat | null): boolean => {
+        if (stat === null) return true;
+
+        return (
+          stat.averageRating >= 1 &&
+          stat.averageRating <= 5 &&
+          stat.averageDifficulty >= 1 &&
+          stat.averageDifficulty <= 5 &&
+          stat.averageWorkload >= 0 &&
+          stat.reviewCount >= 0
+        );
+      };
+
+      for (const stat of Object.values(validatedResponse.courses)) {
+        if (!validateStat(stat)) {
+          throw new Error('Invalid rating values in course stats');
+        }
+      }
+
+      for (const stat of Object.values(validatedResponse.professors)) {
+        if (!validateStat(stat)) {
+          throw new Error('Invalid rating values in professor stats');
+        }
+      }
+
+      return validatedResponse;
+    } catch (err) {
+      softError(
+        new ErrorWithFields({
+          message: 'error validating ratings API response',
+          source: err,
+          fields: {
+            courses: normalizedCourses,
+            professors: normalizedProfessors,
+          },
+        })
+      );
+      return null;
+    }
+  }
+
+  async fetchProfessorRatings(
+    term: string
+  ): Promise<Record<string, NormalizedStat | null>> {
+    type ProfessorRatingsCache = Record<string, ProfessorRatingsCacheItem>;
+    interface ProfessorRatingsCacheItem {
+      d: NormalizedStat | null;
+      exp: string;
+    }
+
+    // Get professors who taught in this term
+    const professorsInTerm = this.termInfo[term] ?? [];
+
+    if (professorsInTerm.length === 0) {
+      return {};
+    }
+
+    try {
+      const rawCache = window.localStorage.getItem(
+        PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        const cache: ProfessorRatingsCache = JSON.parse(
+          rawCache
+        ) as unknown as ProfessorRatingsCache;
+        const cacheItems = professorsInTerm.map((professor) => ({
+          name: professor,
+          item: cache[slugifyProfessor(professor)],
+        }));
+        const now = new Date().toISOString();
+        const allCached = cacheItems.every(
+          ({ item }) => item != null && now < item.exp
+        );
+        if (allCached) {
+          const result: Record<string, NormalizedStat | null> = {};
+          if (!this.professorRatings) {
+            this.professorRatings = {};
+          }
+          cacheItems.forEach(({ name, item }) => {
+            console.log('cached item', name, item);
+            this.professorRatings![name] = item?.d ?? null;
+            result[name] = item?.d ?? null;
+          });
+          return result;
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
+    // Fetch professor ratings normally
+    if (this.professorRatings === undefined) {
+      const allProfessors = Array.from(
+        new Set(Object.values(this.termInfo).flat())
+      );
+
+      const ratingsResponse = await this.fetchRatingsInner([], allProfessors);
+      if (ratingsResponse === null) {
+        this.professorRatings = {};
+        return {};
+      }
+
+      const exp = new Date();
+      exp.setDate(
+        exp.getDate() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_DAYS
+      );
+      try {
+        let cache: ProfessorRatingsCache = {};
+        const rawCache = window.localStorage.getItem(
+          PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
+        );
+        if (rawCache != null) {
+          cache = JSON.parse(rawCache) as unknown as ProfessorRatingsCache;
+        }
+        allProfessors.forEach((professor) => {
+          const slugifiedName = slugifyProfessor(professor);
+          cache[slugifiedName] = {
+            d: ratingsResponse.professors[slugifiedName] ?? null,
+            exp: exp.toISOString(),
+          };
+        });
+        const rawUpdatedCache = JSON.stringify(cache);
+        window.localStorage.setItem(
+          PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
+          rawUpdatedCache
+        );
+      } catch (err) {
+        // Ignore
+      }
+      this.professorRatings = ratingsResponse.professors;
+    }
+
+    const result: Record<string, NormalizedStat | null> = {};
+
+    professorsInTerm.forEach((professor) => {
+      const slugifiedName = slugifyProfessor(professor);
+      if (slugifiedName in this.professorRatings!) {
+        result[professor] = this.professorRatings![slugifiedName] ?? null;
+      }
+    });
+
+    return result;
   }
 
   private decodeCourseCritiqueResponse(
