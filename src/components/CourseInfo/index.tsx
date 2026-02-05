@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ScheduleContext } from '../../contexts';
-import { serializePrereqs } from '../../utils/misc';
-import { slugifyProfessor } from '../../data/beans/Course';
+import { serializePrereqs, slugify } from '../../utils/misc';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
@@ -16,8 +15,6 @@ export type CourseInfoProps = {
   courseId: string;
   enableTermSelect?: boolean;
 };
-
-// Need to create course info short and course info long
 
 export default function CourseInfo({
   courseId,
@@ -35,33 +32,16 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (course) {
-      course
-        .fetchGpa()
-        .then((gpaData) => {
+      Promise.all([course.fetchGpa(), course.fetchRatings()])
+        .then(([gpaData]) => {
           setGpaMap(gpaData);
           setIsLoaded(true);
-        })
-        .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'error fetching course gpa',
-              source: err,
-              fields: {
-                courseId,
-                term: course.term,
-              },
-            })
-          );
-        });
-      course
-        .fetchRatings()
-        .then(() => {
           setIsRatingsLoaded(true);
         })
         .catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'error fetching course ratings',
+              message: 'error fetching course data',
               source: err,
               fields: {
                 courseId,
@@ -149,43 +129,38 @@ export default function CourseInfo({
     }
   }, [selectedTermKey, course, courseId]);
 
-  const formatValue = (val: number, decimals: number): string =>
-    Number.isInteger(val) ? val.toString() : val.toFixed(decimals);
-
   const metrics = useMemo(() => {
+    const courseRatings = course?.ratings;
+    const courseGpa = gpaMap?.averageGpa;
+
     return [
       {
         label: 'Overall Rating',
         value: !isRatingsLoaded
-          ? 'Loading'
-          : course?.ratings
-          ? `${formatValue(course.ratings.averageRating, 2)}/5`
-          : '—',
+          ? 'Loading...'
+          : courseRatings
+          ? `${courseRatings.averageRating.toFixed(2)}/5`
+          : null,
       },
       {
         label: 'Course GPA',
-        value:
-          gpaMap === null
-            ? 'Loading...'
-            : gpaMap.averageGpa
-            ? formatValue(gpaMap.averageGpa, 2)
-            : '-',
+        value: gpaMap === null ? 'Loading...' : courseGpa?.toFixed(2) ?? null,
       },
       {
         label: 'Level of Difficulty',
         value: !isRatingsLoaded
-          ? 'Loading'
-          : course?.ratings
-          ? `${formatValue(course.ratings.averageDifficulty, 1)}/5`
-          : '—',
+          ? 'Loading...'
+          : courseRatings
+          ? `${courseRatings.averageDifficulty.toFixed(1)}/5`
+          : null,
       },
       {
         label: 'Workload',
         value: !isRatingsLoaded
-          ? 'Loading'
-          : course?.ratings
-          ? formatValue(course.ratings.averageWorkload, 1)
-          : '—',
+          ? 'Loading...'
+          : courseRatings
+          ? courseRatings.averageWorkload.toFixed(1)
+          : null,
         unit: 'hrs/week',
       },
     ];
@@ -197,65 +172,6 @@ export default function CourseInfo({
     const rawInstructors = course.termInfo?.[selectedTermKey] ?? [];
     return Array.from(new Set(rawInstructors));
   }, [course, selectedTermKey]);
-
-  const professorMetricsMap = useMemo(() => {
-    const metricsMap: Record<
-      string,
-      { label: string; value: string; unit?: string }[]
-    > = {};
-
-    instructorsForSelectedTerm.forEach((professorName) => {
-      const profGpa = gpaMap?.[professorName];
-      const slugifiedName = slugifyProfessor(professorName);
-
-      if (!isProfessorRatingsLoaded || !course?.professorRatings) {
-        metricsMap[slugifiedName] = [
-          { label: 'Overall Rating', value: '—' },
-          {
-            label: 'Course GPA',
-            value: profGpa ? formatValue(profGpa, 2) : '—',
-          },
-          { label: 'Level of Difficulty', value: '—' },
-          { label: 'Workload', value: '—', unit: 'hrs/week' },
-        ];
-      } else {
-        const profRating = course.professorRatings[slugifiedName];
-
-        metricsMap[slugifiedName] = [
-          {
-            label: 'Overall Rating',
-            value: profRating
-              ? `${formatValue(profRating.averageRating, 2)}/5`
-              : '—',
-          },
-          {
-            label: 'Course GPA',
-            value: profGpa ? formatValue(profGpa, 2) : '—',
-          },
-          {
-            label: 'Level of Difficulty',
-            value: profRating
-              ? `${formatValue(profRating.averageDifficulty, 1)}/5`
-              : '—',
-          },
-          {
-            label: 'Workload',
-            value: profRating
-              ? formatValue(profRating.averageWorkload, 1)
-              : '—',
-            unit: 'hrs/week',
-          },
-        ];
-      }
-    });
-
-    return metricsMap;
-  }, [
-    instructorsForSelectedTerm,
-    isProfessorRatingsLoaded,
-    course?.professorRatings,
-    gpaMap,
-  ]);
 
   if (!course) {
     return <div />;
@@ -328,14 +244,11 @@ export default function CourseInfo({
                   <ProfessorInfoCard
                     key={instructorName}
                     professorName={instructorName}
-                    professorMetrics={
-                      professorMetricsMap[slugifyProfessor(instructorName)] ?? [
-                        { label: 'Overall Rating', value: '—' },
-                        { label: 'Course GPA', value: '—' },
-                        { label: 'Level of Difficulty', value: '—' },
-                        { label: 'Workload', value: '—', unit: 'hrs/week' },
-                      ]
+                    professorGpa={gpaMap?.[instructorName] ?? null}
+                    professorRatings={
+                      course.professorRatings?.[slugify(instructorName)] ?? null
                     }
+                    isRatingsLoaded={isProfessorRatingsLoaded}
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
                   />

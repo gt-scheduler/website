@@ -20,7 +20,13 @@ import './stylesheet.scss';
 
 export type ProfessorInfoCardProps = {
   professorName: string;
-  professorMetrics: Metric[];
+  professorGpa: number | null;
+  professorRatings: {
+    averageRating: number;
+    averageDifficulty: number;
+    averageWorkload: number;
+  } | null;
+  isRatingsLoaded: boolean;
   course: Course;
   displaySectionInfo: boolean;
 };
@@ -115,7 +121,9 @@ function SectionRow({
 
 export default function ProfessorInfoCard({
   professorName,
-  professorMetrics,
+  professorGpa,
+  professorRatings,
+  isRatingsLoaded,
   course,
   displaySectionInfo,
 }: ProfessorInfoCardProps): React.ReactElement {
@@ -127,6 +135,40 @@ export default function ProfessorInfoCard({
   });
   const [{ pinnedCrns, desiredCourses, colorMap, palette }, { patchSchedule }] =
     useContext(ScheduleContext);
+
+  const professorMetrics: Metric[] = useMemo(() => {
+    return [
+      {
+        label: 'Overall Rating',
+        value: !isRatingsLoaded
+          ? 'Loading...'
+          : professorRatings
+          ? `${professorRatings.averageRating.toFixed(2)}/5`
+          : null,
+      },
+      {
+        label: 'Course GPA',
+        value: professorGpa === null ? 'Loading...' : professorGpa.toFixed(2),
+      },
+      {
+        label: 'Level of Difficulty',
+        value: !isRatingsLoaded
+          ? 'Loading...'
+          : professorRatings
+          ? `${professorRatings.averageDifficulty.toFixed(1)}/5`
+          : null,
+      },
+      {
+        label: 'Workload',
+        value: !isRatingsLoaded
+          ? 'Loading...'
+          : professorRatings
+          ? professorRatings.averageWorkload.toFixed(1)
+          : null,
+        unit: 'hrs/week',
+      },
+    ];
+  }, [isRatingsLoaded, professorRatings, professorGpa]);
 
   const handleAddSection = (section: Section): void => {
     const updates: Partial<Schedule> = {

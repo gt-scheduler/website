@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { decode } from 'html-entities';
-import { z } from 'zod';
 
 import { Oscar, Section } from '.';
 import {
@@ -15,6 +14,11 @@ import {
   isLab,
   isLecture,
   isAxiosNetworkError,
+  NormalizedStat,
+  RatingStatsResponse,
+  slugify,
+  normalizeCourseName,
+  validateRatingStatsResponse,
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
@@ -30,11 +34,16 @@ const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCou
 const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
+// Cache for course-level rating statistics
 const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
 const RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
 
+// Cache for professor-level rating statistics
 const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY = 'professor-ratings-cache-1';
 const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
+
+// TODO: update URL when deployed
+const DEV_GET_RATING_URL = `http://localhost:5001/gt-scheduler-web-dev/us-east1/getRatingStats`;
 
 interface SectionGroupMeeting {
   days: string[];
@@ -49,42 +58,6 @@ interface SectionGroup {
   meetings: SectionGroupMeeting[];
   sections: Section[];
 }
-
-const NormalizedStatSchema = z.object({
-  averageRating: z.number().nonnegative(),
-  averageDifficulty: z.number().nonnegative(),
-  averageWorkload: z.number().nonnegative(),
-  reviewCount: z.number().int().nonnegative(),
-});
-
-export interface NormalizedStat {
-  averageRating: number;
-  averageDifficulty: number;
-  averageWorkload: number;
-  reviewCount: number;
-}
-
-const RatingStatsResponseSchema = z.object({
-  courses: z.record(z.string(), NormalizedStatSchema.nullable()),
-  professors: z.record(z.string(), NormalizedStatSchema.nullable()),
-});
-
-export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;
-
-export const slugifyCourse = (courseId: string): string => {
-  const [subject, number] = courseId.split(' ');
-  if (!subject || !number) return courseId;
-  const cleanNumber = number.replace(/\D/g, '');
-  return `${subject} ${cleanNumber}`;
-};
-
-export const slugifyProfessor = (name: string): string => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
-};
 
 export default class Course {
   id: string;
@@ -452,11 +425,8 @@ export default class Course {
     courses: string[],
     professors: string[]
   ): Promise<RatingStatsResponse | null> {
-    const normalizedCourses = courses.map((c) => slugifyCourse(c));
-    const normalizedProfessors = professors.map((p) => slugifyProfessor(p));
-
-    // TODO: update URL when deployed
-    const url = `http://localhost:5001/gt-scheduler-web-dev/us-east1/getRatingStats`;
+    const normalizedCourses = courses.map((c) => normalizeCourseName(c));
+    const normalizedProfessors = professors.map((p) => slugify(p));
 
     let responseData: RatingStatsResponse;
     try {
@@ -468,7 +438,7 @@ export default class Course {
 
       responseData = (
         await axios.post<RatingStatsResponse>(
-          url,
+          DEV_GET_RATING_URL,
           `data=${encodeURIComponent(JSON.stringify(payload))}`,
           {
             headers: {
@@ -487,7 +457,7 @@ export default class Course {
             fields: {
               courses: normalizedCourses,
               professors: normalizedProfessors,
-              url,
+              DEV_GET_RATING_URL,
             },
           })
         );
@@ -496,41 +466,14 @@ export default class Course {
       return null;
     }
 
-    // Validate the response data
-    try {
-      const validatedResponse = RatingStatsResponseSchema.parse(responseData);
+    // Validate the response data using reusable function
+    const validatedResponse = validateRatingStatsResponse(responseData);
 
-      const validateStat = (stat: NormalizedStat | null): boolean => {
-        if (stat === null) return true;
-
-        return (
-          stat.averageRating >= 1 &&
-          stat.averageRating <= 5 &&
-          stat.averageDifficulty >= 1 &&
-          stat.averageDifficulty <= 5 &&
-          stat.averageWorkload >= 0 &&
-          stat.reviewCount >= 0
-        );
-      };
-
-      for (const stat of Object.values(validatedResponse.courses)) {
-        if (!validateStat(stat)) {
-          throw new Error('Invalid rating values in course stats');
-        }
-      }
-
-      for (const stat of Object.values(validatedResponse.professors)) {
-        if (!validateStat(stat)) {
-          throw new Error('Invalid rating values in professor stats');
-        }
-      }
-
-      return validatedResponse;
-    } catch (err) {
+    if (validatedResponse === null) {
       softError(
         new ErrorWithFields({
           message: 'error validating ratings API response',
-          source: err,
+          source: new Error('Validation failed'),
           fields: {
             courses: normalizedCourses,
             professors: normalizedProfessors,
@@ -539,6 +482,8 @@ export default class Course {
       );
       return null;
     }
+
+    return validatedResponse;
   }
 
   async fetchProfessorRatings(
@@ -552,94 +497,89 @@ export default class Course {
 
     // Get professors who taught in this term
     const professorsInTerm = this.termInfo[term] ?? [];
-
     if (professorsInTerm.length === 0) {
       return {};
     }
+    if (!this.professorRatings) {
+      this.professorRatings = {};
+    }
 
+    const { professorRatings } = this;
+    const now = new Date().toISOString();
+    const professorsToFetch: string[] = [];
+    const cachedResults: Record<string, NormalizedStat | null> = {};
+
+    let cache: ProfessorRatingsCache = {};
     try {
       const rawCache = window.localStorage.getItem(
         PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
       );
       if (rawCache != null) {
-        const cache: ProfessorRatingsCache = JSON.parse(
-          rawCache
-        ) as unknown as ProfessorRatingsCache;
-        const cacheItems = professorsInTerm.map((professor) => ({
-          name: professor,
-          item: cache[slugifyProfessor(professor)],
-        }));
-        const now = new Date().toISOString();
-        const allCached = cacheItems.every(
-          ({ item }) => item != null && now < item.exp
-        );
-        if (allCached) {
-          const result: Record<string, NormalizedStat | null> = {};
-          if (!this.professorRatings) {
-            this.professorRatings = {};
-          }
-          cacheItems.forEach(({ name, item }) => {
-            const slugifiedName = slugifyProfessor(name);
-            if (this.professorRatings) {
-              this.professorRatings[slugifiedName] = item?.d ?? null;
-            }
-            result[slugifiedName] = item?.d ?? null;
-          });
-          return result;
-        }
+        cache = JSON.parse(rawCache) as unknown as ProfessorRatingsCache;
       }
     } catch (err) {
-      // Ignore
+      // Ignore cache read errors
     }
 
-    if (this.professorRatings === undefined) {
-      const allProfessors = Array.from(
-        new Set(Object.values(this.termInfo).flat())
-      );
+    professorsInTerm.forEach((professor) => {
+      const slugifiedName = slugify(professor);
 
-      const ratingsResponse = await this.fetchRatingsInner([], allProfessors);
-      if (ratingsResponse === null) {
-        this.professorRatings = {};
-        return {};
+      if (slugifiedName in professorRatings) {
+        cachedResults[slugifiedName] = professorRatings[slugifiedName] ?? null;
+        return;
       }
 
-      const exp = new Date();
-      exp.setMinutes(
-        exp.getMinutes() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
+      const cacheItem = cache[slugifiedName];
+      if (cacheItem != null && now < cacheItem.exp) {
+        cachedResults[slugifiedName] = cacheItem.d;
+        professorRatings[slugifiedName] = cacheItem.d;
+      } else {
+        professorsToFetch.push(professor);
+      }
+    });
+
+    // Fetch only missing/expired professors
+    if (professorsToFetch.length > 0) {
+      const ratingsResponse = await this.fetchRatingsInner(
+        [],
+        professorsToFetch
       );
-      try {
-        let cache: ProfessorRatingsCache = {};
-        const rawCache = window.localStorage.getItem(
-          PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
+
+      if (ratingsResponse !== null) {
+        const exp = new Date();
+        exp.setMinutes(
+          exp.getMinutes() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
         );
-        if (rawCache != null) {
-          cache = JSON.parse(rawCache) as unknown as ProfessorRatingsCache;
+
+        // Merge results
+        try {
+          professorsToFetch.forEach((professor) => {
+            const slugifiedName = slugify(professor);
+            const rating = ratingsResponse.professors[slugifiedName] ?? null;
+
+            professorRatings[slugifiedName] = rating;
+            cache[slugifiedName] = {
+              d: rating,
+              exp: exp.toISOString(),
+            };
+            cachedResults[slugifiedName] = rating;
+          });
+
+          const rawUpdatedCache = JSON.stringify(cache);
+          window.localStorage.setItem(
+            PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
+            rawUpdatedCache
+          );
+        } catch (err) {
+          // Ignore cache write errors
         }
-        allProfessors.forEach((professor) => {
-          const slugifiedName = slugifyProfessor(professor);
-          cache[slugifiedName] = {
-            d: ratingsResponse.professors[slugifiedName] ?? null,
-            exp: exp.toISOString(),
-          };
-        });
-        const rawUpdatedCache = JSON.stringify(cache);
-        window.localStorage.setItem(
-          PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
-          rawUpdatedCache
-        );
-      } catch (err) {
-        // Ignore
       }
-      this.professorRatings = ratingsResponse.professors;
     }
 
     const result: Record<string, NormalizedStat | null> = {};
-
     professorsInTerm.forEach((professor) => {
-      const slugifiedName = slugifyProfessor(professor);
-      if (this.professorRatings && slugifiedName in this.professorRatings) {
-        result[slugifiedName] = this.professorRatings[slugifiedName] ?? null;
-      }
+      const slugifiedName = slugify(professor);
+      result[slugifiedName] = cachedResults[slugifiedName] ?? null;
     });
 
     return result;
