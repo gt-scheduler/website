@@ -142,3 +142,8 @@
   gap: 14px;
   flex-wrap: wrap;
 }
+
+.mobile .course-title-container {
+  flex-direction: column;
+  gap: 4px;
+}
