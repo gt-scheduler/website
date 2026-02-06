@@ -32,16 +32,33 @@ export default function CourseInfo({
 
   useEffect(() => {
     if (course) {
-      Promise.all([course.fetchGpa(), course.fetchRatings()])
-        .then(([gpaData]) => {
+      course
+        .fetchGpa()
+        .then((gpaData) => {
           setGpaMap(gpaData);
           setIsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching course gpa',
+              source: err,
+              fields: {
+                courseId,
+                term: course.term,
+              },
+            })
+          );
+        });
+      course
+        .fetchRatings()
+        .then(() => {
           setIsRatingsLoaded(true);
         })
         .catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'error fetching course data',
+              message: 'error fetching course ratings',
               source: err,
               fields: {
                 courseId,
