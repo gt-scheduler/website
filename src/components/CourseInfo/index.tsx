@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ScheduleContext } from '../../contexts';
 import { serializePrereqs } from '../../utils/misc';
@@ -8,19 +10,23 @@ import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
 import { getSemesterName } from '../../utils/semesters';
 import ProfessorInfoCard from '../ProfessorInfoCard';
+import Button from '../Button';
 
 import './stylesheet.scss';
 
 export type CourseInfoProps = {
   courseId: string;
   enableTermSelect?: boolean;
+  isModal?: boolean;
+  onHide?: () => void;
 };
 
 // Need to create course info short and course info long
-
 export default function CourseInfo({
   courseId,
   enableTermSelect = false,
+  isModal = false,
+  onHide,
 }: CourseInfoProps): React.ReactElement {
   const [{ oscar, term }] = useContext(ScheduleContext);
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
@@ -138,18 +144,38 @@ export default function CourseInfo({
   return (
     <div className="course-info-container">
       <div className="course-info-content">
-        <div className="course-header">
-          <div className="course-title-container">
-            <div className="course-id">{courseId}</div>
-            <div className="course-title">{course.title}</div>
+        {isModal && onHide && (
+          <div className="course-header-container-modal">
+            <div className="course-header-modal">
+              <div className="course-title-container">
+                <div className="course-id">{courseId}</div>
+                <div className="course-title">{course.title}</div>
+              </div>
+              <div className="course-credits">
+                {credits !== undefined
+                  ? `${credits} Credit${credits !== 1 ? 's' : ''}`
+                  : 'N/A'}
+              </div>
+            </div>
+            <Button className="cancel-button" onClick={(): void => onHide()}>
+              <FontAwesomeIcon icon={faXmark} size="lg" />
+            </Button>
           </div>
+        )}
+        {!isModal && (
+          <div className="course-header">
+            <div className="course-title-container">
+              <div className="course-id">{courseId}</div>
+              <div className="course-title">{course.title}</div>
+            </div>
 
-          {credits !== undefined && (
-            <div className="course-credits">{`${credits} Credit${
-              credits !== 1 ? 's' : ''
-            }`}</div>
-          )}
-        </div>
+            {credits !== undefined && (
+              <div className="course-credits">{`${credits} Credit${
+                credits !== 1 ? 's' : ''
+              }`}</div>
+            )}
+          </div>
+        )}
         <div className="course-metrics">
           <MetricsCard metrics={metrics} />
         </div>
