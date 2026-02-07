@@ -36,12 +36,12 @@ function CourseHeader({
   isModal = false,
   onHide,
 }: CourseHeaderProps): React.ReactElement {
-  const creditsLabel =
+  const creditText =
     credits !== undefined
       ? `${credits} Credit${credits !== 1 ? 's' : ''}`
       : 'N/A';
 
-  if (isModal && onHide) {
+  if (isModal) {
     return (
       <div className="course-header-container-modal">
         <div className="course-header-modal">
@@ -49,11 +49,13 @@ function CourseHeader({
             <div className="course-id">{courseId}</div>
             <div className="course-title">{title}</div>
           </div>
-          <div className="course-credits">{creditsLabel}</div>
+          <div className="course-credits">{creditText}</div>
         </div>
-        <Button className="cancel-button" onClick={onHide}>
-          <FontAwesomeIcon icon={faXmark} size="lg" />
-        </Button>
+        {onHide && (
+          <Button className="cancel-button" onClick={onHide}>
+            <FontAwesomeIcon icon={faXmark} size="lg" />
+          </Button>
+        )}
       </div>
     );
   }
@@ -65,7 +67,7 @@ function CourseHeader({
         <div className="course-title">{title}</div>
       </div>
       {credits !== undefined && (
-        <div className="course-credits">{creditsLabel}</div>
+        <div className="course-credits">{creditText}</div>
       )}
     </div>
   );
