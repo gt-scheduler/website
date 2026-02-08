@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ScheduleContext } from '../../contexts';
-import { serializePrereqs } from '../../utils/misc';
-import { CrawlerPrerequisites } from '../../types';
+import { serializePrereqs, slugify } from '../../utils/misc';
+import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
 import { ErrorWithFields, softError } from '../../log';
@@ -16,8 +16,6 @@ export type CourseInfoProps = {
   enableTermSelect?: boolean;
 };
 
-// Need to create course info short and course info long
-
 export default function CourseInfo({
   courseId,
   enableTermSelect = false,
@@ -26,19 +24,41 @@ export default function CourseInfo({
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isRatingsLoaded, setIsRatingsLoaded] = useState(false);
+  const [isProfessorRatingsLoaded, setIsProfessorRatingsLoaded] =
+    useState(false);
   const [selectedTermKey, setSelectedTermKey] = useState<string | null>(null);
+  const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
 
   useEffect(() => {
     if (course) {
       course
         .fetchGpa()
-        .then(() => {
+        .then((gpaData) => {
+          setGpaMap(gpaData);
           setIsLoaded(true);
         })
         .catch((err) => {
           softError(
             new ErrorWithFields({
-              message: 'error fetching course GPA',
+              message: 'error fetching course gpa',
+              source: err,
+              fields: {
+                courseId,
+                term: course.term,
+              },
+            })
+          );
+        });
+      course
+        .fetchRatings()
+        .then(() => {
+          setIsRatingsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching course ratings',
               source: err,
               fields: {
                 courseId,
@@ -102,7 +122,66 @@ export default function CourseInfo({
         );
       }
     }
-  }, [enableTermSelect, offeredTerms, selectedTermKey]);
+  }, [enableTermSelect, course, offeredTerms, selectedTermKey]);
+
+  useEffect(() => {
+    if (selectedTermKey && course) {
+      course
+        .fetchProfessorRatings(selectedTermKey)
+        .then(() => {
+          setIsProfessorRatingsLoaded(true);
+        })
+        .catch((err) => {
+          softError(
+            new ErrorWithFields({
+              message: 'error fetching professor ratings',
+              source: err,
+              fields: {
+                courseId,
+                term: course.term,
+              },
+            })
+          );
+        });
+    }
+  }, [selectedTermKey, course, courseId]);
+
+  const metrics = useMemo(() => {
+    const courseRatings = course?.ratings;
+    const courseGpa = gpaMap?.averageGpa;
+
+    return [
+      {
+        label: 'Overall Rating',
+        value: !isRatingsLoaded
+          ? 'Loading...'
+          : courseRatings
+          ? `${courseRatings.averageRating.toFixed(2)}/5`
+          : null,
+      },
+      {
+        label: 'Course GPA',
+        value: gpaMap === null ? 'Loading...' : courseGpa?.toFixed(2) ?? null,
+      },
+      {
+        label: 'Level of Difficulty',
+        value: !isRatingsLoaded
+          ? 'Loading...'
+          : courseRatings
+          ? `${courseRatings.averageDifficulty.toFixed(1)}/5`
+          : null,
+      },
+      {
+        label: 'Workload',
+        value: !isRatingsLoaded
+          ? 'Loading...'
+          : courseRatings
+          ? courseRatings.averageWorkload.toFixed(1)
+          : null,
+        unit: 'hrs/week',
+      },
+    ];
+  }, [isRatingsLoaded, course?.ratings, gpaMap]);
 
   const instructorsForSelectedTerm = useMemo(() => {
     if (!course || !selectedTermKey) return [];
@@ -114,26 +193,6 @@ export default function CourseInfo({
   if (!course) {
     return <div />;
   }
-
-  const metrics = [
-    {
-      label: 'Overall Rating',
-      value: '3.91/5',
-    },
-    {
-      label: 'Course GPA',
-      value: '3.91',
-    },
-    {
-      label: 'Level of Difficulty',
-      value: '3.4/5',
-    },
-    {
-      label: 'Workload',
-      value: '14.5',
-      unit: 'hrs/week',
-    },
-  ];
 
   return (
     <div className="course-info-container">
@@ -202,7 +261,11 @@ export default function CourseInfo({
                   <ProfessorInfoCard
                     key={instructorName}
                     professorName={instructorName}
-                    professorMetrics={metrics}
+                    professorGpa={gpaMap?.[instructorName] ?? null}
+                    professorRatings={
+                      course.professorRatings?.[slugify(instructorName)] ?? null
+                    }
+                    isRatingsLoaded={isProfessorRatingsLoaded}
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
                   />

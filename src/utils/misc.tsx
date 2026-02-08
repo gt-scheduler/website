@@ -5,6 +5,7 @@ import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import { Immutable } from 'immer';
+import { z } from 'zod';
 
 import { Oscar, Section } from '../data/beans';
 import {
@@ -571,12 +572,16 @@ export function abbreviateLocation(location: string): string {
 
 // Normalize Course Names
 // e.g. "cs1331" -> "CS 1331", "MATH 1551" -> "MATH 1551"
-export function normalizeCourseName(courseName: string): string {
+export function normalizeCourseName(
+  courseName: string,
+  trimSection = false
+): string {
   let normalizedName = courseName;
   const results = /^([A-Z]+)(\d.*)$/i.exec(courseName);
   if (results != null) {
     const [, subject, number] = results as unknown as [string, string, string];
-    normalizedName = `${subject} ${number}`;
+    const cleanNumber = trimSection ? number.replace(/\D/g, '') : number;
+    normalizedName = `${subject} ${cleanNumber}`;
   }
   return normalizedName;
 }
@@ -598,4 +603,77 @@ export function normalizeSeatingData(raw: Seating): SeatData {
     inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
     waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
   };
+}
+
+const NormalizedStatSchema = z.object({
+  averageRating: z.number().nonnegative(),
+  averageDifficulty: z.number().nonnegative(),
+  averageWorkload: z.number().nonnegative(),
+  reviewCount: z.number().int().nonnegative(),
+});
+
+export interface NormalizedStat {
+  averageRating: number;
+  averageDifficulty: number;
+  averageWorkload: number;
+  reviewCount: number;
+}
+
+const RatingStatsResponseSchema = z.object({
+  courses: z.record(z.string(), NormalizedStatSchema.nullable()),
+  professors: z.record(z.string(), NormalizedStatSchema.nullable()),
+});
+
+export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;
+
+export const slugify = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+};
+
+/**
+ * Validates rating statistics from the ratings API response
+ * @param response - The rating stats response to validate
+ * @returns The validated response or null if validation fails
+ */
+export function validateRatingStatsResponse(
+  response: unknown
+): RatingStatsResponse | null {
+  try {
+    const validatedResponse = RatingStatsResponseSchema.parse(response);
+
+    const validateStat = (stat: NormalizedStat | null): boolean => {
+      if (stat === null) return true;
+
+      return (
+        stat.averageRating >= 1 &&
+        stat.averageRating <= 5 &&
+        stat.averageDifficulty >= 1 &&
+        stat.averageDifficulty <= 5 &&
+        stat.averageWorkload >= 0 &&
+        stat.reviewCount >= 0
+      );
+    };
+
+    // Validate all course stats
+    for (const stat of Object.values(validatedResponse.courses)) {
+      if (!validateStat(stat)) {
+        throw new Error('Invalid rating values in course stats');
+      }
+    }
+
+    // Validate all professor stats
+    for (const stat of Object.values(validatedResponse.professors)) {
+      if (!validateStat(stat)) {
+        throw new Error('Invalid rating values in professor stats');
+      }
+    }
+
+    return validatedResponse;
+  } catch (err) {
+    return null;
+  }
 }
