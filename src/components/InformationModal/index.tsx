@@ -126,7 +126,7 @@ export default function InformationModal(): React.ReactElement {
           label: 'Donate Today',
           onClick: (): void => {
             setShow(false);
-            window.open(DONATE_LINK);
+            window.open(DONATE_LINK, '_blank', 'noopener,noreferrer');
           },
         },
       ]}
