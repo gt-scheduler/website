@@ -5,7 +5,6 @@ import { getSanitizedOptions } from 'exponential-backoff/dist/options';
 import domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import { Immutable } from 'immer';
-import { z } from 'zod';
 
 import { Oscar, Section } from '../data/beans';
 import {
@@ -31,6 +30,11 @@ import {
 import ics from '../vendor/ics';
 import { getSemesterName } from './semesters';
 import { Seating } from '../data/beans/Section';
+import {
+  NormalizedStat,
+  RatingStatsResponse,
+  RatingStatsResponseSchema,
+} from '../data/types';
 
 /* Converts a string of the form "930" to 750. strings of the
   mentioned format are returned by crawler v2 */
@@ -604,27 +608,6 @@ export function normalizeSeatingData(raw: Seating): SeatData {
     waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
   };
 }
-
-const NormalizedStatSchema = z.object({
-  averageRating: z.number().nonnegative(),
-  averageDifficulty: z.number().nonnegative(),
-  averageWorkload: z.number().nonnegative(),
-  reviewCount: z.number().int().nonnegative(),
-});
-
-export interface NormalizedStat {
-  averageRating: number;
-  averageDifficulty: number;
-  averageWorkload: number;
-  reviewCount: number;
-}
-
-const RatingStatsResponseSchema = z.object({
-  courses: z.record(z.string(), NormalizedStatSchema.nullable()),
-  professors: z.record(z.string(), NormalizedStatSchema.nullable()),
-});
-
-export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;
 
 export const slugify = (name: string): string => {
   return name

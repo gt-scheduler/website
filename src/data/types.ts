@@ -1,4 +1,5 @@
 import { castImmutable, Immutable } from 'immer';
+import { z } from 'zod';
 
 import { Event, Palette } from '../types';
 import { generateRandomId } from '../utils/misc';
@@ -228,3 +229,24 @@ export type PlannedCountsData = {
   courseCounts: Record<string, number>;
   sectionCounts: Record<string, number>;
 };
+
+const NormalizedStatSchema = z.object({
+  averageRating: z.number().nonnegative(),
+  averageDifficulty: z.number().nonnegative(),
+  averageWorkload: z.number().nonnegative(),
+  reviewCount: z.number().int().nonnegative(),
+});
+
+export interface NormalizedStat {
+  averageRating: number;
+  averageDifficulty: number;
+  averageWorkload: number;
+  reviewCount: number;
+}
+
+export const RatingStatsResponseSchema = z.object({
+  courses: z.record(z.string(), NormalizedStatSchema.nullable()),
+  professors: z.record(z.string(), NormalizedStatSchema.nullable()),
+});
+
+export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;

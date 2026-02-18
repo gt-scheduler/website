@@ -14,8 +14,6 @@ import {
   isLab,
   isLecture,
   isAxiosNetworkError,
-  NormalizedStat,
-  RatingStatsResponse,
   slugify,
   normalizeCourseName,
   validateRatingStatsResponse,
@@ -23,6 +21,7 @@ import {
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import { getTermFromSemesterName } from '../../utils/semesters';
+import { NormalizedStat, RatingStatsResponse } from '../types';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
