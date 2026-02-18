@@ -11,7 +11,7 @@ import { ErrorWithFields, softError } from '../log';
  * @returns Whether the CSS media query is matched
  */
 export default function useMedia(query: string): boolean {
-  const [matches, setMatches] = useState(() => {
+  const [matches, setMatches] = useState<boolean>(() => {
     try {
       return window.matchMedia(query).matches;
     } catch (error) {
