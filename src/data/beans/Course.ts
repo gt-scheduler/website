@@ -376,7 +376,9 @@ export default class Course {
         if (cacheItem != null) {
           const now = new Date().toISOString();
           if (now < cacheItem.exp) {
-            this.ratings = cacheItem.d;
+            if (cacheItem.d) {
+              this.ratings = cacheItem.d;
+            }
             return cacheItem.d;
           }
         }

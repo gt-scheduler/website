@@ -1,0 +1,143 @@
+@import '../../variables';
+
+.scroller {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.ratings-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+
+  .sub-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #515151;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+
+      .progress {
+        height: 100%;
+        width: 0%;
+        background: #fff;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+      }
+    }
+
+    .section-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: $theme-dark-card-background;
+      border-radius: 8px;
+      padding: 2rem;
+      width: 100%;
+      box-sizing: border-box;
+
+      h3 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 600;
+      }
+
+      p {
+        color: #ccc;
+        margin: 0;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      margin-top: 1rem;
+      justify-content: center;
+      align-content: center;
+      text-align: center;
+      gap: 1rem;
+    }
+
+      .start-button,
+      .next-button {
+        height: 41px;
+        border: none;
+        border-radius: 10px;
+        background: #c56e5b;
+        align-self: center;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+          background: #e2944b;
+        }
+      }
+
+      .skip-button {
+        color: #66b3ff;
+        background: none;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+    .start-button {
+      width: 247px;
+    }
+
+    .next-button {
+      width: 177px;
+    }
+  }
+
+  .done-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+
+    .done-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      gap: 8px;
+
+      .done {
+        font-size: 27px;
+      }
+      .thank-you {
+        font-size: 18px;
+      }
+    }
+
+    .done-image {
+      max-width: 200px;
+      height: auto;
+    }
+  }
+}

@@ -1,0 +1,81 @@
+@import '../../variables';
+
+.course-rating-entry {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 2rem;
+  background: $theme-dark-card-background;
+  border-radius: 10px;
+  gap: 1rem;
+  font-size: 16px;
+  width: 800px;
+
+  .delete-button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .course-info {
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    gap: 1rem;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    width: 90%;
+
+    .label {
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-right: 10px;
+    }
+
+    .value {
+      background: #515151;
+      height: 2rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 0.75rem;
+      flex: 1;
+
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      &.section {
+        flex: 0 0 140px;
+        margin-right: 20px;
+      }
+    }
+
+    .section-dropdown {
+      margin-right: 20px;
+      width: 140px;
+    }
+
+    .course-dropdown {
+      display: flex;
+      flex: 1;
+    }
+
+    .label.instructor {
+      margin-right: 10px;
+      cursor: default;
+    }
+  }
+}

@@ -1,0 +1,48 @@
+.course-rating-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  width: 100%;
+  gap: 2rem;
+  max-height: 75vh;
+  overflow: hidden;
+
+  .add-course-warning {
+    color: #ff4c4c;
+    font-size: 16px;
+  }
+
+  .card-header {
+    display: flex;
+    text-align: start;
+    font-weight: bold;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .entries-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding-right: 0.5rem;
+  }
+
+  .add-course {
+    color: #66b3ff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    align-self: flex-start;
+    flex-shrink: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}
