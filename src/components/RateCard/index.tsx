@@ -15,6 +15,7 @@ type RateCardProps = {
   section: string;
   instructor: string;
   onChange: (data: Partial<SubmitMetricsRequestData>) => void;
+  initialData?: Partial<SubmitMetricsRequestData>;
 };
 
 export default function RateCard({
@@ -22,12 +23,21 @@ export default function RateCard({
   section,
   instructor,
   onChange,
+  initialData,
 }: RateCardProps): React.ReactElement {
-  const [overallRating, setOverallRating] = useState<StarsValue>(null);
-  const [levelOfDifficulty, setLevelOfDifficulty] = useState<StarsValue>(null);
-  const [workload, setWorkload] = useState<TimeValue>({
-    hours: null,
-    minutes: null,
+  const [overallRating, setOverallRating] = useState<StarsValue>(
+    (initialData?.values?.[0] as StarsValue) ?? null
+  );
+  const [levelOfDifficulty, setLevelOfDifficulty] = useState<StarsValue>(
+    (initialData?.values?.[1] as StarsValue) ?? null
+  );
+  const [workload, setWorkload] = useState<TimeValue>(() => {
+    const totalMinutes = initialData?.values?.[2];
+    if (totalMinutes == null) return { hours: null, minutes: null };
+    return {
+      hours: Math.floor(totalMinutes / 60),
+      minutes: totalMinutes % 60,
+    };
   });
 
   function buildData(

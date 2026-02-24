@@ -21,7 +21,7 @@ import {
 } from '../App/navigation';
 import CourseDetails from '../CourseDetails';
 import SectionDetails from '../SectionDetails';
-import { AccountContext } from '../../contexts';
+import { AccountContext, ScheduleContext } from '../../contexts';
 
 type ScheduleContainerProps = {
   overlayCrns: string[];
@@ -53,10 +53,14 @@ export default function ScheduleContainer({
   overlaySchedules,
   mobile,
 }: ScheduleContainerProps): React.ReactElement {
-  const { currentSchedulerPage, setCurrentSchedulerPage } =
+  const { currentSchedulerPage, setTab, setCurrentSchedulerPage } =
     useContext(AppNavigationContext);
-
   const { type } = useContext(AccountContext);
+  const [{ term }] = useContext(ScheduleContext);
+
+  const hasSubmitted = useMemo(() => {
+    return localStorage.getItem(`ratings_submitted_${term}`) === 'true';
+  }, [term]);
 
   // We don't use the view-mode tab bar on mobile, we display in the nav menu.
   // Weird when user goes from a mobile to web view while on the scheduler page
@@ -128,10 +132,10 @@ export default function ScheduleContainer({
             />
           </div>
 
-          {type === 'signedIn' && (
+          {type === 'signedIn' && !hasSubmitted && (
             <Button
               className="rate-button"
-              href={`${window.location.origin}${window.location.pathname}#/ratings`}
+              onClick={(): void => setTab('Ratings')}
             >
               <FontAwesomeIcon fixedWidth icon={faStarHalfStroke} />
               <div className="rate-button-label">Rate my courses</div>

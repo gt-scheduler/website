@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -28,6 +28,7 @@ import { Term, Palette } from '../../types';
 import Toast, { notifyToast } from '../Toast';
 
 import './stylesheet.scss';
+import { AppNavigationContext } from '../App/navigation';
 
 type VersionState =
   | { type: 'loading' }
@@ -113,7 +114,7 @@ export default function HeaderDisplay({
   // (small mobile is < 600 px wide)
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
 
-  const navigate = useNavigate();
+  const { setTab } = useContext(AppNavigationContext);
 
   useEffect(() => {
     if (termsState.type === 'loaded' && !skeleton) {
@@ -130,7 +131,7 @@ export default function HeaderDisplay({
   if (minimal) {
     return (
       <div className="Header">
-        <div className="logo" onClick={(): void => navigate('/')}>
+        <div className="logo" onClick={(): void => setTab('Scheduler')}>
           <span className="gt">GT </span>
           <span className="scheduler">Scheduler</span>
         </div>

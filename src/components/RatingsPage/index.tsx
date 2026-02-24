@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ScheduleContext } from '../../contexts/schedule';
 import Section from '../../data/beans/Section';
@@ -8,6 +8,14 @@ import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
 import { MetricName, SubmitMetricsRequestData } from '../../data/types';
 
 import './stylesheet.scss';
+
+const RATINGS_STORAGE_KEY = 'gt_scheduler_ratings_state';
+
+interface PersistedRatingsState {
+  selectedCrns: string[];
+  currentIndex: number;
+  collectedMetrics: (Partial<SubmitMetricsRequestData> | undefined)[];
+}
 
 export default function RatingsPage(): React.ReactElement {
   const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
@@ -49,6 +57,46 @@ export default function RatingsPage(): React.ReactElement {
   });
 
   const [showEmptyWarning, setShowEmptyWarning] = useState(false);
+
+  const [{ term }] = useContext(ScheduleContext);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(RATINGS_STORAGE_KEY);
+    if (saved) {
+      try {
+        const {
+          selectedCrns,
+          currentIndex: savedIndex,
+          collectedMetrics: savedMetrics,
+        } = JSON.parse(saved) as PersistedRatingsState;
+
+        const reconstructedSections = selectedCrns
+          .map((crn) => oscar.crnMap[crn])
+          .filter((s): s is Section => s instanceof Section);
+
+        if (reconstructedSections.length > 0) {
+          setSelectedSections(reconstructedSections);
+          setUnselectedSections(
+            allSections.filter((s) => !selectedCrns.includes(s.crn))
+          );
+          setCurrentIndex(savedIndex);
+          setCollectedMetrics(savedMetrics);
+        }
+      } catch (e) {
+        console.error('Failed to load persisted ratings', e);
+        localStorage.removeItem(RATINGS_STORAGE_KEY);
+      }
+    }
+  }, [oscar.crnMap, allSections]);
+
+  useEffect(() => {
+    const stateToSave: PersistedRatingsState = {
+      selectedCrns: selectedSections.map((s) => s.crn),
+      currentIndex,
+      collectedMetrics,
+    };
+    localStorage.setItem(RATINGS_STORAGE_KEY, JSON.stringify(stateToSave));
+  }, [selectedSections, currentIndex, collectedMetrics]);
 
   useSubmitMetrics({
     requestData: submitData as SubmitMetricsRequestData,
@@ -107,6 +155,9 @@ export default function RatingsPage(): React.ReactElement {
     };
     setSubmitData(merged);
     setCurrentIndex((prev) => prev + 1);
+
+    localStorage.removeItem(RATINGS_STORAGE_KEY);
+    localStorage.setItem(`ratings_submitted_${term}`, 'true');
   };
 
   const progress =
@@ -156,6 +207,7 @@ export default function RatingsPage(): React.ReactElement {
               section={activeSectionLabel}
               instructor={activeInstructorLabel}
               onChange={handleRateChange}
+              initialData={collectedMetrics[currentIndex - 1]}
             />
           ) : (
             <div className="done-container">
