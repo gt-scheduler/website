@@ -6,6 +6,13 @@
   gap: 16px;
   margin-left: $calendar-web-margin;
   margin-top: 16px;
+  justify-content: space-between;
+
+  .view-mode-tabs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
   .view-mode-label {
     font-size: 1em;
@@ -14,5 +21,17 @@
 
   .view-mode-tab-bar {
     font-size: 0.875em;
+  }
+
+  .rate-button {
+    border-radius: 10px;
+    @include dark(background-color, rgba($color-neutral, 0.3));
+    @include light(background-color, $theme-light-background);
+
+    .rate-button-label {
+      font-size: 0.875em;
+      font-weight: bold;
+      margin-left: 5px;
+    }
   }
 }

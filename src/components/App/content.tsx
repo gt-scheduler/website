@@ -20,6 +20,7 @@ import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
 import CourseDetails from '../CourseDetails';
 import SectionDetails from '../SectionDetails';
+import RatingsPage from '../RatingsPage';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
@@ -38,13 +39,14 @@ function AppContentBase(): React.ReactElement {
     <>
       <AppMobileNav captureRef={captureRef} />
       <Header
+        minimal={currentTab === 'Ratings'}
         currentTab={currentTab}
         onChangeTab={setTab}
         onToggleMenu={openDrawer}
         tabs={WEB_NAV_TABS}
         captureRef={captureRef}
       />
-      <SurveyBanner />
+      {currentTab !== 'Ratings' && <SurveyBanner />}
       <ErrorBoundary
         // ErrorBoundary.fallback is a normal render prop, not a component.
         // eslint-disable-next-line react/no-unstable-nested-components
@@ -74,12 +76,13 @@ function AppContentBase(): React.ReactElement {
           ))}
         {currentTab === 'Map' && <Map />}
         {currentTab === 'Finals' && <Finals />}
+        {currentTab === 'Ratings' && <RatingsPage />}
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
         </div>
       </ErrorBoundary>
-      <Attribution />
+      {currentTab !== 'Ratings' && <Attribution />}
     </>
   );
 }

@@ -5,9 +5,14 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
-import { faCalendar, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCalendar,
+  faInfoCircle,
+  faStarHalfStroke,
+} from '@fortawesome/free-solid-svg-icons';
 
-import { Calendar } from '..';
+import { Calendar, Button } from '..';
 import TabBar from '../TabBar';
 import {
   AppNavigationContext,
@@ -16,6 +21,7 @@ import {
 } from '../App/navigation';
 import CourseDetails from '../CourseDetails';
 import SectionDetails from '../SectionDetails';
+import { AccountContext } from '../../contexts';
 
 type ScheduleContainerProps = {
   overlayCrns: string[];
@@ -49,6 +55,8 @@ export default function ScheduleContainer({
 }: ScheduleContainerProps): React.ReactElement {
   const { currentSchedulerPage, setCurrentSchedulerPage } =
     useContext(AppNavigationContext);
+
+  const { type } = useContext(AccountContext);
 
   // We don't use the view-mode tab bar on mobile, we display in the nav menu.
   // Weird when user goes from a mobile to web view while on the scheduler page
@@ -109,14 +117,26 @@ export default function ScheduleContainer({
     <div className="scheduler-container">
       {!mobile && (
         <div className="view-mode">
-          <span className="view-mode-label">View Mode:</span>
-          <TabBar
-            className="view-mode-tab-bar"
-            enableSelect
-            items={TABS}
-            selected={selectedTab}
-            onSelect={handleTabSelect}
-          />
+          <div className="view-mode-tabs">
+            <span className="view-mode-label">View Mode:</span>
+            <TabBar
+              className="view-mode-tab-bar"
+              enableSelect
+              items={TABS}
+              selected={selectedTab}
+              onSelect={handleTabSelect}
+            />
+          </div>
+
+          {type === 'signedIn' && (
+            <Button
+              className="rate-button"
+              href={`${window.location.origin}${window.location.pathname}#/ratings`}
+            >
+              <FontAwesomeIcon fixedWidth icon={faStarHalfStroke} />
+              <div className="rate-button-label">Rate my courses</div>
+            </Button>
+          )}
         </div>
       )}
 
