@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { ScheduleContext } from '../../contexts/schedule';
 import Section from '../../data/beans/Section';
@@ -6,6 +8,8 @@ import CourseRatingCard from '../CourseRatingCard';
 import RateCard from '../RateCard';
 import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
 import { MetricName, SubmitMetricsRequestData } from '../../data/types';
+import Button from '../Button';
+import { AppNavigationContext } from '../App/navigation';
 
 import './stylesheet.scss';
 
@@ -18,6 +22,7 @@ interface PersistedRatingsState {
 }
 
 export default function RatingsPage(): React.ReactElement {
+  const { setTab } = useContext(AppNavigationContext);
   const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
 
   const allSections = useMemo(
@@ -83,7 +88,6 @@ export default function RatingsPage(): React.ReactElement {
           setCollectedMetrics(savedMetrics);
         }
       } catch (e) {
-        console.error('Failed to load persisted ratings', e);
         localStorage.removeItem(RATINGS_STORAGE_KEY);
       }
     }
@@ -117,6 +121,9 @@ export default function RatingsPage(): React.ReactElement {
   };
 
   const handleNext = (): void => setCurrentIndex((prev) => prev + 1);
+
+  const handleBack = (): void =>
+    setCurrentIndex((prev) => Math.max(prev - 1, 0));
 
   const handleStart = (): void => {
     if (selectedSections.length === 0) {
@@ -186,11 +193,20 @@ export default function RatingsPage(): React.ReactElement {
   return (
     <div className="scroller">
       <div className="ratings-container">
-        <div className="sub-container">
+        <div className="progress-header">
+          <span className="header-label">Rate my courses</span>
           <div className="progress-bar">
             <div className="progress" style={{ width: `${progress}%` }} />
           </div>
+          <Button
+            className="close-button"
+            onClick={(): void => setTab('Scheduler')}
+          >
+            <FontAwesomeIcon fixedWidth icon={faXmark} size="lg" />
+          </Button>
+        </div>
 
+        <div className="sub-container">
           {currentIndex === 0 && !isDone ? (
             <CourseRatingCard
               selectedSections={selectedSections}
@@ -236,13 +252,23 @@ export default function RatingsPage(): React.ReactElement {
               </button>
             ) : currentIndex < selectedSections.length ? (
               <div className="button-group">
-                <button
-                  type="button"
-                  className="next-button"
-                  onClick={handleNext}
-                >
-                  Next
-                </button>
+                <div className="nav-buttons">
+                  <button
+                    type="button"
+                    className="back-button"
+                    onClick={handleBack}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    className="next-button"
+                    onClick={handleNext}
+                  >
+                    Next
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   className="skip-button"
@@ -252,13 +278,22 @@ export default function RatingsPage(): React.ReactElement {
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                className="next-button"
-                onClick={handleSubmit}
-              >
-                Submit
-              </button>
+              <div className="nav-buttons">
+                <button
+                  type="button"
+                  className="back-button"
+                  onClick={handleBack}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="next-button"
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </button>
+              </div>
             ))}
         </div>
       </div>

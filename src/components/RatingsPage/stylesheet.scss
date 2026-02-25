@@ -11,11 +11,52 @@
 
 .ratings-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   margin-top: 20px;
   margin-bottom: 20px;
   overflow-y: auto;
+  
+  .progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;  // ← center the progress bar
+    width: 100%;
+    position: relative;       // ← anchor for absolute children
+    padding: 0 51px;
+    box-sizing: border-box;
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+
+    .header-label {
+      position: absolute;
+      left: 2em;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .close-button {
+      position: absolute;
+      right: 2em;
+    }
+
+    .progress-bar {
+      width: 100%;
+      max-width: 800px;
+      height: 8px;
+      background: #515151;
+      border-radius: 10px;
+      overflow: hidden;
+
+      .progress {
+        height: 100%;
+        background: #fff;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+      }
+    }
+  }
 
   .sub-container {
     width: 100%;
@@ -23,23 +64,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: #515151;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-
-      .progress {
-        height: 100%;
-        width: 0%;
-        background: #fff;
-        transition: width 0.3s ease;
-        border-radius: 10px;
-      }
-    }
 
     .section-step {
       display: flex;
@@ -66,15 +90,26 @@
     .button-group {
       display: flex;
       flex-direction: column;
-      margin-top: 1rem;
       justify-content: center;
       align-content: center;
       text-align: center;
       gap: 1rem;
     }
+      .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .back-button {
+        @include dark(background-color, rgba($color-neutral, 0.3));
+        @include light(background-color, $theme-light-background);
+      }
 
       .start-button,
-      .next-button {
+      .next-button, 
+      .back-button {
         height: 41px;
         border: none;
         border-radius: 10px;
@@ -106,7 +141,7 @@
       width: 247px;
     }
 
-    .next-button {
+    .next-button, .back-button {
       width: 177px;
     }
   }

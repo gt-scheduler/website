@@ -6,7 +6,6 @@ import {
   faTrashAlt,
   faCopy,
 } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
 
 import { getSemesterName } from '../../utils/semesters';
 import { Button, Select, Tab } from '..';
@@ -26,9 +25,9 @@ import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 import { Term, Palette } from '../../types';
 import Toast, { notifyToast } from '../Toast';
+import { AppNavigationContext } from '../App/navigation';
 
 import './stylesheet.scss';
-import { AppNavigationContext } from '../App/navigation';
 
 type VersionState =
   | { type: 'loading' }
