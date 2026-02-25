@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 
 import { classes } from '../../utils/misc';
 import RateEntry, { StarsValue, TimeValue } from '../RateEntry';
-import {
-  MetricName,
-  SubmitMetricsRequestData,
-  TargetType,
-} from '../../data/types';
 
 import './stylesheet.scss';
+
+export interface RateCardData {
+  rating?: number;
+  difficulty?: number;
+  workload?: number;
+}
 
 type RateCardProps = {
   course: string;
   section: string;
   instructor: string;
-  onChange: (data: Partial<SubmitMetricsRequestData>) => void;
-  initialData?: Partial<SubmitMetricsRequestData>;
+  onChange: (data: RateCardData) => void;
+  initialData?: RateCardData;
 };
 
 export default function RateCard({
@@ -26,13 +27,13 @@ export default function RateCard({
   initialData,
 }: RateCardProps): React.ReactElement {
   const [overallRating, setOverallRating] = useState<StarsValue>(
-    (initialData?.values?.[0] as StarsValue) ?? null
+    (initialData?.rating as StarsValue) ?? null
   );
   const [levelOfDifficulty, setLevelOfDifficulty] = useState<StarsValue>(
-    (initialData?.values?.[1] as StarsValue) ?? null
+    (initialData?.difficulty as StarsValue) ?? null
   );
   const [workload, setWorkload] = useState<TimeValue>(() => {
-    const totalMinutes = initialData?.values?.[2];
+    const totalMinutes = initialData?.workload;
     if (totalMinutes == null) return { hours: null, minutes: null };
     return {
       hours: Math.floor(totalMinutes / 60),
@@ -44,26 +45,16 @@ export default function RateCard({
     overall: StarsValue,
     difficulty: StarsValue,
     workloadValue: TimeValue
-  ): Partial<SubmitMetricsRequestData> {
-    const targets = [
-      { type: TargetType.COURSE, reference: course },
-      { type: TargetType.SECTION, reference: section },
-      { type: TargetType.PROFESSOR, reference: instructor },
-    ];
-
-    const values: number[] = [];
-    if (overall != null) values.push(overall);
-    if (difficulty != null) values.push(difficulty);
-    if (workloadValue.hours != null || workloadValue.minutes != null) {
-      const totalMinutes =
-        (workloadValue.hours ?? 0) * 60 + (workloadValue.minutes ?? 0);
-      values.push(totalMinutes);
-    }
+  ): RateCardData {
+    const totalMinutes =
+      workloadValue.hours != null || workloadValue.minutes != null
+        ? (workloadValue.hours ?? 0) * 60 + (workloadValue.minutes ?? 0)
+        : undefined;
 
     return {
-      metricName: MetricName.DIFFICULTY,
-      targets,
-      values,
+      ...(overall != null && { rating: overall }),
+      ...(difficulty != null && { difficulty }),
+      ...(totalMinutes != null && { workload: totalMinutes }),
     };
   }
 

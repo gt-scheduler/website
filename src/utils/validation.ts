@@ -1,8 +1,4 @@
-import {
-  MetricName,
-  TargetType,
-  SubmitMetricsRequestData,
-} from '../data/types';
+import { SubmitRatingsRequestDataSchema } from '../data/types';
 
 // Course format: ABCD 1234
 export function validateCourse(reference: string): boolean {
@@ -17,26 +13,6 @@ export function validateProfessor(reference: string): boolean {
 // Section: ABC01 (letters + digits)
 export function validateSection(reference: string): boolean {
   return /^[A-Z]+\d+$/.test(reference);
-}
-
-export function validateTarget(target: unknown): boolean {
-  if (typeof target !== 'object' || target === null) return false;
-
-  const t = target as { type: TargetType; reference: string };
-
-  if (!Object.values(TargetType).includes(t.type)) return false;
-  if (typeof t.reference !== 'string') return false;
-
-  switch (t.type) {
-    case TargetType.COURSE:
-      return validateCourse(t.reference);
-    case TargetType.PROFESSOR:
-      return validateProfessor(t.reference);
-    case TargetType.SECTION:
-      return validateSection(t.reference);
-    default:
-      return false;
-  }
 }
 
 export function validateSemester(value: unknown): boolean {
@@ -57,22 +33,8 @@ export function validateSemester(value: unknown): boolean {
 }
 
 export function validateMetricData(data: unknown): boolean {
-  if (typeof data !== 'object' || data === null) return false;
-  const d = data as SubmitMetricsRequestData;
-
-  // Metric name
-  if (!Object.values(MetricName).includes(d.metricName)) return false;
-
-  // Targets
-  if (!Array.isArray(d.targets)) return false;
-  for (const target of d.targets) {
-    if (!validateTarget(target)) return false;
-  }
-
-  // Semester
-  if (d.semester !== undefined && !validateSemester(d.semester)) {
-    return false;
-  }
-
-  return true;
+  const result = SubmitRatingsRequestDataSchema.omit({
+    IDToken: true,
+  }).safeParse(data);
+  return result.success;
 }

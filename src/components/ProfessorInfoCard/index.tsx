@@ -163,7 +163,7 @@ export default function ProfessorInfoCard({
         value: !isRatingsLoaded
           ? 'Loading...'
           : professorRatings
-          ? professorRatings.averageWorkload.toFixed(1)
+          ? (professorRatings.averageWorkload / 60).toFixed(1)
           : null,
         unit: 'hrs/week',
       },

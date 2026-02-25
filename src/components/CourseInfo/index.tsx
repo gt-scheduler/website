@@ -236,7 +236,7 @@ export default function CourseInfo({
         value: !isRatingsLoaded
           ? 'Loading...'
           : courseRatings
-          ? courseRatings.averageWorkload.toFixed(1)
+          ? (courseRatings.averageWorkload / 60).toFixed(1)
           : null,
         unit: 'hrs/week',
       },

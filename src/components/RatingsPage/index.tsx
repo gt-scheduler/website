@@ -1,29 +1,42 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { slugify } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts/schedule';
 import Section from '../../data/beans/Section';
 import CourseRatingCard from '../CourseRatingCard';
-import RateCard from '../RateCard';
-import useSubmitMetrics from '../../data/hooks/useSubmitMetrics';
-import { MetricName, SubmitMetricsRequestData } from '../../data/types';
+import RateCard, { RateCardData } from '../RateCard';
+import useSubmitRatings from '../../data/hooks/useSubmitRatings';
+import { SubmitRatingsRequestData } from '../../data/types';
 import Button from '../Button';
 import { AppNavigationContext } from '../App/navigation';
+import {
+  RATINGS_CACHE_LOCAL_STORAGE_KEY,
+  PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
+} from '../../data/beans/Course';
+import useRateLimiter from '../../hooks/useRateLimiter';
 
 import './stylesheet.scss';
 
 const RATINGS_STORAGE_KEY = 'gt_scheduler_ratings_state';
 
+interface CollectedRating extends RateCardData {
+  courseId: string;
+  professorId: string;
+  term: number;
+}
+
+type RatingsMap = Record<string, CollectedRating>;
+
 interface PersistedRatingsState {
   selectedCrns: string[];
   currentIndex: number;
-  collectedMetrics: (Partial<SubmitMetricsRequestData> | undefined)[];
+  ratingsMap: RatingsMap;
 }
 
 export default function RatingsPage(): React.ReactElement {
   const { setTab } = useContext(AppNavigationContext);
-  const [{ pinnedCrns, oscar }] = useContext(ScheduleContext);
+  const [{ pinnedCrns, oscar, term }] = useContext(ScheduleContext);
 
   const allSections = useMemo(
     () =>
@@ -49,62 +62,57 @@ export default function RatingsPage(): React.ReactElement {
     useState<Section[]>(initialUnselected);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const [collectedMetrics, setCollectedMetrics] = useState<
-    (Partial<SubmitMetricsRequestData> | undefined)[]
-  >([]);
+  const [ratingsMap, setRatingsMap] = useState<RatingsMap>({});
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [submitData, setSubmitData] = useState<
-    Partial<SubmitMetricsRequestData>
-  >({
-    metricName: MetricName.DIFFICULTY,
-    targets: [],
-    values: [],
-  });
+    Omit<SubmitRatingsRequestData, 'IDToken'> | undefined
+  >(undefined);
 
   const [showEmptyWarning, setShowEmptyWarning] = useState(false);
 
-  const [{ term }] = useContext(ScheduleContext);
-
   useEffect(() => {
-    const saved = localStorage.getItem(RATINGS_STORAGE_KEY);
-    if (saved) {
-      try {
-        const {
-          selectedCrns,
-          currentIndex: savedIndex,
-          collectedMetrics: savedMetrics,
-        } = JSON.parse(saved) as PersistedRatingsState;
-
-        const reconstructedSections = selectedCrns
-          .map((crn) => oscar.crnMap[crn])
-          .filter((s): s is Section => s instanceof Section);
-
-        if (reconstructedSections.length > 0) {
-          setSelectedSections(reconstructedSections);
-          setUnselectedSections(
-            allSections.filter((s) => !selectedCrns.includes(s.crn))
-          );
-          setCurrentIndex(savedIndex);
-          setCollectedMetrics(savedMetrics);
-        }
-      } catch (e) {
-        localStorage.removeItem(RATINGS_STORAGE_KEY);
-      }
-    }
+    // const saved = localStorage.getItem(RATINGS_STORAGE_KEY);
+    // if (!saved) return;
+    // try {
+    //   const parsed = JSON.parse(saved) as PersistedRatingsState;
+    //   console.log(parsed);
+    //   const {
+    //     selectedCrns,
+    //     currentIndex: savedIndex,
+    //     ratingsMap: savedMap,
+    //   } = parsed;
+    //   const reconstructed = selectedCrns
+    //     .map((crn) => oscar.crnMap[crn])
+    //     .filter((s): s is Section => s instanceof Section);
+    //   if (reconstructed.length > 0) {
+    //     setSelectedSections(reconstructed);
+    //     setUnselectedSections(
+    //       allSections.filter((s) => !selectedCrns.includes(s.crn))
+    //     );
+    //     setCurrentIndex(savedIndex);
+    //     setRatingsMap(savedMap);
+    //   }
+    // } catch {
+    //   localStorage.removeItem(RATINGS_STORAGE_KEY);
+    // }
   }, [oscar.crnMap, allSections]);
 
   useEffect(() => {
     const stateToSave: PersistedRatingsState = {
       selectedCrns: selectedSections.map((s) => s.crn),
       currentIndex,
-      collectedMetrics,
+      ratingsMap,
     };
     localStorage.setItem(RATINGS_STORAGE_KEY, JSON.stringify(stateToSave));
-  }, [selectedSections, currentIndex, collectedMetrics]);
+  }, [selectedSections, currentIndex, ratingsMap]);
 
-  useSubmitMetrics({
-    requestData: submitData as SubmitMetricsRequestData,
-  });
+  useSubmitRatings(
+    submitData != null
+      ? { requestData: submitData }
+      : { requestData: { ratings: [] } }
+  );
 
   const handleAddCourse = (section: Section): void => {
     setSelectedSections((prev) => [...prev, section]);
@@ -120,50 +128,96 @@ export default function RatingsPage(): React.ReactElement {
     ]);
   };
 
-  const handleNext = (): void => setCurrentIndex((prev) => prev + 1);
+  const validateCurrentRatings = (): boolean => {
+    if (currentIndex <= 0 || currentIndex > selectedSections.length) {
+      return true;
+    }
 
-  const handleBack = (): void =>
+    const activeSection = selectedSections[currentIndex - 1];
+    if (!activeSection) return true;
+
+    const currentRating = ratingsMap[activeSection.crn];
+
+    const isComplete =
+      currentRating &&
+      currentRating.rating !== undefined &&
+      currentRating.difficulty !== undefined &&
+      currentRating.workload !== undefined;
+
+    if (!isComplete) {
+      setErrorMessage('Please fill out all fields before proceeding.');
+      return false;
+    }
+
+    setErrorMessage(null);
+    return true;
+  };
+
+  const handleNext = (): void => {
+    if (!validateCurrentRatings()) return;
+    setCurrentIndex((prev) => prev + 1);
+  };
+
+  const handleSkip = (): void => {
+    setErrorMessage(null);
+    setCurrentIndex((prev) => prev + 1);
+  };
+
+  const handleBack = (): void => {
+    setErrorMessage(null);
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
+  };
 
   const handleStart = (): void => {
     if (selectedSections.length === 0) {
       setShowEmptyWarning(true);
       return;
     }
-    setShowEmptyWarning(false);
-    handleNext();
+    setErrorMessage(null);
+    setCurrentIndex((prev) => prev + 1);
   };
 
-  const handleRateChange = (data: Partial<SubmitMetricsRequestData>): void => {
+  const handleRateChange = (data: RateCardData): void => {
     if (currentIndex <= 0) return;
+    const section = selectedSections[currentIndex - 1];
+    if (!section) return;
 
-    const idx = currentIndex - 1;
+    if (errorMessage) setErrorMessage(null);
 
-    setCollectedMetrics((prev) => {
-      const next = [...prev];
-      next[idx] = data;
-      return next;
-    });
+    const rawName = section.instructors[0] ?? 'unknown';
+
+    setRatingsMap((prev) => ({
+      ...prev,
+      [section.crn]: {
+        courseId: section.course.id,
+        professorId: slugify(rawName),
+        term: Number(term),
+        ...(prev[section.crn] || {}),
+        ...data,
+      },
+    }));
   };
 
-  const handleSubmit = (): void => {
-    const nonEmpty = collectedMetrics.filter(
-      (m): m is Partial<SubmitMetricsRequestData> =>
-        m != null &&
-        ((m.targets?.length ?? 0) > 0 || (m.values?.length ?? 0) > 0)
+  const handleSubmit = (skip: boolean): void => {
+    if (!skip && !validateCurrentRatings()) return;
+
+    const allRatings = Object.values(ratingsMap);
+    const completeRatings = allRatings.filter(
+      (r): r is Required<CollectedRating> =>
+        r != null &&
+        r.rating != null &&
+        r.difficulty != null &&
+        r.workload != null
     );
 
-    if (nonEmpty.length === 0) return;
-
-    const merged: Partial<SubmitMetricsRequestData> = {
-      metricName: MetricName.DIFFICULTY,
-      targets: nonEmpty.flatMap((d) => d.targets ?? []),
-      values: nonEmpty.flatMap((d) => d.values ?? []),
-    };
-    setSubmitData(merged);
+    if (completeRatings.length === 0) return;
+    setSubmitData({ ratings: completeRatings });
     setCurrentIndex((prev) => prev + 1);
 
     localStorage.removeItem(RATINGS_STORAGE_KEY);
+    localStorage.removeItem(RATINGS_CACHE_LOCAL_STORAGE_KEY);
+    localStorage.removeItem(PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY);
+
     localStorage.setItem(`ratings_submitted_${term}`, 'true');
   };
 
@@ -180,7 +234,6 @@ export default function RatingsPage(): React.ReactElement {
   const activeCourseLabel = activeSection
     ? `${activeSection.course.subject} ${activeSection.course.number} ${activeSection.course.title}`
     : '';
-
   const activeSectionLabel = activeSection ? activeSection.id : '';
   const activeInstructorLabel = activeSection
     ? activeSection.instructors.length
@@ -223,7 +276,8 @@ export default function RatingsPage(): React.ReactElement {
               section={activeSectionLabel}
               instructor={activeInstructorLabel}
               onChange={handleRateChange}
-              initialData={collectedMetrics[currentIndex - 1]}
+              // CHANGED: Retrieve data from map using CRN
+              initialData={ratingsMap[activeSection.crn]}
             />
           ) : (
             <div className="done-container">
@@ -240,6 +294,8 @@ export default function RatingsPage(): React.ReactElement {
               </div>
             </div>
           )}
+
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
 
           {!isDone &&
             (currentIndex === 0 ? (
@@ -268,30 +324,38 @@ export default function RatingsPage(): React.ReactElement {
                     Next
                   </button>
                 </div>
-
                 <button
                   type="button"
                   className="skip-button"
-                  onClick={handleNext}
+                  onClick={handleSkip}
                 >
                   Skip this course
                 </button>
               </div>
             ) : (
-              <div className="nav-buttons">
+              <div className="button-group">
+                <div className="nav-buttons">
+                  <button
+                    type="button"
+                    className="back-button"
+                    onClick={handleBack}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    className="next-button"
+                    onClick={(): void => handleSubmit(false)}
+                  >
+                    Submit
+                  </button>
+                </div>
                 <button
                   type="button"
-                  className="back-button"
-                  onClick={handleBack}
+                  className="skip-button"
+                  onClick={(): void => handleSubmit(true)}
                 >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  className="next-button"
-                  onClick={handleSubmit}
-                >
-                  Submit
+                  Skip this course and submit
                 </button>
               </div>
             ))}

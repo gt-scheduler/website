@@ -251,27 +251,20 @@ export const RatingStatsResponseSchema = z.object({
 
 export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;
 
-// MetricNames are temporary
-export enum MetricName {
-  DIFFICULTY = 'difficulty',
-  RECOMMENDED = 'recommended',
-}
+export const Rating = z.object({
+  courseId: z.string(),
+  professorId: z.string(),
+  term: z.number(),
+  rating: z.number().min(1).max(5),
+  difficulty: z.number().min(1).max(5),
+  workload: z.number().min(0),
+});
 
-export enum TargetType {
-  PROFESSOR = 'professor',
-  COURSE = 'course',
-  SECTION = 'section',
-}
+export const SubmitRatingsRequestDataSchema = z.object({
+  IDToken: z.string(),
+  ratings: z.array(Rating).min(1),
+});
 
-export interface MetricTarget {
-  type: TargetType;
-  reference: string;
-}
-
-export type SubmitMetricsRequestData = {
-  IDToken: string;
-  metricName: MetricName;
-  targets: MetricTarget[];
-  values: number[];
-  semester?: number;
-};
+export type SubmitRatingsRequestData = z.infer<
+  typeof SubmitRatingsRequestDataSchema
+>;

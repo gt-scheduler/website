@@ -63,7 +63,6 @@
     max-width: 800px;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
 
     .section-step {
       display: flex;
@@ -174,5 +173,10 @@
       max-width: 200px;
       height: auto;
     }
+  }
+  .error-message {
+    margin-top: 1rem;
+    color: 'red';
+    align-self: 'center';
   }
 }
