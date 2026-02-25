@@ -27,6 +27,7 @@ export type ProfessorInfoCardProps = {
     averageWorkload: number;
   } | null;
   isRatingsLoaded: boolean;
+  isGpaLoaded: boolean;
   course: Course;
   displaySectionInfo: boolean;
 };
@@ -124,6 +125,7 @@ export default function ProfessorInfoCard({
   professorGpa,
   professorRatings,
   isRatingsLoaded,
+  isGpaLoaded,
   course,
   displaySectionInfo,
 }: ProfessorInfoCardProps): React.ReactElement {
@@ -148,7 +150,11 @@ export default function ProfessorInfoCard({
       },
       {
         label: 'Course GPA',
-        value: professorGpa === null ? 'Loading...' : professorGpa.toFixed(2),
+        value: !isGpaLoaded
+          ? 'Loading...'
+          : professorGpa !== null
+          ? professorGpa.toFixed(2)
+          : 'N/A',
       },
       {
         label: 'Level of Difficulty',

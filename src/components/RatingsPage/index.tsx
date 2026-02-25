@@ -73,30 +73,30 @@ export default function RatingsPage(): React.ReactElement {
   const [showEmptyWarning, setShowEmptyWarning] = useState(false);
 
   useEffect(() => {
-    // const saved = localStorage.getItem(RATINGS_STORAGE_KEY);
-    // if (!saved) return;
-    // try {
-    //   const parsed = JSON.parse(saved) as PersistedRatingsState;
-    //   console.log(parsed);
-    //   const {
-    //     selectedCrns,
-    //     currentIndex: savedIndex,
-    //     ratingsMap: savedMap,
-    //   } = parsed;
-    //   const reconstructed = selectedCrns
-    //     .map((crn) => oscar.crnMap[crn])
-    //     .filter((s): s is Section => s instanceof Section);
-    //   if (reconstructed.length > 0) {
-    //     setSelectedSections(reconstructed);
-    //     setUnselectedSections(
-    //       allSections.filter((s) => !selectedCrns.includes(s.crn))
-    //     );
-    //     setCurrentIndex(savedIndex);
-    //     setRatingsMap(savedMap);
-    //   }
-    // } catch {
-    //   localStorage.removeItem(RATINGS_STORAGE_KEY);
-    // }
+    const saved = localStorage.getItem(RATINGS_STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved) as PersistedRatingsState;
+      console.log(parsed);
+      const {
+        selectedCrns,
+        currentIndex: savedIndex,
+        ratingsMap: savedMap,
+      } = parsed;
+      const reconstructed = selectedCrns
+        .map((crn) => oscar.crnMap[crn])
+        .filter((s): s is Section => s instanceof Section);
+      if (reconstructed.length > 0) {
+        setSelectedSections(reconstructed);
+        setUnselectedSections(
+          allSections.filter((s) => !selectedCrns.includes(s.crn))
+        );
+        setCurrentIndex(savedIndex);
+        setRatingsMap(savedMap);
+      }
+    } catch {
+      localStorage.removeItem(RATINGS_STORAGE_KEY);
+    }
   }, [oscar.crnMap, allSections]);
 
   useEffect(() => {
@@ -199,7 +199,10 @@ export default function RatingsPage(): React.ReactElement {
   };
 
   const handleSubmit = (skip: boolean): void => {
-    if (!skip && !validateCurrentRatings()) return;
+    if (!skip && !validateCurrentRatings()) {
+      setCurrentIndex((prev) => prev + 1);
+      return;
+    }
 
     const allRatings = Object.values(ratingsMap);
     const completeRatings = allRatings.filter(
@@ -210,7 +213,10 @@ export default function RatingsPage(): React.ReactElement {
         r.workload != null
     );
 
-    if (completeRatings.length === 0) return;
+    if (completeRatings.length === 0) {
+      setCurrentIndex((prev) => prev + 1);
+      return;
+    }
     setSubmitData({ ratings: completeRatings });
     setCurrentIndex((prev) => prev + 1);
 

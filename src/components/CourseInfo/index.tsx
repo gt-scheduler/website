@@ -321,6 +321,7 @@ export default function CourseInfo({
                       course.professorRatings?.[slugify(instructorName)] ?? null
                     }
                     isRatingsLoaded={isProfessorRatingsLoaded}
+                    isGpaLoaded={isLoaded}
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
                   />
