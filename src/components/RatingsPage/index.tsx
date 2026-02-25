@@ -14,7 +14,6 @@ import {
   RATINGS_CACHE_LOCAL_STORAGE_KEY,
   PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
 } from '../../data/beans/Course';
-import useRateLimiter from '../../hooks/useRateLimiter';
 
 import './stylesheet.scss';
 
@@ -282,7 +281,6 @@ export default function RatingsPage(): React.ReactElement {
               section={activeSectionLabel}
               instructor={activeInstructorLabel}
               onChange={handleRateChange}
-              // CHANGED: Retrieve data from map using CRN
               initialData={ratingsMap[activeSection.crn]}
             />
           ) : (
