@@ -132,8 +132,8 @@ export default function ScheduleContainer({
             />
           </div>
 
-          {/* {type === 'signedIn' && !hasSubmitted && ( */}
-          {type === 'signedIn' && (
+          {type === 'signedIn' && !hasSubmitted && (
+            // {type === 'signedIn' && (
             <Button
               className="rate-button"
               onClick={(): void => setTab('Ratings')}

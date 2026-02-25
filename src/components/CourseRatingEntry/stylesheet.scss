@@ -5,7 +5,12 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 2rem;
-  background: $theme-dark-card-background;
+  @include dark {
+    background: $theme-dark-card-background;
+  }
+  @include light {
+    background: $theme-light-card-background;
+  }
   border-radius: 10px;
   gap: 1rem;
   font-size: 16px;
@@ -14,7 +19,12 @@
   .delete-button {
     background: none;
     border: none;
-    color: #fff;
+    @include dark {
+      color: #fff;
+    }
+    @include light {
+      color: $ratings-dark-background;
+    }
     cursor: pointer;
     align-self: flex-start;
   }
@@ -39,7 +49,12 @@
     }
 
     .value {
-      background: #515151;
+      @include dark {
+        background: $ratings-dark-background;
+      }
+      @include light {
+        background: $ratings-light-background;
+      }
       height: 2rem;
       border-radius: 6px;
       display: flex;

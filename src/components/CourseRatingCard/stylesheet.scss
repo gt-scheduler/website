@@ -1,3 +1,5 @@
+@import '../../variables';
+
 .course-rating-card {
   display: flex;
   flex-direction: column;
@@ -8,7 +10,7 @@
   overflow: hidden;
 
   .add-course-warning {
-    color: #ff4c4c;
+    color: $error-message;
     font-size: 16px;
   }
 

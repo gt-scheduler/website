@@ -1,8 +1,8 @@
 import axios, { AxiosPromise } from 'axios';
 import { useState } from 'react';
 import { Immutable } from 'immer';
+import firebase from 'firebase';
 
-import { auth } from '../firebase';
 import { ErrorWithFields, softError } from '../../log';
 import { SubmitRatingsRequestData } from '../types';
 import {
@@ -16,7 +16,6 @@ import Cancellable from '../../utils/cancellable';
 import { validateMetricData } from '../../utils/validation';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import useDeepCompareEffect from '../../hooks/useDeepCompareEffect';
-import firebase from 'firebase';
 import useRateLimiter from '../../hooks/useRateLimiter';
 
 type HookResult = {

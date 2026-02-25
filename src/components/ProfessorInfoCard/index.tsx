@@ -174,7 +174,7 @@ export default function ProfessorInfoCard({
         unit: 'hrs/week',
       },
     ];
-  }, [isRatingsLoaded, professorRatings, professorGpa]);
+  }, [isRatingsLoaded, professorRatings, professorGpa, isGpaLoaded]);
 
   const handleAddSection = (section: Section): void => {
     const updates: Partial<Schedule> = {

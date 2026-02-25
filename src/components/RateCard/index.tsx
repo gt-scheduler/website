@@ -13,7 +13,6 @@ export interface RateCardData {
 
 type RateCardProps = {
   course: string;
-  section: string;
   instructor: string;
   onChange: (data: RateCardData) => void;
   initialData?: RateCardData;
@@ -21,7 +20,6 @@ type RateCardProps = {
 
 export default function RateCard({
   course,
-  section,
   instructor,
   onChange,
   initialData,

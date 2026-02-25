@@ -9,7 +9,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #515151;
+    @include dark {
+      background: $ratings-dark-background;
+    }
+    @include light {
+      background: $ratings-light-background;
+    }
     border-radius: 6px;
     height: 32px;
     padding: 12px 8px;
@@ -29,7 +34,9 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      color: #fff;
+      @include dark {
+        color: #fff;
+      }
     }
 
     &:hover {
@@ -52,14 +59,6 @@
     z-index: 1;
     border-radius: 6px;
 
-    @include dark {
-      background-color: $theme-dark-card-background;
-    }
-
-    @include light {
-      background-color: $theme-light-background;
-    }
-
     .option {
       justify-content: flex-start;
       align-items: center;
@@ -70,7 +69,12 @@
       white-space: nowrap;
       transition: background-color 0.2s;
       cursor: pointer;
-      color: #fff;
+      @include dark {
+        background-color: $theme-dark-card-background;
+      }
+      @include light {
+        background-color: $ratings-light-background;
+      }
 
       &:hover {
         background-color: $color-border;
@@ -89,12 +93,16 @@
 
         .label-code {
           font-weight: 600;
-          color: #fff;
+          @include dark {
+            color: #fff;
+          }
         }
 
         .label-title {
           font-size: 0.875rem;
-          color: #aaa;
+          @include dark {
+            color: #aaa;
+          }
         }
       }
     }

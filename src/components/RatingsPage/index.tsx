@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { slugify } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts/schedule';
 import Section from '../../data/beans/Section';
@@ -76,7 +77,6 @@ export default function RatingsPage(): React.ReactElement {
     if (!saved) return;
     try {
       const parsed = JSON.parse(saved) as PersistedRatingsState;
-      console.log(parsed);
       const {
         selectedCrns,
         currentIndex: savedIndex,
@@ -239,7 +239,6 @@ export default function RatingsPage(): React.ReactElement {
   const activeCourseLabel = activeSection
     ? `${activeSection.course.subject} ${activeSection.course.number} ${activeSection.course.title}`
     : '';
-  const activeSectionLabel = activeSection ? activeSection.id : '';
   const activeInstructorLabel = activeSection
     ? activeSection.instructors.length
       ? activeSection.instructors.join(', ')
@@ -278,7 +277,6 @@ export default function RatingsPage(): React.ReactElement {
             <RateCard
               key={activeSection.crn}
               course={activeCourseLabel}
-              section={activeSectionLabel}
               instructor={activeInstructorLabel}
               onChange={handleRateChange}
               initialData={ratingsMap[activeSection.crn]}
