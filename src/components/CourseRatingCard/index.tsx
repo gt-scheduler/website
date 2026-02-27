@@ -4,8 +4,10 @@ import Section from '../../data/beans/Section';
 import CourseRatingEntry from '../CourseRatingEntry';
 
 import './stylesheet.scss';
+import { getSemesterName } from '../../utils/semesters';
 
 type CourseRatingCardProps = {
+  term: string;
   selectedSections: Section[];
   unselectedSections: Section[];
   onAddCourse: (section: Section) => void;
@@ -15,6 +17,7 @@ type CourseRatingCardProps = {
 };
 
 export default function CourseRatingCard({
+  term,
   selectedSections,
   unselectedSections,
   onAddCourse,
@@ -47,7 +50,9 @@ export default function CourseRatingCard({
       <div className="card-header">
         To start,
         <br />
-        Are these the courses you took for Spring 2024?
+        {selectedSections.length === 0
+          ? `Add the courses you took for ${getSemesterName(term)}`
+          : `Are these the courses you took for ${getSemesterName(term)}?`}
       </div>
 
       <div className="entries-scroll">

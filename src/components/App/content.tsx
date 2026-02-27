@@ -21,6 +21,7 @@ import { Term } from '../../types';
 import CourseDetails from '../CourseDetails';
 import SectionDetails from '../SectionDetails';
 import RatingsPage from '../RatingsPage';
+import RateBanner from '../RateBanner';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
@@ -31,8 +32,13 @@ export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
  * This component is memoized, so it only re-renders when its context changes.
  */
 function AppContentBase(): React.ReactElement {
-  const { currentTab, setTab, openDrawer, currentSchedulerPage } =
-    useContext(AppNavigationContext);
+  const {
+    currentTab,
+    ratingsOverrideTerm,
+    setTab,
+    openDrawer,
+    currentSchedulerPage,
+  } = useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -47,6 +53,7 @@ function AppContentBase(): React.ReactElement {
         captureRef={captureRef}
       />
       {currentTab !== 'Ratings' && <SurveyBanner />}
+      {currentTab !== 'Ratings' && <RateBanner />}
       <ErrorBoundary
         // ErrorBoundary.fallback is a normal render prop, not a component.
         // eslint-disable-next-line react/no-unstable-nested-components
@@ -76,7 +83,9 @@ function AppContentBase(): React.ReactElement {
           ))}
         {currentTab === 'Map' && <Map />}
         {currentTab === 'Finals' && <Finals />}
-        {currentTab === 'Ratings' && <RatingsPage />}
+        {currentTab === 'Ratings' && (
+          <RatingsPage overrideTerm={ratingsOverrideTerm} />
+        )}
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />

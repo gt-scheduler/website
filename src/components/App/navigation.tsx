@@ -29,7 +29,8 @@ export type SchedulerPageState =
 
 export type AppNavigationContextValue = {
   currentTab: string;
-  setTab: (next: string) => void;
+  setTab: (next: string, options?: { overrideTerm?: string }) => void;
+  ratingsOverrideTerm: string | undefined;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -45,6 +46,7 @@ export const AppNavigationContext =
         message: 'empty AppNavigationContext.setTab value being used',
       });
     },
+    ratingsOverrideTerm: undefined,
     isDrawerOpen: false,
     openDrawer: (): void => {
       throw new ErrorWithFields({
@@ -78,28 +80,40 @@ export function AppNavigation({
 }: AppNavigationProps): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
-  // Allow top-level tab-based navigation
-  const [currentTab, setTab] = useState<string>('Scheduler');
+  const [currentTab, setCurrentTab] = useState<string>('Scheduler');
+  const [ratingsOverrideTerm, setRatingsOverrideTerm] = useState<
+    string | undefined
+  >(undefined);
+
+  const setTab = useCallback(
+    (next: string, options?: { overrideTerm?: string }): void => {
+      setCurrentTab(next);
+      // Clear the override whenever we leave the Ratings tab, and set it when
+      // navigating to Ratings with an explicit prior term.
+      setRatingsOverrideTerm(
+        next === 'Ratings' ? options?.overrideTerm : undefined
+      );
+    },
+    []
+  );
 
   const [currentSchedulerPage, setCurrentSchedulerPage] =
     useState<SchedulerPageState>({ type: SchedulerPageType.CALENDAR });
 
-  // Handle the status of the drawer being open on mobile
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
   useEffect(() => {
-    // Close the drawer if switching to desktop
     if (isDrawerOpen && !mobile) {
       setIsDrawerOpen(false);
     }
   }, [isDrawerOpen, mobile]);
 
-  // Memoize the context value
   const contextValue = useMemo<AppNavigationContextValue>(
     () => ({
       currentTab,
       setTab,
+      ratingsOverrideTerm,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -109,6 +123,7 @@ export function AppNavigation({
     [
       currentTab,
       setTab,
+      ratingsOverrideTerm,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -128,12 +143,6 @@ type AppMobileNavProps = {
   captureRef: React.RefObject<HTMLDivElement>;
 };
 
-/**
- * Adds the nav drawer that is conditionally open depending on navigation state
- * when the app is running on a mobile device.
- * Use over the "dumb" display AppMobileNavDisplay component
- * when the app data contexts are available.
- */
 export function AppMobileNav({
   captureRef,
 }: AppMobileNavProps): React.ReactElement {
@@ -151,12 +160,6 @@ type AppMobileNavDisplayProps = {
   accountState?: AccountContextValue | { type: 'loading' };
 };
 
-/**
- * Adds the nav drawer that is conditionally open depending on navigation state
- * when the app is running on a mobile device.
- * Runs as a "dumb" display component,
- * not needing valid values for the app data contexts.
- */
 export function AppMobileNavDisplay({
   onCopyCrns = (): void => undefined,
   enableCopyCrns = false,
@@ -175,7 +178,6 @@ export function AppMobileNavDisplay({
 
   return (
     <NavDrawer open={isDrawerOpen} onClose={closeDrawer}>
-      {/* On small mobile devices, show the header action row */}
       {!largeMobile && (
         <HeaderActionBar
           accountState={accountState}
