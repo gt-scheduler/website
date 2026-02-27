@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
+import { getSemesterName } from '../../utils/semesters';
 import Section from '../../data/beans/Section';
 import CourseRatingEntry from '../CourseRatingEntry';
 
 import './stylesheet.scss';
-import { getSemesterName } from '../../utils/semesters';
 
 type CourseRatingCardProps = {
   term: string;

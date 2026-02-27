@@ -11,19 +11,11 @@ function Content(): React.ReactElement {
   return (
     <span onClick={(): void => setTab('Ratings', { overrideTerm: '202602' })}>
       Rate {getSemesterName('202602')} courses
-      {/* <a
-            className="bannerButton"
-            href={SURVEY_LINK}
-            rel="noopener noreferrer"
-            target="_blank"
-        >
-            <b className="buttonText">Take our quick survey.</b>
-        </a> */}
     </span>
   );
 }
 
-export default function SurveyBanner(): React.ReactElement {
+export default function RateBanner(): React.ReactElement {
   return (
     <Banner localStorageKey={BANNER_LOCAL_STORAGE_KEY} content={<Content />} />
   );

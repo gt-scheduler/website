@@ -18,11 +18,12 @@ import {
   PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
 } from '../../data/beans/Course';
 import { LoadingState } from '../../types';
-
-import './stylesheet.scss';
 import LoadingDisplay from '../LoadingDisplay';
 import { SkeletonContent } from '../App/content';
 import { getSemesterName } from '../../utils/semesters';
+import { ErrorWithFields, softError } from '../../log';
+
+import './stylesheet.scss';
 
 type OverrideOscarLoaderProps = {
   overrideTerm: string;
@@ -32,8 +33,38 @@ type OverrideOscarLoaderProps = {
 function OverrideOscarLoader({
   overrideTerm,
   children,
-}: OverrideOscarLoaderProps): React.ReactElement {
+}: OverrideOscarLoaderProps): React.ReactElement | null {
+  const { setTab } = useContext(AppNavigationContext);
+  const [attempt, setAttempt] = useState(0);
+  const [hasFailed, setHasFailed] = useState(false);
   const state = useDownloadOscarData(overrideTerm);
+
+  useEffect(() => {
+    if (state.type === 'error') {
+      if (attempt === 0) {
+        // First failure: retry automatically by incrementing attempt
+        setAttempt(1);
+      } else if (!hasFailed) {
+        // Second failure: report soft error and navigate home
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching oscar object',
+            source: state.error,
+            fields: {
+              overrideTerm,
+            },
+          })
+        );
+        setHasFailed(true);
+        setTab('Scheduler');
+      }
+    }
+  }, [state, attempt, hasFailed, setTab, overrideTerm]);
+
+  if (state.type === 'error' && attempt === 1 && !hasFailed) {
+    return null;
+  }
+
   return children(state);
 }
 
@@ -280,6 +311,8 @@ function RatingsPageInner({
   const progress =
     selectedSections.length > 0
       ? Math.min((currentIndex / (selectedSections.length + 1)) * 100, 100)
+      : currentIndex > 0
+      ? 100 // assume fully completed for submitted ratings
       : 0;
 
   const activeSection =
