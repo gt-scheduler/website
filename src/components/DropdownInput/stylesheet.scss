@@ -1,0 +1,114 @@
+@import '../../variables';
+
+.dropdown-input {
+  position: relative;
+  width: 100%;
+  font-size: 0.95rem;
+
+  .input-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    @include dark {
+      background: $ratings-dark-background;
+    }
+    @include light {
+      background: $ratings-light-background;
+    }
+    border-radius: 6px;
+    height: 32px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: inherit;
+    }
+
+    .text {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      @include dark {
+        color: #fff;
+      }
+    }
+
+    &:hover {
+      background-color: $color-border;
+    }
+  }
+
+  .options {
+    @include popup;
+
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 0;
+    width: auto;
+    min-width: 100%;
+    /* prevent wrapping so width reflects longest option */
+    white-space: nowrap;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 1;
+    border-radius: 6px;
+
+    .option {
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      flex-direction: row;
+      user-select: none;
+      white-space: nowrap;
+      transition: background-color 0.2s;
+      cursor: pointer;
+      @include dark {
+        background-color: $theme-dark-card-background;
+      }
+      @include light {
+        background-color: $ratings-light-background;
+      }
+
+      &:hover {
+        background-color: $color-border;
+      }
+
+      &.disabled {
+        color: #777;
+        cursor: default;
+        background: transparent;
+      }
+
+      > div {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+
+        .label-code {
+          font-weight: 600;
+          @include dark {
+            color: #fff;
+          }
+        }
+
+        .label-title {
+          font-size: 0.875rem;
+          @include dark {
+            color: #aaa;
+          }
+        }
+      }
+    }
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}

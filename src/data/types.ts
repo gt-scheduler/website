@@ -250,3 +250,21 @@ export const RatingStatsResponseSchema = z.object({
 });
 
 export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;
+
+export const Rating = z.object({
+  courseId: z.string(),
+  professorId: z.string(),
+  term: z.number(),
+  rating: z.number().min(1).max(5),
+  difficulty: z.number().min(1).max(5),
+  workload: z.number().min(0),
+});
+
+export const SubmitRatingsRequestDataSchema = z.object({
+  IDToken: z.string(),
+  ratings: z.array(Rating).min(1),
+});
+
+export type SubmitRatingsRequestData = z.infer<
+  typeof SubmitRatingsRequestDataSchema
+>;

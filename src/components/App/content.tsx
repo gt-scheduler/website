@@ -15,11 +15,15 @@ import {
   AppMobileNavDisplay,
   SchedulerPageType,
 } from './navigation';
-import { classes } from '../../utils/misc';
-import { AccountContextValue } from '../../contexts/account';
+import { classes, shouldDisplayRatings } from '../../utils/misc';
+import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
 import CourseDetails from '../CourseDetails';
 import SectionDetails from '../SectionDetails';
+import RatingsPage from '../RatingsPage';
+import RateBanner from '../RateBanner';
+import useScreenWidth from '../../hooks/useScreenWidth';
+import { DESKTOP_BREAKPOINT } from '../../constants';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
@@ -30,21 +34,33 @@ export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
  * This component is memoized, so it only re-renders when its context changes.
  */
 function AppContentBase(): React.ReactElement {
-  const { currentTab, setTab, openDrawer, currentSchedulerPage } =
-    useContext(AppNavigationContext);
+  const {
+    currentTab,
+    ratingsOverrideTerm,
+    setTab,
+    openDrawer,
+    currentSchedulerPage,
+  } = useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
+  const { type } = useContext(AccountContext);
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   return (
     <>
       <AppMobileNav captureRef={captureRef} />
       <Header
+        minimal={currentTab === 'Ratings'}
         currentTab={currentTab}
         onChangeTab={setTab}
         onToggleMenu={openDrawer}
         tabs={WEB_NAV_TABS}
         captureRef={captureRef}
       />
-      <SurveyBanner />
+      {currentTab !== 'Ratings' && <SurveyBanner />}
+      {/* TODO: remove after testing */}
+      {currentTab !== 'Ratings' && shouldDisplayRatings(!mobile, type) && (
+        <RateBanner />
+      )}
       <ErrorBoundary
         // ErrorBoundary.fallback is a normal render prop, not a component.
         // eslint-disable-next-line react/no-unstable-nested-components
@@ -74,12 +90,15 @@ function AppContentBase(): React.ReactElement {
           ))}
         {currentTab === 'Map' && <Map />}
         {currentTab === 'Finals' && <Finals />}
+        {currentTab === 'Ratings' && (
+          <RatingsPage overrideTerm={ratingsOverrideTerm} />
+        )}
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
         </div>
       </ErrorBoundary>
-      <Attribution />
+      {currentTab !== 'Ratings' && <Attribution />}
     </>
   );
 }

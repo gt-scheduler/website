@@ -5,7 +5,15 @@
   align-items: center;
   gap: 16px;
   margin-left: $calendar-web-margin;
+  margin-right: $calendar-web-margin;
   margin-top: 16px;
+  justify-content: space-between;
+
+  .view-mode-tabs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
   .view-mode-label {
     font-size: 1em;
@@ -14,5 +22,27 @@
 
   .view-mode-tab-bar {
     font-size: 0.875em;
+  }
+
+  .rate-button {
+    border-radius: 10px;
+    @include dark(background-color, rgba($color-neutral, 0.3));
+    @include light(background-color, $buttons-secondary-action-light);
+
+    &:hover {
+      @include dark {
+        background: $modal-foreground-color-light;
+      }
+
+      @include light {
+        background: $modal-foreground-color-dark;
+      }
+    }
+
+    .rate-button-label {
+      font-size: 0.875em;
+      font-weight: bold;
+      margin-left: 5px;
+    }
   }
 }

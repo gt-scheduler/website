@@ -35,11 +35,12 @@ const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
 
 // Cache for course-level rating statistics
-const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
+export const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
 const RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
 
 // Cache for professor-level rating statistics
-const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY = 'professor-ratings-cache-1';
+export const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY =
+  'professor-ratings-cache-1';
 const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
 
 // TODO: update URL when deployed
@@ -376,7 +377,9 @@ export default class Course {
         if (cacheItem != null) {
           const now = new Date().toISOString();
           if (now < cacheItem.exp) {
-            this.ratings = cacheItem.d;
+            if (cacheItem.d) {
+              this.ratings = cacheItem.d;
+            }
             return cacheItem.d;
           }
         }
@@ -500,7 +503,13 @@ export default class Course {
     if (professorsInTerm.length === 0) {
       return {};
     }
-    if (!this.professorRatings) {
+
+    const rawCacheString = window.localStorage.getItem(
+      PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
+    );
+    if (!rawCacheString) {
+      this.professorRatings = {};
+    } else if (!this.professorRatings) {
       this.professorRatings = {};
     }
 

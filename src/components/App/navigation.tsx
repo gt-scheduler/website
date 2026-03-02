@@ -29,7 +29,8 @@ export type SchedulerPageState =
 
 export type AppNavigationContextValue = {
   currentTab: string;
-  setTab: (next: string) => void;
+  setTab: (next: string, options?: { overrideTerm?: string }) => void;
+  ratingsOverrideTerm: string | undefined;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -45,6 +46,7 @@ export const AppNavigationContext =
         message: 'empty AppNavigationContext.setTab value being used',
       });
     },
+    ratingsOverrideTerm: undefined,
     isDrawerOpen: false,
     openDrawer: (): void => {
       throw new ErrorWithFields({
@@ -77,13 +79,26 @@ export function AppNavigation({
   children,
 }: AppNavigationProps): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
-
   // Allow top-level tab-based navigation
-  const [currentTab, setTab] = useState<string>('Scheduler');
+  const [currentTab, setCurrentTab] = useState<string>('Scheduler');
+  const [ratingsOverrideTerm, setRatingsOverrideTerm] = useState<
+    string | undefined
+  >(undefined);
+
+  const setTab = useCallback(
+    (next: string, options?: { overrideTerm?: string }): void => {
+      setCurrentTab(next);
+      // Clear the override whenever we leave the Ratings tab, and set it when
+      // navigating to Ratings with an explicit prior term.
+      setRatingsOverrideTerm(
+        next === 'Ratings' ? options?.overrideTerm : undefined
+      );
+    },
+    []
+  );
 
   const [currentSchedulerPage, setCurrentSchedulerPage] =
     useState<SchedulerPageState>({ type: SchedulerPageType.CALENDAR });
-
   // Handle the status of the drawer being open on mobile
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
@@ -100,6 +115,7 @@ export function AppNavigation({
     () => ({
       currentTab,
       setTab,
+      ratingsOverrideTerm,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -109,6 +125,7 @@ export function AppNavigation({
     [
       currentTab,
       setTab,
+      ratingsOverrideTerm,
       isDrawerOpen,
       openDrawer,
       closeDrawer,

@@ -1,0 +1,96 @@
+@import '../../variables';
+
+.rateentry {
+  height: 180px;
+  width: 100%;
+  padding: 32px 24px;
+  border-radius: 10px;
+  @include dark {
+    background: $theme-dark-card-background;
+  }
+  @include light {
+    background: $theme-light-card-background;
+  }
+
+  .heading {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .stars-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+
+    .labels {
+      width: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      @include dark {
+        color: $modal-foreground-color-dark;
+      }
+    }
+
+    .star {
+      font-size: 48px;
+      color: #d79758;
+    }
+  }
+
+  .time-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    gap: 24px;
+
+    .time-input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      .time-input {
+        aspect-ratio: 1 / 1;
+        height: 32px;
+        width: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        @include dark {
+          background: $ratings-dark-background;
+          color: #fff;
+        }
+        @include light {
+          background: rgba(0, 0, 0, 0.05);
+        }
+        font-size: 14px;
+        border: none;
+        outline: none;
+        text-align: center;
+        border-radius: 5px;
+
+        // remove spinner
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        &:focus {
+          outline: none;
+          border: none;
+        }
+      }
+
+      .time-label {
+        font-size: 14px;
+      }
+    }
+  }
+}

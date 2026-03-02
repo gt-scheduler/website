@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -25,6 +25,7 @@ import Modal from '../Modal';
 import { AccountContextValue } from '../../contexts/account';
 import { Term, Palette } from '../../types';
 import Toast, { notifyToast } from '../Toast';
+import { AppNavigationContext } from '../App/navigation';
 
 import './stylesheet.scss';
 
@@ -75,6 +76,7 @@ export type HeaderDisplayProps = {
   paletteState: PaletteState;
   accountState: AccountContextValue | { type: 'loading' };
   skeleton: boolean;
+  minimal?: boolean;
 };
 
 /**
@@ -101,6 +103,7 @@ export default function HeaderDisplay({
   paletteState,
   accountState,
   skeleton = true,
+  minimal = false,
 }: HeaderDisplayProps): React.ReactElement {
   // Re-render when the page is re-sized to become mobile/desktop
   // (desktop is >= 1024 px wide)
@@ -109,6 +112,8 @@ export default function HeaderDisplay({
   // Re-render when the page is re-sized to be small mobile vs. greater
   // (small mobile is < 600 px wide)
   const largeMobile = useScreenWidth(LARGE_MOBILE_BREAKPOINT);
+
+  const { setTab } = useContext(AppNavigationContext);
 
   useEffect(() => {
     if (termsState.type === 'loaded' && !skeleton) {
@@ -121,6 +126,17 @@ export default function HeaderDisplay({
       }
     }
   }, [termsState, skeleton]);
+
+  if (minimal) {
+    return (
+      <div className="Header">
+        <div className="logo" onClick={(): void => setTab('Scheduler')}>
+          <span className="gt">GT </span>
+          <span className="scheduler">Scheduler</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="Header">

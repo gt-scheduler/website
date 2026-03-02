@@ -1,0 +1,199 @@
+@import '../../variables';
+
+.scroller {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.ratings-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+  
+  .progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    padding: 0 51px;
+    box-sizing: border-box;
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+
+    .header-label {
+      position: absolute;
+      left: 2em;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .close-button {
+      position: absolute;
+      right: 2em;
+    }
+
+    .progress-bar {
+      width: 100%;
+      max-width: 800px;
+      height: 8px;
+      @include dark {
+        background: $ratings-dark-background;
+      }
+      @include light {
+        background: $ratings-light-background;
+      }
+      border-radius: 10px;
+      overflow: hidden;
+
+      .progress {
+        height: 100%;
+        @include dark {
+          background: #fff;
+        }
+        @include light {
+          background: $theme-dark-background;
+        }
+        transition: width 0.3s ease;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  .sub-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+
+    .section-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      @include dark {
+        background: $theme-dark-card-background;
+      }
+      @include light {
+        background: $theme-light-card-background;
+      }
+      border-radius: 8px;
+      padding: 2rem;
+      width: 100%;
+      box-sizing: border-box;
+
+      h3 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 600;
+      }
+
+      p {
+        color: #ccc;
+        margin: 0;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: center;
+      text-align: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+      .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .back-button {
+        @include dark(background-color, rgba($color-neutral, 0.3));
+        @include light(background-color, $buttons-secondary-action);
+      }
+
+      .start-button,
+      .next-button, 
+      .back-button {
+        height: 41px;
+        border: none;
+        border-radius: 10px;
+        background: #c56e5b;
+        align-self: center;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+          background: #e2944b;
+        }
+      }
+
+      .skip-button {
+        color: #66b3ff;
+        background: none;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+    .start-button {
+      width: 247px;
+    }
+
+    .next-button, .back-button {
+      width: 177px;
+    }
+  }
+
+  .done-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+
+    .done-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      gap: 8px;
+
+      .done {
+        font-size: 27px;
+      }
+      .thank-you {
+        font-size: 18px;
+      }
+    }
+
+    .done-image {
+      max-width: 200px;
+      height: auto;
+    }
+  }
+  .error-message {
+    margin-top: 1rem;
+    color: $error-message;
+    align-self: 'center';
+  }
+}
