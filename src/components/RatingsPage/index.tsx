@@ -45,10 +45,8 @@ function OverrideOscarLoader({
   useEffect(() => {
     if (state.type === 'error') {
       if (attempt === 0) {
-        // First failure: retry automatically by incrementing attempt
         setAttempt(1);
       } else if (!hasFailed) {
-        // Second failure: report soft error and navigate home
         softError(
           new ErrorWithFields({
             message: 'error fetching oscar object',
