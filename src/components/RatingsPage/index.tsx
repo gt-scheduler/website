@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { slugify } from '../../utils/misc';
+import { shouldDisplayRatings, slugify } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts/schedule';
 import Oscar from '../../data/beans/Oscar';
 import Section from '../../data/beans/Section';
@@ -22,6 +22,9 @@ import LoadingDisplay from '../LoadingDisplay';
 import { SkeletonContent } from '../App/content';
 import { getSemesterName } from '../../utils/semesters';
 import { ErrorWithFields, softError } from '../../log';
+import useScreenWidth from '../../hooks/useScreenWidth';
+import { DESKTOP_BREAKPOINT } from '../../constants';
+import { AccountContext } from '../../contexts';
 
 import './stylesheet.scss';
 
@@ -271,10 +274,8 @@ function RatingsPageInner({
     setCurrentIndex((prev) => prev + 1);
 
     localStorage.removeItem(RATINGS_STORAGE_KEY(ratingTerm));
-    localStorage.removeItem(`${RATINGS_CACHE_LOCAL_STORAGE_KEY}_${ratingTerm}`);
-    localStorage.removeItem(
-      `${PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY}_${ratingTerm}`
-    );
+    localStorage.removeItem(`${RATINGS_CACHE_LOCAL_STORAGE_KEY}`);
+    localStorage.removeItem(`${PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY}`);
     localStorage.setItem(`ratings_submitted_${ratingTerm}`, 'true');
   };
 
@@ -459,6 +460,15 @@ type RatingsPageProps = {
 export default function RatingsPage({
   overrideTerm,
 }: RatingsPageProps): React.ReactElement {
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
+  const { type } = useContext(AccountContext);
+  const { setTab } = useContext(AppNavigationContext);
+
+  // Non-logged in and mobile users should not be able to rate
+  if (!shouldDisplayRatings(!mobile, type)) {
+    setTab('Scheduler');
+  }
+
   if (overrideTerm != null) {
     return (
       <OverrideOscarLoader overrideTerm={overrideTerm}>

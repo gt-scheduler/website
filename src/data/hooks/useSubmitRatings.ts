@@ -14,7 +14,6 @@ import {
 import { exponentialBackoff, isAxiosNetworkError } from '../../utils/misc';
 import Cancellable from '../../utils/cancellable';
 import { validateMetricData } from '../../utils/validation';
-import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import useDeepCompareEffect from '../../hooks/useDeepCompareEffect';
 import useRateLimiter from '../../hooks/useRateLimiter';
 
@@ -23,7 +22,7 @@ type HookResult = {
 };
 
 // const url = `${CLOUD_FUNCTION_BASE_URL}/submitRatings`;
-// TODO: change back
+// TODO: update URL when deployed
 const url = `http://127.0.0.1:5001/gt-scheduler-web-dev/us-east1/submitRatings`;
 const MAX_RETRIES = 3;
 

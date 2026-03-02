@@ -15,13 +15,15 @@ import {
   AppMobileNavDisplay,
   SchedulerPageType,
 } from './navigation';
-import { classes } from '../../utils/misc';
-import { AccountContextValue } from '../../contexts/account';
+import { classes, shouldDisplayRatings } from '../../utils/misc';
+import { AccountContext, AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
 import CourseDetails from '../CourseDetails';
 import SectionDetails from '../SectionDetails';
 import RatingsPage from '../RatingsPage';
 import RateBanner from '../RateBanner';
+import useScreenWidth from '../../hooks/useScreenWidth';
+import { DESKTOP_BREAKPOINT } from '../../constants';
 
 export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
@@ -40,6 +42,8 @@ function AppContentBase(): React.ReactElement {
     currentSchedulerPage,
   } = useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
+  const { type } = useContext(AccountContext);
+  const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
 
   return (
     <>
@@ -53,7 +57,10 @@ function AppContentBase(): React.ReactElement {
         captureRef={captureRef}
       />
       {currentTab !== 'Ratings' && <SurveyBanner />}
-      {currentTab !== 'Ratings' && <RateBanner />}
+      {/* TODO: remove after testing */}
+      {currentTab !== 'Ratings' && shouldDisplayRatings(!mobile, type) && (
+        <RateBanner />
+      )}
       <ErrorBoundary
         // ErrorBoundary.fallback is a normal render prop, not a component.
         // eslint-disable-next-line react/no-unstable-nested-components

@@ -660,3 +660,10 @@ export function validateRatingStatsResponse(
     return null;
   }
 }
+
+export function shouldDisplayRatings(
+  isDesktop: boolean,
+  accountType: string
+): boolean {
+  return isDesktop && accountType === 'signedIn';
+}
