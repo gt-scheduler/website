@@ -1,23 +1,22 @@
 .banner {
-    width: 100%;
-    height: fit-content;
-    color: white;
-    background-color: #C56E5B;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
+  width: 100%;
+  color: white;
+  background-color: #c56e5b;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  padding-left: 12px;
 
-    .bannerButton {
-        display: inline-block;
-        padding: 10px 6px;
-    }
+  .bannerContent {
+    flex: 1;
+    text-align: center;
+  }
 
-    .bannerButton:hover {
-        text-decoration: underline;
-    }
+  .bannerButton {
+    display: inline-block;
+  }
 
-    .spacer {
-        width: 49px;
-    }
+  .bannerButton:hover {
+    text-decoration: underline;
+  }
 }
