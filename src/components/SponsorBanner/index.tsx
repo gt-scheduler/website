@@ -22,7 +22,7 @@ function Content(): React.ReactElement {
   );
 }
 
-export default function SurveyBanner(): React.ReactElement {
+export default function SponsorBanner(): React.ReactElement {
   return (
     <Banner
       localStorageKey={BANNER_LOCAL_STORAGE_KEY}
