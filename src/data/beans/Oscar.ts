@@ -1,7 +1,9 @@
 import { Immutable } from 'immer';
 import { decode } from 'html-entities';
 
-import { Course, Section, SortingOption } from '.';
+import Course from './Course';
+import Section from './Section';
+import SortingOption from './SortingOption';
 import {
   hasConflictBetween,
   hasConflictBetweenSectionAndEvent,

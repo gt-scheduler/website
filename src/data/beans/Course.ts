@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { decode } from 'html-entities';
 
-import { Oscar, Section } from '.';
+import Section from './Section';
+import Oscar from './Oscar';
 import {
   CourseGpa,
   CrawlerCourse,
