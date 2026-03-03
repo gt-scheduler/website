@@ -16,7 +16,7 @@ function Content(): React.ReactElement {
         rel="noopener noreferrer"
         target="_blank"
       >
-        <b className="buttonText">Apply now.</b>
+        <b className="buttonText">Apply now!</b>
       </a>
     </span>
   );
