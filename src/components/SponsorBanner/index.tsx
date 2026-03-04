@@ -9,7 +9,7 @@ const SPONSOR_LINK =
 function Content(): React.ReactElement {
   return (
     <span>
-      Mechanize is hiring. 250k base + equity.{' '}
+      Mechanize is hiring junior software engineers. 250k base + equity.{' '}
       <a
         className="bannerButton"
         href={SPONSOR_LINK}
