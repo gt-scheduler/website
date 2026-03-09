@@ -6,8 +6,24 @@ import { unique } from '../../utils/misc';
 import { DELIVERY_MODES, BACKEND_BASE_URL } from '../../constants';
 import Course from './Course';
 import Oscar from './Oscar';
-import { CrawlerMeeting, Meeting } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import {
+  CrawlerMeeting,
+  Meeting,
+  SectionRestrictions,
+  Restriction,
+} from '../../types';
+
+export interface DecodedRestriction {
+  category: string;
+  value: string;
+}
+
+export interface DecodedSectionRestrictions {
+  allowed: DecodedRestriction[];
+  disallowed: DecodedRestriction[];
+  status: string;
+}
 
 export type Seating = [
   seating:
@@ -31,7 +47,8 @@ type SectionConstructionData = [
   campusIndex: number,
   attributeIndices: number[],
   gradeBasisIndex: number,
-  sectionTitle: string
+  sectionTitle: string,
+  restrictionData: SectionRestrictions
 ];
 
 export default class Section {
@@ -67,6 +84,8 @@ export default class Section {
 
   sectionTitle: string;
 
+  restrictions: DecodedSectionRestrictions;
+
   plannedCount: number | undefined;
 
   constructor(
@@ -85,6 +104,7 @@ export default class Section {
       attributeIndices,
       gradeBasisIndex,
       sectionTitle,
+      restrictionData,
     ] = data;
 
     this.plannedCount = oscar.plannedCounts?.sectionCounts[crn];
@@ -97,6 +117,30 @@ export default class Section {
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';
     this.campus = oscar.campuses[campusIndex] ?? 'unknown';
     this.sectionTitle = sectionTitle;
+    this.restrictions = {
+      allowed: [],
+      disallowed: [],
+      status: restrictionData?.status ?? 'success',
+    };
+    if (restrictionData?.restrictions?.length === 2) {
+      const [allowedTuples, disallowedTuples] = restrictionData.restrictions;
+
+      // Helper to decode [categoryIdx, valueIdx] using the Oscar caches
+      const decodeRestrictions = (
+        tuples: Restriction[]
+      ): DecodedRestriction[] => {
+        return tuples.map(([catIdx, valIdx]) => {
+          const category = oscar.restrictions[catIdx] ?? 'Unknown Category';
+          const value =
+            oscar.restrictionValues?.[category]?.[valIdx] ?? 'Unknown Value';
+
+          return { category, value };
+        });
+      };
+
+      this.restrictions.allowed = decodeRestrictions(allowedTuples);
+      this.restrictions.disallowed = decodeRestrictions(disallowedTuples);
+    }
     const attributes = attributeIndices
       .map((attributeIndex) => oscar.attributes[attributeIndex])
       .flatMap((attribute) => (attribute == null ? [] : [attribute]));

@@ -48,6 +48,10 @@ export default class Oscar {
 
   locations: (Location | null)[];
 
+  restrictions: string[];
+
+  restrictionValues: Record<string, string[]>;
+
   updatedAt: Date;
 
   version: number;
@@ -159,6 +163,8 @@ export default class Oscar {
     this.attributes = caches.attributes;
     this.gradeBases = caches.gradeBases;
     this.locations = caches.locations;
+    this.restrictions = caches.restrictions || [];
+    this.restrictionValues = caches.restrictionValues || {};
     this.updatedAt = new Date(updatedAt);
     this.version = version;
 
@@ -469,6 +475,8 @@ export const EMPTY_OSCAR = new Oscar(
       finalDates: [],
       finalTimes: [],
       fullCourseNames: {},
+      restrictions: [],
+      restrictionValues: {},
     },
     // This converts the Date to the expected string
     // that it serializes to in the crawler

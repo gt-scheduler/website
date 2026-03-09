@@ -289,6 +289,22 @@ export default function CourseInfo({
                   : 'None'}
               </div>
             </li>
+            <li>
+              <div className="course-eligibility-list-item">
+                <div className="course-eligibility-content-title">
+                  Major Lock
+                </div>
+                {Array.from(
+                  new Set(
+                    course.sections.flatMap((section) =>
+                      (section.restrictions?.allowed || [])
+                        .filter((req) => req.category === 'Majors')
+                        .map((req) => req.value)
+                    )
+                  )
+                ).join(' or ') || 'None'}
+              </div>
+            </li>
           </ul>
         </div>
       </div>
