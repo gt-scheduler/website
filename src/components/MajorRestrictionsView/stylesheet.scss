@@ -1,0 +1,71 @@
+@import '../../variables';
+
+.modal-restrictions-body {
+  text-align: left;
+  padding-bottom: 20px;
+  @include dark(color,$theme-light-background); 
+
+  .modal-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .modal-header-back-title-container {
+      display: flex;
+      align-items: center; 
+      gap: 20px;
+
+      h3 {
+        font-size: 24px;
+        margin: 0;
+        font-weight: 500;
+      }
+    }
+
+    .close-x-icon, .back-icon {
+      color: #666666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover, &:focus {
+        @include dark(color, $theme-light-background);
+        @include light(color, #000);
+        outline: none;
+      }
+    }
+  }
+
+  .modal-section-details-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .modal-course-name {
+      color: $information-blue;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  }
+
+  p {
+    margin-bottom: 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+
+  .no-bullet-list {
+    list-style-type: none;
+    margin: 0;
+    max-height: 700px;
+    overflow-y: auto;
+    padding-left: 40px;
+
+    li {
+      font-size: 14px;
+      border-bottom: none;
+    }
+  }
+}

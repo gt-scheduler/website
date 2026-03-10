@@ -11,6 +11,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { getSemesterName } from '../../utils/semesters';
 import ProfessorInfoCard from '../ProfessorInfoCard';
 import Button from '../Button';
+import { MajorRestrictionsView } from '../MajorRestrictionsView';
 
 import './stylesheet.scss';
 
@@ -73,7 +74,6 @@ function CourseHeader({
   );
 }
 
-// Need to create course info short and course info long
 export default function CourseInfo({
   courseId,
   enableTermSelect = false,
@@ -89,6 +89,9 @@ export default function CourseInfo({
     useState(false);
   const [selectedTermKey, setSelectedTermKey] = useState<string | null>(null);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
+  const [restrictionsViewMajors, setRestrictionsViewMajors] = React.useState<
+    string[] | null
+  >(null);
 
   useEffect(() => {
     if (course) {
@@ -254,6 +257,17 @@ export default function CourseInfo({
     return <div />;
   }
 
+  if (restrictionsViewMajors !== null) {
+    return (
+      <MajorRestrictionsView
+        majors={restrictionsViewMajors}
+        onBack={(): void => setRestrictionsViewMajors(null)}
+        onHide={onHide}
+        courseName={`${course.subject} ${course.number}`}
+      />
+    );
+  }
+
   return (
     <div className="course-info-container">
       <div className="course-info-content">
@@ -323,6 +337,9 @@ export default function CourseInfo({
                     isRatingsLoaded={isProfessorRatingsLoaded}
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
+                    onViewRestrictions={
+                      isModal ? setRestrictionsViewMajors : undefined
+                    }
                   />
                 ))}
               </div>
