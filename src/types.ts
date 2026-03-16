@@ -119,10 +119,9 @@ export type SeatData = {
 export type Restriction = [categoryIndex: number, valueIndex: number];
 export type RestrictionStatus = 'success' | 'parse-error' | 'fetch-error';
 
-export interface SectionRestrictions {
-  restrictions: [allowed: Restriction[], disallowed: Restriction[]] | [];
-  status: RestrictionStatus;
-}
+export type SectionRestrictions =
+  | [allowed: Restriction[], disallowed: Restriction[]]
+  | [];
 
 // Meeting type (imported as `CrawlerMeeting`):
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts

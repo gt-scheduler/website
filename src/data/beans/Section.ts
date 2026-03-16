@@ -22,7 +22,6 @@ export interface DecodedRestriction {
 export interface DecodedSectionRestrictions {
   allowed: DecodedRestriction[];
   disallowed: DecodedRestriction[];
-  status: string;
 }
 
 export type Seating = [
@@ -120,19 +119,26 @@ export default class Section {
     this.restrictions = {
       allowed: [],
       disallowed: [],
-      status: restrictionData?.status ?? 'success',
     };
 
-    if (restrictionData?.restrictions?.length === 2) {
-      const [allowedTuples, disallowedTuples] = restrictionData.restrictions;
+    if (restrictionData && restrictionData.length === 2) {
+      const [allowedTuples, disallowedTuples] = restrictionData;
       // Helper to decode [categoryIdx, valueIdx] using the Oscar caches
       const decodeRestrictions = (
         tuples: Restriction[]
       ): DecodedRestriction[] => {
         return tuples.map(([catIdx, valIdx]) => {
           const category = oscar.restrictions[catIdx] ?? 'Unknown Category';
-          const value =
-            oscar.restrictionValues?.[category]?.[valIdx] ?? 'Unknown Value';
+          let value = 'Unknown Value';
+
+          // Route campus restrictions to the global campuses array
+          if (category.toLowerCase().includes('campus')) {
+            value = oscar.campuses[valIdx] ?? 'Unknown Campus';
+          } else {
+            // Standard routing for other restrictions
+            value =
+              oscar.restrictionValues?.[category]?.[valIdx] ?? 'Unknown Value';
+          }
 
           return { category, value };
         });
