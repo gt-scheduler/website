@@ -23,6 +23,7 @@ import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 import { getTermFromSemesterName } from '../../utils/semesters';
 import { NormalizedStat, RatingStatsResponse } from '../types';
+import LocalStorageCache from '../../utils/cache';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -31,17 +32,29 @@ import { NormalizedStat, RatingStatsResponse } from '../types';
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
 const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
-const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
-const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
+interface GpaCacheItem {
+  gpa: CourseGpa;
+  termInfo: Record<string, string[]>;
+}
 
-// Cache for course-level rating statistics
+// NOTE: if cache entries ever change, cache needs to be invalidated
+// by changing local storage key
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-5'; // changed from 4 → 5 due to GpaCacheItem shape change
+const gpaCache = new LocalStorageCache<GpaCacheItem>(
+  GPA_CACHE_LOCAL_STORAGE_KEY,
+  7 * 24 * 60 * 60 * 1000 // 7 days
+);
 export const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
-const RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
-
-// Cache for professor-level rating statistics
+const ratingsCache = new LocalStorageCache<NormalizedStat | null>(
+  RATINGS_CACHE_LOCAL_STORAGE_KEY,
+  15 * 60 * 1000 // 15 minutes
+);
 export const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY =
   'professor-ratings-cache-1';
-const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
+const professorRatingsCache = new LocalStorageCache<NormalizedStat | null>(
+  PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
+  15 * 60 * 1000 // 15 minutes
+);
 
 // TODO: update URL when deployed
 const DEV_GET_RATING_URL = `http://localhost:5001/gt-scheduler-web-dev/us-east1/getRatingStats`;
@@ -252,37 +265,10 @@ export default class Course {
     // Note: if `CourseGpa` ever changes,
     // the cache needs to be invalidated
     // (by changing the local storage key).
-    type GpaCache = Record<string, GpaCacheItem>;
-    interface GpaCacheItem {
-      d: CourseGpa;
-      exp: string;
-      termInfo: Record<string, string[]>;
-    }
-
-    // Try to look in the cache for a cached course gpa item
-    // that has not expired.
-    // If it is expired, we don't evict; we just ignore it
-    // (and update it with a fresh expiry once it has been fetched).
-    // The size of the cache may bloat over time, but shouldn't be substantial.
-    try {
-      const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
-      if (rawCache != null) {
-        const cache: GpaCache = JSON.parse(rawCache) as unknown as GpaCache;
-        const cacheItem = cache[this.id];
-        if (cacheItem != null) {
-          const now = new Date().toISOString();
-          // Use lexicographic comparison on date strings
-          // (since they are ISO 8601)
-          if (now < cacheItem.exp) {
-            if (cacheItem.termInfo) {
-              this.termInfo = cacheItem.termInfo;
-            }
-            return cacheItem.d;
-          }
-        }
-      }
-    } catch (err) {
-      // Ignore
+    const cached = gpaCache.get(this.id);
+    if (cached != null) {
+      this.termInfo = cached.termInfo;
+      return cached.gpa;
     }
 
     // Fetch the GPA normally
@@ -292,27 +278,7 @@ export default class Course {
       return {};
     }
 
-    // Store the GPA in the cache
-    const exp = new Date();
-    exp.setDate(exp.getDate() + GPA_CACHE_EXPIRATION_DURATION_DAYS);
-    try {
-      let cache: GpaCache = {};
-      const rawCache = window.localStorage.getItem(GPA_CACHE_LOCAL_STORAGE_KEY);
-      if (rawCache != null) {
-        cache = JSON.parse(rawCache) as unknown as GpaCache;
-      }
-
-      cache[this.id] = {
-        d: courseGpa,
-        exp: exp.toISOString(),
-        termInfo: this.termInfo,
-      };
-      const rawUpdatedCache = JSON.stringify(cache);
-      window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
-    } catch (err) {
-      // Ignore
-    }
-
+    gpaCache.set(this.id, { gpa: courseGpa, termInfo: this.termInfo });
     return courseGpa;
   }
 
@@ -358,34 +324,10 @@ export default class Course {
   }
 
   async fetchRatings(): Promise<NormalizedStat | null> {
-    type ratingsCache = Record<string, ratingsCacheItem>;
-    interface ratingsCacheItem {
-      d: NormalizedStat | null;
-      exp: string;
-    }
-
-    // Try to look in the cache for a cached ratings item
-    try {
-      const rawCache = window.localStorage.getItem(
-        RATINGS_CACHE_LOCAL_STORAGE_KEY
-      );
-      if (rawCache != null) {
-        const cache: ratingsCache = JSON.parse(
-          rawCache
-        ) as unknown as ratingsCache;
-        const cacheItem = cache[this.id];
-        if (cacheItem != null) {
-          const now = new Date().toISOString();
-          if (now < cacheItem.exp) {
-            if (cacheItem.d) {
-              this.ratings = cacheItem.d;
-            }
-            return cacheItem.d;
-          }
-        }
-      }
-    } catch (err) {
-      // Ignore
+    const cached = ratingsCache.get(this.id);
+    if (cached !== undefined) {
+      this.ratings = cached;
+      return cached;
     }
 
     // Fetch the ratings normally
@@ -394,33 +336,9 @@ export default class Course {
       return null;
     }
 
-    const exp = new Date();
-    exp.setMinutes(
-      exp.getMinutes() + RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
-    );
-    try {
-      let cache: ratingsCache = {};
-      const rawCache = window.localStorage.getItem(
-        RATINGS_CACHE_LOCAL_STORAGE_KEY
-      );
-      if (rawCache != null) {
-        cache = JSON.parse(rawCache) as unknown as ratingsCache;
-      }
-      cache[this.id] = {
-        d: ratingsResponse.courses[this.id] ?? null,
-        exp: exp.toISOString(),
-      };
-      const rawUpdatedCache = JSON.stringify(cache);
-      window.localStorage.setItem(
-        RATINGS_CACHE_LOCAL_STORAGE_KEY,
-        rawUpdatedCache
-      );
-    } catch (err) {
-      // Ignore
-    }
     const courseRating = ratingsResponse.courses[this.id] ?? null;
+    ratingsCache.set(this.id, courseRating);
     this.ratings = courseRating;
-
     return courseRating;
   }
 
@@ -492,43 +410,20 @@ export default class Course {
   async fetchProfessorRatings(
     term: string
   ): Promise<Record<string, NormalizedStat | null>> {
-    type ProfessorRatingsCache = Record<string, ProfessorRatingsCacheItem>;
-    interface ProfessorRatingsCacheItem {
-      d: NormalizedStat | null;
-      exp: string;
-    }
-
-    // Get professors who taught in this term
     const professorsInTerm = this.termInfo[term] ?? [];
     if (professorsInTerm.length === 0) {
       return {};
     }
-
-    const rawCacheString = window.localStorage.getItem(
-      PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
-    );
-    if (!rawCacheString) {
-      this.professorRatings = {};
-    } else if (!this.professorRatings) {
+    if (!this.professorRatings) {
       this.professorRatings = {};
     }
 
     const { professorRatings } = this;
-    const now = new Date().toISOString();
-    const professorsToFetch: string[] = [];
     const cachedResults: Record<string, NormalizedStat | null> = {};
+    const professorsToFetch: string[] = [];
 
-    let cache: ProfessorRatingsCache = {};
-    try {
-      const rawCache = window.localStorage.getItem(
-        PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
-      );
-      if (rawCache != null) {
-        cache = JSON.parse(rawCache) as unknown as ProfessorRatingsCache;
-      }
-    } catch (err) {
-      // Ignore cache read errors
-    }
+    const slugifiedNames = professorsInTerm.map(slugify);
+    const cachedData = professorRatingsCache.getMany(slugifiedNames);
 
     professorsInTerm.forEach((professor) => {
       const slugifiedName = slugify(professor);
@@ -538,16 +433,15 @@ export default class Course {
         return;
       }
 
-      const cacheItem = cache[slugifiedName];
-      if (cacheItem != null && now < cacheItem.exp) {
-        cachedResults[slugifiedName] = cacheItem.d;
-        professorRatings[slugifiedName] = cacheItem.d;
+      const cached = cachedData[slugifiedName];
+      if (cached !== undefined) {
+        cachedResults[slugifiedName] = cached;
+        professorRatings[slugifiedName] = cached;
       } else {
         professorsToFetch.push(professor);
       }
     });
 
-    // Fetch only missing/expired professors
     if (professorsToFetch.length > 0) {
       const ratingsResponse = await this.fetchRatingsInner(
         [],
@@ -555,33 +449,18 @@ export default class Course {
       );
 
       if (ratingsResponse !== null) {
-        const exp = new Date();
-        exp.setMinutes(
-          exp.getMinutes() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
-        );
+        const newCacheEntries: Record<string, NormalizedStat | null> = {};
 
-        // Merge results
-        try {
-          professorsToFetch.forEach((professor) => {
-            const slugifiedName = slugify(professor);
-            const rating = ratingsResponse.professors[slugifiedName] ?? null;
+        professorsToFetch.forEach((professor) => {
+          const slugifiedName = slugify(professor);
+          const rating = ratingsResponse.professors[slugifiedName] ?? null;
 
-            professorRatings[slugifiedName] = rating;
-            cache[slugifiedName] = {
-              d: rating,
-              exp: exp.toISOString(),
-            };
-            cachedResults[slugifiedName] = rating;
-          });
+          professorRatings[slugifiedName] = rating;
+          cachedResults[slugifiedName] = rating;
+          newCacheEntries[slugifiedName] = rating;
+        });
 
-          const rawUpdatedCache = JSON.stringify(cache);
-          window.localStorage.setItem(
-            PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
-            rawUpdatedCache
-          );
-        } catch (err) {
-          // Ignore cache write errors
-        }
+        professorRatingsCache.setMany(newCacheEntries);
       }
     }
 
