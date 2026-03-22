@@ -36,7 +36,9 @@
     .sections-header,
     .section-row .section-content {
       display: grid;
-      width: min-content;
+      min-width: 100%;
+      width: fit-content; 
+
       grid-template-columns:
         45px /* action */
         69px /* CRN */
@@ -45,7 +47,7 @@
         150px /* Time */
         115px /* Seats Filled */
         103px /* Waitlist */
-        210px; /* Location */
+        minmax(210px, 1fr); /* Location */
       align-items: center;
     }
 
