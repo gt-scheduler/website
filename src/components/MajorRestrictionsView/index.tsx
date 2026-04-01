@@ -54,7 +54,9 @@ export function MajorRestrictionsView({
           <div className="modal-course-name" onClick={onBack}>
             {courseName} Section Details
           </div>
-          <FontAwesomeIcon icon={faChevronRight} />
+          <div className="modal-section-chevron">
+            <FontAwesomeIcon icon={faChevronRight} />
+          </div>
           Major Restrictions
         </div>
       )}
