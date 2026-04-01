@@ -116,6 +116,13 @@ export type SeatData = {
   waitlist: OccupiedInfo | null;
 };
 
+export type Restriction = [categoryIndex: number, valueIndex: number];
+export type RestrictionStatus = 'success' | 'parse-error' | 'fetch-error';
+
+export type SectionRestrictions =
+  | [allowed: Restriction[], disallowed: Restriction[]]
+  | [];
+
 // Meeting type (imported as `CrawlerMeeting`):
 // Copied from https://github.com/gt-scheduler/crawler/blob/master/src/types.ts
 
@@ -212,7 +219,11 @@ export type CrawlerSection = [
    * the section-specific title of the course (e.g. "Animal Interaction"),
    * used for 8803 Special Topics courses
    */
-  sectionTitle: string
+  sectionTitle: string,
+  /**
+   * restriction information for this section with status
+   */
+  restrictionData: SectionRestrictions
 ];
 
 // Prerequisite types:
@@ -276,6 +287,13 @@ export interface CrawlerCaches {
    * (e.g. `"Georgia Tech-Atlanta *"` or `"Online"`)
    */
   campuses: string[];
+  /** List of restrictions on a course (e.g. `"Campus"`, or `"Level"`) */
+  restrictions: string[];
+  /** A dedicated object to hold the dynamically discovered restriction values.
+   * Keys are the category names (e.g., "campuses" or "degree_programs"),
+   * values are the arrays of strings.
+   */
+  restrictionValues: Record<string, string[]>;
   /**
    * List of other miscellaneous attributes that can be associated with a class
    * (e.g. `"Hybrid Course"`, `"Honors Program"`, or `"Capstone"`)
