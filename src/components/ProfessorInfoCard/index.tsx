@@ -15,6 +15,8 @@ import ActionRow from '../ActionRow';
 import MetricsCard, { Metric } from '../MetricsCard';
 import useScrollFade from '../../hooks/useScrollFade';
 import { OccupiedInfo } from '../../types';
+import Modal from '../Modal';
+import { MajorRestrictionsView } from '../MajorRestrictionsView';
 
 import './stylesheet.scss';
 
@@ -29,6 +31,7 @@ export type ProfessorInfoCardProps = {
   isRatingsLoaded: boolean;
   course: Course;
   displaySectionInfo: boolean;
+  onViewRestrictions?: (majors: string[]) => void;
 };
 
 function SectionRow({
@@ -37,14 +40,24 @@ function SectionRow({
   isPinned,
   onAdd,
   onRemove,
+  onViewRestrictions,
 }: {
   section: Section;
   term: string;
   isPinned: boolean;
   onAdd: () => void;
   onRemove: () => void;
+  onViewRestrictions?: (majors: string[]) => void;
 }): React.ReactElement {
   const meeting = section.meetings[0];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const majors =
+    section.restrictions?.allowed
+      ?.filter((res) => res.category === 'Majors')
+      .map((res) => res.value) || [];
+  const majorString = majors.join(', ') || 'None';
+  // Only show the link if there are multiple majors or a long string
+  const needsViewAll = majors.length > 1 || majorString.length > 25;
 
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -82,6 +95,14 @@ function SectionRow({
     return `${info.occupied} / ${info.total}`;
   };
 
+  const handleViewAllClick = (): void => {
+    if (onViewRestrictions) {
+      onViewRestrictions(majors);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
   if (!section) {
     return <div />;
   }
@@ -114,6 +135,34 @@ function SectionRow({
           {formatSeatData(seating?.waitlist ?? null)}
         </div>
         <div className="row-cell">{meeting?.where || 'TBA'}</div>
+        <div className="row-cell restrictions-cell">
+          <div className="restrictions-text" title={majorString}>
+            {majorString}
+          </div>
+
+          {needsViewAll && (
+            <div
+              className="view-all-link"
+              onClick={handleViewAllClick}
+              role="button"
+              tabIndex={0}
+            >
+              View all
+            </div>
+          )}
+
+          <Modal
+            show={isModalOpen}
+            onHide={(): void => setIsModalOpen(false)}
+            width={800}
+            className="major-restrictions-modal"
+          >
+            <MajorRestrictionsView
+              majors={majors}
+              onHide={(): void => setIsModalOpen(false)}
+            />
+          </Modal>
+        </div>
       </div>
     </ActionRow>
   );
@@ -126,6 +175,7 @@ export default function ProfessorInfoCard({
   isRatingsLoaded,
   course,
   displaySectionInfo,
+  onViewRestrictions,
 }: ProfessorInfoCardProps): React.ReactElement {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const { fadeLeft, fadeRight } = useScrollFade(scrollRef, displaySectionInfo);
@@ -212,6 +262,7 @@ export default function ProfessorInfoCard({
                 <div className="row-cell">Seats Filled</div>
                 <div className="row-cell">Waitlist</div>
                 <div className="row-cell">Location</div>
+                <div className="row-cell">Major Lock</div>
               </div>
             </div>
 
@@ -224,6 +275,7 @@ export default function ProfessorInfoCard({
                   isPinned={pinnedCrns.includes(section.crn)}
                   onAdd={(): void => handleAddSection(section)}
                   onRemove={(): void => handleRemoveSection(section)}
+                  onViewRestrictions={onViewRestrictions}
                 />
               );
             })}

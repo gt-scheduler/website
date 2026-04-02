@@ -47,7 +47,8 @@
         150px /* Time */
         115px /* Seats Filled */
         103px /* Waitlist */
-        minmax(210px, 1fr); /* Location */
+        minmax(210px, 1fr) /* Location */
+        210px; /* Major Lock */
       align-items: center;
     }
 
@@ -93,6 +94,7 @@
       display: flex;
       align-items: center;
       min-height: 46px;
+      min-width: 0;
 
       .action-button {
         background: none;
@@ -105,6 +107,26 @@
 
         .action-icon {
           color: $information-blue;
+        }
+      }
+
+      &.restrictions-cell {
+        gap: 6px;
+
+        .restrictions-text {
+          flex: 1 1 0%;
+          min-width: 0; 
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .view-all-link {
+          flex-shrink: 0; 
+          color: $information-blue;
+          cursor: pointer;
+          font-size: 12px;
+          white-space: nowrap;
         }
       }
     }
