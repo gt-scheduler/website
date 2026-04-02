@@ -7,19 +7,34 @@ import { saveAs } from 'file-saver';
 import { Immutable } from 'immer';
 
 import { Oscar, Section } from '../data/beans';
-import { DAYS, PALETTE, PNG_SCALE_FACTOR } from '../constants';
+import {
+  DAYS,
+  DEFAULT_PALETTE,
+  DEEP_PALETTE,
+  SOFT_PALETTE,
+  PNG_SCALE_FACTOR,
+} from '../constants';
 import { ErrorWithFields, softError } from '../log';
 import {
   DateRange,
   Event,
   ICS,
   Meeting,
+  OccupiedInfo,
+  Palette,
   Period,
   PrerequisiteClause,
+  SeatData,
   Theme,
 } from '../types';
 import ics from '../vendor/ics';
 import { getSemesterName } from './semesters';
+import { Seating } from '../data/beans/Section';
+import {
+  NormalizedStat,
+  RatingStatsResponse,
+  RatingStatsResponseSchema,
+} from '../data/types';
 
 /* Converts a string of the form "930" to 750. strings of the
   mentioned format are returned by crawler v2 */
@@ -69,21 +84,40 @@ export const daysToString = (days: readonly string[] | string[]): string => {
   return DAYS.filter((day) => set.has(day)).join('');
 };
 
-export const getRandomColor = (): string => {
-  const colors = PALETTE.flat();
-  const index = (Math.random() * colors.length) | 0;
-  return colors[index] ?? '#333333';
+export const getRandomColor = (palette: Palette): string => {
+  const paletteColors =
+    palette === 'default'
+      ? DEFAULT_PALETTE
+      : palette === 'soft'
+      ? SOFT_PALETTE
+      : DEEP_PALETTE;
+  const colors = paletteColors.flat();
+  const uniqueColors = Array.from(new Set(colors));
+  const index = Math.floor(Math.random() * uniqueColors.length);
+  return uniqueColors[index] ?? '#333333';
 };
 
-export const getContentClassName = (color: string | undefined): string => {
-  if (color == null) return 'light-content';
-  const r = parseInt(color.substring(1, 3), 16);
-  const g = parseInt(color.substring(3, 5), 16);
-  const b = parseInt(color.substring(5, 7), 16);
-  return r * 0.299 + g * 0.587 + b * 0.114 > 128
-    ? 'light-content'
-    : 'dark-content';
+const getLuminance = (color: string): number => {
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  return r * 0.299 + g * 0.587 + b * 0.114;
 };
+
+const getContrastClass = (
+  color: string | undefined,
+  lightClass: string,
+  darkClass: string
+): string => {
+  if (!color) return lightClass;
+  return getLuminance(color) > 128 ? lightClass : darkClass;
+};
+
+export const getContentClassName = (color?: string): string =>
+  getContrastClass(color, 'light-content', 'dark-content');
+
+export const getLabelClassName = (color?: string): string =>
+  getContrastClass(color, 'light-label', 'dark-label');
 
 export const hasConflictBetweenMeetings = (
   meeting1: Meeting | Immutable<Event>,
@@ -173,6 +207,18 @@ export function humanizeArrayReact<T>(
     </>
   );
 }
+
+export const MULTIPLE_TOPICS_COURSE_TITLE = 'Multiple Topics';
+
+export const getSectionCourseTitle = (section: Section): string => {
+  if (
+    section.course.title === MULTIPLE_TOPICS_COURSE_TITLE &&
+    section.sectionTitle
+  ) {
+    return section.sectionTitle;
+  }
+  return section.course.title;
+};
 
 export const serializePrereqs = (
   reqs: PrerequisiteClause,
@@ -346,7 +392,7 @@ export function exportCoursesToCalendar(
     section.meetings.forEach((meeting) => {
       if (!meeting.period || !meeting.days.length) return;
       const subject = section.course.id;
-      const description = section.course.title;
+      const description = getSectionCourseTitle(section);
       const location = meeting.where;
       addEventsToCalendar(
         meeting.period,
@@ -526,4 +572,91 @@ export function abbreviateLocation(location: string): string {
   }
 
   return location;
+}
+
+// Normalize Course Names
+// e.g. "cs1331" -> "CS 1331", "MATH 1551" -> "MATH 1551"
+export function normalizeCourseName(
+  courseName: string,
+  trimSection = false
+): string {
+  let normalizedName = courseName;
+  const results = /^([A-Z]+)(\d.*)$/i.exec(courseName);
+  if (results != null) {
+    const [, subject, number] = results as unknown as [string, string, string];
+    const cleanNumber = trimSection ? number.replace(/\D/g, '') : number;
+    normalizedName = `${subject} ${cleanNumber}`;
+  }
+  return normalizedName;
+}
+
+export function normalizeSeatingData(raw: Seating): SeatData {
+  if (!raw[0] || raw[0].length < 4) {
+    return { inClass: null, waitlist: null };
+  }
+
+  const [inClassTotal, inClassOccupied, waitlistTotal, waitlistOccupied] =
+    raw[0];
+
+  const toOccupiedInfo = (total: unknown, occupied: unknown): OccupiedInfo => ({
+    occupied: Number(occupied ?? 0),
+    total: Number(total ?? 0),
+  });
+
+  return {
+    inClass: toOccupiedInfo(inClassTotal, inClassOccupied),
+    waitlist: toOccupiedInfo(waitlistTotal, waitlistOccupied),
+  };
+}
+
+export const slugify = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+};
+
+/**
+ * Validates rating statistics from the ratings API response
+ * @param response - The rating stats response to validate
+ * @returns The validated response or null if validation fails
+ */
+export function validateRatingStatsResponse(
+  response: unknown
+): RatingStatsResponse | null {
+  try {
+    const validatedResponse = RatingStatsResponseSchema.parse(response);
+
+    const validateStat = (stat: NormalizedStat | null): boolean => {
+      if (stat === null) return true;
+
+      return (
+        stat.averageRating >= 1 &&
+        stat.averageRating <= 5 &&
+        stat.averageDifficulty >= 1 &&
+        stat.averageDifficulty <= 5 &&
+        stat.averageWorkload >= 0 &&
+        stat.reviewCount >= 0
+      );
+    };
+
+    // Validate all course stats
+    for (const stat of Object.values(validatedResponse.courses)) {
+      if (!validateStat(stat)) {
+        throw new Error('Invalid rating values in course stats');
+      }
+    }
+
+    // Validate all professor stats
+    for (const stat of Object.values(validatedResponse.professors)) {
+      if (!validateStat(stat)) {
+        throw new Error('Invalid rating values in professor stats');
+      }
+    }
+
+    return validatedResponse;
+  } catch (err) {
+    return null;
+  }
 }

@@ -1,0 +1,149 @@
+@import '../../variables.scss';
+
+.course-info-subtitle {
+  font-weight: bold;
+}
+
+.course-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+  flex: 1 0 0;
+  font-size: 0.875rem;
+
+  .course-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+
+    .course-header-container-modal {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      width: 100%;
+
+      .course-header-modal {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        flex: 1 0 0;
+
+        .mobile & {
+          gap: 4px;
+        }
+
+        .course-title-container {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          align-self: stretch;
+
+          .mobile & {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+          }
+
+          .course-id {
+            font-size: 1.25em;
+            font-weight: bold;
+          }
+
+          .course-title {
+            font-size: 1.25em;
+          }
+        }
+
+        .course-credits {
+          font-size: 1.25em;
+        }
+      }
+
+      .cancel-button {
+        padding: 0px;
+      }
+    }
+
+    .course-header {
+      display: flex;
+      justify-content: space-between;
+      align-self: stretch;
+      font-size: 1.25rem;
+
+      .course-id {
+        font-weight: bold;
+      }
+    }
+
+    .course-metrics {
+      align-self: stretch;
+    }
+
+    .course-eligibility {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      align-self: stretch;
+
+      .course-eligibility-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0px;
+
+        .course-eligibility-list-item {
+          display: flex;
+          gap: 8px;
+
+          .course-eligibility-content-title {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+
+  .course-terms {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .term-info {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .course-terms-tab-bar {
+        @include dark(background-color, $buttons-navigation-hover);
+      }
+
+      .course-terms-tab-bar.enable-select {
+        padding: 2px;
+        .tab {
+          border-radius: 8px;
+        }
+      }
+
+      .professor-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  }
+}
+
+.course-title-container {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.mobile .course-title-container {
+  flex-direction: column;
+  gap: 4px;
+}
