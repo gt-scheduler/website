@@ -9,9 +9,21 @@ import useScreenWidth from '../../hooks/useScreenWidth';
 
 import './stylesheet.scss';
 
+function ExternalLink({
+  children,
+  ...props
+}: React.AnchorHTMLAttributes<HTMLAnchorElement>): React.ReactElement {
+  return (
+    <a target="_blank" rel="noopener noreferrer" {...props}>
+      {children}
+    </a>
+  );
+}
+
 export default function Attribution(): React.ReactElement {
   const mobile = !useScreenWidth(DESKTOP_BREAKPOINT);
   const year = getFullYear();
+
   return (
     <div className={classes('Attribution')}>
       {!mobile ? (
@@ -28,11 +40,17 @@ export default function Attribution(): React.ReactElement {
         <span role="img" aria-label="love">
           ❤️
         </span>
-        &nbsp;by <a href="https://jasonpark.me">Jinseo Park</a>,&nbsp;
-        <a href="https://bitsofgood.org">Bits of Good</a>, and&nbsp;
-        <a href="https://github.com/gt-scheduler/website/graphs/contributors">
-          {mobile ? 'others' : 'the GT Scheduler contributors'}
-        </a>
+        &nbsp;by{' '}
+        <ExternalLink href="https://jasonpark.me">Jinseo Park</ExternalLink>,{' '}
+        <ExternalLink href="https://bitsofgood.org">Bits of Good</ExternalLink>,
+        and{' '}
+        <ExternalLink href="https://github.com/gt-scheduler/website/graphs/contributors">
+          the GT Scheduler contributors
+        </ExternalLink>
+        . Sponsored by{' '}
+        <ExternalLink href="https://www.mechanize.work/">
+          Mechanize
+        </ExternalLink>
         .
       </p>
       <p>&nbsp;</p>

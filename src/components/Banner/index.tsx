@@ -30,8 +30,9 @@ export default function Banner({
 
   return (
     <div className="banner">
-      <div className="spacer" />
-      {!mobile ? content : mobileContent || content}
+      <div className="bannerContent">
+        {!mobile ? content : mobileContent || content}
+      </div>
       <Button
         className="close-button"
         onClick={(): void => {
