@@ -1,0 +1,40 @@
+@import "../../variables";
+
+.SeatInfo {
+  padding: 5px;
+  display: flex;
+  justify-content: flex-end;
+
+  .seating-container {
+    display: flex;
+    flex-direction: row;
+
+    .seating {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      
+
+      .seating-label {
+        font-size: 0.8em;
+
+        &.dark-label {
+          color: $seat-info-dark-label; // color of title on dark bg
+        }
+
+        &.light-label {
+          color: $seat-info-light-label;
+        }
+
+        .seat-waitlist-stats.light-content {
+          color: $theme-dark-card-background; // color of numbers on light bg
+        }
+
+        .seat-waitlist-stats.dark-content { // color of numbers on dark bg
+          color: $theme-light-background;
+        }
+      }
+    }
+  }
+}

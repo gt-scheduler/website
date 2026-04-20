@@ -1,0 +1,31 @@
+@import '../../variables';
+
+.LocationPicker {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .location-option {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .location-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+      @include light {
+        color: $theme-light-foreground;
+      }
+      @include dark {
+        color: $theme-dark-foreground;
+      }
+    }
+
+    .location-address {
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: $color-neutral;
+      margin-top: 2px;
+    }
+  }
+}

@@ -158,7 +158,10 @@ export function AppMobileNavDisplay({
       <NavMenu
         items={NAV_TABS}
         currentItem={currentTabIndex}
-        onChangeItem={setTabIndex}
+        onChangeItem={(next): void => {
+          setTabIndex(next);
+          closeDrawer();
+        }}
       />
     </NavDrawer>
   );

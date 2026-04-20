@@ -10,6 +10,7 @@ import {
 } from '../types';
 import * as dataTypes from '../types';
 import * as migrations from '../migrations';
+import { Palette } from '../../types';
 
 // Mock the `Cookies` object so we can set values
 jest.mock('js-cookie');
@@ -98,6 +99,7 @@ describe('useMigrateScheduleData', () => {
                 events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
+                palette: 'default' as Palette,
               },
             },
           },
@@ -156,6 +158,7 @@ describe('useMigrateScheduleData', () => {
                     events: [],
                     colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                     sortingOptionIndex: 0,
+                    palette: 'default' as Palette,
                   },
                 },
               },
@@ -187,6 +190,7 @@ describe('useMigrateScheduleData', () => {
                 events: [],
                 colorMap: { 'CS 1100': '#0062B1', 'CS 1331': '#194D33' },
                 sortingOptionIndex: 0,
+                palette: 'default',
               },
               friends: {},
             },
