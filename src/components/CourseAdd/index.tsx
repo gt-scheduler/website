@@ -18,6 +18,17 @@ import { Course as CourseBean, Section } from '../../data/beans';
 
 import './stylesheet.scss';
 
+/** GT CRNs are 5 digits */
+const CRN_LENGTH = 5;
+
+function normalizeCrnInput(value: string): string {
+  return value.replace(/\D/g, '').slice(0, CRN_LENGTH);
+}
+
+function normalizeCrnPaste(value: string): string {
+  return value.replace(/\s/g, '').replace(/\D/g, '').slice(0, CRN_LENGTH);
+}
+
 export type CourseAddProps = {
   className?: string;
 };
@@ -72,8 +83,10 @@ function doesFilterMatchSection(section: Section, filter: SortFilter): boolean {
 export default function CourseAdd({
   className,
 }: CourseAddProps): React.ReactElement {
-  const [{ oscar, desiredCourses, excludedCrns, colorMap }, { patchSchedule }] =
-    useContext(ScheduleContext);
+  const [
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { patchSchedule },
+  ] = useContext(ScheduleContext);
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState<SortFilter>({
     deliveryMode: [],
@@ -81,6 +94,10 @@ export default function CourseAdd({
   });
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [crnInput, setCrnInput] = useState('');
+  const [crnError, setCrnError] = useState<string | null>(null);
+  const crnInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChangeKeyword = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -191,6 +208,75 @@ export default function CourseAdd({
     [filter]
   );
 
+  const crnNormalized = useMemo(
+    () => normalizeCrnPaste(crnInput),
+    [crnInput]
+  );
+  const isCrnValid = crnNormalized.length === CRN_LENGTH;
+
+  const handleCrnChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value;
+      const next = raw.includes(' ') || raw.includes('\n')
+        ? normalizeCrnPaste(raw)
+        : normalizeCrnInput(raw);
+      setCrnInput(next);
+      if (crnError) setCrnError(null);
+    },
+    [crnError]
+  );
+
+  const handleAddByCrn = useCallback(() => {
+    if (!isCrnValid) return;
+    const crn = crnNormalized;
+
+    if (pinnedCrns.includes(crn)) {
+      setCrnError('This section is already in your schedule.');
+      return;
+    }
+
+    const section = oscar.findSection(crn);
+    if (section == null) {
+      setCrnError('CRN not found for this term.');
+      return;
+    }
+
+    const courseId = section.course.id;
+    patchSchedule({
+      desiredCourses: desiredCourses.includes(courseId)
+        ? desiredCourses
+        : [...desiredCourses, courseId],
+      pinnedCrns: [...pinnedCrns, crn],
+      excludedCrns: excludedCrns.filter((c) => c !== crn),
+      colorMap:
+        colorMap[courseId] != null
+          ? colorMap
+          : { ...colorMap, [courseId]: getRandomColor() },
+    });
+    setCrnInput('');
+    setCrnError(null);
+    crnInputRef.current?.focus();
+  }, [
+    isCrnValid,
+    crnNormalized,
+    pinnedCrns,
+    oscar,
+    desiredCourses,
+    excludedCrns,
+    colorMap,
+    patchSchedule,
+  ]);
+
+  const handleCrnKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (isCrnValid) handleAddByCrn();
+      }
+    },
+    [isCrnValid, handleAddByCrn]
+  );
+
   const activeCourse = courses[activeIndex];
 
   return (
@@ -232,6 +318,36 @@ export default function CourseAdd({
             onToggle={(tag): void => handleToggleFilter(property, tag)}
           />
         ))}
+        <div className="crn-row">
+          <label className="crn-label" htmlFor="crn-input">
+            CRN
+          </label>
+          <input
+            id="crn-input"
+            ref={crnInputRef}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            className="crn-input"
+            placeholder={`${CRN_LENGTH} digits`}
+            value={crnInput}
+            onChange={handleCrnChange}
+            onKeyDown={handleCrnKeyDown}
+          />
+          <button
+            type="button"
+            className="crn-add"
+            disabled={!isCrnValid}
+            onClick={handleAddByCrn}
+          >
+            Add
+          </button>
+        </div>
+        {crnError != null && (
+          <div className="crn-error" role="alert">
+            {crnError}
+          </div>
+        )}
       </div>
       {courses.length > 0 ? (
         courses.map((course) => (
