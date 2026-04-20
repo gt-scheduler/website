@@ -122,6 +122,7 @@ export function AppSkeleton({
             : { type: 'loaded', ...termsState }
         }
         versionsState={{ type: 'loading' }}
+        paletteState={{ type: 'loading' }}
         skeleton
       />
       {children}
