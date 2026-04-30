@@ -198,7 +198,6 @@ function MeetingDayBlock({
   const isDraft = color === undefined;
   const [isHovered, setIsHovered] = React.useState(false);
   const BlockElement = canBeTabFocused ? 'button' : 'div';
-
   return (
     <div ref={outerRef}>
       <BlockElement
@@ -211,13 +210,13 @@ function MeetingDayBlock({
         )}
         style={{
           top: `${
-            (((tempStart ?? period.start) - OPEN) / (CLOSE - OPEN)) * 100
+            (((tempStart ?? period.start) - OPEN) / (CLOSE + 1 - OPEN)) * 100
           }%`,
           left: `${
             DAYS.indexOf(day) * 20 + sizeInfo.rowIndex * (20 / sizeInfo.rowSize)
           }%`,
           height: `${
-            (Math.max(15, period.end - period.start) / (CLOSE - OPEN)) * 100
+            (Math.max(15, period.end - period.start) / (CLOSE + 1 - OPEN)) * 100
           }%`,
           width: `${20 / sizeInfo.rowSize}%`,
           ...({

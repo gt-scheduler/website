@@ -123,7 +123,16 @@
     // Disable false positives for render props
     "react/no-unstable-nested-components": ["error", { "allowAsProps": true }],
     // Allow code like `<>{children}</>` to convert React.ReactNode => React.ReactElement
-    "react/jsx-no-useless-fragment": ["error", { "allowExpressions": true }]
+    "react/jsx-no-useless-fragment": ["error", { "allowExpressions": true }],
+    // Use ts version of no shadow
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": [
+      "error",
+      {
+        "ignoreTypeValueShadow": true,
+        "ignoreFunctionTypeParameterNameValueShadow": true
+      }
+    ]
   },
   "overrides": [
     {

@@ -6,6 +6,7 @@ import {
   faPalette,
   faPlus,
   faTrash,
+  faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, getContentClassName } from '../../utils/misc';
@@ -15,6 +16,8 @@ import { ScheduleContext } from '../../contexts';
 import { Course as CourseBean, Section } from '../../data/beans';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import Modal from '../Modal';
+import CourseInfo from '../CourseInfo';
 
 import './stylesheet.scss';
 
@@ -29,13 +32,14 @@ export default function Course({
   courseId,
   onAddCourse,
 }: CourseProps): React.ReactElement | null {
+  const [modalOpen, setModalOpen] = useState(false);
   const [expanded, setExpanded] = useState<boolean>(false);
   const [prereqOpen, setPrereqOpen] = useState<boolean>(false);
   const [paletteShown, setPaletteShown] = useState<boolean>(false);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap, palette },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -136,6 +140,7 @@ export default function Course({
   ): void => {
     setPrereqOpen(nextPrereqOpen);
     setExpanded(nextExpanded);
+    setPaletteShown(false);
   };
   const prereqAction = {
     icon: faShareAlt,
@@ -154,7 +159,6 @@ export default function Course({
     (credits, section) => credits + section.credits,
     0
   );
-
   return (
     <div
       className={classes('Course', contentClassName, 'default', className)}
@@ -176,8 +180,18 @@ export default function Course({
                 },
                 prereqAction,
                 {
+                  icon: faInfoCircle,
+                  onClick: (): void => {
+                    setModalOpen(true);
+                  },
+                  tooltip: 'View Section Details',
+                  id: `${course.id}-details`,
+                },
+                {
                   icon: faPalette,
-                  onClick: (): void => setPaletteShown(!paletteShown),
+                  onClick: (): void => {
+                    setPaletteShown(!paletteShown);
+                  },
                   tooltip: 'Edit Color',
                   id: `${course.id}-color`,
                 },
@@ -214,6 +228,7 @@ export default function Course({
         {paletteShown && (
           <Palette
             className="palette"
+            palette={palette}
             onSelectColor={(col): void =>
               patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
             }
@@ -267,6 +282,41 @@ export default function Course({
       {expanded && prereqOpen && prereqs !== null && (
         <Prerequisite course={course} prereqs={prereqs} />
       )}
+      {modalOpen && (
+        <CourseInfoModal
+          courseId={course.id}
+          show={modalOpen}
+          onHide={(): void => setModalOpen(false)}
+        />
+      )}
     </div>
+  );
+}
+
+export type CourseInfoModalProps = {
+  courseId: string;
+  show: boolean;
+  onHide: () => void;
+};
+
+export function CourseInfoModal({
+  courseId,
+  show,
+  onHide,
+}: CourseInfoModalProps): React.ReactElement {
+  return (
+    <Modal
+      width={930}
+      show={show}
+      onHide={onHide}
+      className="course-info-modal"
+    >
+      <CourseInfo
+        courseId={courseId}
+        enableTermSelect
+        isModal
+        onHide={onHide}
+      />
+    </Modal>
   );
 }
