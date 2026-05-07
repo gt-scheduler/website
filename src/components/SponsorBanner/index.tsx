@@ -4,7 +4,7 @@ import Banner from '../Banner';
 
 const BANNER_LOCAL_STORAGE_KEY = '2026-04-14-mechanize-survey-banner';
 const SPONSOR_LINK =
-  'https://jobs.ashbyhq.com/mechanize?utm_source=gt-scheduler';
+  'https://mechanize.work/apply/software-engineer/?utm_source=gt-scheduler&utm_campaign=gt-scheduler';
 
 const SLOGANS = [
   'Better at coding than AI? Prove it. Mechanize: $300k + equity.',
