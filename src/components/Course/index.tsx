@@ -35,7 +35,7 @@ export default function Course({
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const isSearching = Boolean(onAddCourse);
   const [
-    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap },
+    { oscar, desiredCourses, pinnedCrns, excludedCrns, colorMap, palette },
     { patchSchedule },
   ] = useContext(ScheduleContext);
 
@@ -136,6 +136,7 @@ export default function Course({
   ): void => {
     setPrereqOpen(nextPrereqOpen);
     setExpanded(nextExpanded);
+    setPaletteShown(false);
   };
   const prereqAction = {
     icon: faShareAlt,
@@ -177,7 +178,9 @@ export default function Course({
                 prereqAction,
                 {
                   icon: faPalette,
-                  onClick: (): void => setPaletteShown(!paletteShown),
+                  onClick: (): void => {
+                    setPaletteShown(!paletteShown);
+                  },
                   tooltip: 'Edit Color',
                   id: `${course.id}-color`,
                 },
@@ -214,6 +217,7 @@ export default function Course({
         {paletteShown && (
           <Palette
             className="palette"
+            palette={palette}
             onSelectColor={(col): void =>
               patchSchedule({ colorMap: { ...colorMap, [courseId]: col } })
             }
