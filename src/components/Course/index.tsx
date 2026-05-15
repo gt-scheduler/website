@@ -6,6 +6,7 @@ import {
   faPalette,
   faPlus,
   faTrash,
+  faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { classes, getContentClassName } from '../../utils/misc';
@@ -147,6 +148,14 @@ export default function Course({
     id: `${course.id}-prerequisites`,
   };
 
+  const infoAction = {
+    icon: faInfoCircle,
+    href:
+      `https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_` +
+      `course_detail?cat_term_in=${course.term}&subj_code_in=` +
+      `${course.subject}&crse_numb_in=${course.number}`,
+  };
+
   const pinnedSections = course.sections.filter((section) =>
     pinnedCrns.includes(section.crn)
   );
@@ -175,6 +184,7 @@ export default function Course({
                   onClick: (): void => prereqControl(false, !expanded),
                 },
                 prereqAction,
+                infoAction,
                 {
                   icon: faPalette,
                   onClick: (): void => setPaletteShown(!paletteShown),
