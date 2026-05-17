@@ -114,6 +114,14 @@ export default function EventBlocks({
       ref.current.parentNode?.appendChild(cloneMeeting);
       ref.current.classList.add('meeting--dragging');
       ref.current.style.width = '20%';
+
+      // Align to the block to the start of the day column
+      if (ref.current.style.left.includes('%')) {
+        const oldLeftPercentValue = parseFloat(ref.current.style.left);
+        ref.current.style.left = `${
+          Math.floor(oldLeftPercentValue / 20) * 20
+        }%`;
+      }
     }
 
     // Disabled eslint because it doesn't like the parameter
