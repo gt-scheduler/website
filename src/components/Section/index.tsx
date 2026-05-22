@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useId, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useState,
+} from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import {
   faBan,
@@ -35,25 +41,29 @@ export default function Section({
   const [, setOverlayCrns] = useContext(OverlayCrnsContext);
   const [seating, setSeating] = useState<Seating>([[], 0]);
 
+  const updateSeating = useCallback((): void => {
+    section
+      .fetchSeating(term)
+      .then((newSeating) => {
+        setSeating(newSeating);
+      })
+      .catch((err) =>
+        softError(
+          new ErrorWithFields({
+            message: 'error while fetching seating',
+            source: err,
+            fields: { crn: section.crn, term: section.term },
+          })
+        )
+      );
+  }, [section, term]);
+
   let hovering = false;
   const handleHover = (): void => {
     hovering = true;
     setTimeout(() => {
       if (hovering) {
-        section
-          .fetchSeating(term)
-          .then((newSeating) => {
-            setSeating(newSeating);
-          })
-          .catch((err) =>
-            softError(
-              new ErrorWithFields({
-                message: 'error while fetching seating',
-                source: err,
-                fields: { crn: section.crn, term: section.term },
-              })
-            )
-          );
+        updateSeating();
       }
     }, 333);
   };
@@ -84,11 +94,31 @@ export default function Section({
     [pinnedCrns, excludedCrns, patchSchedule]
   );
 
+  const sectionIsFull = (): boolean => {
+    if (seating[0].length > 0 && typeof seating[0][1] === 'number') {
+      const seatsTaken = seating[0][1];
+      const capacity = seating[0][0];
+
+      if (typeof capacity !== 'number') return false;
+      if (seatsTaken >= capacity) return true;
+    }
+
+    return false;
+  };
+
+  // Gather seating data on initial load
+  useEffect(() => {
+    updateSeating();
+  }, [updateSeating]);
+
+  let name = section.id;
+  if (sectionIsFull()) name += ' (Full)';
+
   const excludeTooltipId = useId();
   const sectionTooltipId = useId();
   return (
     <ActionRow
-      label={section.id}
+      label={name}
       className={classes('Section', className)}
       onMouseEnter={(): void => setOverlayCrns([section.crn])}
       onMouseLeave={(): void => setOverlayCrns([])}
@@ -109,7 +139,13 @@ export default function Section({
           onClick: (): void => excludeSection(section),
         },
       ]}
-      style={pinned ? { backgroundColor: color } : undefined}
+      style={
+        pinned
+          ? { backgroundColor: color }
+          : sectionIsFull()
+          ? { backgroundColor: 'rgba(244, 78, 59, 0.5)' }
+          : undefined
+      }
     >
       <div className="section-details">
         <div className="delivery-mode">
