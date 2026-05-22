@@ -55,6 +55,58 @@
         }
       }
     }
+
+    .crn-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      flex-wrap: wrap;
+
+      .crn-label {
+        font-weight: bold;
+        min-width: 2.5em;
+      }
+
+      .crn-input {
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
+        padding: 6px 8px;
+        font-size: inherit;
+        border: 1px solid $color-neutral;
+        border-radius: 4px;
+
+        &::placeholder {
+          color: $color-neutral;
+        }
+      }
+
+      .crn-add {
+        padding: 6px 12px;
+        font-size: inherit;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid $color-neutral;
+        background-color: $color-border;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        &:not(:disabled):hover {
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .crn-error {
+      padding: 4px 8px;
+      font-size: 0.9em;
+      color: $color-neutral;
+    }
   }
 
   .Course {
