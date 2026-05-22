@@ -58,11 +58,12 @@ export default function ComparisonPanel({
   }, [type]);
 
   const handleTogglePanel = useCallback(() => {
-    if (type === 'signedIn') {
-      handleCompareSchedules(!compare, undefined, undefined);
-    } else {
+    const enablingCompare = !compare;
+    if (type !== 'signedIn' && enablingCompare) {
       setLoginOpen(true);
+      return;
     }
+    handleCompareSchedules(!compare, undefined, undefined);
   }, [type, compare, handleCompareSchedules]);
 
   const [shareBackRemount, setShareBackRemount] = useState(0);
