@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { CLOSE, OPEN } from '../../constants';
+import { FINALS_CLOSE, FINALS_OPEN } from '../../constants';
 import { timeToShortString } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { FinalBlocks } from '..';
@@ -139,8 +139,8 @@ export default function Finals(): React.ReactElement {
   return (
     <div className="FinalsContainer">
       <div className="times">
-        {new Array((CLOSE - OPEN) / 60).fill(0).map((_, i) => {
-          const time = OPEN + i * 60;
+        {new Array((FINALS_CLOSE - FINALS_OPEN) / 60).fill(0).map((_, i) => {
+          const time = FINALS_OPEN + i * 60;
           return (
             <div className="time" key={time}>
               <span className="label">{timeToShortString(time)}</span>

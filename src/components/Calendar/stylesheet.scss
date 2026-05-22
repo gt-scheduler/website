@@ -1,14 +1,14 @@
 @import '../../variables';
 
 @mixin calendar-margin($calendar-margin, $hidden-sections-margin) {
-  margin-top: $day-height + $calendar-margin;
+  margin-top: $day-height;
   margin-right: $calendar-margin;
   margin-bottom: $hidden-sections-margin + $calendar-margin;
   margin-left: $time-width + $calendar-margin;
 }
 
 .Calendar {
-  @include calendar-margin(24px, 16px);
+  @include calendar-margin($calendar-web-margin, 16px);
   flex: 1;
   position: relative;
   height: $calendar-height;
@@ -46,7 +46,7 @@
         display: block;
         width: $time-width;
         padding-right: 8px;
-        font-size: .8em;
+        font-size: 0.8em;
         font-weight: bold;
         text-align: right;
       }
@@ -98,8 +98,6 @@
     }
   }
 
-  .meeting {}
-
   .hidden-sections {
     max-width: fit-content;
     padding-top: 10px;
@@ -107,7 +105,7 @@
     align-self: self-start;
     display: flex !important;
     flex-wrap: wrap;
-    font-size: .8em;
+    font-size: 0.8em;
     position: relative !important;
     top: 100% !important;
   }

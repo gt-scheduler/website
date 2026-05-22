@@ -18,7 +18,7 @@ export function isTerm(maybeTerm: string): boolean {
 /**
  * Gets the human-facing display name of a term/semester
  */
-export function getSemesterName(term: string): string {
+export function getSemesterName(term: string, yearFirst = false): string {
   if (!isTerm(term)) return 'Unknown';
 
   const year = term.substring(0, 4);
@@ -39,5 +39,42 @@ export function getSemesterName(term: string): string {
         return 'Unknown';
     }
   })();
-  return `${semester} ${year}`;
+  return yearFirst ? `${year} ${semester}` : `${semester} ${year}`;
+}
+
+/**
+ * Converts a human-facing semester name back to a term string.
+ * Example: "Fall 2021" -> "202108"
+ */
+export function getTermFromSemesterName(semesterName: string): string | null {
+  const match = semesterName.match(/^(\w+)\s+(\d{4})$/);
+  if (!match) return null;
+
+  const semester = match[1];
+  const yearStr = match[2];
+
+  if (!semester || !yearStr) return null;
+
+  const year = Number(yearStr);
+  if (Number.isNaN(year)) return null;
+
+  let month: string;
+  switch (semester.toLowerCase()) {
+    case 'winter':
+      month = '01';
+      break;
+    case 'spring':
+      month = '02';
+      break;
+    case 'summer':
+      month = '05';
+      break;
+    case 'fall':
+      month = '08';
+      break;
+    default:
+      return null;
+  }
+
+  return `${year}${month}`;
 }

@@ -1,6 +1,7 @@
 import { castImmutable, Immutable } from 'immer';
+import { z } from 'zod';
 
-import { Event } from '../types';
+import { Event, Palette } from '../types';
 import { generateRandomId } from '../utils/misc';
 
 // This file defines all of the possible types that the schedule data can take
@@ -71,6 +72,7 @@ export const defaultSchedule: Immutable<Schedule> = {
   events: [],
   colorMap: {},
   sortingOptionIndex: 0,
+  palette: 'default' as Palette,
 };
 
 export const generateScheduleVersionId = (): string =>
@@ -168,6 +170,7 @@ export interface Version3Schedule {
   events: Event[];
   colorMap: Record<string, string>;
   sortingOptionIndex: number;
+  palette: Palette;
 }
 
 export type FriendIds = Record<string, string[]>;
@@ -220,3 +223,30 @@ export type FriendScheduleData = Record<
     >;
   }
 >;
+
+export type PlannedCountsData = {
+  term: string;
+  courseCounts: Record<string, number>;
+  sectionCounts: Record<string, number>;
+};
+
+const NormalizedStatSchema = z.object({
+  averageRating: z.number().nonnegative(),
+  averageDifficulty: z.number().nonnegative(),
+  averageWorkload: z.number().nonnegative(),
+  reviewCount: z.number().int().nonnegative(),
+});
+
+export interface NormalizedStat {
+  averageRating: number;
+  averageDifficulty: number;
+  averageWorkload: number;
+  reviewCount: number;
+}
+
+export const RatingStatsResponseSchema = z.object({
+  courses: z.record(z.string(), NormalizedStatSchema.nullable()),
+  professors: z.record(z.string(), NormalizedStatSchema.nullable()),
+});
+
+export type RatingStatsResponse = z.infer<typeof RatingStatsResponseSchema>;

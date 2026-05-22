@@ -1,0 +1,98 @@
+@import '../../variables';
+
+.travel-toggle {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 14px 8px 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 150ms ease, background-color 150ms ease;
+
+  @include dark {
+    background-color: $toggle-background-dark;
+    color: $theme-dark-foreground;
+  }
+
+  @include light {
+    background-color: $toggle-background-light;
+    color: $theme-light-foreground;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &.travel-toggle--active {
+    @include dark {
+      background-color: $toggle-background-active-dark;
+    }
+
+    @include light {
+      background-color: $toggle-background-active-light;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: $opacity-inactive;
+  }
+
+  &__indicator {
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    position: relative;
+    transition: background-color 150ms ease;
+
+    @include dark {
+      background-color: $toggle-indicator-background-dark;
+    }
+
+    @include light {
+      background-color: $toggle-indicator-background-light;
+    }
+
+    &::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 150ms ease,
+        background-color 150ms ease;
+
+      @include dark {
+        background-color: $theme-dark-foreground;
+      }
+
+      @include light {
+        background-color: $theme-light-foreground;
+      }
+    }
+  }
+
+  &.travel-toggle--active {
+    .travel-toggle__indicator {
+      background-color: $travel-time-blue;
+
+      &::after {
+        transform: translateX(16px);
+
+        @include dark {
+          background-color: $theme-dark-background;
+        }
+
+        @include light {
+          background-color: $theme-light-background;
+        }
+      }
+    }
+  }
+}

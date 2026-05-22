@@ -53,8 +53,10 @@ export default function EventDrag({
   onCreate,
   containerRef,
 }: EventDragProps): React.ReactElement | null {
-  const [{ colorMap, events }, { patchSchedule, setCourseContainerTab }] =
-    useContext(ScheduleContext);
+  const [
+    { colorMap, events, palette },
+    { patchSchedule, setCourseContainerTab },
+  ] = useContext(ScheduleContext);
   const [theme] = useContext(ThemeContext);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -69,7 +71,10 @@ export default function EventDrag({
   } | null>(null);
 
   const snapTo = useCallback(
-    (m: number): number => Math.round(m / snap) * snap,
+    (m: number): number => {
+      const snapped = Math.round(m / snap) * snap;
+      return Math.min(snapped, CLOSE);
+    },
     [snap]
   );
 
@@ -141,6 +146,7 @@ export default function EventDrag({
     [daysRef, timesRef, snapTo]
   );
 
+  const rafIdRef = useRef<number | null>(null);
   // Resize the draftEvent as the pointer
   // moves, respecting bounds and min duration
   const handlePointerDown = useCallback(
@@ -206,7 +212,10 @@ export default function EventDrag({
 
       const next: DraftEvent = { day: pressDay, start, end };
       draftRef.current = next;
-      window.requestAnimationFrame(() => setDraftEvent(next));
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = requestAnimationFrame(() => {
+        setDraftEvent(next);
+      });
 
       e.preventDefault();
     },
@@ -227,6 +236,15 @@ export default function EventDrag({
 
       const { current: d } = draftRef;
 
+      // Clear draft state and refs immediately
+      draftRef.current = null;
+      pressRef.current = null;
+      setDraftEvent(null);
+
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       draftRef.current = null;
       pressRef.current = null;
       setDraftEvent(null);
@@ -241,11 +259,12 @@ export default function EventDrag({
           days: [d.day],
           period: { start: d.start, end: d.end },
           showEditForm: true,
+          isSaved: false, // Mark as unsaved draft
         };
 
         patchSchedule({
           events: [...castDraft(events), newEvent],
-          colorMap: { ...colorMap, [eventId]: getRandomColor() },
+          colorMap: { ...colorMap, [eventId]: getRandomColor(palette) },
         });
 
         onCreate?.(newEvent);
@@ -259,6 +278,7 @@ export default function EventDrag({
       patchSchedule,
       events,
       colorMap,
+      palette,
       onCreate,
       setCourseContainerTab,
     ]

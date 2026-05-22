@@ -99,7 +99,7 @@
 
   // Add a minimum gaps to the top/bottom and left/right
   --min-x-gap: 12px;
-  --min-y-gap: 20px;
+  --min-y-gap: 59px;
   max-width: calc(100vw - (var(--min-x-gap) * 2));
   max-height: calc(100vh - (var(--min-y-gap) * 2));
 

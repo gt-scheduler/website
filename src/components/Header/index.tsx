@@ -1,15 +1,16 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useCallback } from 'react';
 
 import { ScheduleContext, TermsContext } from '../../contexts';
 import HeaderDisplay from '../HeaderDisplay';
 import useHeaderActionBarProps from '../../hooks/useHeaderActionBarProps';
-import { Term } from '../../types';
+import { Palette, Term } from '../../types';
+import { DEFAULT_PALETTE, SOFT_PALETTE, DEEP_PALETTE } from '../../constants';
 
 import './stylesheet.scss';
 
 export type HeaderProps = {
-  currentTab: number;
-  onChangeTab: (newTab: number) => void;
+  currentTab: string;
+  onChangeTab: (newTab: string) => void;
   onToggleMenu: () => void;
   tabs: string[];
   captureRef: React.RefObject<HTMLDivElement>;
@@ -33,6 +34,12 @@ type TermsState = {
   onChangeTerm: (next: string) => void;
 };
 
+type PaletteState = {
+  type: 'loaded';
+  palette: Palette;
+  setPalette: (newPalette: Palette) => void;
+};
+
 /**
  * Renders the top header component with all state/interactivity,
  * and includes controls for top-level tab-based navigation.
@@ -46,7 +53,15 @@ export default function Header({
   captureRef,
 }: HeaderProps): React.ReactElement {
   const [
-    { term, oscar, pinnedCrns, allVersionNames, currentVersion },
+    {
+      term,
+      oscar,
+      pinnedCrns,
+      allVersionNames,
+      currentVersion,
+      palette,
+      colorMap,
+    },
     {
       setTerm,
       setCurrentVersion,
@@ -54,6 +69,7 @@ export default function Header({
       deleteVersion,
       renameVersion,
       cloneVersion,
+      patchSchedule,
     },
   ] = useContext(ScheduleContext);
   const terms = useContext(TermsContext);
@@ -66,6 +82,48 @@ export default function Header({
   }, [pinnedCrns, oscar]);
 
   const headerActionBarProps = useHeaderActionBarProps(captureRef);
+
+  const setPalette = useCallback(
+    (newPalette: Palette): void => {
+      if (newPalette === palette) return;
+
+      let paletteArray: string[];
+
+      switch (newPalette) {
+        case 'deep':
+          paletteArray = DEEP_PALETTE.flat();
+          break;
+        case 'soft':
+          paletteArray = SOFT_PALETTE.flat();
+          break;
+        default:
+          paletteArray = DEFAULT_PALETTE.flat();
+          break;
+      }
+
+      const newColorMap: Record<string, string> = {};
+
+      Object.keys(colorMap).forEach((courseId, i) => {
+        newColorMap[courseId] = paletteArray[i % paletteArray.length] as string;
+      });
+
+      patchSchedule({
+        colorMap: newColorMap,
+        palette: newPalette,
+      });
+    },
+    [colorMap, patchSchedule, palette]
+  );
+
+  const paletteState = useMemo(
+    () => ({
+      type: 'loaded',
+      palette,
+      setPalette,
+    }),
+    [palette, setPalette]
+  ) as PaletteState;
+
   const termsState = useMemo(
     () => ({
       type: 'loaded',
@@ -108,6 +166,7 @@ export default function Header({
       {...headerActionBarProps}
       termsState={termsState}
       versionsState={versionsState}
+      paletteState={paletteState}
       skeleton={false}
     />
   );

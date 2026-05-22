@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ActionRow } from '..';
-import { classes, getContentClassName } from '../../utils/misc';
-import { Period } from '../../types';
+import { classes, getContentClassName, daysToString } from '../../utils/misc';
+import { Period, Event } from '../../types';
 import { ThemeContext } from '../../contexts';
 
 import './stylesheet.scss';
@@ -24,15 +24,24 @@ export function isDay(rawDay: string): rawDay is Day {
   }
 }
 
-export interface CourseDateItem {
+// eslint-disable-next-line no-shadow
+export enum ScheduleBlockEventType {
+  Course = 'course',
+  CustomEvent = 'customEvent',
+}
+export interface ScheduleBlockDateItem {
   id: string;
   title: string;
   times: Period | undefined;
   daysOfWeek: string[];
+  type: ScheduleBlockEventType;
+  section?: string;
+  where?: string;
 }
 
 export type DaySelectionProps = {
-  courseDateMap: Record<Day, CourseDateItem[]>;
+  courseDateMap: Record<Day, ScheduleBlockDateItem[]>;
+  unpicturedEvents: Event[];
   activeDay: Day | '';
   setActiveDay: (next: Day | '') => void;
 };
@@ -56,6 +65,7 @@ const DARK_COLOR_PALETTE = [
 
 export default function DaySelection({
   courseDateMap,
+  unpicturedEvents,
   activeDay,
   setActiveDay,
 }: DaySelectionProps): React.ReactElement {
@@ -131,10 +141,23 @@ export default function DaySelection({
 
                     return (
                       <div className="course-content" key={course.id}>
-                        <div className="course-id">{course.id}</div>
-                        <span className="course-row">{course.title}</span>
+                        <div className="course-id">
+                          {course.type === ScheduleBlockEventType.CustomEvent
+                            ? course.title
+                            : course.id}
+                          {course.type === ScheduleBlockEventType.Course
+                            ? ` - ${course.title}`
+                            : ''}
+                        </div>
+                        {course.where && (
+                          <span className="course-row">
+                            {/* avoid showing full address
+                                  is there a better way to format this? */}
+                            {course.where.split(',')[0]}
+                          </span>
+                        )}
                         <span className="course-row">
-                          {course.daysOfWeek} {timeLabel}
+                          {daysToString(course.daysOfWeek)} {timeLabel}
                         </span>
                       </div>
                     );
@@ -145,6 +168,19 @@ export default function DaySelection({
           </div>
         );
       })}
+
+      {/* Unpictured Events Section */}
+      {unpicturedEvents.length > 0 && (
+        <div className="unpictured-section">
+          *Sections not shown in map:{' '}
+          {unpicturedEvents.map((event, index) => (
+            <span key={event.id}>
+              {event.name}
+              {index < unpicturedEvents.length - 1 ? ', ' : ''}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

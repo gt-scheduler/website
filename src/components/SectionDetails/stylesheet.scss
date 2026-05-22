@@ -1,0 +1,17 @@
+.section-details-container {
+  padding: 20px;
+  padding-top: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .course-header {
+    font-size: 1.25rem;
+  }
+}
+
+.mobile .section-details-container {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}

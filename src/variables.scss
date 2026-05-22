@@ -1,8 +1,9 @@
-$calendar-height: 920px;
+$calendar-height: 1180px;
 $calendar-width: 720px;
 $time-width: 48px;
 $day-height: 40px;
 $header-height: 64px;
+$calendar-web-margin: 24px;
 
 $desktop-breakpoint: 1024px;
 $large-mobile-breakpoint: 600px;
@@ -15,8 +16,18 @@ $theme-light-card-background: #e5e5e5;
 $theme-dark-card-background: #434343;
 $theme-light-foreground: $theme-dark-background;
 $theme-dark-foreground: $theme-light-background;
+$theme-dark-background-foreground: #3b3b3b;
 $color-background-light: #f8f9fa;
-$account-accent: #0C797D;
+$account-accent: #0c797d;
+$travel-time-blue: #589bd5;
+
+$toggle-background-dark: rgba(15, 23, 42, 0.85);
+$toggle-background-active-dark: rgba(15, 23, 42, 0.95);
+$toggle-indicator-background-dark: rgba(255, 255, 255, 0.25);
+
+$toggle-background-light: rgba(255, 255, 255, 0.9);
+$toggle-background-active-light: rgba(255, 255, 255, 0.95);
+$toggle-indicator-background-light: rgba(0, 0, 0, 0.15);
 
 $opacity-inactive: 0.6;
 $opacity-disabled: 0.38;
@@ -29,6 +40,23 @@ $modal-foreground-color-dark: #cccccc;
 $modal-foreground-color-light: #555555;
 $modal-strong-foreground-color-dark: #dddddd;
 $modal-strong-foreground-color-light: #444444;
+
+$seat-info-dark-label: rgba(255, 255, 255, 0.5);
+$seat-info-light-label: #848173;
+
+$buttons-secondary-action: #676767;
+$buttons-secondary-action-dark: #2a2a2a;
+$buttons-secondary-action-light: rgba($theme-dark-background, 0.10);
+$buttons-secondary-gradient-dark: #323232;
+$buttons-navigation-hover: #424242;
+
+$card-light-background: rgba(51, 51, 51, 0.05);
+$card-dark-background: $theme-dark-background-foreground;
+
+$information-blue: #57a0d5;
+$table-header-dark: #adadad;
+$table-header-light: rgba(51, 51, 51, 0.60);
+$table-border: #505050;
 
 @mixin card {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
