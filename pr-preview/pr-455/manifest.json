@@ -1,0 +1,15 @@
+{
+  "short_name": "GT Scheduler",
+  "name": "GT Scheduler",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "128x128",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#333333",
+  "background_color": "#FFFFFF"
+}
