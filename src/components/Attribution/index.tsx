@@ -47,10 +47,6 @@ export default function Attribution(): React.ReactElement {
         <ExternalLink href="https://github.com/gt-scheduler/website/graphs/contributors">
           the GT Scheduler contributors
         </ExternalLink>
-        . Sponsored by{' '}
-        <ExternalLink href="https://www.mechanize.work/">
-          Mechanize
-        </ExternalLink>
         .
       </p>
       <p>&nbsp;</p>
