@@ -30,7 +30,8 @@ type SectionConstructionData = [
   scheduleTypeIndex: number,
   campusIndex: number,
   attributeIndices: number[],
-  gradeBasisIndex: number
+  gradeBasisIndex: number,
+  title: string
 ];
 
 export default class Section {
@@ -39,6 +40,8 @@ export default class Section {
   id: string;
 
   crn: string;
+
+  title: string;
 
   seating: Seating;
 
@@ -79,11 +82,13 @@ export default class Section {
       campusIndex,
       attributeIndices,
       gradeBasisIndex,
+      title,
     ] = data;
 
     this.course = course;
     this.id = sectionId;
     this.crn = crn;
+    this.title = decode(title);
     this.seating = [[], 0];
     this.credits = credits;
     this.scheduleType = oscar.scheduleTypes[scheduleTypeIndex] ?? 'unknown';

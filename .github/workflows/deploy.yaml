@@ -49,7 +49,7 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT_FINE_GRAINED_TOKEN }}
           BRANCH: gh-pages
           FOLDER: build
           CLEAN: true
