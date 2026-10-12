@@ -51,38 +51,136 @@ type FriendEventData = {
   event: Event;
 };
 
-export default function Calendar({
-  className,
-  overlayCrns,
-  preview = false,
-  capture = false,
-  compare = false,
-  pinnedFriendSchedules = [],
-  pinSelf = true,
-  overlayFriendSchedules = [],
-  isAutosized = false,
-}: CalendarProps): React.ReactElement {
-  const [
-    { pinnedCrns, oscar, events, currentVersion, versions, courseContainerTab },
-  ] = useContext(ScheduleContext);
+type BlockPosition = SectionBlockPosition | EventBlockPosition;
 
-  const [{ friends }] = useContext(FriendContext);
+type MeetingSizeInfo = Record<
+  string,
+  Record<string, Record<string, BlockPosition>>
+>;
 
-  // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
-  // e.g. meetingSizeInfo[crn/id][day]["period.start-period.end"].rowIndex
-  const meetingSizeInfo: Record<
-    string,
-    Record<string, Record<string, SectionBlockPosition | EventBlockPosition>>
-  > = {};
+function blockKey(block: BlockPosition): string {
+  return 'crn' in block ? block.crn : block.id;
+}
 
-  const daysRef = React.useRef<HTMLDivElement>(null);
-  const timesRef = React.useRef<HTMLDivElement>(null);
-  const calendarRef = React.useRef<HTMLDivElement>(null);
+/**
+ * Lays out every block of a single day into columns.
+ *
+ * Blocks are first split into "joined groups": maximal runs of blocks that are
+ * connected to each other by overlapping in time. Each block then takes the
+ * leftmost column that is free at the moment it starts, and every block of a
+ * joined group is finally given the same `rowSize` — the number of columns
+ * that group needed, which for time intervals is exactly the largest number of
+ * blocks that are ever concurrent within it.
+ *
+ * The effect is that a set of blocks that overlap each other always divides
+ * the day column evenly between them, with no empty column left between or
+ * beside them: two people busy at the same time each get half the column,
+ * however many other (non-concurrent) blocks that day happens to contain.
+ */
+function packDayBlocks(blocks: BlockPosition[]): void {
+  // Earliest start first, so a column is only ever reused by a block that
+  // starts after its previous occupant ends. Ties are broken deterministically
+  // so the layout does not depend on the order schedules were merged in.
+  const sorted = [...blocks].sort(
+    (a, b) =>
+      a.period.start - b.period.start ||
+      a.period.end - b.period.end ||
+      blockKey(a).localeCompare(blockKey(b))
+  );
 
+  // The end time of the last block placed in each column of the current group.
+  let columnEnds: number[] = [];
+  let group: BlockPosition[] = [];
+  // The latest end time seen in the current group: a block starting at or
+  // after it cannot overlap anything already placed, so it starts a new group.
+  let groupEnd = -Infinity;
+
+  const closeGroup = (): void => {
+    group.forEach((block) => {
+      block.rowSize = columnEnds.length;
+    });
+    columnEnds = [];
+    group = [];
+    groupEnd = -Infinity;
+  };
+
+  sorted.forEach((block) => {
+    if (block.period.start >= groupEnd) closeGroup();
+
+    let column = columnEnds.findIndex((end) => end <= block.period.start);
+    if (column === -1) {
+      column = columnEnds.length;
+      columnEnds.push(block.period.end);
+    } else {
+      columnEnds[column] = block.period.end;
+    }
+
+    block.rowIndex = column;
+    group.push(block);
+    groupEnd = Math.max(groupEnd, block.period.end);
+  });
+
+  closeGroup();
+}
+
+/**
+ * Populates `meetingSizeInfo` for compare mode, where the blocks of every
+ * person shown (the current user included) are packed together, one group per
+ * day, by `packDayBlocks`.
+ */
+function packMeetingsCompare(
+  meetings: CommonMeetingObject[],
+  meetingSizeInfo: MeetingSizeInfo
+): void {
+  const blocksByDay: Record<string, BlockPosition[]> = {};
+
+  meetings.forEach((meeting) => {
+    const { period } = meeting;
+    if (period == null) return;
+
+    meeting.days.forEach((day) => {
+      const mSizeInfo = meetingSizeInfo[meeting.id] ?? {};
+      meetingSizeInfo[meeting.id] = mSizeInfo;
+
+      const daySizeInfo = mSizeInfo[day] ?? {};
+      mSizeInfo[day] = daySizeInfo;
+
+      // The exact same block can be contributed more than once — e.g. when a
+      // single schedule version is accessible through two people and is
+      // therefore overlaid once per person. It is rendered on top of itself
+      // either way, so it must only ever take a single column.
+      const key = makeSizeInfoKey(period);
+      if (daySizeInfo[key] != null) return;
+
+      const block: BlockPosition = meeting.event
+        ? { period, id: meeting.id, rowIndex: 0, rowSize: 1 }
+        : { period, crn: meeting.id, rowIndex: 0, rowSize: 1 };
+      daySizeInfo[key] = block;
+
+      const dayBlocks = blocksByDay[day] ?? [];
+      blocksByDay[day] = dayBlocks;
+      dayBlocks.push(block);
+    });
+  });
+
+  Object.values(blocksByDay).forEach(packDayBlocks);
+}
+
+/**
+ * Populates `meetingSizeInfo` the way the regular (non-compare) calendar has
+ * always done: each block is given a brand new column, one wider than the
+ * widest already-placed block it overlaps, and that width is then pushed onto
+ * every block connected to it. Kept as-is so the Scheduler tab's layout is
+ * untouched by the compare-mode packing above.
+ */
+function packMeetingsLegacy(
+  meetings: CommonMeetingObject[],
+  meetingSizeInfo: MeetingSizeInfo
+): void {
   // Recursively sets the rowSize of all time blocks within the current
   // connected grouping of blocks to the current block's rowSize
   const updateJoinedRowSizes = (
-    periodInfos: (SectionBlockPosition | EventBlockPosition)[],
+    periodInfos: BlockPosition[],
     seen: Set<string>,
     curCrn: string,
     curPeriod: Period,
@@ -105,12 +203,96 @@ export default function Calendar({
         updateJoinedRowSizes(
           periodInfos,
           seen,
-          'crn' in period2Info ? period2Info.crn : period2Info.id,
+          blockKey(period2Info),
           period2Info.period,
           newRowSize
         );
       });
   };
+
+  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
+  // next time block's rowSize and rowIndex (1 more than
+  // greatest of already processed connected blocks), updating
+  // the processed connected blocks to match its rowSize
+  meetings.forEach((meeting) => {
+    const { period } = meeting;
+    if (period == null) return;
+
+    meeting.days.forEach((day) => {
+      const dayPeriodInfos = Object.values(meetingSizeInfo)
+        .flatMap<BlockPosition | undefined>((days) =>
+          days != null ? Object.values(days[day] ?? {}) : []
+        )
+        .flatMap<BlockPosition>((info) => (info == null ? [] : [info]));
+
+      const curRowSize = dayPeriodInfos
+        .filter(
+          (period2Info) =>
+            period2Info.period.start < period.end &&
+            period2Info.period.end > period.start
+        )
+        .reduce(
+          (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
+          1
+        );
+
+      updateJoinedRowSizes(
+        dayPeriodInfos,
+        new Set(),
+        meeting.id,
+        period,
+        curRowSize
+      );
+
+      const mSizeInfo = meetingSizeInfo[meeting.id] || {};
+      meetingSizeInfo[meeting.id] = mSizeInfo;
+
+      const daySizeInfo = mSizeInfo[day] || {};
+      mSizeInfo[day] = daySizeInfo;
+
+      if (!meeting.event) {
+        daySizeInfo[makeSizeInfoKey(period)] = {
+          period,
+          crn: meeting.id,
+          rowIndex: curRowSize - 1,
+          rowSize: curRowSize,
+        };
+      } else {
+        daySizeInfo[makeSizeInfoKey(period)] = {
+          period: meeting.period,
+          id: meeting.id,
+          rowIndex: curRowSize - 1,
+          rowSize: curRowSize,
+        };
+      }
+    });
+  });
+}
+
+export default function Calendar({
+  className,
+  overlayCrns,
+  preview = false,
+  capture = false,
+  compare = false,
+  pinnedFriendSchedules = [],
+  pinSelf = true,
+  overlayFriendSchedules = [],
+  isAutosized = false,
+}: CalendarProps): React.ReactElement {
+  const [
+    { pinnedCrns, oscar, events, currentVersion, versions, courseContainerTab },
+  ] = useContext(ScheduleContext);
+
+  const [{ friends }] = useContext(FriendContext);
+
+  // Contains the rowIndex's and rowSize's passed into each crn's TimeBlocks
+  // e.g. meetingSizeInfo[crn/id][day]["period.start-period.end"].rowIndex
+  const meetingSizeInfo: MeetingSizeInfo = {};
+
+  const daysRef = React.useRef<HTMLDivElement>(null);
+  const timesRef = React.useRef<HTMLDivElement>(null);
+  const calendarRef = React.useRef<HTMLDivElement>(null);
 
   const crns =
     pinSelf && !compare
@@ -237,65 +419,16 @@ export default function Calendar({
     );
   }
 
-  // Populates crnSizeInfo and eventSizeInfo by iteratively finding the
-  // next time block's rowSize and rowIndex (1 more than
-  // greatest of already processed connected blocks), updating
-  // the processed connected blocks to match its rowSize
-  meetings.forEach((meeting) => {
-    const { period } = meeting;
-    if (period == null) return;
-
-    meeting.days.forEach((day) => {
-      const dayPeriodInfos = Object.values(meetingSizeInfo)
-        .flatMap<SectionBlockPosition | EventBlockPosition | undefined>(
-          (days) => (days != null ? Object.values(days[day] ?? {}) : [])
-        )
-        .flatMap<SectionBlockPosition | EventBlockPosition>((info) =>
-          info == null ? [] : [info]
-        );
-
-      const curRowSize = dayPeriodInfos
-        .filter(
-          (period2Info) =>
-            period2Info.period.start < period.end &&
-            period2Info.period.end > period.start
-        )
-        .reduce(
-          (acc, period2Info) => Math.max(acc, period2Info.rowSize + 1),
-          1
-        );
-
-      updateJoinedRowSizes(
-        dayPeriodInfos,
-        new Set(),
-        meeting.id,
-        period,
-        curRowSize
-      );
-
-      const mSizeInfo = meetingSizeInfo[meeting.id] || {};
-      meetingSizeInfo[meeting.id] = mSizeInfo;
-
-      const daySizeInfo = mSizeInfo[day] || {};
-      mSizeInfo[day] = daySizeInfo;
-
-      if (!meeting.event) {
-        daySizeInfo[makeSizeInfoKey(period)] = {
-          period,
-          crn: meeting.id,
-          rowIndex: curRowSize - 1,
-          rowSize: curRowSize,
-        };
-      } else {
-        daySizeInfo[makeSizeInfoKey(period)] = {
-          period: meeting.period,
-          id: meeting.id,
-          rowIndex: curRowSize - 1,
-          rowSize: curRowSize,
-        };
-      }
-    });
-  });
+  // Compare mode draws several people at once, so all of their blocks — the
+  // current user's sections and events included — are packed together, one
+  // group per day, and any set of overlapping blocks splits its day column
+  // evenly. Outside compare mode the calendar only ever draws one schedule,
+  // and keeps its original packing.
+  if (compare) {
+    packMeetingsCompare(meetings, meetingSizeInfo);
+  } else {
+    packMeetingsLegacy(meetings, meetingSizeInfo);
+  }
 
   // Allow the user to select a meeting, which will cause it to be highlighted
   // and for the meeting "details" popover/tooltip to remain open.
