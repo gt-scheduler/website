@@ -546,6 +546,7 @@ const LOCATION_ABBREVIATIONS: Record<string, string> = {
   'Engineering Sci and Mechanics': 'ESM',
   'Ford Environmental Sci & Tech': 'ES&T',
   'Ford Environmental Sci &amp; Tech': 'ES&T',
+  'George Tower Scheller Tower': 'George Tower',
   'Howey (Physics)': 'Howey',
   'Howey Physics': 'Howey',
   'Instr Center': 'IC',
