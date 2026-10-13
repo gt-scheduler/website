@@ -44,12 +44,9 @@ export default function Map(): React.ReactElement {
   const [activeDay, setActiveDay] = useState<Day | ''>('ALL');
   const [showTravelTimes, setShowTravelTimes] = useState(false);
   const isTravelToggleDisabled = activeDay === '' || activeDay === 'ALL';
-  let travelToggleLabel = 'Hide travel time';
-  if (isTravelToggleDisabled) {
-    travelToggleLabel = 'Travel time (select weekday)';
-  } else if (showTravelTimes) {
-    travelToggleLabel = 'Show travel time';
-  }
+  const travelToggleLabel = isTravelToggleDisabled
+    ? 'Travel time (select weekday)'
+    : 'Travel time';
 
   useEffect(() => {
     if (isTravelToggleDisabled && showTravelTimes) {
