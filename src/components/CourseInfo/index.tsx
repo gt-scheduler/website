@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ScheduleContext } from '../../contexts';
-import { serializePrereqs, slugify } from '../../utils/misc';
+import { serializePrereqs } from '../../utils/misc';
 import { CourseGpa, CrawlerPrerequisites } from '../../types';
 import MetricsCard from '../MetricsCard';
 import TabBar from '../TabBar';
@@ -84,9 +84,6 @@ export default function CourseInfo({
   const course = useMemo(() => oscar.findCourse(courseId), [oscar, courseId]);
 
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isRatingsLoaded, setIsRatingsLoaded] = useState(false);
-  const [isProfessorRatingsLoaded, setIsProfessorRatingsLoaded] =
-    useState(false);
   const [selectedTermKey, setSelectedTermKey] = useState<string | null>(null);
   const [gpaMap, setGpaMap] = useState<CourseGpa | null>(null);
   const [restrictionsViewMajors, setRestrictionsViewMajors] = React.useState<
@@ -105,23 +102,6 @@ export default function CourseInfo({
           softError(
             new ErrorWithFields({
               message: 'error fetching course gpa',
-              source: err,
-              fields: {
-                courseId,
-                term: course.term,
-              },
-            })
-          );
-        });
-      course
-        .fetchRatings()
-        .then(() => {
-          setIsRatingsLoaded(true);
-        })
-        .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'error fetching course ratings',
               source: err,
               fields: {
                 courseId,
@@ -187,64 +167,16 @@ export default function CourseInfo({
     }
   }, [enableTermSelect, course, offeredTerms, selectedTermKey]);
 
-  useEffect(() => {
-    if (selectedTermKey && course) {
-      course
-        .fetchProfessorRatings(selectedTermKey)
-        .then(() => {
-          setIsProfessorRatingsLoaded(true);
-        })
-        .catch((err) => {
-          softError(
-            new ErrorWithFields({
-              message: 'error fetching professor ratings',
-              source: err,
-              fields: {
-                courseId,
-                term: course.term,
-              },
-            })
-          );
-        });
-    }
-  }, [selectedTermKey, course, courseId]);
-
   const metrics = useMemo(() => {
-    const courseRatings = course?.ratings;
     const courseGpa = gpaMap?.averageGpa;
 
     return [
       {
-        label: 'Overall Rating',
-        value: !isRatingsLoaded
-          ? 'Loading...'
-          : courseRatings
-          ? `${courseRatings.averageRating.toFixed(2)}/5`
-          : null,
-      },
-      {
         label: 'Course GPA',
         value: gpaMap === null ? 'Loading...' : courseGpa?.toFixed(2) ?? null,
       },
-      {
-        label: 'Level of Difficulty',
-        value: !isRatingsLoaded
-          ? 'Loading...'
-          : courseRatings
-          ? `${courseRatings.averageDifficulty.toFixed(1)}/5`
-          : null,
-      },
-      {
-        label: 'Workload',
-        value: !isRatingsLoaded
-          ? 'Loading...'
-          : courseRatings
-          ? courseRatings.averageWorkload.toFixed(1)
-          : null,
-        unit: 'hrs/week',
-      },
     ];
-  }, [isRatingsLoaded, course?.ratings, gpaMap]);
+  }, [gpaMap]);
 
   const instructorsForSelectedTerm = useMemo(() => {
     if (!course || !selectedTermKey) return [];
@@ -331,10 +263,6 @@ export default function CourseInfo({
                     key={instructorName}
                     professorName={instructorName}
                     professorGpa={gpaMap?.[instructorName] ?? null}
-                    professorRatings={
-                      course.professorRatings?.[slugify(instructorName)] ?? null
-                    }
-                    isRatingsLoaded={isProfessorRatingsLoaded}
                     course={course}
                     displaySectionInfo={selectedTermKey === term}
                     onViewRestrictions={
