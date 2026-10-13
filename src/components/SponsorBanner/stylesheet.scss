@@ -1,0 +1,17 @@
+.banner {
+  .bannerContent > span {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 12px;
+  }
+
+  .bannerButton {
+    display: flex;
+  }
+
+  .sponsorLogo {
+    height: 20px;
+  }
+}
