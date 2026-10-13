@@ -12,6 +12,8 @@
     .dropdown-input {
       position: relative;
       flex: 1;
+      width: 0;
+      min-width: 0;
       background: none;
       border: none;
       outline: none;
@@ -31,11 +33,12 @@
     }
 
     .dropdown-clear {
+      flex-shrink: 0;
       background: none;
       border: none;
       color: $color-neutral;
       font-size: 1.2rem;
-      padding: 0 8px;
+      padding: 0 14px 0 8px;
       cursor: pointer;
       transition: color 0.2s;
 
