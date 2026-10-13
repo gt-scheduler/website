@@ -5,6 +5,7 @@ import Section from './Section';
 import Oscar from './Oscar';
 import {
   CourseGpa,
+  CrawlerCorequisites,
   CrawlerCourse,
   CrawlerPrerequisites,
   Period,
@@ -14,9 +15,14 @@ import {
   isLab,
   isLecture,
   isAxiosNetworkError,
+  slugify,
+  normalizeCourseName,
+  validateRatingStatsResponse,
 } from '../../utils/misc';
 import { ErrorWithFields, softError } from '../../log';
 import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { getTermFromSemesterName } from '../../utils/semesters';
+import { NormalizedStat, RatingStatsResponse } from '../types';
 
 // This is actually a transparent read-through cache
 // in front of the Course Critique API's course data endpoint,
@@ -25,8 +31,19 @@ import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
 // https://github.com/gt-scheduler/firebase-conf/blob/main/functions/src/course_critique_cache.ts
 const COURSE_CRITIQUE_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getCourseDataFromCourseCritique`;
 
-const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-2';
+const GPA_CACHE_LOCAL_STORAGE_KEY = 'course-gpa-cache-4';
 const GPA_CACHE_EXPIRATION_DURATION_DAYS = 7;
+
+// Cache for course-level rating statistics
+const RATINGS_CACHE_LOCAL_STORAGE_KEY = 'course-ratings-cache-1';
+const RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
+
+// Cache for professor-level rating statistics
+const PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY = 'professor-ratings-cache-1';
+const PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES = 15;
+
+// TODO: update URL when deployed
+const DEV_GET_RATING_URL = `http://localhost:5001/gt-scheduler-web-dev/us-east1/getRatingStats`;
 
 interface SectionGroupMeeting {
   days: string[];
@@ -51,9 +68,13 @@ export default class Course {
 
   title: string;
 
+  description?: string;
+
   sections: Section[];
 
   prereqs: CrawlerPrerequisites | undefined;
+
+  coreqs: CrawlerCorequisites | undefined;
 
   hasLab: boolean;
 
@@ -67,9 +88,18 @@ export default class Course {
 
   term: string;
 
+  termInfo: Record<string, string[]>;
+
+  plannedCount: number | undefined;
+
+  ratings: NormalizedStat | null | undefined;
+
+  professorRatings: Record<string, NormalizedStat | null> | undefined;
+
   constructor(oscar: Oscar, courseId: string, data: CrawlerCourse) {
     this.term = oscar.term;
-    const [title, sections, prereqs] = data;
+    this.plannedCount = oscar.plannedCounts?.courseCounts[courseId];
+    const [title, sections, prereqs, description, coreqs] = data;
 
     this.id = courseId;
     const [subject, number] = this.id.split(' ');
@@ -88,6 +118,7 @@ export default class Course {
     this.number = number;
 
     this.title = decode(title);
+    this.description = description ? decode(description) : undefined;
     this.sections = Object.entries(sections).flatMap<Section>(
       ([sectionId, sectionData]) => {
         if (sectionData == null) return [];
@@ -108,7 +139,14 @@ export default class Course {
         }
       }
     );
+    this.termInfo = {
+      [this.term]: this.sections.flatMap((s) => s.instructors),
+    };
     this.prereqs = prereqs;
+    this.coreqs = coreqs;
+
+    this.ratings = undefined;
+    this.professorRatings = undefined;
 
     const onlyLectures = this.sections.filter(
       (section) => isLecture(section) && !isLab(section)
@@ -217,6 +255,7 @@ export default class Course {
     interface GpaCacheItem {
       d: CourseGpa;
       exp: string;
+      termInfo: Record<string, string[]>;
     }
 
     // Try to look in the cache for a cached course gpa item
@@ -234,6 +273,9 @@ export default class Course {
           // Use lexicographic comparison on date strings
           // (since they are ISO 8601)
           if (now < cacheItem.exp) {
+            if (cacheItem.termInfo) {
+              this.termInfo = cacheItem.termInfo;
+            }
             return cacheItem.d;
           }
         }
@@ -259,7 +301,11 @@ export default class Course {
         cache = JSON.parse(rawCache) as unknown as GpaCache;
       }
 
-      cache[this.id] = { d: courseGpa, exp: exp.toISOString() };
+      cache[this.id] = {
+        d: courseGpa,
+        exp: exp.toISOString(),
+        termInfo: this.termInfo,
+      };
       const rawUpdatedCache = JSON.stringify(cache);
       window.localStorage.setItem(GPA_CACHE_LOCAL_STORAGE_KEY, rawUpdatedCache);
     } catch (err) {
@@ -310,6 +356,235 @@ export default class Course {
     return this.decodeCourseCritiqueResponse(responseData);
   }
 
+  async fetchRatings(): Promise<NormalizedStat | null> {
+    type ratingsCache = Record<string, ratingsCacheItem>;
+    interface ratingsCacheItem {
+      d: NormalizedStat | null;
+      exp: string;
+    }
+
+    // Try to look in the cache for a cached ratings item
+    try {
+      const rawCache = window.localStorage.getItem(
+        RATINGS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        const cache: ratingsCache = JSON.parse(
+          rawCache
+        ) as unknown as ratingsCache;
+        const cacheItem = cache[this.id];
+        if (cacheItem != null) {
+          const now = new Date().toISOString();
+          if (now < cacheItem.exp) {
+            this.ratings = cacheItem.d;
+            return cacheItem.d;
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
+    // Fetch the ratings normally
+    const ratingsResponse = await this.fetchRatingsInner([this.id], []);
+    if (ratingsResponse === null) {
+      return null;
+    }
+
+    const exp = new Date();
+    exp.setMinutes(
+      exp.getMinutes() + RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
+    );
+    try {
+      let cache: ratingsCache = {};
+      const rawCache = window.localStorage.getItem(
+        RATINGS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        cache = JSON.parse(rawCache) as unknown as ratingsCache;
+      }
+      cache[this.id] = {
+        d: ratingsResponse.courses[this.id] ?? null,
+        exp: exp.toISOString(),
+      };
+      const rawUpdatedCache = JSON.stringify(cache);
+      window.localStorage.setItem(
+        RATINGS_CACHE_LOCAL_STORAGE_KEY,
+        rawUpdatedCache
+      );
+    } catch (err) {
+      // Ignore
+    }
+    const courseRating = ratingsResponse.courses[this.id] ?? null;
+    this.ratings = courseRating;
+
+    return courseRating;
+  }
+
+  private async fetchRatingsInner(
+    courses: string[],
+    professors: string[]
+  ): Promise<RatingStatsResponse | null> {
+    const normalizedCourses = courses.map((c) => normalizeCourseName(c));
+    const normalizedProfessors = professors.map((p) => slugify(p));
+
+    let responseData: RatingStatsResponse;
+    try {
+      const payload = {
+        courses: normalizedCourses.length > 0 ? normalizedCourses : undefined,
+        professors:
+          normalizedProfessors.length > 0 ? normalizedProfessors : undefined,
+      };
+
+      responseData = (
+        await axios.post<RatingStatsResponse>(
+          DEV_GET_RATING_URL,
+          `data=${encodeURIComponent(JSON.stringify(payload))}`,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        )
+      ).data;
+    } catch (err) {
+      // Ignore network errors
+      if (!isAxiosNetworkError(err)) {
+        softError(
+          new ErrorWithFields({
+            message: 'error fetching ratings from ratings API',
+            source: err,
+            fields: {
+              courses: normalizedCourses,
+              professors: normalizedProfessors,
+              DEV_GET_RATING_URL,
+            },
+          })
+        );
+      }
+
+      return null;
+    }
+
+    // Validate the response data using reusable function
+    const validatedResponse = validateRatingStatsResponse(responseData);
+
+    if (validatedResponse === null) {
+      softError(
+        new ErrorWithFields({
+          message: 'error validating ratings API response',
+          source: new Error('Validation failed'),
+          fields: {
+            courses: normalizedCourses,
+            professors: normalizedProfessors,
+          },
+        })
+      );
+      return null;
+    }
+
+    return validatedResponse;
+  }
+
+  async fetchProfessorRatings(
+    term: string
+  ): Promise<Record<string, NormalizedStat | null>> {
+    type ProfessorRatingsCache = Record<string, ProfessorRatingsCacheItem>;
+    interface ProfessorRatingsCacheItem {
+      d: NormalizedStat | null;
+      exp: string;
+    }
+
+    // Get professors who taught in this term
+    const professorsInTerm = this.termInfo[term] ?? [];
+    if (professorsInTerm.length === 0) {
+      return {};
+    }
+    if (!this.professorRatings) {
+      this.professorRatings = {};
+    }
+
+    const { professorRatings } = this;
+    const now = new Date().toISOString();
+    const professorsToFetch: string[] = [];
+    const cachedResults: Record<string, NormalizedStat | null> = {};
+
+    let cache: ProfessorRatingsCache = {};
+    try {
+      const rawCache = window.localStorage.getItem(
+        PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY
+      );
+      if (rawCache != null) {
+        cache = JSON.parse(rawCache) as unknown as ProfessorRatingsCache;
+      }
+    } catch (err) {
+      // Ignore cache read errors
+    }
+
+    professorsInTerm.forEach((professor) => {
+      const slugifiedName = slugify(professor);
+
+      if (slugifiedName in professorRatings) {
+        cachedResults[slugifiedName] = professorRatings[slugifiedName] ?? null;
+        return;
+      }
+
+      const cacheItem = cache[slugifiedName];
+      if (cacheItem != null && now < cacheItem.exp) {
+        cachedResults[slugifiedName] = cacheItem.d;
+        professorRatings[slugifiedName] = cacheItem.d;
+      } else {
+        professorsToFetch.push(professor);
+      }
+    });
+
+    // Fetch only missing/expired professors
+    if (professorsToFetch.length > 0) {
+      const ratingsResponse = await this.fetchRatingsInner(
+        [],
+        professorsToFetch
+      );
+
+      if (ratingsResponse !== null) {
+        const exp = new Date();
+        exp.setMinutes(
+          exp.getMinutes() + PROFESSOR_RATINGS_CACHE_EXPIRATION_DURATION_MINUTES
+        );
+
+        // Merge results
+        try {
+          professorsToFetch.forEach((professor) => {
+            const slugifiedName = slugify(professor);
+            const rating = ratingsResponse.professors[slugifiedName] ?? null;
+
+            professorRatings[slugifiedName] = rating;
+            cache[slugifiedName] = {
+              d: rating,
+              exp: exp.toISOString(),
+            };
+            cachedResults[slugifiedName] = rating;
+          });
+
+          const rawUpdatedCache = JSON.stringify(cache);
+          window.localStorage.setItem(
+            PROFESSOR_RATINGS_CACHE_LOCAL_STORAGE_KEY,
+            rawUpdatedCache
+          );
+        } catch (err) {
+          // Ignore cache write errors
+        }
+      }
+    }
+
+    const result: Record<string, NormalizedStat | null> = {};
+    professorsInTerm.forEach((professor) => {
+      const slugifiedName = slugify(professor);
+      result[slugifiedName] = cachedResults[slugifiedName] ?? null;
+    });
+
+    return result;
+  }
+
   private decodeCourseCritiqueResponse(
     responseData: CourseDetailsAPIResponse
   ): CourseGpa | null {
@@ -337,11 +612,13 @@ export default class Course {
           class_size_group: classSizeGroup,
           instructor_name: rawInstructorName,
           GPA: gpa,
+          Term: historicalTerm,
         } = historicalSectionData;
 
         if (typeof classSizeGroup !== 'string') return;
         if (typeof rawInstructorName !== 'string') return;
         if (typeof gpa !== 'number') return;
+        if (typeof historicalTerm !== 'string') return;
 
         // Map the class size group to an estimate
         // of the number of actual students.
@@ -393,6 +670,15 @@ export default class Course {
         instructorGpa.count += classSizeEstimate;
         instructorGpa.sum += gpa * classSizeEstimate;
         instructors.set(instructorName, instructorGpa);
+
+        const termKey = getTermFromSemesterName(String(historicalTerm));
+        if (termKey) {
+          this.termInfo[termKey] ??= [];
+          const termInstructors = this.termInfo[termKey];
+          if (termInstructors && !termInstructors.includes(instructorName)) {
+            termInstructors.push(instructorName);
+          }
+        }
       });
 
       // Now, finally compute the actual weighted averages
@@ -442,6 +728,7 @@ interface CourseDetailsAPIResponse {
     link: string | unknown;
     class_size_group: string | unknown;
     GPA: number | unknown;
+    Term: string | unknown;
     A: number | unknown;
     B: number | unknown;
     C: number | unknown;

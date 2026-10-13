@@ -13,8 +13,9 @@ import './stylesheet.scss';
 
 // Key to mark when a user has already been shown the information modal.
 // Update this when updating the contents of the modal.
-const MODAL_LOCAL_STORAGE_KEY = '2024-04-01-spr2024-new-features-announcement';
+const MODAL_LOCAL_STORAGE_KEY = '2026-10-13-fa2026-new-features-announcement';
 const OUTDATED_LOCAL_STORAGE_KEY = [
+  '2024-04-01-spr2024-new-features-announcement',
   '2023-04-05-spr2023-new-features-announcement',
   '2021-10-27-spr2022-schedule-versions-account-sync',
   '2023-03-05-spr2023-oscar-migration',
@@ -56,36 +57,37 @@ export function InformationModalContent({
           margin: '16px auto',
         }}
       >
-        New Feature: Compare Schedules
+        New Features in GT Scheduler!
       </h1>
-      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>April 2, 2024</h4>
+      <h4 style={{ opacity: 0.7, fontWeight: 700 }}>October 13, 2026</h4>
       <div className="information-content">
-        <p>
-          Hello <span style={{ color: '#EDA91F' }}>Yellow Jackets!</span> We are
-          excited to announce a new feature for GT Scheduler.
-          <br />
-          <br />
-          Share your schedule with other students and they can share theirs
-          back. Then toggle &quot;Compare Schedules&quot; and click on the other
-          students&apos; schedules to compare.
-          <br />
-          <br />
-          However, to keep GT Scheduler and its amazing features, we need to
-          maintain our costs. Please consider donating to help keep GT Scheduler
-          running!
-        </p>
-        <div className="information-images">
-          <img
-            className="information-image"
-            alt="Compare Schedules View"
-            src="/compare_schedule.png"
-          />
-          <div className="information-spacer" />
-          <img
-            className="information-image"
-            alt="Compare Schedules Panel"
-            src="/compare_panel.png"
-          />
+        <div className="announcement-copy">
+          <p>
+            Hello <span style={{ color: '#EDA91F' }}>Yellow Jackets!</span> We
+            are excited to share several new features for GT Scheduler.
+          </p>
+          <ul>
+            <li>
+              <strong>Explore Course Details:</strong> View descriptions,
+              prerequisites, instructors, GPAs, waitlists, and major
+              restrictions all in one place.
+            </li>
+            <li>
+              <strong>Estimate Travel Time:</strong> Check out the Map tab to
+              view estimated travel time between classes.
+            </li>
+            <li>
+              <strong>Make It Yours:</strong> Choose new color palettes for your
+              courses and events.
+            </li>
+          </ul>
+          <p>
+            <strong>
+              To keep GT Scheduler and its amazing features, we need to maintain
+              our costs. Please consider donating to help keep GT Scheduler
+              running!
+            </strong>
+          </p>
         </div>
       </div>
     </>

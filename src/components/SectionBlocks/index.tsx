@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
 
-import { abbreviateLocation, periodToString } from '../../utils/misc';
+import {
+  abbreviateLocation,
+  getSectionCourseTitle,
+  periodToString,
+} from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { Period } from '../../types';
 import { TimeBlocks } from '..';
@@ -92,7 +96,7 @@ export default function SectionBlocks({
             popover={[
               {
                 name: 'Course Name',
-                content: section.course.title,
+                content: getSectionCourseTitle(section),
               },
               {
                 name: 'Instructors',

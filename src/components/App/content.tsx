@@ -11,12 +11,16 @@ import Finals from '../Finals';
 import {
   AppNavigationContext,
   AppMobileNav,
-  NAV_TABS,
   AppMobileNavDisplay,
+  SchedulerPageType,
 } from './navigation';
 import { classes } from '../../utils/misc';
 import { AccountContextValue } from '../../contexts/account';
 import { Term } from '../../types';
+import CourseDetails from '../CourseDetails';
+import SectionDetails from '../SectionDetails';
+
+export const WEB_NAV_TABS = ['Scheduler', 'Map', 'Finals'];
 
 /**
  * Renders the actual content at the root of the app
@@ -25,7 +29,7 @@ import { Term } from '../../types';
  * This component is memoized, so it only re-renders when its context changes.
  */
 function AppContentBase(): React.ReactElement {
-  const { currentTabIndex, setTabIndex, openDrawer } =
+  const { currentTab, setTab, openDrawer, currentSchedulerPage } =
     useContext(AppNavigationContext);
   const captureRef = useRef<HTMLDivElement>(null);
 
@@ -33,10 +37,10 @@ function AppContentBase(): React.ReactElement {
     <>
       <AppMobileNav captureRef={captureRef} />
       <Header
-        currentTab={currentTabIndex}
-        onChangeTab={setTabIndex}
+        currentTab={currentTab}
+        onChangeTab={setTab}
         onToggleMenu={openDrawer}
-        tabs={NAV_TABS}
+        tabs={WEB_NAV_TABS}
         captureRef={captureRef}
       />
       <ErrorBoundary
@@ -52,17 +56,22 @@ function AppContentBase(): React.ReactElement {
             >
               <div>
                 There was en error somewhere somewhere in the{' '}
-                {NAV_TABS[currentTabIndex] ?? '?'} tab and it can&apos;t
-                continue.
+                {currentTab ?? '?'} tab and it can&apos;t continue.
               </div>
               <div>Try refreshing the page to see if it fixes the issue.</div>
             </ErrorDisplay>
           </SkeletonContent>
         )}
       >
-        {currentTabIndex === 0 && <Scheduler />}
-        {currentTabIndex === 1 && <Map />}
-        {currentTabIndex === 2 && <Finals />}
+        {currentTab === 'Scheduler' && <Scheduler />}
+        {currentTab === 'Course details' &&
+          (currentSchedulerPage.type === SchedulerPageType.SECTION_DETAILS ? (
+            <SectionDetails courseId={currentSchedulerPage.courseId} />
+          ) : (
+            <CourseDetails />
+          ))}
+        {currentTab === 'Map' && <Map />}
+        {currentTab === 'Finals' && <Finals />}
         {/* Fake calendar used to capture screenshots */}
         <div className="capture-container" ref={captureRef}>
           <Calendar className="fake-calendar" capture overlayCrns={[]} />
@@ -102,17 +111,16 @@ export function AppSkeleton({
   accountState,
   termsState,
 }: AppSkeletonProps): React.ReactElement {
-  const { currentTabIndex, setTabIndex, openDrawer } =
-    useContext(AppNavigationContext);
+  const { currentTab, setTab, openDrawer } = useContext(AppNavigationContext);
 
   return (
     <>
       <AppMobileNavDisplay />
       <HeaderDisplay
-        currentTab={currentTabIndex}
-        onChangeTab={setTabIndex}
+        currentTab={currentTab}
+        onChangeTab={setTab}
         onToggleMenu={openDrawer}
-        tabs={NAV_TABS}
+        tabs={WEB_NAV_TABS}
         accountState={accountState ?? { type: 'loading' }}
         termsState={
           termsState == null
@@ -120,6 +128,7 @@ export function AppSkeleton({
             : { type: 'loaded', ...termsState }
         }
         versionsState={{ type: 'loading' }}
+        paletteState={{ type: 'loading' }}
         skeleton
       />
       {children}

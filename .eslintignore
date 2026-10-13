@@ -9,3 +9,4 @@
 /tests/performance/**
 /tmp/**
 /src/vendor/**
+src/utils/mapbox/scripts/

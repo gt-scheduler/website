@@ -3,7 +3,6 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { classes } from '../../utils/misc';
 import {
   Button,
-  Calendar,
   CombinationContainer,
   ComparisonPanel,
   CourseContainer,
@@ -16,6 +15,9 @@ import {
 import { DESKTOP_BREAKPOINT } from '../../constants';
 import useCompareStateFromStorage from '../../data/hooks/useCompareStateFromStorage';
 import useScreenWidth from '../../hooks/useScreenWidth';
+import ScheduleContainer from '../ScheduleContainer';
+
+import './stylesheet.scss';
 
 /**
  * Wraps around the root top-level component of the Scheduler tab
@@ -77,16 +79,14 @@ export default function Scheduler(): React.ReactElement {
           {(!mobile || tabIndex === 0) && <CourseContainer />}
           {mobile && tabIndex === 1 && <CombinationContainer />}
           {(!mobile || tabIndex === 2) && (
-            <div className="calendar-container">
-              <Calendar
-                className="calendar"
-                overlayCrns={overlayCrns}
-                compare={compare}
-                pinnedFriendSchedules={pinned}
-                pinSelf={!compare || pinSelf}
-                overlayFriendSchedules={overlaySchedules}
-              />
-            </div>
+            <ScheduleContainer
+              overlayCrns={overlayCrns}
+              compare={compare}
+              pinnedFriendSchedules={pinned}
+              pinSelf={!compare || pinSelf}
+              overlaySchedules={overlaySchedules}
+              mobile={mobile}
+            />
           )}
           {(!mobile || tabIndex === 3) && (
             <ComparisonPanel

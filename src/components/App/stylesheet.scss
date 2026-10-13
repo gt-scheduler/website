@@ -21,13 +21,13 @@
     display: flex;
     align-items: stretch;
 
-    .calendar-container {
+    .scheduler-container {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       overflow-y: auto;
-
+      gap: 20px;
       .calendar {
         min-height: $calendar-height;
       }
@@ -127,11 +127,11 @@ body.light .App {
           line-height: 28px;
 
           span {
-            color: #C56E5B;
+            color: #c56e5b;
           }
-          
+
           a {
-            color: #C56E5B;
+            color: #c56e5b;
           }
         }
       }
@@ -144,7 +144,7 @@ body.light .App {
     .footer {
       position: absolute;
       bottom: 32px;
-      
+
       img {
         width: 200px;
       }
@@ -186,7 +186,7 @@ body.light .App {
 
     .footer {
       bottom: 18px;
-      
+
       img {
         width: 150px;
       }

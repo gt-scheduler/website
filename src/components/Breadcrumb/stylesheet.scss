@@ -1,0 +1,33 @@
+@import '../../variables.scss';
+
+.breadcrumb-container {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+
+  .breadcrumb-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+
+      .breadcrumb-clickable {
+        color: $information-blue;
+        text-decoration: none;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .breadcrumb-separator {
+        margin: 0 6px;
+        font-size: 0.75em;
+      }
+    }
+  }
+}

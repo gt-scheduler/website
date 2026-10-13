@@ -7,8 +7,8 @@ import './stylesheet.scss';
 
 export type NavMenuProps = {
   items: string[];
-  currentItem: number;
-  onChangeItem: (next: number) => void;
+  currentItem: string;
+  onChangeItem: (next: string) => void;
   className?: string;
   style?: React.CSSProperties;
 };
@@ -27,8 +27,8 @@ export default function NavMenu({
     <div className={classes('nav-menu', className)} style={style}>
       {items.map((item, idx) => (
         <Button
-          className={classes('nav-button', currentItem === idx && 'active')}
-          onClick={(): void => onChangeItem(idx)}
+          className={classes('nav-button', currentItem === item && 'active')}
+          onClick={(): void => onChangeItem(item)}
           key={idx}
         >
           {item}

@@ -1,5 +1,6 @@
 import { Immutable } from 'immer';
 import { decode } from 'html-entities';
+import axios from 'axios';
 
 import Course from './Course';
 import Section from './Section';
@@ -19,6 +20,11 @@ import {
   Meeting,
 } from '../../types';
 import { ErrorWithFields, softError } from '../../log';
+import { CLOUD_FUNCTION_BASE_URL } from '../../constants';
+import { PlannedCountsData } from '../types';
+import { getTravel } from '../../utils/mapbox/misc';
+
+const PLANNED_COUNTS_API_URL = `${CLOUD_FUNCTION_BASE_URL}/getPlannedCounts`;
 
 // `new Oscar(...)` gets the entirety of the crawler JSON data
 type OscarConstructionDate = CrawlerTermData;
@@ -42,6 +48,10 @@ export default class Oscar {
 
   locations: (Location | null)[];
 
+  restrictions: string[];
+
+  restrictionValues: Record<string, string[]>;
+
   updatedAt: Date;
 
   version: number;
@@ -54,7 +64,14 @@ export default class Oscar {
 
   sortingOptions: SortingOption[];
 
-  constructor(data: OscarConstructionDate, public term: string) {
+  plannedCounts: PlannedCountsData | undefined;
+
+  constructor(
+    data: OscarConstructionDate,
+    public term: string,
+    plannedCounts?: PlannedCountsData
+  ) {
+    this.plannedCounts = plannedCounts;
     const { courses, caches, updatedAt, version } = data;
 
     this.periods = caches.periods.map((period, i) => {
@@ -146,6 +163,8 @@ export default class Oscar {
     this.attributes = caches.attributes;
     this.gradeBases = caches.gradeBases;
     this.locations = caches.locations;
+    this.restrictions = caches.restrictions || [];
+    this.restrictionValues = caches.restrictionValues || {};
     this.updatedAt = new Date(updatedAt);
     this.version = version;
 
@@ -225,7 +244,50 @@ export default class Oscar {
         const avg = sum / starts.length;
         return -avg;
       }),
+      new SortingOption('Least Travel Time', (combination) => {
+        let total = 0;
+        for (let c = 0; c < combination.crns.length - 1; c++) {
+          const crnA = combination.crns[c];
+          const crnB = combination.crns[c + 1];
+
+          if (crnA && crnB) {
+            const sectionA = this.findSection(crnA);
+            const sectionB = this.findSection(crnB);
+
+            if (sectionA && sectionB) {
+              const locA = sectionA.meetings[0]?.location ?? null;
+              const locB = sectionB.meetings[0]?.location ?? null;
+
+              total += getTravel(locA, locB);
+            }
+          }
+        }
+        return total;
+      }),
     ];
+  }
+
+  static async create(
+    data: OscarConstructionDate,
+    term: string
+  ): Promise<Oscar> {
+    const url = `${PLANNED_COUNTS_API_URL}?term=${term}`;
+    let plannedCounts: PlannedCountsData | undefined;
+    try {
+      plannedCounts = (await axios.get<PlannedCountsData>(url)).data;
+    } catch (err) {
+      softError(
+        new ErrorWithFields({
+          message: 'could not retrieve plannedCounts',
+          fields: {
+            term,
+          },
+        })
+      );
+      return new Oscar(data, term);
+    }
+
+    return new Oscar(data, term, plannedCounts);
   }
 
   findCourse(courseId: string): Course | undefined {
@@ -287,13 +349,22 @@ export default class Oscar {
               dfs(courseIndex + 1, [...crns, lecture.crn]);
             });
         } else {
+          let progressed = false;
           (course.onlyLectures ?? []).filter(isIncluded).forEach((lecture) => {
             if (hasConflict(lecture)) return;
-            lecture.associatedLabs.filter(isIncluded).forEach((lab) => {
+            const validLabs = (lecture.associatedLabs ?? []).filter(isIncluded);
+            if (validLabs.length === 0) return;
+            validLabs.forEach((lab) => {
               if (hasConflict(lab)) return;
+              progressed = true;
               dfs(courseIndex + 1, [...crns, lecture.crn, lab.crn]);
             });
           });
+
+          // Prevents dfs stalling when no lecture-lab pairs exist
+          // (usually happens for VIPs) by ignoring the class altogether
+          if (!progressed) dfs(courseIndex + 1, crns);
+
           (course.allInOnes ?? []).filter(isIncluded).forEach((section) => {
             if (hasConflict(section)) return;
             dfs(courseIndex + 1, [...crns, section.crn]);
@@ -404,6 +475,8 @@ export const EMPTY_OSCAR = new Oscar(
       finalDates: [],
       finalTimes: [],
       fullCourseNames: {},
+      restrictions: [],
+      restrictionValues: {},
     },
     // This converts the Date to the expected string
     // that it serializes to in the crawler

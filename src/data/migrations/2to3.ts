@@ -1,3 +1,4 @@
+import { Palette } from '../../types';
 import {
   Version2ScheduleData,
   Version3ScheduleData,
@@ -32,6 +33,7 @@ export default function migrate2To3(
     >(([id, version2ScheduleVersion]) => {
       const newFields = {
         events: [],
+        palette: 'default' as Palette,
       };
 
       const version3ScheduleVersion: Version3ScheduleVersion = {

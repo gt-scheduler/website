@@ -100,7 +100,7 @@ export default function useDownloadOscarData(
             return;
           }
 
-          const oscar = new Oscar(json, term);
+          const oscar = await Oscar.create(json, term);
           setState({
             type: 'loaded',
             result: oscar,

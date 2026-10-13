@@ -1,0 +1,69 @@
+@import '../../variables';
+
+.empty-container {
+  padding-bottom: 9%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: $color-neutral;
+  flex: 1;
+
+  .empty-course-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 12px;
+    gap: 3px;
+
+    img {
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-size: 1.125em;
+      font-weight: bold;
+    }
+
+    .empty-description {
+      font-size: 0.875em;
+      text-align: center;
+    }
+  }
+}
+
+.cards-container {
+  display: flex;
+  padding: 20px;
+  padding-top: 0px;
+  gap: 20px;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 29px;
+
+    .metric-value {
+      font-weight: bold;
+    }
+  }
+
+  .view-section {
+    color: $information-blue;
+    font-size: 0.875em;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .view-section:hover {
+    text-decoration: underline;
+  }
+}
+
+.mobile .cards-container {
+  padding: 16px;
+}

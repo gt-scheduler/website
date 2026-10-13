@@ -57,9 +57,9 @@ export default function FinalBlocks({
             className={classes('meeting', contentClassName, 'default', day)}
             key={[i, day].join('-')}
             style={{
-              top: `${((finalTime.start - OPEN) / (CLOSE - OPEN)) * 100}%`,
+              top: `${((finalTime.start - OPEN) / (CLOSE + 1 - OPEN)) * 100}%`,
               height: `${
-                ((finalTime.end - finalTime.start) / (CLOSE - OPEN)) * 100
+                ((finalTime.end - finalTime.start) / (CLOSE + 1 - OPEN)) * 100
               }%`,
               width: `${width / sizeInfoPeriodDay.rowSize}%`,
               left: `${

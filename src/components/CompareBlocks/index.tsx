@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { periodToString } from '../../utils/misc';
+import { getSectionCourseTitle, periodToString } from '../../utils/misc';
 import { ScheduleContext } from '../../contexts';
 import { Period } from '../../types';
 import { TimeBlocks } from '..';
@@ -104,7 +104,7 @@ export default function CompareBlocks({
               },
               {
                 name: 'Course Name',
-                content: section.course.title,
+                content: getSectionCourseTitle(section),
               },
               {
                 name: 'Instructors',
