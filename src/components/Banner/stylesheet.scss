@@ -1,11 +1,12 @@
 .banner {
   width: 100%;
   color: white;
-  background-color: #c56e5b;
+  background-color: #151b24;
   display: flex;
   align-items: center;
   font-size: 14px;
   padding-left: 12px;
+  min-height: calc(24px + 1.25em);
 
   .bannerContent {
     flex: 1;
