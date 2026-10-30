@@ -111,7 +111,7 @@ export function InvitationModalContent({
 
     return axios.post(
       `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitation`,
-      `data=${data}`,
+      `data=${encodeURIComponent(data)}`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -210,7 +210,7 @@ export function InvitationModalContent({
     });
     return axios.post(
       `${CLOUD_FUNCTION_BASE_URL}/createFriendInvitationLink`,
-      `data=${data}`,
+      `data=${encodeURIComponent(data)}`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
