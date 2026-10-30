@@ -41,11 +41,15 @@ const handleInvite = async (
     inviteId,
     token,
   });
-  const res = await axios.post<HandleInvitationResponse>(url, `data=${data}`, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
+  const res = await axios.post<HandleInvitationResponse>(
+    url,
+    `data=${encodeURIComponent(data)}`,
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    }
+  );
 
   return res.data;
 };
